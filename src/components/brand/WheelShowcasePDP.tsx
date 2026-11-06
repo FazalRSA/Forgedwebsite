@@ -210,6 +210,7 @@ export const WheelShowcasePDP: React.FC<WheelShowcasePDPProps> = ({ slug }) => {
               onSelectFinish={setSelectedFinish}
               onEnquire={handleEnquireWheel}
               userVehicleLabel={userVehicleLabel}
+              modelUrl={wheel.modelUrl}
             />
           ) : (
             <div className="flex flex-col items-center">

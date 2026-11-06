@@ -14,6 +14,7 @@ import {
   WheelFinishId,
   formatCurrencyPrice,
   getStoreProductBySlug,
+  findWheelBySlug,
 } from '../../data/kahnData';
 import { useKahnStore } from '../../store/useKahnStore';
 import { useRouter } from '../../utils/router';
@@ -39,9 +40,13 @@ export const TechnicalProductView: React.FC<TechnicalProductViewProps> = ({
     setChatOpen,
     sendChatMessage,
     customStoreProducts,
+    customBrandWheels,
   } = useKahnStore();
 
   const product = getStoreProductBySlug(productSlug, customStoreProducts);
+  // Photoreal 3D model: product-level override, else the linked brand wheel's model.
+  const modelUrl =
+    product.modelUrl ?? findWheelBySlug(product.wheelSlug, customBrandWheels)?.modelUrl;
   const [selectedFinish, setSelectedFinish] = useState<WheelFinishId>(
     product.defaultFinish
   );
@@ -171,6 +176,7 @@ export const TechnicalProductView: React.FC<TechnicalProductViewProps> = ({
                   selectedFinish={selectedFinish}
                   availableFinishes={product.availableFinishes}
                   onSelectFinish={setSelectedFinish}
+                  modelUrl={modelUrl}
                 />
 
                 {/* Finish Swatch Selector Bar */}

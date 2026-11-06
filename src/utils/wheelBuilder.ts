@@ -15,6 +15,8 @@ export interface NewWheelInput {
   originalPriceGBP?: number;
   imageUrl?: string;
   galleryImages?: string[];
+  /** Served path to a .glb rim model, e.g. "/models/wheels/type-60.glb". */
+  modelUrl?: string;
   marques?: string[];
   make?: string;
   vehicleModel?: string;
@@ -103,6 +105,7 @@ export function createWheelAndProductEntries(input: NewWheelInput): {
     basePriceGBP: numericPrice,
     imageUrl: input.imageUrl?.trim() || undefined,
     galleryImages: input.galleryImages?.filter(Boolean),
+    modelUrl: input.modelUrl?.trim() || undefined,
     specs: {
       product: `${cleanName} ${series} Monoblock Wheel Set`,
       material: '6061-T6 Aerospace Forged Aluminium',
@@ -137,6 +140,7 @@ export function createWheelAndProductEntries(input: NewWheelInput): {
     availableFinishes: ['satin-black', 'silver', 'champagne-bronze', 'dark-gunmetal'],
     imageUrl: input.imageUrl?.trim() || undefined,
     galleryImages: input.galleryImages?.filter(Boolean),
+    modelUrl: input.modelUrl?.trim() || undefined,
     technicalSpecs: {
       productName: `${make} ${vehicleModel} (${yearRange}) FORGED ALLOY WHEELS - ${cleanName}`,
       frontWheelSize: input.frontWheelSize?.trim().toUpperCase() || '9.5 X 20 ET18',
