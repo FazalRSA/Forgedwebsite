@@ -337,6 +337,55 @@
         "warranty": "3-Year Structural & Finish Guarantee"
       },
       "compatibleStoreProductSlug": "bmw-m4-defiant-forged"
+    },
+    {
+      "id": "wheel-ff3-liquid-metal",
+      "slug": "ff-3-liquid-metal",
+      "model": "FF-3 — LiquidMetal",
+      "modelCode": "FF-3",
+      "series": "20 INCH / 21 INCH · IN STOCK (2 SETS)",
+      "headline": "FF-3 (LiquidMetal) for BMW M3 Competition Sedan (G80).",
+      "editorialLead": "20 inch / 21 inch staggered fitment engineered specifically for BMW M3 Competition Sedan (G80) (PCD 5×112 · ET15/17 · CB66.6).",
+      "editorialBody": "Direct bolt-on specification (PCD 5×112 · ET15/17 · CB66.6) finished in LiquidMetal. Currently in stock with 2 complete sets ready for immediate dispatch.",
+      "marques": [
+        "BMW"
+      ],
+      "geometry": "y-spoke-forged",
+      "spokeCount": 10,
+      "defaultFinish": "silver",
+      "availableFinishes": [
+        "silver",
+        "champagne-bronze",
+        "satin-black"
+      ],
+      "basePriceGBP": 95000,
+      "priceZAR": 95000,
+      "priceFormatted": "R 95,000",
+      "sizesAvailable": "20 inch / 21 inch",
+      "finishName": "LiquidMetal",
+      "compatibleCars": "M3 Competition Sedan (G80)",
+      "stockStatus": "In Stock",
+      "stockQuantitySets": 2,
+      "technicalSpecSheet": "PCD 5×112 · ET15/17 · CB66.6",
+      "images": [
+        "/images/wheels/ff-3-liquid-metal/front.webp",
+        "/images/wheels/ff-3-liquid-metal/hero.webp",
+        "/images/wheels/ff-3-liquid-metal/profile.webp"
+      ],
+      "imageLabels": [
+        "Picture 1 · FF-3 LiquidMetal",
+        "Picture 2 · 20 inch / 21 inch Profile",
+        "Picture 3 · PCD 5×112 · ET15/17 · CB66.6"
+      ],
+      "specs": {
+        "product": "FF-3 (LiquidMetal) — 2 Sets In Stock",
+        "material": "6061-T6 Aerospace Forged Aluminium",
+        "diameters": "20 inch / 21 inch (M3 Competition Sedan (G80))",
+        "finishOptions": "LiquidMetal",
+        "testing": "PCD 5×112 · ET15/17 · CB66.6",
+        "warranty": "3-Year Structural & Finish Guarantee"
+      },
+      "compatibleStoreProductSlug": "bmw-m5-vengeance-forged"
     }
   ],
   "storeProducts": []
