@@ -107,6 +107,15 @@ export const BrandHeader: React.FC<BrandHeaderProps> = () => {
             Client Fitments
           </button>
 
+          {/* Official Dealer of Sixnine Wheels Link (Desktop) */}
+          <button
+            type="button"
+            onClick={() => handleNav('/sixnine-wheels')}
+            className="hidden lg:inline-flex text-xs sm:text-sm font-medium text-[#C2C2CC] hover:text-[#FF5500] transition-colors cursor-pointer whitespace-nowrap shrink-0"
+          >
+            Sixnine Wheels
+          </button>
+
           {/* Quick Store Pill */}
           <button
             type="button"
@@ -202,7 +211,17 @@ export const BrandHeader: React.FC<BrandHeaderProps> = () => {
                 <Disc3 className="w-5 h-5 text-[#FF5500]" />
               </button>
 
-              {/* 2. Wheel Store */}
+              {/* 2. Official Dealer of Sixnine Wheels */}
+              <button
+                type="button"
+                onClick={() => handleNav('/sixnine-wheels')}
+                className="w-full py-4 border-b border-[#26262E] text-left text-2xl font-light tracking-tight hover:text-[#FF5500] transition-colors cursor-pointer flex items-center justify-between"
+              >
+                <span>Official Dealer of Sixnine Wheels</span>
+                <ArrowUpRight className="w-5 h-5 text-[#FF5500]" />
+              </button>
+
+              {/* 3. Wheel Store */}
               <button
                 type="button"
                 onClick={() => handleNav('/store')}
@@ -212,7 +231,7 @@ export const BrandHeader: React.FC<BrandHeaderProps> = () => {
                 <ArrowUpRight className="w-5 h-5 text-[#FF5500]" />
               </button>
 
-              {/* 2. My Account & Vehicle Garage */}
+              {/* 4. My Account & Vehicle Garage */}
               <button
                 type="button"
                 onClick={() => handleNav('/account')}
@@ -222,7 +241,7 @@ export const BrandHeader: React.FC<BrandHeaderProps> = () => {
                 <Car className="w-5 h-5 text-[#FF5500]" />
               </button>
 
-              {/* 3. Client Fitments */}
+              {/* 5. Client Fitments */}
               <button
                 type="button"
                 onClick={() => handleNav('/client-fitments')}
@@ -231,7 +250,7 @@ export const BrandHeader: React.FC<BrandHeaderProps> = () => {
                 Client Fitments
               </button>
 
-              {/* 3. Dealer Application */}
+              {/* 6. Dealer Application */}
               <button
                 type="button"
                 onClick={() => handleNav('/dealer-application')}

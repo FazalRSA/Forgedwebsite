@@ -55,6 +55,13 @@ function StackedCircularFooter({ onNavigate, useBrandLinks = false }: StackedCir
                 </button>
                 <button
                   type="button"
+                  onClick={() => onNavigate('/sixnine-wheels')}
+                  className="hover:text-white transition-colors cursor-pointer"
+                >
+                  Official Dealer of Sixnine Wheels
+                </button>
+                <button
+                  type="button"
                   onClick={() => onNavigate('/client-fitments')}
                   className="hover:text-white transition-colors cursor-pointer"
                 >

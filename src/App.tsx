@@ -55,6 +55,11 @@ const PrivacyPolicyPage = lazy(() =>
     default: m.PrivacyPolicyPage,
   }))
 );
+const SixnineDealerPage = lazy(() =>
+  import('./components/brand/SixnineDealerPage').then((m) => ({
+    default: m.SixnineDealerPage,
+  }))
+);
 
 function RouteLoadingFallback() {
   return (
@@ -89,6 +94,16 @@ function BrandHomePage() {
 
 function AppRoutes() {
   const { pathname } = useRouter();
+
+  // Route: /sixnine-wheels — Official Dealer of Sixnine Wheels
+  if (
+    pathname === '/sixnine-wheels' ||
+    pathname === '/sixnine-wheels/' ||
+    pathname === '/official-dealer-sixnine-wheels' ||
+    pathname === '/official-dealer-sixnine-wheels/'
+  ) {
+    return <SixnineDealerPage />;
+  }
 
   // Route: /account or /garage — Client Account & Vehicle Garage
   if (

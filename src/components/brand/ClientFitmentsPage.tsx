@@ -285,9 +285,6 @@ export const ClientFitmentsPage: React.FC = () => {
             <h1 className="text-4xl sm:text-6xl md:text-7xl font-light tracking-[-0.03em] leading-none text-white">
               Client <span className="font-editorial-serif italic font-normal text-[#FF5500]">Fitments</span>.
             </h1>
-            <p className="text-sm sm:text-base text-neutral-300 max-w-2xl leading-relaxed pt-1">
-              Verified BMW M client commissions. Click any card to inspect dual-angle photography with right and left navigation arrows.
-            </p>
           </div>
 
           {/* BMW Chassis Filter Pills */}
@@ -318,15 +315,6 @@ export const ClientFitmentsPage: React.FC = () => {
 
       {/* Scrollable 4x4 Bento Grid of 16 Clean Fitments */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 py-12">
-        <div className="flex items-center justify-between mb-6">
-          <span className="text-xs font-tech-mono uppercase tracking-[0.15em] text-[#FF5500]">
-            CLIENT COMMISSIONS · {visibleItems.length} FITMENTS (2 PHOTOS EACH)
-          </span>
-          <span className="text-xs font-tech-mono uppercase tracking-[0.12em] text-neutral-400 hidden sm:inline">
-            CLICK CARD TO OPEN · USE LEFT &amp; RIGHT ARROWS TO NAVIGATE PHOTOS
-          </span>
-        </div>
-
         <div
           data-testid="client-fitments-bento-grid"
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"
@@ -387,11 +375,8 @@ export const ClientFitmentsPage: React.FC = () => {
                   </button>
                 </div>
 
-                {/* Top Bar: Clean Minimalist Slot & Photo Counter */}
-                <div className="relative z-10 flex items-center justify-between gap-2 w-full">
-                  <span className="px-3 py-1 rounded-full bg-[#0A0A0A]/85 backdrop-blur-md border border-[#33333E] text-[10px] font-tech-mono font-semibold uppercase tracking-[0.14em] text-[#F5F5F7]">
-                    PHOTO {activePhotoIdx + 1} / 2
-                  </span>
+                {/* Top Bar: Expand Icon Only */}
+                <div className="relative z-10 flex items-center justify-end gap-2 w-full">
                   <span className="w-8 h-8 rounded-full bg-[#FF5500] text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-md">
                     <Maximize2 className="w-3.5 h-3.5" />
                   </span>
