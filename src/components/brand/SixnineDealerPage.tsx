@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { ArrowUpRight, ShieldCheck, Layers, Gauge, Check } from 'lucide-react';
 import { motion } from 'motion/react';
 import { BrandHeader } from './BrandHeader';
-import { BRAND_WHEELS, BrandWheelItem } from '../../data/kahnData';
+import { BRAND_WHEELS, BrandWheelItem, formatZAR } from '../../data/kahnData';
 import { WheelLightboxModal } from './WheelLightboxModal';
 import { useKahnStore } from '../../store/useKahnStore';
 import { useRouter } from '../../utils/router';
@@ -299,7 +299,7 @@ export const SixnineDealerPage: React.FC = () => {
 
                     <div className="pt-4 border-t border-[#26262E] flex items-center justify-between">
                       <span className="text-base font-medium text-white font-tech-mono tabular-nums">
-                        {wheel.priceFormatted}
+                        {formatZAR(wheel.priceZAR)}
                       </span>
 
                       <span className="inline-flex items-center gap-1.5 text-xs font-tech-mono uppercase tracking-wider text-neutral-300 group-hover:text-[#FF5500] transition-colors">
