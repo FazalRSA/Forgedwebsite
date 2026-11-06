@@ -253,11 +253,11 @@ export const TechnicalProductView: React.FC<TechnicalProductViewProps> = ({
                       {formatZAR(product.priceZAR, true)}
                     </p>
                     <p className="text-xs font-tech-mono text-neutral-400 mt-1">
-                      INCL. UK VAT · WORLDWIDE EXPORT TAX-FREE AVAILABLE
+                      PER SET OF 4 · PRICED IN SOUTH AFRICAN RAND (ZAR)
                     </p>
                   </div>
                   <span className="text-xs font-tech-mono font-semibold uppercase text-emerald-400">
-                    IN STOCK (UK DISPATCH)
+                    IN STOCK (SA DISPATCH)
                   </span>
                 </div>
 
