@@ -10,6 +10,7 @@ import {
 } from '../../data/kahnData';
 import { useKahnStore } from '../../store/useKahnStore';
 import { useRouter } from '../../utils/router';
+import { StyledSelect } from '../shared/StyledSelect';
 import { StoreHeader } from './StoreHeader';
 import { VehicleProfileRender } from '../visuals/VehicleProfileRender';
 import { WheelRenderSVG } from '../visuals/WheelRenderSVG';
@@ -117,19 +118,16 @@ export const VehicleFitmentWidget: React.FC = () => {
                   >
                     1. MAKE
                   </label>
-                  <select
+                  <StyledSelect
                     id="fitment-make"
                     value={selectedMake}
-                    onChange={(e) => setSelectedMake(e.target.value)}
-                    className="w-full h-12 px-4 bg-[#18181D] border border-[#26262E] text-[#F5F5F7] text-xs font-tech-mono uppercase tracking-wider focus:border-[#FF5500] focus:outline-none cursor-pointer"
-                  >
-                    <option value="">SELECT MAKE...</option>
-                    {makes.map((make) => (
-                      <option key={make} value={make}>
-                        {make}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={setSelectedMake}
+                    placeholder="SELECT MAKE..."
+                    options={[
+                      { value: '', label: 'SELECT MAKE...' },
+                      ...makes.map((make) => ({ value: make, label: make })),
+                    ]}
+                  />
                 </div>
 
                 {/* Step 2: MODEL */}
@@ -140,22 +138,17 @@ export const VehicleFitmentWidget: React.FC = () => {
                   >
                     2. MODEL
                   </label>
-                  <select
+                  <StyledSelect
                     id="fitment-model"
                     value={selectedModel}
                     disabled={!selectedMake}
-                    onChange={(e) => setSelectedModel(e.target.value)}
-                    className="w-full h-12 px-4 bg-[#18181D] border border-[#26262E] text-[#F5F5F7] text-xs font-tech-mono uppercase tracking-wider disabled:opacity-45 disabled:cursor-not-allowed focus:border-[#FF5500] focus:outline-none cursor-pointer"
-                  >
-                    <option value="">
-                      {selectedMake ? 'SELECT MODEL...' : 'SELECT MAKE FIRST'}
-                    </option>
-                    {models.map((model) => (
-                      <option key={model} value={model}>
-                        {model}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={setSelectedModel}
+                    placeholder={selectedMake ? 'SELECT MODEL...' : 'SELECT MAKE FIRST'}
+                    options={[
+                      { value: '', label: selectedMake ? 'SELECT MODEL...' : 'SELECT MAKE FIRST' },
+                      ...models.map((model) => ({ value: model, label: model })),
+                    ]}
+                  />
                 </div>
 
                 {/* Step 3: YEAR */}
@@ -166,22 +159,17 @@ export const VehicleFitmentWidget: React.FC = () => {
                   >
                     3. YEAR
                   </label>
-                  <select
+                  <StyledSelect
                     id="fitment-year"
                     value={selectedYear}
                     disabled={!selectedModel}
-                    onChange={(e) => setSelectedYear(e.target.value)}
-                    className="w-full h-12 px-4 bg-[#18181D] border border-[#26262E] text-[#F5F5F7] text-xs font-tech-mono uppercase tracking-wider disabled:opacity-45 disabled:cursor-not-allowed focus:border-[#FF5500] focus:outline-none cursor-pointer"
-                  >
-                    <option value="">
-                      {selectedModel ? 'SELECT YEAR...' : 'SELECT MODEL FIRST'}
-                    </option>
-                    {years.map((year) => (
-                      <option key={year} value={year}>
-                        {year}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={setSelectedYear}
+                    placeholder={selectedModel ? 'SELECT YEAR...' : 'SELECT MODEL FIRST'}
+                    options={[
+                      { value: '', label: selectedModel ? 'SELECT YEAR...' : 'SELECT MODEL FIRST' },
+                      ...years.map((year) => ({ value: year, label: year })),
+                    ]}
+                  />
                 </div>
 
                 {/* Step 4: PART (OPTIONAL) */}
@@ -192,20 +180,17 @@ export const VehicleFitmentWidget: React.FC = () => {
                   >
                     4. PART (OPTIONAL)
                   </label>
-                  <select
+                  <StyledSelect
                     id="fitment-part"
                     value={selectedPart}
                     disabled={!selectedModel}
-                    onChange={(e) => setSelectedPart(e.target.value)}
-                    className="w-full h-12 px-4 bg-[#18181D] border border-[#26262E] text-[#F5F5F7] text-xs font-tech-mono uppercase tracking-wider disabled:opacity-45 disabled:cursor-not-allowed focus:border-[#FF5500] focus:outline-none cursor-pointer"
-                  >
-                    <option value="">ALL PARTS</option>
-                    {parts.map((part) => (
-                      <option key={part} value={part}>
-                        {part}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={setSelectedPart}
+                    placeholder="ALL PARTS"
+                    options={[
+                      { value: '', label: 'ALL PARTS' },
+                      ...parts.map((part) => ({ value: part, label: part })),
+                    ]}
+                  />
                 </div>
               </div>
 
