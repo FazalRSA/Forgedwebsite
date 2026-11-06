@@ -12,7 +12,7 @@ import {
 import {
   WHEEL_FINISHES,
   WheelFinishId,
-  formatCurrencyPrice,
+  formatZAR,
   getStoreProductBySlug,
   findWheelBySlug,
   getStoreProductImages,
@@ -34,7 +34,6 @@ export const TechnicalProductView: React.FC<TechnicalProductViewProps> = ({
 }) => {
   const { navigate } = useRouter();
   const {
-    currency,
     wishlistSlugs,
     toggleWishlist,
     openEnquiryModal,
@@ -259,18 +258,18 @@ export const TechnicalProductView: React.FC<TechnicalProductViewProps> = ({
                   </span>
                 </div>
 
-                {/* Price £4,600.00 */}
+                {/* Price, e.g. R 75,000.00 (set of 4) */}
                 <div className="py-4 border-y border-[#26262E] flex items-baseline justify-between">
                   <div>
                     <p className="text-3xl sm:text-4xl font-extrabold font-tech-mono tabular-nums text-[#FF5500]">
-                      {formatCurrencyPrice(product.priceGBP, currency, true)}
+                      {formatZAR(product.priceZAR, true)}
                     </p>
                     <p className="text-xs font-tech-mono text-neutral-400 mt-1">
-                      INCL. UK VAT · WORLDWIDE EXPORT TAX-FREE AVAILABLE
+                      PER SET OF 4 · PRICED IN SOUTH AFRICAN RAND (ZAR)
                     </p>
                   </div>
                   <span className="text-xs font-tech-mono font-semibold uppercase text-emerald-400">
-                    IN STOCK (UK DISPATCH)
+                    IN STOCK (SA DISPATCH)
                   </span>
                 </div>
 
@@ -288,7 +287,7 @@ export const TechnicalProductView: React.FC<TechnicalProductViewProps> = ({
                           subject: `${product.title} (${finishObj.name})`,
                           partNo: product.technicalSpecs.partNo,
                           finish: finishObj.name,
-                          priceGBP: product.priceGBP,
+                          priceZAR: product.priceZAR,
                           domain: 'store',
                         })
                       }
@@ -362,7 +361,7 @@ export const TechnicalProductView: React.FC<TechnicalProductViewProps> = ({
                           subject: `Priority Telephone Fitment Order: ${product.shortModel}`,
                           partNo: product.technicalSpecs.partNo,
                           finish: finishObj.name,
-                          priceGBP: product.priceGBP,
+                          priceZAR: product.priceZAR,
                           domain: 'store',
                         })
                       }

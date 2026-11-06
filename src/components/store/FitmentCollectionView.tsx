@@ -4,7 +4,7 @@ import {
   StoreSortOption,
   VEHICLE_FITMENT_TREE,
   filterAndSortStoreProducts,
-  formatCurrencyPrice,
+  formatZAR,
   resolveCollectionBySlug,
 } from '../../data/kahnData';
 import { useKahnStore } from '../../store/useKahnStore';
@@ -21,7 +21,7 @@ export const FitmentCollectionView: React.FC<FitmentCollectionViewProps> = ({
   fitmentSlug,
 }) => {
   const { navigate } = useRouter();
-  const { currency, saveVehicleSession, customStoreProducts, openEnquiryModal } = useKahnStore();
+  const { saveVehicleSession, customStoreProducts, openEnquiryModal } = useKahnStore();
 
   const { node, make, products } = useMemo(
     () => resolveCollectionBySlug(fitmentSlug, customStoreProducts),
@@ -308,7 +308,7 @@ export const FitmentCollectionView: React.FC<FitmentCollectionViewProps> = ({
                   </button>
                 </div>
 
-                {/* Title, Price (£4,600), Subtitle (SET OF 4), and Full-Width Outlined Button VIEW PRODUCT */}
+                {/* Title, Price (R 75,000), Subtitle (SET OF 4), and Full-Width Outlined Button VIEW PRODUCT */}
                 <div className="pt-4 space-y-3 border-t border-[#26262E]">
                   <h2 className="text-xs sm:text-base font-bold uppercase tracking-tight leading-snug text-[#F5F5F7]">
                     {product.title}
@@ -317,11 +317,11 @@ export const FitmentCollectionView: React.FC<FitmentCollectionViewProps> = ({
                   <div className="flex flex-wrap items-baseline justify-between gap-2">
                     <div className="flex items-baseline gap-2">
                       <span className="text-lg sm:text-xl font-extrabold font-tech-mono tabular-nums text-[#FF5500]">
-                        {formatCurrencyPrice(product.priceGBP, currency, false)}
+                        {formatZAR(product.priceZAR)}
                       </span>
-                      {product.originalPriceGBP && (
+                      {product.originalPriceZAR && (
                         <span className="text-xs font-tech-mono text-neutral-500 line-through tabular-nums">
-                          {formatCurrencyPrice(product.originalPriceGBP, currency, false)}
+                          {formatZAR(product.originalPriceZAR)}
                         </span>
                       )}
                     </div>

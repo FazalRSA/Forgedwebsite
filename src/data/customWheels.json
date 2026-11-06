@@ -20,9 +20,7 @@
         "dark-gunmetal",
         "silver"
       ],
-      "basePriceGBP": 75000,
       "priceZAR": 75000,
-      "priceFormatted": "R 75,000",
       "sizesAvailable": "20 inch / 21 inch",
       "finishName": "Gold",
       "compatibleCars": "M3 Competition Sedan (G80)",
@@ -67,9 +65,7 @@
       "availableFinishes": [
         "silver"
       ],
-      "basePriceGBP": 80000,
       "priceZAR": 80000,
-      "priceFormatted": "R 80,000",
       "sizesAvailable": "20 inch / 21 inch",
       "finishName": "HyperSilver",
       "compatibleCars": "M3 Sedan (G80)",
@@ -114,9 +110,7 @@
       "availableFinishes": [
         "silver"
       ],
-      "basePriceGBP": 95000,
       "priceZAR": 95000,
-      "priceFormatted": "R 95,000",
       "sizesAvailable": "20 inch / 21 inch",
       "finishName": "LiquidMetal",
       "compatibleCars": "M3 Competition Sedan (G80)",
@@ -162,9 +156,7 @@
         "dark-gunmetal",
         "silver"
       ],
-      "basePriceGBP": 75000,
       "priceZAR": 75000,
-      "priceFormatted": "R 75,000",
       "sizesAvailable": "20 inch / 21 inch",
       "finishName": "Hyper Black",
       "compatibleCars": "M3 Sedan (G80)",
@@ -211,9 +203,7 @@
         "dark-gunmetal",
         "satin-black"
       ],
-      "basePriceGBP": 70000,
       "priceZAR": 70000,
-      "priceFormatted": "R 70,000",
       "sizesAvailable": "20 inch / 21 inch",
       "finishName": "Silver",
       "compatibleCars": "M3 Competition Sedan (G80)",
@@ -260,9 +250,7 @@
         "satin-black",
         "silver"
       ],
-      "basePriceGBP": 80000,
       "priceZAR": 80000,
-      "priceFormatted": "R 80,000",
       "sizesAvailable": "20 inch / 21 inch",
       "finishName": "PureBronze",
       "compatibleCars": "M3 Competition Sedan (G80)",
@@ -309,9 +297,7 @@
         "champagne-bronze",
         "silver"
       ],
-      "basePriceGBP": 80000,
       "priceZAR": 80000,
-      "priceFormatted": "R 80,000",
       "sizesAvailable": "20 inch / 21 inch",
       "finishName": "GlossyBlack",
       "compatibleCars": "M3 Competition Sedan (G80)",
@@ -358,9 +344,7 @@
         "champagne-bronze",
         "satin-black"
       ],
-      "basePriceGBP": 95000,
       "priceZAR": 95000,
-      "priceFormatted": "R 95,000",
       "sizesAvailable": "20 inch / 21 inch",
       "finishName": "LiquidMetal",
       "compatibleCars": "M3 Competition Sedan (G80)",
@@ -407,9 +391,7 @@
         "champagne-bronze",
         "satin-black"
       ],
-      "basePriceGBP": 80000,
       "priceZAR": 80000,
-      "priceFormatted": "R 80,000",
       "sizesAvailable": "20 inch / 21 inch",
       "finishName": "HyperSilver",
       "compatibleCars": "M3 Competition Sedan (G80)",

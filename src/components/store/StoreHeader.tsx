@@ -13,8 +13,7 @@ import {
 import { useRouter } from '../../utils/router';
 import { useKahnStore } from '../../store/useKahnStore';
 import {
-  CurrencyCode,
-  formatCurrencyPrice,
+  formatZAR,
   getAllStoreProducts,
 } from '../../data/kahnData';
 import { LogoPlaceholder } from '../shared/LogoPlaceholder';
@@ -22,8 +21,6 @@ import { LogoPlaceholder } from '../shared/LogoPlaceholder';
 export const StoreHeader: React.FC = () => {
   const { navigate } = useRouter();
   const {
-    currency,
-    setCurrency,
     wishlistSlugs,
     openEnquiryModal,
     customStoreProducts,
@@ -186,7 +183,7 @@ export const StoreHeader: React.FC = () => {
                       </p>
                     </div>
                     <span className="text-xs font-tech-mono font-bold text-[#FF5500] tabular-nums ml-3 shrink-0">
-                      {formatCurrencyPrice(item.priceGBP, currency)}
+                      {formatZAR(item.priceZAR)}
                     </span>
                   </button>
                 ))}
@@ -360,7 +357,7 @@ export const StoreHeader: React.FC = () => {
                             {prod.shortModel} ({prod.make} {prod.model})
                           </span>
                           <span className="text-xs font-tech-mono text-[#FF5500] tabular-nums shrink-0">
-                            {formatCurrencyPrice(prod.priceGBP, currency)}
+                            {formatZAR(prod.priceZAR)}
                           </span>
                         </button>
                       );
@@ -370,27 +367,11 @@ export const StoreHeader: React.FC = () => {
               </div>
             </div>
 
-            {/* Bottom: LANGUAGE & CURRENCY Selector */}
-            <div className="p-5 border-t border-[#26262E] bg-[#0A0A0A] space-y-3">
+            {/* Bottom: Pricing note (all prices are South African Rand, per set of 4) */}
+            <div className="p-5 border-t border-[#26262E] bg-[#0A0A0A]">
               <p className="text-[11px] font-tech-mono uppercase tracking-[0.15em] text-[#C2C2CC]">
-                LANGUAGE &amp; CURRENCY
+                ALL PRICES IN SOUTH AFRICAN RAND (ZAR) · PER SET OF 4
               </p>
-              <div className="grid grid-cols-3 gap-2">
-                {(['GBP', 'USD', 'EUR'] as CurrencyCode[]).map((code) => (
-                  <button
-                    key={code}
-                    type="button"
-                    onClick={() => setCurrency(code)}
-                    className={`py-2 px-3 text-xs font-tech-mono uppercase border transition-colors cursor-pointer ${
-                      currency === code
-                        ? 'bg-[#FF5500] text-white border-[#FF5500] font-bold'
-                        : 'border-[#26262E] text-neutral-400 hover:border-neutral-500 hover:text-white'
-                    }`}
-                  >
-                    {code === 'GBP' ? '🇬🇧 EN · £' : code === 'USD' ? '🇺🇸 EN · $' : '🇪🇺 EN · €'}
-                  </button>
-                ))}
-              </div>
             </div>
           </aside>
         </div>

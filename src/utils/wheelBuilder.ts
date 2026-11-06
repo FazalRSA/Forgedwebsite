@@ -11,8 +11,10 @@ import {
 export interface NewWheelInput {
   name: string;
   series?: string;
-  priceGBP: number;
-  originalPriceGBP?: number;
+  /** Price in Rand for a set of 4. */
+  priceZAR: number;
+  /** Previous Rand price; triggers the SALE badge when higher than priceZAR. */
+  originalPriceZAR?: number;
   imageUrl?: string;
   galleryImages?: string[];
   /** Served path to a .glb rim model, e.g. "/models/wheels/type-60.glb". */
@@ -65,9 +67,9 @@ export function createWheelAndProductEntries(input: NewWheelInput): {
   if (!cleanName) {
     throw new Error('Wheel name is required');
   }
-  const numericPrice = Number(input.priceGBP);
+  const numericPrice = Number(input.priceZAR);
   if (!Number.isFinite(numericPrice) || numericPrice <= 0) {
-    throw new Error('Valid positive priceGBP is required');
+    throw new Error('Valid positive priceZAR is required');
   }
 
   const wheelSlug = slugifyWheelText(cleanName);
@@ -102,7 +104,7 @@ export function createWheelAndProductEntries(input: NewWheelInput): {
     spokeCount: 10,
     defaultFinish,
     availableFinishes: ['satin-black', 'silver', 'champagne-bronze', 'dark-gunmetal'],
-    basePriceGBP: numericPrice,
+    priceZAR: numericPrice,
     imageUrl: input.imageUrl?.trim() || undefined,
     galleryImages: input.galleryImages?.filter(Boolean),
     modelUrl: input.modelUrl?.trim() || undefined,
@@ -127,9 +129,9 @@ export function createWheelAndProductEntries(input: NewWheelInput): {
     model: vehicleModel,
     yearRange,
     partCategory: 'ALLOY WHEELS',
-    priceGBP: numericPrice,
-    originalPriceGBP: input.originalPriceGBP,
-    isSale: Boolean(input.isSale || (input.originalPriceGBP && input.originalPriceGBP > numericPrice)),
+    priceZAR: numericPrice,
+    originalPriceZAR: input.originalPriceZAR,
+    isSale: Boolean(input.isSale || (input.originalPriceZAR && input.originalPriceZAR > numericPrice)),
     isLatest: input.isLatest ?? true,
     isReserve: input.isReserve ?? true,
     setLabel: 'SET OF 4',

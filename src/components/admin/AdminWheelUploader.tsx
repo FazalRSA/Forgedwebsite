@@ -20,6 +20,7 @@ import {
   WHEEL_FINISHES,
   WheelFinishId,
   getModelsForMake,
+  formatZAR,
 } from '../../data/kahnData';
 import { WheelRenderSVG } from '../visuals/WheelRenderSVG';
 
@@ -51,7 +52,7 @@ export const AdminWheelUploader: React.FC = () => {
 
   // Wheel Uploader Form State
   const [name, setName] = useState('');
-  const [price, setPrice] = useState('4850');
+  const [price, setPrice] = useState('75000');
   const [brand] = useState<'BMW'>('BMW');
   const [bmwModel, setBmwModel] = useState('M3');
   const [series, setSeries] = useState('FORGED SERIES');
@@ -75,7 +76,7 @@ export const AdminWheelUploader: React.FC = () => {
     wheelSlug: string;
     productSlug: string;
     model: string;
-    priceGBP: number;
+    priceZAR: number;
   } | null>(null);
 
   const bmwModels = getModelsForMake('BMW');
@@ -134,7 +135,7 @@ export const AdminWheelUploader: React.FC = () => {
 
     const numericPrice = Number(price);
     if (!Number.isFinite(numericPrice) || numericPrice <= 0) {
-      setFormError('Please enter a valid positive price in GBP.');
+      setFormError('Please enter a valid positive price in Rand (set of 4).');
       return;
     }
 
@@ -142,7 +143,7 @@ export const AdminWheelUploader: React.FC = () => {
       const { brandWheel, storeProduct } = addCustomWheelAndProduct({
         name: trimmedName,
         series,
-        priceGBP: numericPrice,
+        priceZAR: numericPrice,
         imageUrl: imagePreviewUrl.trim() || undefined,
         marques: ['BMW'],
         make: 'BMW',
@@ -159,7 +160,7 @@ export const AdminWheelUploader: React.FC = () => {
         wheelSlug: brandWheel.slug,
         productSlug: storeProduct.slug,
         model: brandWheel.model,
-        priceGBP: brandWheel.basePriceGBP,
+        priceZAR: brandWheel.priceZAR,
       });
 
       // Reset primary name & partNo for next entry
@@ -307,7 +308,7 @@ export const AdminWheelUploader: React.FC = () => {
                   <span>NEW BMW WHEEL PUBLISHED LIVE</span>
                 </div>
                 <h2 className="text-2xl font-medium tracking-tight text-[#F5F5F7]">
-                  {createdWheel.model} — £{createdWheel.priceGBP.toLocaleString('en-GB')} (BMW)
+                  {createdWheel.model} — {formatZAR(createdWheel.priceZAR)} (BMW)
                 </h2>
                 <p className="text-xs font-tech-mono text-[#C2C2CC]">
                   Synchronised across the FORGED Custom wheels 360° Catalogue and BMW Storefront.
@@ -499,7 +500,7 @@ export const AdminWheelUploader: React.FC = () => {
                       htmlFor="admin-wheel-price"
                       className="block text-[11px] font-tech-mono uppercase tracking-[0.12em] text-[#C2C2CC] mb-1.5"
                     >
-                      PRICE (£ GBP) *
+                      PRICE (ZAR, SET OF 4) *
                     </label>
                     <input
                       id="admin-wheel-price"
@@ -723,7 +724,7 @@ export const AdminWheelUploader: React.FC = () => {
                             <span className="text-[#C2C2CC] font-normal">{wheel.series}</span>
                           </p>
                           <p className="text-xs font-tech-mono text-[#FF5500]">
-                            BRAND: BMW · £{wheel.basePriceGBP.toLocaleString('en-GB')}
+                            BRAND: BMW · {formatZAR(wheel.priceZAR)}
                           </p>
                         </div>
 

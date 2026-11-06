@@ -6,6 +6,7 @@ import {
   WheelModelFilter,
   getAllBrandWheels,
   getWheelImages,
+  formatZAR,
   WheelFinishId,
 } from '../../data/kahnData';
 import { useKahnStore } from '../../store/useKahnStore';
@@ -88,7 +89,7 @@ export const WheelCatalogue: React.FC = () => {
             const wheelData = getWheelImages(wheel);
             const cardImage = wheelData.images[0];
             const displayPrice =
-              wheel.priceFormatted || `R ${wheel.basePriceGBP.toLocaleString('en-ZA')}`;
+              formatZAR(wheel.priceZAR);
 
             return (
               <motion.div

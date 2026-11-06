@@ -21,6 +21,7 @@ import {
   BRAND_WHEELS,
   WHEEL_FINISHES,
   WheelFinishId,
+  formatZAR,
 } from '../../data/kahnData';
 import { useRouter } from '../../utils/router';
 import { useKahnStore } from '../../store/useKahnStore';
@@ -529,7 +530,7 @@ export const AccountGaragePage: React.FC = () => {
                       >
                         {BRAND_WHEELS.map((w) => (
                           <option key={w.slug} value={w.slug}>
-                            {w.model} · {w.sizesAvailable} · {w.priceFormatted}
+                            {w.model} · {w.sizesAvailable} · {formatZAR(w.priceZAR)}
                           </option>
                         ))}
                       </select>
@@ -618,7 +619,7 @@ export const AccountGaragePage: React.FC = () => {
                               </span>
                             </div>
                             <span className="font-mono text-neutral-200">
-                              {wheelObj.priceFormatted}
+                              {formatZAR(wheelObj.priceZAR)}
                             </span>
                           </div>
                         </div>
@@ -639,7 +640,7 @@ export const AccountGaragePage: React.FC = () => {
                               openEnquiryModal({
                                 subject: `Garage Fitment Enquiry: ${wheelObj.model} for ${veh.year} ${veh.make} ${veh.model}`,
                                 finish: wheelObj.finishName,
-                                priceGBP: wheelObj.basePriceGBP,
+                                priceZAR: wheelObj.priceZAR,
                                 domain: 'brand',
                               })
                             }

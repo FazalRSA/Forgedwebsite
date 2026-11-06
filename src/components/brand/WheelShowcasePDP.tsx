@@ -89,7 +89,7 @@ export const WheelShowcasePDP: React.FC<WheelShowcasePDPProps> = ({ slug }) => {
     openEnquiryModal({
       subject: `FORGED ${wheel.model} (${finishObj.name}) Specification Request${carContext}`,
       finish: finishObj.name,
-      priceGBP: wheel.basePriceGBP,
+      priceZAR: wheel.priceZAR,
       domain: 'brand',
     });
   };

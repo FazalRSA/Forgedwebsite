@@ -1,173 +1,211 @@
-# FORGED Custom wheels — Luxury Editorial Showcase & Technical BMW Fitment Storefront
+# FORGED Custom Wheels
 
-A unified dual-architecture automotive web application built with **React 19, TypeScript, Tailwind CSS v4, Motion, Zustand, and Lucide React**.
+Brand showcase and technical fitment storefront for **FORGED Custom Wheels**, a South African supplier of forged alloy wheel sets for BMW M cars. The site presents the in-stock wheel inventory, lets a visitor find wheels for their BMW model, inspect each wheel in photography and a 360° 3D studio, and submit an interest request. There is no online checkout; every call to action leads to an enquiry.
 
-The platform combines two distinct yet cohesive digital experiences under the **FORGED Custom wheels** marque:
-1. **The Editorial Brand Showcase (`/`)** — An architectural digital magazine featuring an isometric mag wheel CAD canvas, *Trusted by BMW* (3 UK BMW Locations) partnership showcase, certified distribution credentials, *Customer Fitments across South Africa*, clickable 3-image wheel cards with interactive cycling modal windows, a 16-slot *Client Fitments* Bento archive with dual-photo navigation, and a B2B *Dealer Application* portal.
-2. **The Technical Specification Storefront (`/store`)** — A high-density, brutalist BMW M parts counter featuring a cascading 4-step *Vehicle Fitment Engine*, real-time SKU counter, filtered collection grids, and contiguous technical product pages where all shopping carts and checkouts are replaced with a direct *Interest Request Form*.
-3. **The Global Atelier Footer** — Present on every page (`/`, `/store`, `/client-fitments`, `/dealer-application`, `/wheels/*`, `/privacy-policy`), featuring clean atelier typography, official Facebook & Instagram channels, allocation newsletter subscription, and full privacy compliance links.
+Built with React 19, TypeScript, Vite 8, Tailwind CSS v4, Three.js, Zustand and Firebase.
 
 ---
 
-## Table of Contents
+## Contents
 
-1. [Architecture & Route Map](#1-architecture--route-map)
-2. [Wheel Showcase: 3-Image Cycling System](#2-wheel-showcase-3-image-cycling-system)
-3. [Client Fitments: Dual-Photo Architecture](#3-client-fitments-dual-photo-architecture)
-4. [Technical Plan: How to Add Images to Customer Fitments](#4-technical-plan-how-to-add-images-to-customer-fitments)
-5. [Brand Identity & Design Tokens](#5-brand-identity--design-tokens)
-6. [Forms & Interactive Workflows Reference](#6-forms--interactive-workflows-reference)
-7. [Local Development & Scripts](#7-local-development--scripts)
-
----
-
-## 1. Architecture & Route Map
-
-All routes are handled client-side via `src/utils/router.tsx` and `src/App.tsx` with instant scroll restoration and hash-anchor support. The global layout in `App.tsx` wraps all views with `BrandHeader`, `AppRoutes`, `StackedCircularFooter`, and `GlobalOverlays`:
-
-| Route | Component | Description |
-| :--- | :--- | :--- |
-| `/` | `BrandHomePage` | Editorial landing page with `HeroSection`, `TrustedByBmwSection` (3 BMW locations), `CertifiedDistributorSection`, `EditorialFlow` (Customer Fitments across South Africa), and `WheelCatalogue` (`#catalogue`). |
-| `/wheels/[slug]` | `WheelShowcasePDP` | Clickable 3-image cycling gallery (Front Monoblock Profile, 3/4 Deep Concave Depth, On-Vehicle BMW M Fitment Stance) with fullscreen lightbox window, finish swatches, and floating `Enquire` pill CTA. |
-| `/client-fitments` | `ClientFitmentsPage` | Scrollable 4×4 Bento gallery of 16 verified BMW commissions, each equipped with dual photography (Stance & Concave Detail) and left/right navigation arrows. |
-| `/dealer-application` | `DealerApplicationPage` | B2B trade accreditation portal with partnership pillars, workshop criteria, and interactive dealership onboarding dossier form. |
-| `/admin/wheels` (`/admin`) | `AdminWheelUploader` | **Protected Route** gated by studio passcode (`FORGED-BMW-2026`) allowing administrators to publish new BMW wheels with an interactive image upload placeholder. |
-| `/store` | `VehicleFitmentWidget` | Technical storefront home featuring the 4-step BMW Fitment Finder (`Make → Model → Year → Part`) and persisted session recall. |
-| `/store/collections/[fitmentSlug]` | `FitmentCollectionView` | Filtered BMW model collection PLP with studio vehicle profile render, expandable SEO copy, diameter/sale filters, and 2-column brutalist product grid. |
-| `/store/products/[productSlug]` | `TechnicalProductView` | Technical specification PDP with `TechnicalProductViewSkeleton`, finish selector, bespoke Interest Request Form, WhatsApp/IG/Phone bar, 10-row zebra spec table, and 2×2 angle gallery. |
-| `/privacy-policy` | `PrivacyPolicyPage` | POPIA and GDPR compliant data governance, telemetry privacy, and cookie disclosure dossier. |
+1. [Features](#features)
+2. [Routes](#routes)
+3. [Getting started](#getting-started)
+4. [Project structure](#project-structure)
+5. [Catalogue data model](#catalogue-data-model)
+6. [Adding a wheel](#adding-a-wheel)
+7. [3D models](#3d-models)
+8. [Pricing](#pricing)
+9. [Accounts and Firebase](#accounts-and-firebase)
+10. [Scripts](#scripts)
+11. [Deployment](#deployment)
+12. [Status and roadmap](#status-and-roadmap)
+13. [License](#license)
 
 ---
 
-## 2. Wheel Showcase: 3-Image Cycling System
+## Features
 
-In place of rotating 3D wireframe graphics, both the catalogue and wheel showcase PDP use high-definition, clickable photographic cards with a modal gallery that cycles through 3 angles:
+- **Editorial brand site** with a filterable wheel catalogue, a three-angle lightbox gallery with zoom and pan, client fitment galleries, a dealer application form and a POPIA-aligned privacy policy.
+- **Vehicle fitment finder**: Make → Model → Year → Part, resolving to a filtered collection of wheel sets with sale and diameter filters and price sorting.
+- **Technical product pages** with a ten-row specification table, finish selector, four-angle gallery and an interest request form in place of a cart.
+- **360° 3D wheel studio** (Three.js) on every wheel and product page. A wheel with a registered `.glb` loads its photoreal model; otherwise a procedural reference rim is shown. Finish swatches re-tint named rim meshes on loaded models.
+- **Client accounts** via Google sign-in, with a saved profile and a personal garage of vehicles stored in Firestore under strict owner-only security rules. A saved preferred finish pre-selects the finish on wheel pages.
+- **Rand pricing** throughout, formatted by a single helper and shown per set of four.
+- **Catalogue tooling**: a JSON data file for inventory, a CLI to generate entries, and a passcode-gated admin uploader for local previews.
 
-1. **Front Monoblock Profile (`Angle 1`)**: Direct studio flat-lay highlighting face geometry, spoke facets, and central hub recess.
-2. **3/4 Deep Concave Depth (`Angle 2`)**: Perspective view demonstrating drop depth, spoke pocket milling, and barrel clearance.
-3. **On-Vehicle BMW M Fitment (`Angle 3`)**: Road stance showing the wheel mounted on an M vehicle with flush arch stance and zero rubbing.
+## Routes
 
-### Interaction Features:
-- **Clickable Image Card**: In `WheelCatalogue.tsx`, clicking any wheel card opens an interactive window displaying the wheel in full resolution.
-- **Left (`←`) & Right (`→`) Arrows**: Cycle smoothly between the 3 images.
-- **Direct Angle Pills**: Tap `Image 1`, `Image 2`, or `Image 3` to jump directly to any view.
-- **Keyboard Navigation**: Pressing `ArrowLeft` or `ArrowRight` triggers instant cycling; `Escape` closes the window.
+Routing is client-side (`src/utils/router.tsx`). The host must rewrite all paths to `index.html`.
 
----
+| Route | Component | Purpose |
+| --- | --- | --- |
+| `/` | `BrandHomePage` | Hero, industry partners, wheel catalogue (`#catalogue`), South African client fitments |
+| `/wheels/:slug` | `WheelShowcasePDP` | Wheel page: 3D studio or three-angle photography, finish swatches, enquire |
+| `/client-fitments` | `ClientFitmentsPage` | Bento gallery of client commissions, two photos each |
+| `/dealer-application` | `DealerApplicationPage` | Trade partner application form |
+| `/account`, `/garage` | `AccountGaragePage` | Google sign-in, profile, garage vehicles |
+| `/store` | `VehicleFitmentWidget` | Fitment finder and featured collections |
+| `/store/collections/:slug` | `FitmentCollectionView` | Filtered product grid for a BMW model |
+| `/store/products/:slug` | `TechnicalProductView` | Technical product page with 3D studio and interest request |
+| `/admin`, `/admin/wheels` | `AdminWheelUploader` | Passcode-gated wheel uploader (local preview only) |
+| `/privacy-policy` | `PrivacyPolicyPage` | Data governance and cookie disclosure |
 
-## 3. Client Fitments: Dual-Photo Architecture
+## Getting started
 
-In `ClientFitmentsPage.tsx` and `EditorialFlow.tsx`, every client fitment is structured as a clean, minimalist photographic component:
-- **Text Clutter Removed**: Extraneous placeholder badges and specs have been removed from card surfaces, leaving only the vehicle title and clean photography.
-- **2 Images per Fitment**:
-  - **Photo 1**: Stance & Arch Clearance Profile.
-  - **Photo 2**: Forged Monoblock Spoke Geometry & Brake Caliper Clearance.
-- **Navigation Controls**: Left and right chevron buttons appear directly on card hover and inside the centered lightbox modal window.
-
----
-
-## 4. Technical Plan: How to Add Images to Customer Fitments
-
-To populate real client photography into the Customer Fitments modules, use the following 3-phase technical plan:
-
-### Phase 1: Asset Preparation & Image Specifications
-1. **Aspect Ratio & Resolution**:
-   - **Photo 1 (Full Stance)**: `16:10` or `16:9` ratio, minimum `2400 × 1500 px` (recommended `WEBP` or optimized `JPEG` < 400KB).
-   - **Photo 2 (Detail / Wheel Concavity)**: `1:1` square or `4:3` ratio, minimum `1800 × 1800 px` focused on the caliper and spoke drop.
-2. **Naming Convention**:
-   Store images in an asset folder (e.g. `public/images/fitments/`) or CDN:
-   - `[chassis]-[wheel]-[city]-01.webp` (Stance)
-   - `[chassis]-[wheel]-[city]-02.webp` (Detail)
-   *Example*: `g80-m3-type-52-chelsea-01.webp` & `g80-m3-type-52-chelsea-02.webp`.
-
-### Phase 2: Updating the Static Data Sources
-Each customer fitment item in `src/components/brand/ClientFitmentsPage.tsx` implements the `ClientFitmentItem` interface:
-
-```typescript
-export interface ClientFitmentItem {
-  id: string;
-  slotLabel: string;
-  vehicleTitle: string;
-  chassisCode: string;
-  wheelModel: string;
-  wheelSlug: string;
-  storeProductSlug: string;
-  staggeredSpec: string;
-  finishName: string;
-  clientCity: string;
-  bentoClass: string;
-  accentHex: string;
-  images: [string, string]; // <-- Tuple of exactly 2 image URLs
-  imageLabels: [string, string];
-}
-```
-
-To update any slot with production photography:
-1. Open `src/components/brand/ClientFitmentsPage.tsx`.
-2. Locate the target item (e.g., `fitment-01`).
-3. Replace the `images` tuple with your image URLs:
-   ```typescript
-   images: [
-     '/images/fitments/g80-m3-type-52-chelsea-01.webp',
-     '/images/fitments/g80-m3-type-52-chelsea-02.webp',
-   ],
-   ```
-4. For the South African fitments on the Home Page, update `SOUTH_AFRICA_FITMENTS` in `src/components/brand/EditorialFlow.tsx` in the exact same manner.
-
-### Phase 3: Runtime Client Photo Upload (No-Code Testing)
-- Users and administrators can also test images live in the browser without code changes:
-  1. Click any fitment card to open the modal window.
-  2. Select **Photo 1** or **Photo 2**.
-  3. Click **Upload Custom Photo**.
-  4. Select a local file; the browser's `FileReader` immediately updates that slot's preview in real time.
-
----
-
-## 5. Brand Identity & Design Tokens
-
-### Color Palette
-| Token Role | Hex | Usage |
-| :--- | :--- | :--- |
-| **Rich Black Canvas** | `#0A0A0A` | Deep velvet primary site background, dark stage canvas, root body |
-| **Elevated Surface** | `#121215` / `#141418` | Stage platforms, brutalist product cards, editorial containers |
-| **Card / Input Surface** | `#18181D` | Form inputs, modal dialogue boxes, filter containers, dropdowns |
-| **Hairline Border** | `#26262E` / `#33333E` | Precision 1px grid borders, divider lines, and card frames |
-| **Crisp Ivory (Text)** | `#F5F5F7` / `#FFFFFF` | Primary headings, titles, high-contrast labels, active buttons |
-| **Silver Platinum (Text)** | `#C2C2CC` / `#A1A1AA` | Readable body copy, technical metadata, offsets, PCD specs |
-| **Electric Orange (Accent)**| `#FF5500` | High-impact CTA buttons (`hover: #FF6B1A`), badges, active pills |
-
-### Global Footer Architecture
-- **Branding**: Symmetrical stacked circular logo badge with atelier address:
-  `240 CANAL ROAD · BRADFORD · WEST YORKSHIRE · UNITED KINGDOM`
-- **Navigation Links**: *The Collection*, *Client Fitments*, *Dealer Application*, *Admin Uploader*, *Privacy Policy*, and *Visit Wheel Store*.
-- **Social Channels**: Exclusively **Facebook** and **Instagram** circular icon buttons.
-- **Newsletter**: Instant allocation dispatch list registration with interactive confirmation feedback.
-
----
-
-## 6. Forms & Interactive Workflows Reference
-
-| Form / Interactive Module | Location | Validation & State Behavior |
-| :--- | :--- | :--- |
-| **1. Vehicle Fitment Finder** | `/store` (`VehicleFitmentWidget.tsx`) | Cascading 4-step state machine (`Make [BMW] → Model → Year → Part`). Auto-populates default year upon selecting a BMW model, shows live product count, and persists selection. |
-| **2. Admin Passcode & Wheel Uploader** | `/admin/wheels` (`AdminWheelUploader.tsx`) | Protected route gate (`FORGED-BMW-2026`). Validates required fields, locks brand to `BMW`, supports drag-and-drop file preview, and syncs entries to `useKahnStore`. |
-| **3. Dealer Application Dossier** | `/dealer-application` (`DealerApplicationPage.tsx`) | Captures corporate identity, VAT number, principal contact, facility classification, monthly allocation tier, and workshop criteria. Generates trade reference (`FORGED-DLR-XXXXXX`). |
-| **4. Specification & Fitment Enquiry** | Global Modal (`GlobalOverlays.tsx`) | Triggered from any `Enquire` CTA or `Book Visit` button. Pre-fills subject, part number, finish, and GBP price; logs enquiries with reference `FORGED-XXXXXX`. |
-
----
-
-## 7. Local Development & Scripts
+Requirements: [Bun](https://bun.sh) 1.x (the committed lockfile is `bun.lock`) or Node 22+. A plain `npm install` currently fails on an esbuild peer-dependency conflict; use Bun, or `npm install --legacy-peer-deps`.
 
 ```bash
-# Install dependencies
-npm install
-
-# Start Vite development server on port 3000
-npm run dev
-
-# Type-check and build production bundle
-npm run build
-
-# Run CLI wheel generator
-npm run add-wheel -- --help
+bun install
+bun run dev        # http://localhost:3000
 ```
+
+Other checks:
+
+```bash
+bun run lint       # TypeScript type-check (tsc --noEmit)
+bun run test       # data and security-rules tests (node:test via tsx)
+bun run build      # production bundle in dist/
+bun run preview    # serve the production bundle
+```
+
+No environment variables are required for local development. Firebase configuration is read from `firebase-applet-config.json` (see [Accounts and Firebase](#accounts-and-firebase)).
+
+## Project structure
+
+```
+.
+├─ index.html                     Single-page shell
+├─ firebase-applet-config.json    Firebase project config (public web keys)
+├─ firebase-blueprint.json        JSON Schema for UserProfile and UserVehicle
+├─ firestore.rules                Firestore security rules
+├─ firestore.rules.test.ts        Structural tests for the rules
+├─ security_spec.md               Rules invariants and adversarial payloads
+├─ public/
+│  ├─ images/wheels/<slug>/       front.webp · hero.webp · profile.webp per wheel
+│  ├─ assets/aistudio/            Client fitment car photography
+│  └─ models/wheels/              Per-wheel .glb models (see 3D models)
+├─ scripts/add-wheel.ts           CLI that writes src/data/customWheels.json
+├─ components/ui/                 Button, input, label, icons, global footer
+└─ src/
+   ├─ App.tsx                     Providers, route switch, lazy-loaded pages
+   ├─ data/kahnData.ts            Types, 14 seed wheels, 8 store products, fitment tree, helpers
+   ├─ data/customWheels.json      Inventory overrides and additions (edit this to add wheels)
+   ├─ store/useKahnStore.ts       Zustand store persisted to localStorage
+   ├─ context/FirebaseContext.tsx Auth, profile and garage data
+   ├─ utils/router.tsx            pushState router
+   ├─ utils/wheelBuilder.ts       Builds a wheel + store product from a short input
+   └─ components/
+      ├─ brand/                   Home, catalogue, lightbox, wheel page, fitments, dealer, account, privacy
+      ├─ store/                   Fitment finder, collection grid, product page, store header
+      ├─ admin/                   Admin uploader
+      ├─ shared/                  Interest request form, chat overlay, skeletons
+      └─ visuals/                 Wheel3DScene, 3D prep guide, SVG rim, vehicle silhouette
+```
+
+## Catalogue data model
+
+Two record types live in `src/data/kahnData.ts`:
+
+- **`BrandWheelItem`**: a wheel as shown on the brand site. Key fields: `slug`, `model`, `modelCode`, `finishName`, `priceZAR`, `sizesAvailable`, `compatibleCars`, `technicalSpecSheet`, `stockStatus`, `stockQuantitySets`, `images` (exactly three), `imageLabels`, `availableFinishes`, optional `modelUrl`, and `compatibleStoreProductSlug` linking to a store product.
+- **`StoreProductItem`**: a sellable set as shown in the store. Key fields: `slug`, `wheelSlug`, `make`, `model`, `yearRange`, `priceZAR`, optional `originalPriceZAR` (shown as a sale when higher), `technicalSpecs` (sizes, bolt pattern, part number, load rating, centre bore), optional `modelUrl`.
+
+Fourteen in-stock wheels are seeded in `kahnData.ts`. `src/data/customWheels.json` is merged on top by slug: an entry with a seed's slug overrides it (this is how real photography is attached), and an entry with a new slug is added. `VEHICLE_FITMENT_TREE` maps each BMW model to the store products the fitment finder lists for it.
+
+## Adding a wheel
+
+1. **Choose a slug**: lowercase model code plus finish, e.g. `fsa003-pure-bronze`. It becomes the URL, the image folder and the model file name.
+2. **Add photos** as three square WebP files (2000×2000 recommended, under 400 KB each, consistent background and framing):
+
+   ```
+   public/images/wheels/fsa003-pure-bronze/front.webp
+   public/images/wheels/fsa003-pure-bronze/hero.webp
+   public/images/wheels/fsa003-pure-bronze/profile.webp
+   ```
+
+3. **Add the record** to `brandWheels` in `src/data/customWheels.json`. Copy an existing entry and change the slug, names, price, sizes, finishes, spec sheet, stock, image paths and labels. Reference images as `/images/wheels/<slug>/front.webp` (leading slash, no `public/`).
+4. **Store product**: if the wheel needs its own part number and sizes, add an entry to `storeProducts` in the same file (use a `STORE_PRODUCTS` entry in `kahnData.ts` as a template), point the wheel's `compatibleStoreProductSlug` at it, and add its slug to the right model's `productSlugs` in `VEHICLE_FITMENT_TREE`.
+5. Run `bun run lint` and `bun run dev`, check `/wheels/<slug>` and `/#catalogue`, then commit and deploy.
+
+The CLI can draft an entry for you:
+
+```bash
+bun run add-wheel -- --name "TYPE 60" --price 75000 --model M3 --finish satin-black \
+  --image /images/wheels/type-60/front.webp --glb /models/wheels/type-60.glb
+bun run add-wheel -- --list
+bun run add-wheel -- --remove type-60
+```
+
+The admin page at `/admin` is a local preview tool: wheels created there are stored only in that browser's localStorage and are not published.
+
+## 3D models
+
+A wheel or product with a `modelUrl` loads that `.glb` in the 360° studio in place of the procedural rim.
+
+1. Export the rim as `public/models/wheels/<slug>.glb`.
+2. Add `"modelUrl": "/models/wheels/<slug>.glb"` to the wheel (or product) record.
+3. Rebuild.
+
+Model requirements (full detail in `public/models/wheels/README.md`):
+
+- Binary glTF 2.0 with embedded PBR metallic-roughness textures; bare rim only.
+- Axle bore centre at the origin, face toward +Z, up +Y, spin around Z, real metres.
+- Sub-meshes named `Rim_Barrel`, `Rim_Face_Spokes`, `Hardware_Bolts`, `Center_Cap`. Meshes whose names start with `Rim_Face`, `Rim_Barrel`, `Rim_Lip` or `Rim_Spokes` follow the finish swatches.
+- Keep under roughly 150k triangles for mobile.
+
+`public/models/wheels/sample-reference-rim.glb` is a low-poly test asset with the correct axes and names. The studio's "Test .GLB Rim" button previews any local file without changing data.
+
+## Pricing
+
+All prices are South African Rand for a complete set of four wheels and are stored as whole Rand in `priceZAR`. `formatZAR()` in `src/data/kahnData.ts` is the only formatter and renders `R 75,000` or `R 75,000.00`. There is no currency conversion.
+
+## Accounts and Firebase
+
+Client accounts use Firebase Authentication (Google provider) and Firestore:
+
+- `users/{uid}`: the client's profile and primary vehicle (`UserProfile` in `firebase-blueprint.json`).
+- `users/{uid}/vehicles/{vehicleId}`: garage vehicles (`UserVehicle`).
+
+`firestore.rules` denies everything by default and allows owner-only access with a verified email, exact key sets, bounded string sizes, enum allow-lists, server timestamps and immutable identity fields. `security_spec.md` documents the invariants and the adversarial payloads each rule rejects. Deploy rules with the Firebase CLI:
+
+```bash
+firebase deploy --only firestore:rules
+```
+
+`firebase-applet-config.json` holds the public web configuration for the Firebase project. To point the site at your own project, replace the values in that file and redeploy the rules there.
+
+## Scripts
+
+| Script | What it does |
+| --- | --- |
+| `bun run dev` | Vite dev server on port 3000 |
+| `bun run build` | Production build to `dist/` |
+| `bun run preview` | Serve `dist/` locally |
+| `bun run lint` | `tsc --noEmit` |
+| `bun run test` | `src/data/kahnData.test.ts` and `firestore.rules.test.ts` with `node:test` |
+| `bun run add-wheel` | Catalogue CLI (`--help` for options) |
+| `bun run clean` | Remove `dist/` |
+
+## Deployment
+
+The build output in `dist/` is a static single-page app. Any static host works provided every path is rewritten to `index.html`; for Firebase Hosting:
+
+```json
+{ "hosting": { "public": "dist", "rewrites": [{ "source": "**", "destination": "/index.html" }] } }
+```
+
+Production build chunks are split per vendor (`react`, `motion`, `three`, `firebase`, `lucide`) and per route.
+
+## Status and roadmap
+
+The catalogue, fitment finder, product pages, 3D studio and client accounts are working. The following are not yet connected and are tracked for follow-up:
+
+- **Lead delivery**: interest requests, dealer applications and newsletter sign-ups are currently stored only in the visitor's browser. Planned: write to Firestore and fan out through n8n to email, Google Sheets, WhatsApp and the CRM.
+- **Contact buttons**: the WhatsApp, Instagram and phone buttons on product pages do not yet open external channels.
+- **Admin publishing**: the admin uploader stores wheels locally; publishing goes through `customWheels.json` and a rebuild. Planned: Firebase-backed catalogue with authenticated admin writes.
+- **Industry partners**: the partner section renders placeholders pending logo assets.
+- **Legacy naming**: some internal identifiers (`useKahnStore`, `kahnData.ts`, the persisted store key) and the AI Studio metadata still carry template-era names.
+
+## License
+
+Proprietary. Copyright © 2026 FORGED Custom Wheels. All rights reserved. See [LICENSE](LICENSE). This repository is public for deployment and collaboration purposes only; no permission is granted to use, copy, modify or distribute its contents without prior written consent.

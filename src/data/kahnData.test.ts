@@ -4,12 +4,13 @@ import {
   BRAND_WHEELS,
   MARQUE_FILTERS,
   filterWheelsByMarque,
+  getAllBrandWheels,
   getAvailableMakes,
   getModelsForMake,
   getMatchingProductsForFitment,
   resolveCollectionBySlug,
   filterAndSortStoreProducts,
-  formatCurrencyPrice,
+  formatZAR,
   getStoreProductBySlug,
 } from './kahnData';
 
@@ -17,12 +18,14 @@ test('MARQUE_FILTERS and getAvailableMakes expose only BMW as the car brand opti
   assert.deepEqual(MARQUE_FILTERS, ['ALL', 'BMW']);
   assert.deepEqual(getAvailableMakes(), ['BMW']);
 
+  // The catalogue is the 14 in-stock seeds plus any customWheels.json entries
+  // that do not override a seed slug, so compare against the combined list.
   const allWheels = filterWheelsByMarque('ALL');
-  assert.equal(allWheels.length, BRAND_WHEELS.length);
-  assert.ok(allWheels.length >= 8);
+  assert.equal(allWheels.length, getAllBrandWheels().length);
+  assert.ok(allWheels.length >= BRAND_WHEELS.length);
 
   const bmwWheels = filterWheelsByMarque('BMW');
-  assert.equal(bmwWheels.length, BRAND_WHEELS.length);
+  assert.equal(bmwWheels.length, getAllBrandWheels().length);
   assert.ok(bmwWheels.every((w) => w.marques.includes('BMW')));
 });
 
@@ -75,21 +78,22 @@ test('filterAndSortStoreProducts filters by diameter, sale flag, and price sorti
   assert.equal(saleOnly[0].slug, 'bmw-m3-le-mans-gt-forged');
 
   const sortedAsc = filterAndSortStoreProducts(products, { sortBy: 'price-asc' });
-  assert.ok(sortedAsc[0].priceGBP <= sortedAsc[sortedAsc.length - 1].priceGBP);
+  assert.ok(sortedAsc[0].priceZAR <= sortedAsc[sortedAsc.length - 1].priceZAR);
 });
 
-test('formatCurrencyPrice formats GBP, USD, and EUR with optional decimals', () => {
-  assert.equal(formatCurrencyPrice(4600, 'GBP', false), '£4,600');
-  assert.equal(formatCurrencyPrice(4600, 'GBP', true), '£4,600.00');
-  assert.ok(formatCurrencyPrice(4600, 'USD', false).startsWith('$'));
-  assert.ok(formatCurrencyPrice(4600, 'EUR', false).startsWith('€'));
+test('formatZAR formats Rand with comma thousands and optional two decimals', () => {
+  assert.equal(formatZAR(75000), 'R 75,000');
+  assert.equal(formatZAR(75000, true), 'R 75,000.00');
+  assert.equal(formatZAR(1234567.5, true), 'R 1,234,567.50');
+  assert.equal(formatZAR(0), 'R 0');
+  assert.equal(formatZAR(Number.NaN), 'R 0');
 });
 
 test('getStoreProductBySlug resolves technical PDPs and BRAND_WHEELS matches 14 in-stock sheet rows', () => {
   assert.equal(BRAND_WHEELS.length, 14);
   const type52 = getStoreProductBySlug('bmw-m3-type-52-forged');
   assert.equal(type52.technicalSpecs.partNo, 'WAKB9250B0F-2-KIT');
-  assert.equal(type52.priceGBP, 90000);
+  assert.equal(type52.priceZAR, 90000);
 
   const rs30 = getStoreProductBySlug('bmw-m3-rs-3-0');
   assert.equal(rs30.shortModel, 'WHEEL PLACEHOLDER 03');
@@ -100,8 +104,8 @@ test('createWheelAndProductEntries builds custom wheel and store product with im
   const { brandWheel, storeProduct } = createWheelAndProductEntries({
     name: 'TYPE 60 CARBON',
     series: 'FORGED',
-    priceGBP: 5400,
-    originalPriceGBP: 6200,
+    priceZAR: 5400,
+    originalPriceZAR: 6200,
     imageUrl: 'https://images.unsplash.com/photo-1544829099-b9a0c07fad1a?w=800',
     marques: ['BMW'],
     make: 'BMW',
@@ -113,13 +117,13 @@ test('createWheelAndProductEntries builds custom wheel and store product with im
   });
 
   assert.equal(brandWheel.slug, 'type-60-carbon');
-  assert.equal(brandWheel.basePriceGBP, 5400);
+  assert.equal(brandWheel.priceZAR, 5400);
   assert.equal(
     brandWheel.imageUrl,
     'https://images.unsplash.com/photo-1544829099-b9a0c07fad1a?w=800'
   );
 
-  assert.equal(storeProduct.priceGBP, 5400);
+  assert.equal(storeProduct.priceZAR, 5400);
   assert.equal(storeProduct.isSale, true);
   assert.equal(storeProduct.technicalSpecs.partNo, 'WAKB6000-KIT');
 
@@ -145,13 +149,13 @@ test('findWheelBySlug has no silent fallback and modelUrl flows through the whee
 
   const withModel = createWheelAndProductEntries({
     name: 'TYPE 99',
-    priceGBP: 1000,
+    priceZAR: 1000,
     modelUrl: '  /models/wheels/type-99.glb  ',
   });
   assert.equal(withModel.brandWheel.modelUrl, '/models/wheels/type-99.glb');
   assert.equal(withModel.storeProduct.modelUrl, '/models/wheels/type-99.glb');
 
-  const withoutModel = createWheelAndProductEntries({ name: 'TYPE 98', priceGBP: 1000 });
+  const withoutModel = createWheelAndProductEntries({ name: 'TYPE 98', priceZAR: 1000 });
   assert.equal(withoutModel.brandWheel.modelUrl, undefined);
   assert.equal(withoutModel.storeProduct.modelUrl, undefined);
 });

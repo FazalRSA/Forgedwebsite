@@ -5,6 +5,7 @@ import {
   getWheelImages,
   WHEEL_FINISHES,
   WheelFinishId,
+  formatZAR,
 } from '../../data/kahnData';
 import { useKahnStore } from '../../store/useKahnStore';
 
@@ -131,7 +132,7 @@ export const WheelLightboxModal: React.FC<WheelLightboxModalProps> = ({
   const activeLabel = wheelData.labels[activeAngleIdx];
   const activeFinishObj = WHEEL_FINISHES[selectedFinish] || WHEEL_FINISHES.silver;
   const displayPrice =
-    wheel.priceFormatted || `R ${wheel.basePriceGBP.toLocaleString('en-ZA')}`;
+    formatZAR(wheel.priceZAR);
 
   const finishFilterMap: Record<WheelFinishId, string> = {
     silver: 'contrast(1.04) brightness(1.03)',
@@ -297,7 +298,7 @@ export const WheelLightboxModal: React.FC<WheelLightboxModalProps> = ({
             openEnquiryModal({
               subject: `${wheel.model} Enquiry (${finishName})`,
               finish: finishName,
-              priceGBP: wheel.basePriceGBP,
+              priceZAR: wheel.priceZAR,
               domain: 'brand',
             });
           }}
