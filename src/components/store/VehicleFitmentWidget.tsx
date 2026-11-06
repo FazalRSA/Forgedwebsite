@@ -92,8 +92,12 @@ export const VehicleFitmentWidget: React.FC = () => {
           {/* Headline */}
           <div className="max-w-3xl mb-8">
             <h1 className="text-3xl sm:text-5xl md:text-6xl font-light tracking-[-0.03em] leading-tight text-white">
-              The world&apos;s leading automotive fashion house.
+              Forged wheels, engineered to your BMW&apos;s exact fitment.
             </h1>
+            <p className="text-base sm:text-lg text-neutral-300 font-light max-w-2xl leading-relaxed pt-3">
+              Every set is matched to factory 5&times;112 PCD and 66.6mm hub-centric bore
+              specifications&mdash;direct fitment, no spacers, no adapters.
+            </p>
           </div>
 
           {/* Vehicle Fitment Box */}
