@@ -6,7 +6,7 @@
  *   npm run add-wheel -- \
  *     --name "TYPE 60" \
  *     --series "CARBON SERIES" \
- *     --price 5250 \
+ *     --price 75000 \
  *     --image "/assets/wheels/type-60.png" \
  *     --glb "/models/wheels/type-60.glb" \
  *     --marques "BMW,PORSCHE,FERRARI" \
@@ -35,6 +35,7 @@ import {
   SpokeGeometryType,
   StoreProductItem,
   WheelFinishId,
+  formatZAR,
 } from '../src/data/kahnData';
 import { createWheelAndProductEntries } from '../src/utils/wheelBuilder';
 
@@ -99,8 +100,8 @@ Usage:
 
 Options:
   --name <string>            Wheel model name (e.g. "TYPE 60", "RS-X") [Required]
-  --price <number>           Price in GBP for a set of 4 (e.g. 5250) [Required]
-  --original-price <number>  Optional previous GBP price to trigger SALE badge
+  --price <number>           Price in South African Rand for a set of 4 (e.g. 75000) [Required]
+  --original-price <number>  Optional previous Rand price to trigger SALE badge
   --series <string>          Series label (default: "FORGED SERIES")
   --image <url|path>         Primary wheel image URL or path (e.g. "/wheels/type-60.png")
   --gallery <urls>           Comma-separated extra gallery image URLs
@@ -126,7 +127,7 @@ Options:
   --help                     Show this help message
 
 Example:
-  npm run add-wheel -- --name "TYPE 60" --series "CARBON FORGED" --price 5250 --image "/images/type60.png" --marques "BMW" --make "BMW" --model "M3"
+  npm run add-wheel -- --name "TYPE 60" --series "CARBON FORGED" --price 75000 --image "/images/type60.png" --marques "BMW" --make "BMW" --model "M3"
 `);
 }
 
@@ -148,7 +149,7 @@ async function main() {
     console.log(`Custom Wheels (${currentData.brandWheels.length}):`);
     for (const w of currentData.brandWheels) {
       console.log(
-        `  - [${w.slug}] ${w.model} | ${w.series} — £${w.basePriceGBP} (${w.marques.join(', ')}) ${
+        `  - [${w.slug}] ${w.model} | ${w.series} — ${formatZAR(w.priceZAR)} (${w.marques.join(', ')}) ${
           w.imageUrl ? `[Image: ${w.imageUrl}]` : '[Procedural 3D SVG]'
         } ${w.modelUrl ? `[3D: ${w.modelUrl}]` : '[3D: procedural rim]'}`
       );
@@ -201,7 +202,7 @@ async function main() {
         name = (await rl.question('1. Wheel Model Name (e.g. TYPE 60): ')).trim();
       }
       if (!priceStr) {
-        priceStr = (await rl.question('2. Price in GBP (e.g. 5250): ')).trim();
+        priceStr = (await rl.question('2. Price in Rand for a set of 4 (e.g. 75000): ')).trim();
       }
       const seriesAns = (
         await rl.question(`3. Series [${series}]: `)
@@ -228,8 +229,8 @@ async function main() {
     }
   }
 
-  const priceGBP = Number(priceStr);
-  const originalPriceGBP =
+  const priceZAR = Number(priceStr);
+  const originalPriceZAR =
     typeof args['original-price'] === 'string' ? Number(args['original-price']) : undefined;
   const galleryImages =
     typeof args.gallery === 'string'
@@ -239,8 +240,8 @@ async function main() {
   const { brandWheel, storeProduct } = createWheelAndProductEntries({
     name,
     series,
-    priceGBP,
-    originalPriceGBP,
+    priceZAR,
+    originalPriceZAR,
     imageUrl: imageUrl || undefined,
     galleryImages,
     modelUrl: typeof args.glb === 'string' ? args.glb : undefined,
@@ -273,7 +274,7 @@ async function main() {
   console.log(`✅ Successfully added wheel "${brandWheel.model}" to src/data/customWheels.json!`);
   console.log(`   • Brand Showcase Route : /wheels/${brandWheel.slug}`);
   console.log(`   • Store Technical PDP  : /store/products/${storeProduct.slug}`);
-  console.log(`   • Price (Set of 4)     : £${brandWheel.basePriceGBP.toLocaleString('en-GB')}`);
+  console.log(`   • Price (Set of 4)     : ${formatZAR(brandWheel.priceZAR)}`);
   console.log(`   • Image Asset          : ${brandWheel.imageUrl || 'Procedural 3D Forged SVG (' + brandWheel.geometry + ')'}`);
   console.log(`   • 3D Model (.glb)      : ${brandWheel.modelUrl || 'none — 3D studio shows the procedural reference rim'}`);
 }

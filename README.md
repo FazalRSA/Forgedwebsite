@@ -152,7 +152,7 @@ To update any slot with production photography:
 | **1. Vehicle Fitment Finder** | `/store` (`VehicleFitmentWidget.tsx`) | Cascading 4-step state machine (`Make [BMW] → Model → Year → Part`). Auto-populates default year upon selecting a BMW model, shows live product count, and persists selection. |
 | **2. Admin Passcode & Wheel Uploader** | `/admin/wheels` (`AdminWheelUploader.tsx`) | Protected route gate (`FORGED-BMW-2026`). Validates required fields, locks brand to `BMW`, supports drag-and-drop file preview, and syncs entries to `useKahnStore`. |
 | **3. Dealer Application Dossier** | `/dealer-application` (`DealerApplicationPage.tsx`) | Captures corporate identity, VAT number, principal contact, facility classification, monthly allocation tier, and workshop criteria. Generates trade reference (`FORGED-DLR-XXXXXX`). |
-| **4. Specification & Fitment Enquiry** | Global Modal (`GlobalOverlays.tsx`) | Triggered from any `Enquire` CTA or `Book Visit` button. Pre-fills subject, part number, finish, and GBP price; logs enquiries with reference `FORGED-XXXXXX`. |
+| **4. Specification & Fitment Enquiry** | Global Modal (`GlobalOverlays.tsx`) | Triggered from any `Enquire` CTA or `Book Visit` button. Pre-fills subject, part number, finish, and Rand (ZAR) price; logs enquiries with reference `FORGED-XXXXXX`. |
 
 ---
 

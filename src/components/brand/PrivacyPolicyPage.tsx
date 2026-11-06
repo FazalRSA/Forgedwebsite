@@ -65,7 +65,7 @@ export const PrivacyPolicyPage: React.FC = () => {
               <li><strong className="text-[#F5F5F7]">Client &amp; Contact Telemetry:</strong> Name, business title, email address, telephone contact, and shipping/billing destinations.</li>
               <li><strong className="text-[#F5F5F7]">Automotive Technical Specifications:</strong> Vehicle marque (BMW only), model, chassis generation (e.g. G80, G82, G87, G90), PCD bolt circle, wheel offset preferences, and aftermarket suspension configurations.</li>
               <li><strong className="text-[#F5F5F7]">Trade Dealer Applications:</strong> Corporate registrations, VAT/Tax identification, workshop ramp capacities, and monthly allocation tiers submitted via our Dealer Application portal.</li>
-              <li><strong className="text-[#F5F5F7]">Session Preferences:</strong> Selected currency (GBP, USD, EUR), saved vehicle selections, and reserve bag allocations stored locally on your device.</li>
+              <li><strong className="text-[#F5F5F7]">Session Preferences:</strong> Saved vehicle selections, wishlist and reserve bag allocations stored locally on your device. All prices are shown in South African Rand (ZAR).</li>
             </ul>
           </section>
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { ArrowRight, CheckCircle2, ShieldCheck } from 'lucide-react';
 import {
-  formatCurrencyPrice,
+  formatZAR,
   getAllStoreProducts,
   getAvailableMakes,
   getFitmentNode,
@@ -27,7 +27,6 @@ export const VehicleFitmentWidget: React.FC = () => {
     setSelectedPart,
     savedVehicle,
     saveVehicleSession,
-    currency,
     customStoreProducts,
   } = useKahnStore();
 
@@ -346,7 +345,7 @@ export const VehicleFitmentWidget: React.FC = () => {
                 </h3>
                 <div className="flex items-baseline justify-between">
                   <span className="text-base font-bold font-tech-mono tabular-nums text-[#FF5500]">
-                    {formatCurrencyPrice(product.priceGBP, currency)}
+                    {formatZAR(product.priceZAR)}
                   </span>
                   <span className="text-[11px] font-tech-mono uppercase text-[#C2C2CC]">
                     {product.setLabel}

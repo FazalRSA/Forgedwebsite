@@ -2,7 +2,6 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import {
   BrandWheelItem,
-  CurrencyCode,
   StoreProductItem,
   WheelFinishId,
 } from '../data/kahnData';
@@ -25,7 +24,7 @@ export interface CartItem {
   title: string;
   partNo: string;
   finish: WheelFinishId;
-  priceGBP: number;
+  priceZAR: number;
   quantity: number;
 }
 
@@ -80,10 +79,6 @@ interface KahnStoreState {
   savedVehicle: SavedVehicleSession;
   saveVehicleSession: (session: SavedVehicleSession) => void;
 
-  // Currency & Locale
-  currency: CurrencyCode;
-  setCurrency: (currency: CurrencyCode) => void;
-
   // Wishlist
   wishlistSlugs: string[];
   toggleWishlist: (slug: string) => void;
@@ -103,14 +98,14 @@ interface KahnStoreState {
     subject: string;
     partNo?: string;
     finish?: string;
-    priceGBP?: number;
+    priceZAR?: number;
     domain: 'brand' | 'store';
   };
   openEnquiryModal: (payload: {
     subject: string;
     partNo?: string;
     finish?: string;
-    priceGBP?: number;
+    priceZAR?: number;
     domain: 'brand' | 'store';
   }) => void;
   closeEnquiryModal: () => void;
@@ -224,9 +219,6 @@ export const useKahnStore = create<KahnStoreState>()(
 
       saveVehicleSession: (session: SavedVehicleSession) => set({ savedVehicle: session }),
 
-      currency: 'GBP',
-      setCurrency: (currency: CurrencyCode) => set({ currency }),
-
       wishlistSlugs: ['bmw-m3-type-52-forged'],
       toggleWishlist: (slug: string) => {
         const current = get().wishlistSlugs;
@@ -246,7 +238,7 @@ export const useKahnStore = create<KahnStoreState>()(
           subject: item.title,
           partNo: item.partNo,
           finish: item.finish,
-          priceGBP: item.priceGBP,
+          priceZAR: item.priceZAR,
           domain: 'store',
         });
       },
@@ -341,12 +333,31 @@ export const useKahnStore = create<KahnStoreState>()(
     }),
     {
       name: 'kahn-automotive-store-bmw-v2',
+      // v2: all prices are Rand; the GBP/USD/EUR switcher is gone and GBP-named
+      // fields were renamed. Drop the stale currency key and re-key any
+      // persisted cart lines from older sessions.
+      version: 2,
+      migrate: (persisted, version) => {
+        const state = (persisted ?? {}) as Record<string, unknown>;
+        if (version < 2) {
+          delete state.currency;
+          if (Array.isArray(state.cartItems)) {
+            state.cartItems = (state.cartItems as Array<Record<string, unknown>>).map((item) => {
+              if ('priceGBP' in item && !('priceZAR' in item)) {
+                const { priceGBP, ...rest } = item;
+                return { ...rest, priceZAR: priceGBP };
+              }
+              return item;
+            });
+          }
+        }
+        return state as unknown as KahnStoreState;
+      },
       partialize: (state) => ({
         isAdminAuthenticated: state.isAdminAuthenticated,
         customBrandWheels: state.customBrandWheels,
         customStoreProducts: state.customStoreProducts,
         savedVehicle: state.savedVehicle,
-        currency: state.currency,
         wishlistSlugs: state.wishlistSlugs,
         cartItems: state.cartItems,
         submittedEnquiries: state.submittedEnquiries,

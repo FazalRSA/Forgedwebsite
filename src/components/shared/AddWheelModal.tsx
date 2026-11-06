@@ -19,6 +19,7 @@ import {
   WheelFinishId,
   getAvailableMakes,
   getModelsForMake,
+  formatZAR,
 } from '../../data/kahnData';
 import { WheelRenderSVG } from '../visuals/WheelRenderSVG';
 import { useRouter } from '../../utils/router';
@@ -46,8 +47,8 @@ export const AddWheelModal: React.FC = () => {
 
   const [name, setName] = useState('TYPE 60 CARBON');
   const [series, setSeries] = useState('FORGED SERIES');
-  const [priceGBP, setPriceGBP] = useState('5200');
-  const [originalPriceGBP, setOriginalPriceGBP] = useState('');
+  const [priceZAR, setPriceZAR] = useState('75000');
+  const [originalPriceZAR, setOriginalPriceZAR] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [galleryUrlsInput, setGalleryUrlsInput] = useState('');
   const [selectedMarques, setSelectedMarques] = useState<Exclude<MarqueFilter, 'ALL'>[]>([
@@ -103,8 +104,8 @@ export const AddWheelModal: React.FC = () => {
     'npm run add-wheel --',
     `--name "${name || 'TYPE 60'}"`,
     `--series "${series || 'FORGED SERIES'}"`,
-    `--price ${Number(priceGBP) || 4600}`,
-    originalPriceGBP ? `--original-price ${Number(originalPriceGBP)}` : '',
+    `--price ${Number(priceZAR) || 75000}`,
+    originalPriceZAR ? `--original-price ${Number(originalPriceZAR)}` : '',
     imageUrl && !imageUrl.startsWith('data:') ? `--image "${imageUrl}"` : '',
     `--marques "${selectedMarques.join(',') || 'BMW'}"`,
     `--make "${make}"`,
@@ -137,8 +138,8 @@ export const AddWheelModal: React.FC = () => {
       const { brandWheel, storeProduct } = addCustomWheelAndProduct({
         name,
         series,
-        priceGBP: Number(priceGBP),
-        originalPriceGBP: originalPriceGBP ? Number(originalPriceGBP) : undefined,
+        priceZAR: Number(priceZAR),
+        originalPriceZAR: originalPriceZAR ? Number(originalPriceZAR) : undefined,
         imageUrl: imageUrl.trim() || undefined,
         galleryImages: galleryImages.length > 0 ? galleryImages : undefined,
         marques: selectedMarques.length > 0 ? selectedMarques : ['BMW'],
@@ -224,7 +225,7 @@ export const AddWheelModal: React.FC = () => {
                   </p>
                 </div>
                 <span className="text-base font-extrabold font-tech-mono tabular-nums text-[#FF5500]">
-                  £{(Number(priceGBP) || 0).toLocaleString('en-GB')}
+                  {formatZAR(Number(priceZAR) || 0)}
                 </span>
               </div>
             </div>
@@ -282,7 +283,7 @@ export const AddWheelModal: React.FC = () => {
                         }}
                         className="font-bold uppercase hover:underline text-left truncate pr-2 cursor-pointer text-[#F5F5F7] hover:text-[#FF5500]"
                       >
-                        {cw.model} ({cw.series}) — £{cw.basePriceGBP.toLocaleString('en-GB')}
+                        {cw.model} ({cw.series}) — {formatZAR(cw.priceZAR)}
                       </button>
                       <button
                         type="button"
@@ -378,15 +379,15 @@ export const AddWheelModal: React.FC = () => {
                     htmlFor="wheel-price-input"
                     className="block text-[11px] font-tech-mono uppercase tracking-wider text-[#C2C2CC] mb-1 whitespace-nowrap"
                   >
-                    PRICE (£ GBP) *
+                    PRICE (ZAR, SET OF 4) *
                   </label>
                   <input
                     id="wheel-price-input"
                     type="number"
                     min="100"
                     step="50"
-                    value={priceGBP}
-                    onChange={(e) => setPriceGBP(e.target.value)}
+                    value={priceZAR}
+                    onChange={(e) => setPriceZAR(e.target.value)}
                     className="w-full h-10 px-3 bg-[#18181D] border border-[#26262E] text-[#F5F5F7] text-xs font-tech-mono tabular-nums focus:outline-none focus:border-[#FF5500]"
                     required
                   />

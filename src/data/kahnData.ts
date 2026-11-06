@@ -88,9 +88,8 @@ export interface BrandWheelItem {
   spokeCount: number;
   defaultFinish: WheelFinishId;
   availableFinishes: WheelFinishId[];
-  basePriceGBP: number;
-  priceZAR?: number;
-  priceFormatted?: string;
+  /** Price for a complete set of 4, in South African Rand (whole Rand). */
+  priceZAR: number;
   sizesAvailable?: string;
   finishName?: string;
   otherFinishes?: string;
@@ -125,8 +124,10 @@ export interface StoreProductItem {
   model: string;
   yearRange: string;
   partCategory: 'ALLOY WHEELS' | 'CARBON AERODYNAMICS' | 'EXHAUST SYSTEMS' | 'SUSPENSION';
-  priceGBP: number;
-  originalPriceGBP?: number;
+  /** Price for a complete set of 4, in South African Rand (whole Rand). */
+  priceZAR: number;
+  /** Previous Rand price; when higher than priceZAR the product is shown on sale. */
+  originalPriceZAR?: number;
   isSale?: boolean;
   isLatest?: boolean;
   isReserve?: boolean;
@@ -225,7 +226,6 @@ interface RawInventorySeed {
   otherFinishes?: string;
   compatibleCars: string;
   priceZAR: number;
-  priceFormatted: string;
   stockStatus: string;
   stockQuantitySets: number;
   technicalSpecSheet: string;
@@ -248,7 +248,6 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     otherFinishes: '2 piece wheel',
     compatibleCars: 'M3 Sedan (G80)',
     priceZAR: 90000,
-    priceFormatted: 'R 90,000',
     stockStatus: 'In Stock',
     stockQuantitySets: 1,
     technicalSpecSheet: 'PCD 5×112 · ET8/15 · CB66.6',
@@ -268,7 +267,6 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     finishName: 'Gold',
     compatibleCars: 'M3 Competition Sedan (G80)',
     priceZAR: 75000,
-    priceFormatted: 'R 75,000',
     stockStatus: 'In Stock',
     stockQuantitySets: 1,
     technicalSpecSheet: 'PCD 5×112 · ET8/15 · CB66.6',
@@ -288,7 +286,6 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     finishName: 'Hyper Black',
     compatibleCars: 'M3 Competition Sedan (G80)',
     priceZAR: 75000,
-    priceFormatted: 'R 75,000',
     stockStatus: 'In Stock',
     stockQuantitySets: 1,
     technicalSpecSheet: 'PCD 5×112 · ET8/15 · CB66.6',
@@ -308,7 +305,6 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     finishName: 'Polished Face',
     compatibleCars: 'M3 Competition Sedan (G80)',
     priceZAR: 85000,
-    priceFormatted: 'R 85,000',
     stockStatus: 'In Stock',
     stockQuantitySets: 1,
     technicalSpecSheet: 'PCD 5×112 · ET8/15 · CB66.6',
@@ -328,7 +324,6 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     finishName: 'Silver',
     compatibleCars: 'M3 Sedan (G80)',
     priceZAR: 75000,
-    priceFormatted: 'R 75,000',
     stockStatus: 'In Stock',
     stockQuantitySets: 1,
     technicalSpecSheet: 'PCD 5×112 · ET8/15 · CB66.6',
@@ -348,7 +343,6 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     finishName: 'Hyper Black',
     compatibleCars: 'M3 Sedan (G80)',
     priceZAR: 75000,
-    priceFormatted: 'R 75,000',
     stockStatus: 'In Stock',
     stockQuantitySets: 1,
     technicalSpecSheet: 'PCD 5×112 · ET8/15 · CB66.6',
@@ -368,7 +362,6 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     finishName: 'Silver',
     compatibleCars: 'M3 Competition Sedan (G80)',
     priceZAR: 70000,
-    priceFormatted: 'R 70,000',
     stockStatus: 'In Stock',
     stockQuantitySets: 1,
     technicalSpecSheet: 'PCD 5×112 · ET8/15 · CB66.6',
@@ -388,7 +381,6 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     finishName: 'Hyper Black',
     compatibleCars: 'M3 Sedan (G80)',
     priceZAR: 70000,
-    priceFormatted: 'R 70,000',
     stockStatus: 'In Stock',
     stockQuantitySets: 1,
     technicalSpecSheet: 'PCD 5×112 · ET8/15 · CB66.6',
@@ -408,7 +400,6 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     finishName: 'Gloss Black',
     compatibleCars: 'M3 Sedan (G80)',
     priceZAR: 70000,
-    priceFormatted: 'R 70,000',
     stockStatus: 'In Stock',
     stockQuantitySets: 1,
     technicalSpecSheet: 'PCD 5×112 · ET8/15 · CB66.6',
@@ -428,7 +419,6 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     finishName: 'Silver',
     compatibleCars: 'M3 Sedan (G80)',
     priceZAR: 80000,
-    priceFormatted: 'R 80,000',
     stockStatus: 'In Stock',
     stockQuantitySets: 1,
     technicalSpecSheet: 'PCD 5×112 · ET15/20 · CB66.6',
@@ -448,7 +438,6 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     finishName: 'Pure Bronze',
     compatibleCars: 'M3 Competition Sedan (G80)',
     priceZAR: 80000,
-    priceFormatted: 'R 80,000',
     stockStatus: 'In Stock',
     stockQuantitySets: 1,
     technicalSpecSheet: 'PCD 5×112 · ET15/17 · CB66.6',
@@ -468,7 +457,6 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     finishName: 'Glossy Black',
     compatibleCars: 'M3 Competition Sedan (G80)',
     priceZAR: 80000,
-    priceFormatted: 'R 80,000',
     stockStatus: 'In Stock',
     stockQuantitySets: 1,
     technicalSpecSheet: 'PCD 5×112 · ET15/17 · CB66.6',
@@ -488,7 +476,6 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     finishName: 'Liquid Metal',
     compatibleCars: 'M3 Competition Sedan (G80)',
     priceZAR: 95000,
-    priceFormatted: 'R 95,000',
     stockStatus: 'In Stock',
     stockQuantitySets: 2,
     technicalSpecSheet: 'PCD 5×112 · ET15/17 · CB66.6',
@@ -508,7 +495,6 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     finishName: 'Liquid Metal',
     compatibleCars: 'M3 Competition Sedan (G80)',
     priceZAR: 95000,
-    priceFormatted: 'R 95,000',
     stockStatus: 'In Stock',
     stockQuantitySets: 2,
     technicalSpecSheet: 'PCD 5×112 · ET15/17 · CB66.6',
@@ -544,9 +530,7 @@ export const BRAND_WHEELS: BrandWheelItem[] = INVENTORY_SEEDS.map((seed) => {
     spokeCount: seed.spokeCount,
     defaultFinish: seed.defaultFinish,
     availableFinishes: seed.availableFinishes,
-    basePriceGBP: seed.priceZAR,
     priceZAR: seed.priceZAR,
-    priceFormatted: seed.priceFormatted,
     sizesAvailable: seed.sizesAvailable,
     finishName: seed.finishName,
     otherFinishes: seed.otherFinishes,
@@ -612,7 +596,7 @@ export const STORE_PRODUCTS: StoreProductItem[] = [
     model: 'M3',
     yearRange: '2024 ONWARDS',
     partCategory: 'ALLOY WHEELS',
-    priceGBP: 90000,
+    priceZAR: 90000,
     isLatest: true,
     isReserve: true,
     setLabel: 'IN STOCK · 1 SET',
@@ -651,7 +635,7 @@ export const STORE_PRODUCTS: StoreProductItem[] = [
     model: 'M3',
     yearRange: '2024 ONWARDS',
     partCategory: 'ALLOY WHEELS',
-    priceGBP: 75000,
+    priceZAR: 75000,
     isLatest: true,
     isReserve: true,
     setLabel: 'IN STOCK · 1 SET',
@@ -690,7 +674,7 @@ export const STORE_PRODUCTS: StoreProductItem[] = [
     model: 'M3',
     yearRange: '2024 ONWARDS',
     partCategory: 'ALLOY WHEELS',
-    priceGBP: 75000,
+    priceZAR: 75000,
     isLatest: true,
     isReserve: false,
     setLabel: 'IN STOCK · 3 SETS',
@@ -728,7 +712,7 @@ export const STORE_PRODUCTS: StoreProductItem[] = [
     model: 'M3',
     yearRange: '2024 ONWARDS',
     partCategory: 'ALLOY WHEELS',
-    priceGBP: 70000,
+    priceZAR: 70000,
     isLatest: true,
     isReserve: true,
     setLabel: 'IN STOCK · 3 SETS',
@@ -766,8 +750,8 @@ export const STORE_PRODUCTS: StoreProductItem[] = [
     model: 'M3',
     yearRange: '2024 ONWARDS',
     partCategory: 'ALLOY WHEELS',
-    priceGBP: 80000,
-    originalPriceGBP: 95000,
+    priceZAR: 80000,
+    originalPriceZAR: 95000,
     isSale: true,
     isLatest: false,
     isReserve: true,
@@ -806,8 +790,8 @@ export const STORE_PRODUCTS: StoreProductItem[] = [
     model: 'M2',
     yearRange: '2023 ONWARDS',
     partCategory: 'ALLOY WHEELS',
-    priceGBP: 95000,
-    originalPriceGBP: 98000,
+    priceZAR: 95000,
+    originalPriceZAR: 98000,
     isSale: true,
     isLatest: true,
     isReserve: false,
@@ -846,8 +830,8 @@ export const STORE_PRODUCTS: StoreProductItem[] = [
     model: 'M4',
     yearRange: '2024 ONWARDS',
     partCategory: 'ALLOY WHEELS',
-    priceGBP: 80000,
-    originalPriceGBP: 85000,
+    priceZAR: 80000,
+    originalPriceZAR: 85000,
     isSale: true,
     isLatest: true,
     isReserve: false,
@@ -886,7 +870,7 @@ export const STORE_PRODUCTS: StoreProductItem[] = [
     model: 'M5',
     yearRange: '2024 ONWARDS',
     partCategory: 'ALLOY WHEELS',
-    priceGBP: 95000,
+    priceZAR: 95000,
     isLatest: true,
     isReserve: true,
     setLabel: 'IN STOCK · 2 SETS',
@@ -1177,35 +1161,32 @@ export function filterAndSortStoreProducts(
     result = result.filter((p) => p.diameterBadge === options.diameter);
   }
   if (options.sortBy === 'price-asc') {
-    result.sort((a, b) => a.priceGBP - b.priceGBP);
+    result.sort((a, b) => a.priceZAR - b.priceZAR);
   } else if (options.sortBy === 'price-desc') {
-    result.sort((a, b) => b.priceGBP - a.priceGBP);
+    result.sort((a, b) => b.priceZAR - a.priceZAR);
   } else if (options.sortBy === 'latest') {
     result.sort((a, b) => Number(Boolean(b.isLatest)) - Number(Boolean(a.isLatest)));
   }
   return result;
 }
 
-export type CurrencyCode = 'GBP' | 'USD' | 'EUR';
-
-const CURRENCY_RATES: Record<CurrencyCode, { symbol: string; rate: number }> = {
-  GBP: { symbol: '£', rate: 1 },
-  USD: { symbol: '$', rate: 1.28 },
-  EUR: { symbol: '€', rate: 1.18 },
-};
-
-export function formatCurrencyPrice(
-  amountGBP: number,
-  currency: CurrencyCode = 'GBP',
-  includeDecimals = false
-): string {
-  const config = CURRENCY_RATES[currency] ?? CURRENCY_RATES.GBP;
-  const converted = Math.round(amountGBP * config.rate);
-  const formattedNumber = converted.toLocaleString('en-GB', {
-    minimumFractionDigits: includeDecimals ? 2 : 0,
-    maximumFractionDigits: includeDecimals ? 2 : 0,
+/**
+ * Format a Rand amount for display: "R 75,000" or "R 75,000.00".
+ *
+ * All prices on the site are South African Rand. This deliberately uses the
+ * comma-thousands / point-decimal convention that SA retail sites and the
+ * catalogue's existing copy use. (The SANS / Reserve Bank style is a space
+ * separator and decimal comma, "R 75 000,00"; switch to Intl.NumberFormat with
+ * the 'en-ZA' locale and currency 'ZAR' if that house style is preferred.)
+ */
+export function formatZAR(amountZAR: number, includeDecimals = false): string {
+  const safe = Number.isFinite(amountZAR) ? amountZAR : 0;
+  const digits = includeDecimals ? 2 : 0;
+  const number = safe.toLocaleString('en-US', {
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
   });
-  return `${config.symbol}${formattedNumber}`;
+  return `R ${number}`;
 }
 
 export function getWheelImages(wheel: BrandWheelItem): {
