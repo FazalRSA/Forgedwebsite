@@ -4,6 +4,7 @@ import {
   BRAND_WHEELS,
   MARQUE_FILTERS,
   filterWheelsByMarque,
+  getAllBrandWheels,
   getAvailableMakes,
   getModelsForMake,
   getMatchingProductsForFitment,
@@ -17,12 +18,14 @@ test('MARQUE_FILTERS and getAvailableMakes expose only BMW as the car brand opti
   assert.deepEqual(MARQUE_FILTERS, ['ALL', 'BMW']);
   assert.deepEqual(getAvailableMakes(), ['BMW']);
 
+  // The catalogue is the 14 in-stock seeds plus any customWheels.json entries
+  // that do not override a seed slug, so compare against the combined list.
   const allWheels = filterWheelsByMarque('ALL');
-  assert.equal(allWheels.length, BRAND_WHEELS.length);
-  assert.ok(allWheels.length >= 8);
+  assert.equal(allWheels.length, getAllBrandWheels().length);
+  assert.ok(allWheels.length >= BRAND_WHEELS.length);
 
   const bmwWheels = filterWheelsByMarque('BMW');
-  assert.equal(bmwWheels.length, BRAND_WHEELS.length);
+  assert.equal(bmwWheels.length, getAllBrandWheels().length);
   assert.ok(bmwWheels.every((w) => w.marques.includes('BMW')));
 });
 
