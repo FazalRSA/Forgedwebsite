@@ -1,0 +1,236 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Pillar 1: Global Default-Deny Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Hardened Global Primitives
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidBrakeSystem(val) {
+      return val is string && val.size() >= 1 && val.size() <= 60 && (
+        val == 'M Compound Steel' ||
+        val == 'M Carbon Ceramic' ||
+        val == 'Bespoke Big Brake Kit'
+      );
+    }
+
+    function isValidWheelFinish(val) {
+      return val is string && val.size() >= 1 && val.size() <= 40 && (
+        val == 'silver' ||
+        val == 'satin-black' ||
+        val == 'champagne-bronze' ||
+        val == 'dark-gunmetal'
+      );
+    }
+
+    // Validation Blueprint: UserProfile
+    function isValidUserProfile(data) {
+      return data.keys().hasAll([
+        'uid',
+        'displayName',
+        'email',
+        'city',
+        'primaryMake',
+        'primaryModel',
+        'primaryYear',
+        'chassisCode',
+        'exteriorPaint',
+        'brakeSystem',
+        'preferredFinish',
+        'createdAt',
+        'updatedAt'
+      ]) &&
+      data.keys().hasOnly([
+        'uid',
+        'displayName',
+        'email',
+        'city',
+        'primaryMake',
+        'primaryModel',
+        'primaryYear',
+        'chassisCode',
+        'exteriorPaint',
+        'brakeSystem',
+        'preferredFinish',
+        'createdAt',
+        'updatedAt'
+      ]) &&
+      data.uid is string && data.uid.size() >= 1 && data.uid.size() <= 128 && data.uid.matches('^[a-zA-Z0-9_\\-]+$') &&
+      data.uid == request.auth.uid &&
+      data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 100 &&
+      data.email is string && data.email.size() >= 3 && data.email.size() <= 150 &&
+      data.city is string && data.city.size() >= 0 && data.city.size() <= 80 &&
+      data.primaryMake is string && data.primaryMake.size() >= 1 && data.primaryMake.size() <= 50 &&
+      data.primaryModel is string && data.primaryModel.size() >= 1 && data.primaryModel.size() <= 80 &&
+      data.primaryYear is string && data.primaryYear.size() >= 4 && data.primaryYear.size() <= 20 &&
+      data.chassisCode is string && data.chassisCode.size() >= 0 && data.chassisCode.size() <= 40 &&
+      data.exteriorPaint is string && data.exteriorPaint.size() >= 0 && data.exteriorPaint.size() <= 60 &&
+      isValidBrakeSystem(data.brakeSystem) &&
+      isValidWheelFinish(data.preferredFinish) &&
+      data.createdAt is timestamp &&
+      data.updatedAt is timestamp;
+    }
+
+    // Validation Blueprint: UserVehicle
+    function isValidUserVehicle(data) {
+      return data.keys().hasAll([
+        'ownerId',
+        'make',
+        'model',
+        'year',
+        'chassisCode',
+        'exteriorPaint',
+        'brakeSystem',
+        'targetWheelSlug',
+        'targetFinish',
+        'notes',
+        'createdAt',
+        'updatedAt'
+      ]) &&
+      data.keys().hasOnly([
+        'ownerId',
+        'make',
+        'model',
+        'year',
+        'chassisCode',
+        'exteriorPaint',
+        'brakeSystem',
+        'targetWheelSlug',
+        'targetFinish',
+        'notes',
+        'createdAt',
+        'updatedAt'
+      ]) &&
+      data.ownerId is string && data.ownerId.size() >= 1 && data.ownerId.size() <= 128 && data.ownerId.matches('^[a-zA-Z0-9_\\-]+$') &&
+      data.ownerId == request.auth.uid &&
+      data.make is string && data.make.size() >= 1 && data.make.size() <= 50 &&
+      data.model is string && data.model.size() >= 1 && data.model.size() <= 80 &&
+      data.year is string && data.year.size() >= 4 && data.year.size() <= 20 &&
+      data.chassisCode is string && data.chassisCode.size() >= 1 && data.chassisCode.size() <= 40 &&
+      data.exteriorPaint is string && data.exteriorPaint.size() >= 1 && data.exteriorPaint.size() <= 60 &&
+      isValidBrakeSystem(data.brakeSystem) &&
+      data.targetWheelSlug is string && data.targetWheelSlug.size() >= 1 && data.targetWheelSlug.size() <= 60 &&
+      isValidWheelFinish(data.targetFinish) &&
+      data.notes is string && data.notes.size() >= 0 && data.notes.size() <= 500 &&
+      data.createdAt is timestamp &&
+      data.updatedAt is timestamp;
+    }
+
+    // Collection 1: /users/{userId}
+    match /users/{userId} {
+      allow get: if isOwner(userId) && isValidId(userId);
+      allow list: if false;
+
+      allow create: if isVerifiedUser() &&
+        isValidId(userId) &&
+        isOwner(userId) &&
+        isValidUserProfile(incoming()) &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time;
+
+      allow update: if isVerifiedUser() &&
+        isValidUserProfile(incoming()) &&
+        isValidId(userId) &&
+        isOwner(userId) &&
+        incoming().uid == existing().uid &&
+        incoming().email == existing().email &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time && (
+          // Action: Update Profile & Primary Vehicle Specification
+          incoming().diff(existing()).affectedKeys().hasOnly([
+            'displayName',
+            'city',
+            'primaryMake',
+            'primaryModel',
+            'primaryYear',
+            'chassisCode',
+            'exteriorPaint',
+            'brakeSystem',
+            'preferredFinish',
+            'updatedAt'
+          ])
+        );
+
+      allow delete: if isVerifiedUser() && isValidId(userId) && isOwner(userId);
+
+      // Subcollection 2: /users/{userId}/vehicles/{vehicleId}
+      match /vehicles/{vehicleId} {
+        allow get: if isOwner(userId) &&
+          isValidId(userId) &&
+          isValidId(vehicleId) &&
+          existing().ownerId == request.auth.uid &&
+          get(/databases/$(database)/documents/users/$(userId)).data.uid == request.auth.uid;
+
+        allow list: if isOwner(userId) &&
+          existing().ownerId == request.auth.uid;
+
+        allow create: if isVerifiedUser() &&
+          isOwner(userId) &&
+          isValidId(userId) &&
+          isValidId(vehicleId) &&
+          isValidUserVehicle(incoming()) &&
+          incoming().ownerId == userId &&
+          incoming().createdAt == request.time &&
+          incoming().updatedAt == request.time &&
+          get(/databases/$(database)/documents/users/$(userId)).data.uid == request.auth.uid;
+
+        allow update: if isVerifiedUser() &&
+          isValidUserVehicle(incoming()) &&
+          isOwner(userId) &&
+          isValidId(userId) &&
+          isValidId(vehicleId) &&
+          incoming().ownerId == existing().ownerId &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().updatedAt == request.time &&
+          get(/databases/$(database)/documents/users/$(userId)).data.uid == request.auth.uid && (
+            // Action: Update Garage Vehicle Specification
+            incoming().diff(existing()).affectedKeys().hasOnly([
+              'make',
+              'model',
+              'year',
+              'chassisCode',
+              'exteriorPaint',
+              'brakeSystem',
+              'targetWheelSlug',
+              'targetFinish',
+              'notes',
+              'updatedAt'
+            ])
+          );
+
+        allow delete: if isVerifiedUser() &&
+          isOwner(userId) &&
+          isValidId(userId) &&
+          isValidId(vehicleId) &&
+          existing().ownerId == request.auth.uid &&
+          get(/databases/$(database)/documents/users/$(userId)).data.uid == request.auth.uid;
+      }
+    }
+  }
+}

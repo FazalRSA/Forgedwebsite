@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --color-rich-black-base: #0A0A0A;
+    --color-onyx-base: #0A0A0A;
+    --color-onyx-surface: #121215;
+    --color-onyx-card: #18181D;
+    --color-onyx-border: #26262E;
+    --color-onyx-border-subtle: #1E1E26;
+    --color-text-primary: #F5F5F7;
+    --color-text-secondary: #C2C2CC;
+    --color-text-muted: #727280;
+    --color-electric-orange: #FF5500;
+    --color-electric-orange-hover: #FF6B1A;
+    --color-whatsapp: #25D366;
+    --color-instagram: #E1306C;
+
+    --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-serif: 'Geist', sans-serif;
+    --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, monospace;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    color: var(--color-text-primary);
+    background-color: var(--color-rich-black-base);
+    overflow-x: hidden;
+    letter-spacing: -0.01em;
+  }
+}
+
+.font-editorial-serif {
+  font-family: var(--font-sans);
+  font-style: italic;
+  letter-spacing: -0.02em;
+}
+
+.font-tech-mono {
+  font-family: var(--font-mono);
+  letter-spacing: -0.01em;
+}
+
+/* Hide scrollbars on horizontal pill carousels while keeping scroll functionality */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@keyframes marqueeScroll {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marqueeScroll 22s linear infinite;
+}
+
+@keyframes slowSpin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: slowSpin 24s linear infinite;
+}
+
+.writing-vertical-rl {
+  writing-mode: vertical-rl;
+}

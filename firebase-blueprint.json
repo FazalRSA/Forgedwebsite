@@ -1,0 +1,214 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Private user account profile and primary vehicle specification for FORGED Custom Wheels clients.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Firebase Auth UID of the account owner.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Client display name.",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "Verified email address of the client.",
+          "minLength": 3,
+          "maxLength": 150
+        },
+        "city": {
+          "type": "string",
+          "description": "Client city or region for delivery/fitment partner matching.",
+          "minLength": 0,
+          "maxLength": 80
+        },
+        "primaryMake": {
+          "type": "string",
+          "description": "Primary vehicle marque (e.g., BMW).",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "primaryModel": {
+          "type": "string",
+          "description": "Primary vehicle model (e.g., G80 M3 Competition).",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "primaryYear": {
+          "type": "string",
+          "description": "Model year of primary vehicle.",
+          "minLength": 4,
+          "maxLength": 20
+        },
+        "chassisCode": {
+          "type": "string",
+          "description": "Factory chassis code (e.g., G80 LCI, G82 CSL).",
+          "minLength": 0,
+          "maxLength": 40
+        },
+        "exteriorPaint": {
+          "type": "string",
+          "description": "Vehicle exterior paint colour (e.g., Mint Green Individual).",
+          "minLength": 0,
+          "maxLength": 60
+        },
+        "brakeSystem": {
+          "type": "string",
+          "description": "Brake setup for barrel clearance verification.",
+          "enum": ["M Compound Steel", "M Carbon Ceramic", "Bespoke Big Brake Kit"],
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "preferredFinish": {
+          "type": "string",
+          "description": "Preferred forged wheel finish ID.",
+          "enum": ["silver", "satin-black", "champagne-bronze", "dark-gunmetal"],
+          "minLength": 1,
+          "maxLength": 40
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when the profile was created."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when the profile was last updated."
+        }
+      },
+      "required": [
+        "uid",
+        "displayName",
+        "email",
+        "city",
+        "primaryMake",
+        "primaryModel",
+        "primaryYear",
+        "chassisCode",
+        "exteriorPaint",
+        "brakeSystem",
+        "preferredFinish",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "UserVehicle": {
+      "title": "UserVehicle",
+      "description": "A vehicle stored in a user's personal FORGED Garage for wheel fitment matching.",
+      "type": "object",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "description": "UID of the user who owns this garage vehicle record.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "make": {
+          "type": "string",
+          "description": "Vehicle manufacturer (e.g., BMW, Porsche, Mercedes-AMG).",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "model": {
+          "type": "string",
+          "description": "Vehicle model designation (e.g., M3 Competition xDrive).",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "year": {
+          "type": "string",
+          "description": "Vehicle manufacture year.",
+          "minLength": 4,
+          "maxLength": 20
+        },
+        "chassisCode": {
+          "type": "string",
+          "description": "Chassis code (e.g., G80, G82, G90).",
+          "minLength": 1,
+          "maxLength": 40
+        },
+        "exteriorPaint": {
+          "type": "string",
+          "description": "Exterior paint specification.",
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "brakeSystem": {
+          "type": "string",
+          "description": "Brake caliper/rotor package.",
+          "enum": ["M Compound Steel", "M Carbon Ceramic", "Bespoke Big Brake Kit"],
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "targetWheelSlug": {
+          "type": "string",
+          "description": "Slug of the FORGED wheel configured for this vehicle.",
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "targetFinish": {
+          "type": "string",
+          "description": "Finish ID selected for this vehicle's wheel build.",
+          "enum": ["silver", "satin-black", "champagne-bronze", "dark-gunmetal"],
+          "minLength": 1,
+          "maxLength": 40
+        },
+        "notes": {
+          "type": "string",
+          "description": "Custom suspension drop, tyre preference, or offset notes.",
+          "minLength": 0,
+          "maxLength": 500
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when the vehicle was added."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when the vehicle was last updated."
+        }
+      },
+      "required": [
+        "ownerId",
+        "make",
+        "model",
+        "year",
+        "chassisCode",
+        "exteriorPaint",
+        "brakeSystem",
+        "targetWheelSlug",
+        "targetFinish",
+        "notes",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": {
+        "$ref": "#/entities/UserProfile"
+      },
+      "description": "Stores each authenticated client's profile and primary vehicle specification."
+    },
+    "/users/{userId}/vehicles/{vehicleId}": {
+      "schema": {
+        "$ref": "#/entities/UserVehicle"
+      },
+      "description": "Subcollection storing the vehicles in a client's personal garage."
+    }
+  }
+}

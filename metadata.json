@@ -1,0 +1,6 @@
+{
+  "name": "Kahn Design & Project Kahn — Automotive Fashion House",
+  "description": "Unified dual-domain luxury automotive digital experience featuring the Kahn Design editorial brand showcase, 360-degree forged wheel catalogue, and the Project Kahn technical e-commerce storefront with real-time vehicle fitment engine.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
