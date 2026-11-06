@@ -442,9 +442,11 @@ export const TechnicalProductView: React.FC<TechnicalProductViewProps> = ({
               <button
                 type="button"
                 onClick={() => {
-                  setContactActionFeedback(
-                    `Connected to FORGED Custom wheels WhatsApp Specialist for Part ${product.technicalSpecs.partNo}`
-                  );
+                  // No contactActionFeedback toast here: on narrow viewports the live-chat
+                  // panel this opens (GlobalOverlays.tsx, fixed bottom-5 right-5, up to
+                  // 320px wide below the sm breakpoint) can cover this dock's bottom-left
+                  // footprint and hide the toast right as it appears. Opening the chat
+                  // panel is itself an obvious, immediate confirmation for this action.
                   setChatOpen(true);
                   sendChatMessage(
                     `WhatsApp Fitment Check: ${product.title} (${product.technicalSpecs.partNo})`
