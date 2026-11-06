@@ -1238,3 +1238,39 @@ export function getWheelImages(wheel: BrandWheelItem): {
     labels: ['Picture 1 · Front Face', 'Picture 2 · 3/4 Concave', 'Picture 3 · Rim Barrel'],
   };
 }
+
+/**
+ * Resolves the 3 real studio-photo slots for a Store PDP.
+ * StoreProductItem.imageUrl/galleryImages are seeded empty for most products, even when
+ * real photography already exists for the matching wheel on the Brand Showcase
+ * (linked via wheelSlug === BrandWheelItem.slug). Falls back to that wheel's images
+ * before generating a placeholder, so real renders reach the page closest to the sale.
+ */
+export function getStoreProductImages(
+  product: StoreProductItem,
+  runtimeCustomWheels: BrandWheelItem[] = []
+): { images: [string, string, string]; labels: [string, string, string] } {
+  const matchedWheel = getAllBrandWheels(runtimeCustomWheels).find(
+    (w) => w.slug.toLowerCase() === product.wheelSlug.toLowerCase()
+  );
+  const wheelImages = matchedWheel ? getWheelImages(matchedWheel) : undefined;
+  const finishText = WHEEL_FINISHES[product.defaultFinish]?.name || 'Forged';
+
+  const primary =
+    product.imageUrl ||
+    wheelImages?.images[0] ||
+    createWheelPlaceholderDataUrl(1, product.shortModel, finishText, 'Picture One · Front Face', product.spokeCount);
+  const second =
+    product.galleryImages?.[0] ||
+    wheelImages?.images[1] ||
+    createWheelPlaceholderDataUrl(2, product.shortModel, finishText, 'Picture Two · 3/4 Concave', product.spokeCount);
+  const third =
+    product.galleryImages?.[1] ||
+    wheelImages?.images[2] ||
+    createWheelPlaceholderDataUrl(3, product.shortModel, finishText, 'Picture Three · Rim Barrel', product.spokeCount);
+
+  return {
+    images: [primary, second, third],
+    labels: ['Picture 1 · Front Face', 'Picture 2 · 3/4 Concave', 'Picture 3 · Rim Barrel'],
+  };
+}
