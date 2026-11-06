@@ -7,3 +7,6 @@ coverage/
 *.mov
 .env*
 !.env.example
+
+# Local agent-session tooling artifacts, not project source
+.cto-toolkit/
