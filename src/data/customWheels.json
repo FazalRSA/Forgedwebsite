@@ -142,6 +142,103 @@
         "warranty": "3-Year Structural & Finish Guarantee"
       },
       "compatibleStoreProductSlug": "bmw-m2-mondial-retro-forged"
+    },
+    {
+      "id": "wheel-fsa003-hyper-black",
+      "slug": "fsa003-hyper-black",
+      "model": "FSA003 — Hyper Black",
+      "modelCode": "FSA003",
+      "series": "20 INCH / 21 INCH · IN STOCK (1 SET)",
+      "headline": "FSA003 (Hyper Black) for BMW M3 Sedan (G80).",
+      "editorialLead": "20 inch / 21 inch staggered fitment engineered specifically for BMW M3 Sedan (G80) (PCD 5×112 · ET8/15 · CB66.6).",
+      "editorialBody": "Direct bolt-on specification (PCD 5×112 · ET8/15 · CB66.6) finished in Hyper Black. Currently in stock with 1 complete set ready for immediate dispatch.",
+      "marques": [
+        "BMW"
+      ],
+      "geometry": "multi-spoke-gt",
+      "spokeCount": 10,
+      "defaultFinish": "dark-gunmetal",
+      "availableFinishes": [
+        "dark-gunmetal",
+        "silver"
+      ],
+      "basePriceGBP": 75000,
+      "priceZAR": 75000,
+      "priceFormatted": "R 75,000",
+      "sizesAvailable": "20 inch / 21 inch",
+      "finishName": "Hyper Black",
+      "compatibleCars": "M3 Sedan (G80)",
+      "stockStatus": "In Stock",
+      "stockQuantitySets": 1,
+      "technicalSpecSheet": "PCD 5×112 · ET8/15 · CB66.6",
+      "images": [
+        "/images/wheels/fsa003-hyper-black/front.webp",
+        "/images/wheels/fsa003-hyper-black/hero.webp",
+        "/images/wheels/fsa003-hyper-black/profile.webp"
+      ],
+      "imageLabels": [
+        "Picture 1 · FSA003 Hyper Black",
+        "Picture 2 · 20 inch / 21 inch Profile",
+        "Picture 3 · PCD 5×112 · ET8/15 · CB66.6"
+      ],
+      "specs": {
+        "product": "FSA003 (Hyper Black) — 1 Set In Stock",
+        "material": "6061-T6 Aerospace Forged Aluminium",
+        "diameters": "20 inch / 21 inch (M3 Sedan (G80))",
+        "finishOptions": "Hyper Black",
+        "testing": "PCD 5×112 · ET8/15 · CB66.6",
+        "warranty": "3-Year Structural & Finish Guarantee"
+      },
+      "compatibleStoreProductSlug": "bmw-m3-rs-3-0"
+    },
+    {
+      "id": "wheel-fsa004-silver",
+      "slug": "fsa004-silver",
+      "model": "FSA004 — Silver",
+      "modelCode": "FSA004",
+      "series": "20 INCH / 21 INCH · IN STOCK (1 SET)",
+      "headline": "FSA004 (Silver) for BMW M3 Competition Sedan (G80).",
+      "editorialLead": "20 inch / 21 inch staggered fitment engineered specifically for BMW M3 Competition Sedan (G80) (PCD 5×112 · ET8/15 · CB66.6).",
+      "editorialBody": "Direct bolt-on specification (PCD 5×112 · ET8/15 · CB66.6) finished in Silver. Currently in stock with 1 complete set ready for immediate dispatch.",
+      "marques": [
+        "BMW"
+      ],
+      "geometry": "multi-spoke-gt",
+      "spokeCount": 12,
+      "defaultFinish": "silver",
+      "availableFinishes": [
+        "silver",
+        "dark-gunmetal",
+        "satin-black"
+      ],
+      "basePriceGBP": 70000,
+      "priceZAR": 70000,
+      "priceFormatted": "R 70,000",
+      "sizesAvailable": "20 inch / 21 inch",
+      "finishName": "Silver",
+      "compatibleCars": "M3 Competition Sedan (G80)",
+      "stockStatus": "In Stock",
+      "stockQuantitySets": 1,
+      "technicalSpecSheet": "PCD 5×112 · ET8/15 · CB66.6",
+      "images": [
+        "/images/wheels/fsa004-silver/front.webp",
+        "/images/wheels/fsa004-silver/hero.webp",
+        "/images/wheels/fsa004-silver/profile.webp"
+      ],
+      "imageLabels": [
+        "Picture 1 · FSA004 Silver",
+        "Picture 2 · 20 inch / 21 inch Profile",
+        "Picture 3 · PCD 5×112 · ET8/15 · CB66.6"
+      ],
+      "specs": {
+        "product": "FSA004 (Silver) — 1 Set In Stock",
+        "material": "6061-T6 Aerospace Forged Aluminium",
+        "diameters": "20 inch / 21 inch (M3 Competition Sedan (G80))",
+        "finishOptions": "Silver",
+        "testing": "PCD 5×112 · ET8/15 · CB66.6",
+        "warranty": "3-Year Structural & Finish Guarantee"
+      },
+      "compatibleStoreProductSlug": "bmw-m3-g06-aero-forged"
     }
   ],
   "storeProducts": []
