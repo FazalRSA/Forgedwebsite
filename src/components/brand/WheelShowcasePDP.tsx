@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import {
   ArrowRight,
   ChevronLeft,
@@ -21,8 +21,17 @@ import { useRouter } from '../../utils/router';
 import { useKahnStore } from '../../store/useKahnStore';
 import { useFirebaseAuth } from '../../context/FirebaseContext';
 import { BrandHeader } from './BrandHeader';
-import { Wheel3DScene } from '../visuals/Wheel3DScene';
 import { WheelLightboxModal } from './WheelLightboxModal';
+import { SafeImage } from '../shared/SafeImage';
+import { Wheel3DSceneSkeleton } from '../visuals/Wheel3DSceneSkeleton';
+import { Wheel3DSceneErrorBoundary } from '../visuals/Wheel3DSceneErrorBoundary';
+import { lazyWithRetry } from '../../utils/lazyWithRetry';
+
+// Defers the three.js bundle (core + OrbitControls + RoomEnvironment + GLTFLoader) until
+// a visitor actually opens the 3D tab, instead of shipping it in every PDP's main chunk.
+const Wheel3DScene = lazyWithRetry(() =>
+  import('../visuals/Wheel3DScene').then((m) => ({ default: m.Wheel3DScene }))
+);
 
 interface WheelShowcasePDPProps {
   slug: string;
@@ -201,17 +210,21 @@ export const WheelShowcasePDP: React.FC<WheelShowcasePDPProps> = ({ slug }) => {
         {/* Main Interactive Stage: 360° 3D Three.js Scene OR 3-Angle Photography */}
         <section className="mb-14">
           {viewMode === '3d' ? (
-            <Wheel3DScene
-              wheelModel={wheel.model}
-              wheelSeries={wheel.series}
-              spokeStyle={wheel.geometry}
-              selectedFinish={selectedFinish}
-              availableFinishes={wheel.availableFinishes}
-              onSelectFinish={setSelectedFinish}
-              onEnquire={handleEnquireWheel}
-              userVehicleLabel={userVehicleLabel}
-              modelUrl={wheel.modelUrl}
-            />
+            <Wheel3DSceneErrorBoundary>
+              <Suspense fallback={<Wheel3DSceneSkeleton />}>
+                <Wheel3DScene
+                  wheelModel={wheel.model}
+                  wheelSeries={wheel.series}
+                  spokeStyle={wheel.geometry}
+                  selectedFinish={selectedFinish}
+                  availableFinishes={wheel.availableFinishes}
+                  onSelectFinish={setSelectedFinish}
+                  onEnquire={handleEnquireWheel}
+                  userVehicleLabel={userVehicleLabel}
+                  modelUrl={wheel.modelUrl}
+                />
+              </Suspense>
+            </Wheel3DSceneErrorBoundary>
           ) : (
             <div className="flex flex-col items-center">
               <div
@@ -219,9 +232,10 @@ export const WheelShowcasePDP: React.FC<WheelShowcasePDPProps> = ({ slug }) => {
                 aria-label={`${wheel.model} 3-Image Gallery Stage`}
                 className="relative w-full max-w-4xl aspect-[16/10] bg-[#121215] border border-[#26262E] rounded-3xl overflow-hidden select-none shadow-2xl"
               >
-                <img
+                <SafeImage
                   src={wheelGallery.images[activePhotoIdx]}
                   alt={`${wheel.model} - ${wheelGallery.labels[activePhotoIdx]}`}
+                  fallbackLabel={wheelGallery.labels[activePhotoIdx]}
                   loading="lazy"
                   referrerPolicy="no-referrer"
                   onClick={() => setLightboxOpen(true)}
@@ -360,9 +374,10 @@ export const WheelShowcasePDP: React.FC<WheelShowcasePDPProps> = ({ slug }) => {
                     className="text-left group cursor-pointer"
                   >
                     <div className="bg-[#121215] border border-[#26262E] group-hover:border-[#FF5500] rounded-2xl aspect-square overflow-hidden relative transition-colors">
-                      <img
+                      <SafeImage
                         src={peerData.images[0]}
                         alt={peer.model}
+                        fallbackLabel={peer.model}
                         loading="lazy"
                         referrerPolicy="no-referrer"
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"

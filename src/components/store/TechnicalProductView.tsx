@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import {
   Bookmark,
   MessageCircle,
@@ -21,9 +21,17 @@ import { useKahnStore } from '../../store/useKahnStore';
 import { useRouter } from '../../utils/router';
 import { StoreHeader } from './StoreHeader';
 import { WheelRenderSVG } from '../visuals/WheelRenderSVG';
-import { Wheel3DScene } from '../visuals/Wheel3DScene';
+import { Wheel3DSceneSkeleton } from '../visuals/Wheel3DSceneSkeleton';
+import { Wheel3DSceneErrorBoundary } from '../visuals/Wheel3DSceneErrorBoundary';
 import { TechnicalProductViewSkeleton } from '../shared/SkeletonLoaders';
 import { LogoPlaceholder } from '../shared/LogoPlaceholder';
+import { lazyWithRetry } from '../../utils/lazyWithRetry';
+
+// Defers the three.js bundle (core + OrbitControls + RoomEnvironment + GLTFLoader) until
+// the PDP actually renders the 3D stage, instead of shipping it in every PDP's main chunk.
+const Wheel3DScene = lazyWithRetry(() =>
+  import('../visuals/Wheel3DScene').then((m) => ({ default: m.Wheel3DScene }))
+);
 
 interface TechnicalProductViewProps {
   productSlug: string;
@@ -180,15 +188,19 @@ export const TechnicalProductView: React.FC<TechnicalProductViewProps> = ({
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
               {/* Left Column: Interactive 360° 3D Wheel Studio */}
               <div className="lg:col-span-7 space-y-4">
-                <Wheel3DScene
-                  wheelModel={product.shortModel}
-                  wheelSeries={product.technicalSpecs.construction}
-                  spokeStyle={product.geometry}
-                  selectedFinish={selectedFinish}
-                  availableFinishes={product.availableFinishes}
-                  onSelectFinish={setSelectedFinish}
-                  modelUrl={modelUrl}
-                />
+                <Wheel3DSceneErrorBoundary>
+                  <Suspense fallback={<Wheel3DSceneSkeleton />}>
+                    <Wheel3DScene
+                      wheelModel={product.shortModel}
+                      wheelSeries={product.technicalSpecs.construction}
+                      spokeStyle={product.geometry}
+                      selectedFinish={selectedFinish}
+                      availableFinishes={product.availableFinishes}
+                      onSelectFinish={setSelectedFinish}
+                      modelUrl={modelUrl}
+                    />
+                  </Suspense>
+                </Wheel3DSceneErrorBoundary>
 
                 {/* Finish Swatch Selector Bar */}
                 <div className="p-4 border border-[#26262E] bg-[#121215] flex flex-wrap items-center justify-between gap-4">

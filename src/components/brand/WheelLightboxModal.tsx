@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import {
   BrandWheelItem,
@@ -8,6 +8,7 @@ import {
   formatZAR,
 } from '../../data/kahnData';
 import { useKahnStore } from '../../store/useKahnStore';
+import { SafeImage } from '../shared/SafeImage';
 
 interface WheelLightboxModalProps {
   wheel: BrandWheelItem | null;
@@ -109,6 +110,59 @@ export const WheelLightboxModal: React.FC<WheelLightboxModalProps> = ({
     setIsDragging(false);
   };
 
+  // Touch equivalents: one finger drags/pans when zoomed in (mirrors mouse
+  // drag), two fingers pinch-zoom (mirrors the wheel-zoom step).
+  const pinchDistRef = useRef<number | null>(null);
+
+  const getTouchDistance = (touches: React.TouchList) => {
+    if (touches.length < 2) return null;
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.hypot(dx, dy);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 2) {
+      pinchDistRef.current = getTouchDistance(e.touches);
+      return;
+    }
+    if (zoomLevel <= 1) return;
+    const touch = e.touches[0];
+    setIsDragging(true);
+    setDragStart({ x: touch.clientX - panOffset.x, y: touch.clientY - panOffset.y });
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (e.touches.length === 2) {
+      const dist = getTouchDistance(e.touches);
+      if (dist != null && pinchDistRef.current != null) {
+        const delta = dist - pinchDistRef.current;
+        if (Math.abs(delta) > 4) {
+          setZoomLevel((prev) => {
+            const next = Math.max(1, Math.min(2.5, +(prev + (delta > 0 ? 0.08 : -0.08)).toFixed(2)));
+            if (next === 1) setPanOffset({ x: 0, y: 0 });
+            return next;
+          });
+          pinchDistRef.current = dist;
+        }
+      }
+      return;
+    }
+    if (!isDragging || zoomLevel <= 1) return;
+    const touch = e.touches[0];
+    const maxOffset = (zoomLevel - 1) * 300;
+    const newX = Math.max(-maxOffset, Math.min(maxOffset, touch.clientX - dragStart.x));
+    const newY = Math.max(-maxOffset, Math.min(maxOffset, touch.clientY - dragStart.y));
+    setPanOffset({ x: newX, y: newY });
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (e.touches.length < 2) {
+      pinchDistRef.current = null;
+    }
+    setIsDragging(false);
+  };
+
   const handleImageClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (zoomLevel === 1) {
@@ -149,6 +203,8 @@ export const WheelLightboxModal: React.FC<WheelLightboxModalProps> = ({
       className="fixed inset-0 z-50 bg-[#070709]/95 backdrop-blur-xl flex flex-col justify-between select-none overflow-hidden text-[#F5F5F7] animate-in fade-in duration-200"
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
+      onTouchEnd={handleTouchEnd}
+      onTouchCancel={handleTouchEnd}
     >
       {/* Minimal Header: Title + Quiet Spec Line + Close */}
       <header className="relative z-20 px-6 sm:px-10 py-5 flex items-center justify-between gap-4">
@@ -179,7 +235,9 @@ export const WheelLightboxModal: React.FC<WheelLightboxModalProps> = ({
         onWheel={handleWheel}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
-        className={`relative flex-1 w-full flex items-center justify-center overflow-hidden px-4 sm:px-12 select-none ${
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        className={`relative flex-1 w-full flex items-center justify-center overflow-hidden px-4 sm:px-12 select-none touch-none ${
           zoomLevel > 1
             ? isDragging
               ? 'cursor-grabbing'
@@ -197,9 +255,11 @@ export const WheelLightboxModal: React.FC<WheelLightboxModalProps> = ({
             transition: isDragging ? 'none' : 'transform 200ms cubic-bezier(0.16, 1, 0.3, 1)',
           }}
         >
-          <img
+          <SafeImage
             src={activeImage}
             alt={`${wheel.model} - ${activeLabel}`}
+            fallbackLabel={activeLabel}
+            fallbackClassName="w-full h-full min-h-[280px] rounded-xl"
             loading="eager"
             referrerPolicy="no-referrer"
             onLoad={() => setImageLoaded(true)}
@@ -279,9 +339,10 @@ export const WheelLightboxModal: React.FC<WheelLightboxModalProps> = ({
                     : 'border-white/15 opacity-50 hover:opacity-80'
                 }`}
               >
-                <img
+                <SafeImage
                   src={imgUrl}
                   alt=""
+                  fallbackLabel={wheelData.labels[idx]}
                   className="w-full h-full object-cover"
                 />
               </button>
