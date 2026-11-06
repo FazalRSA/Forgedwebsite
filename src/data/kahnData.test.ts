@@ -133,3 +133,25 @@ test('createWheelAndProductEntries builds custom wheel and store product with im
   assert.equal(mergedM3Collection.products.length, 6);
   assert.equal(mergedM3Collection.products[0].slug, storeProduct.slug);
 });
+
+test('findWheelBySlug has no silent fallback and modelUrl flows through the wheel builder to both entries', async () => {
+  const { findWheelBySlug, getWheelBySlug } = await import('./kahnData');
+  const { createWheelAndProductEntries } = await import('../utils/wheelBuilder');
+
+  assert.equal(findWheelBySlug('does-not-exist'), undefined);
+  assert.equal(findWheelBySlug('fsa002-gold')?.slug, 'fsa002-gold');
+  assert.equal(findWheelBySlug('FSA002')?.modelCode, 'FSA002');
+  assert.equal(getWheelBySlug('does-not-exist').slug, getWheelBySlug('').slug);
+
+  const withModel = createWheelAndProductEntries({
+    name: 'TYPE 99',
+    priceGBP: 1000,
+    modelUrl: '  /models/wheels/type-99.glb  ',
+  });
+  assert.equal(withModel.brandWheel.modelUrl, '/models/wheels/type-99.glb');
+  assert.equal(withModel.storeProduct.modelUrl, '/models/wheels/type-99.glb');
+
+  const withoutModel = createWheelAndProductEntries({ name: 'TYPE 98', priceGBP: 1000 });
+  assert.equal(withoutModel.brandWheel.modelUrl, undefined);
+  assert.equal(withoutModel.storeProduct.modelUrl, undefined);
+});

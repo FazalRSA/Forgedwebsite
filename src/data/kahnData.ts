@@ -100,6 +100,8 @@ export interface BrandWheelItem {
   technicalSpecSheet?: string;
   imageUrl?: string;
   galleryImages?: string[];
+  /** Photoreal .glb rim model served from /public, e.g. "/models/wheels/fsa002-gold.glb". */
+  modelUrl?: string;
   images?: [string, string, string];
   imageLabels?: [string, string, string];
   specs: {
@@ -136,6 +138,8 @@ export interface StoreProductItem {
   availableFinishes: WheelFinishId[];
   imageUrl?: string;
   galleryImages?: string[];
+  /** Photoreal .glb rim model; falls back to the linked brand wheel's modelUrl when absent. */
+  modelUrl?: string;
   technicalSpecs: {
     productName: string;
     frontWheelSize: string;
@@ -1051,18 +1055,25 @@ export function filterWheelsByMarque(
   return allWheels.filter((wheel) => wheel.marques.includes(marque));
 }
 
-export function getWheelBySlug(
+export function findWheelBySlug(
   slug: string,
   runtimeCustomWheels: BrandWheelItem[] = []
-): BrandWheelItem {
+): BrandWheelItem | undefined {
   const normalized = slug.toLowerCase();
-  const allWheels = getAllBrandWheels(runtimeCustomWheels);
-  const found = allWheels.find(
+  return getAllBrandWheels(runtimeCustomWheels).find(
     (w) =>
       w.slug.toLowerCase() === normalized ||
       w.modelCode?.toLowerCase() === normalized
   );
-  return found ?? allWheels[0];
+}
+
+export function getWheelBySlug(
+  slug: string,
+  runtimeCustomWheels: BrandWheelItem[] = []
+): BrandWheelItem {
+  return (
+    findWheelBySlug(slug, runtimeCustomWheels) ?? getAllBrandWheels(runtimeCustomWheels)[0]
+  );
 }
 
 export function getAvailableMakes(): string[] {

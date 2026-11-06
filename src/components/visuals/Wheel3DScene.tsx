@@ -361,6 +361,8 @@ export interface Wheel3DSceneProps {
   onSelectFinish: (finish: WheelFinishId) => void;
   onEnquire?: () => void;
   userVehicleLabel?: string | null;
+  /** Served path to this wheel's photoreal .glb (e.g. "/models/wheels/fsa002-gold.glb"). Absent = procedural rim. */
+  modelUrl?: string | null;
 }
 
 export const Wheel3DScene: React.FC<Wheel3DSceneProps> = ({
@@ -372,6 +374,7 @@ export const Wheel3DScene: React.FC<Wheel3DSceneProps> = ({
   onSelectFinish,
   onEnquire,
   userVehicleLabel,
+  modelUrl,
 }) => {
   const canvasMountRef = useRef<HTMLDivElement | null>(null);
 
@@ -387,6 +390,7 @@ export const Wheel3DScene: React.FC<Wheel3DSceneProps> = ({
     fileName: string;
     triangles: number;
     meshes: number;
+    source: 'official' | 'test';
   } | null>(null);
   const [isLoadingCustom, setIsLoadingCustom] = useState<boolean>(false);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -406,7 +410,9 @@ export const Wheel3DScene: React.FC<Wheel3DSceneProps> = ({
     requestRender: () => {},
     updateFinishColors: (_finish: WheelFinishId) => {},
     rebuildSpokes: (_style: SpokeGeometryType) => {},
-    loadCustomGLB: (_url: string, _fileName: string) => {},
+    loadCustomGLB: (_url: string, _fileName: string, _source: 'official' | 'test') => {},
+    loadOfficialModel: (_url: string | null) => {},
+    restoreBaseModel: () => {},
     restoreDefaultRim: () => {},
   });
 
@@ -418,7 +424,9 @@ export const Wheel3DScene: React.FC<Wheel3DSceneProps> = ({
     stateRef.current.requestRender();
   }, [explodedRatio, showBrakes, spinVelocity]);
 
+  const currentFinishRef = useRef<WheelFinishId>(selectedFinish);
   useEffect(() => {
+    currentFinishRef.current = selectedFinish;
     stateRef.current.updateFinishColors(selectedFinish);
     stateRef.current.requestRender();
   }, [selectedFinish]);
@@ -432,7 +440,7 @@ export const Wheel3DScene: React.FC<Wheel3DSceneProps> = ({
     const file = e.target.files?.[0];
     if (!file) return;
     const objectUrl = URL.createObjectURL(file);
-    stateRef.current.loadCustomGLB(objectUrl, file.name);
+    stateRef.current.loadCustomGLB(objectUrl, file.name, 'test');
     e.target.value = '';
   };
 
@@ -693,6 +701,16 @@ export const Wheel3DScene: React.FC<Wheel3DSceneProps> = ({
 
     let customRimHolder: THREE.Group | null = null;
     let activeCustomUrl: string | null = null;
+    // Official per-wheel model (from props). Test uploads sit on top of it; "Restore" returns here.
+    let officialModelUrl: string | null = null;
+    // Monotonic token so a slow load that finishes after a newer request is discarded.
+    let loadToken = 0;
+    // Materials on named rim meshes of a loaded model that follow the finish swatches.
+    let customFinishMats: THREE.MeshStandardMaterial[] = [];
+    const FINISH_MESH_PATTERN = /^(rim_face|rim_barrel|rim_lip|rim_spokes)/i;
+    const releaseUrl = (url: string | null) => {
+      if (url && url.startsWith('blob:')) URL.revokeObjectURL(url);
+    };
 
     // Part 1: Stepped Forged Alloy Barrel (LatheGeometry)
     const barrelProfile = [
@@ -858,6 +876,12 @@ export const Wheel3DScene: React.FC<Wheel3DSceneProps> = ({
         primaryAlloyMat.roughness = 0.18;
         primaryAlloyMat.metalness = 0.94;
       }
+      for (const mat of customFinishMats) {
+        mat.color.set(f.swatchHex);
+        mat.metalness = primaryAlloyMat.metalness;
+        mat.roughness = primaryAlloyMat.roughness;
+        mat.needsUpdate = true;
+      }
     };
 
     stateRef.current.rebuildSpokes = (newStyle: SpokeGeometryType) => {
@@ -871,21 +895,30 @@ export const Wheel3DScene: React.FC<Wheel3DSceneProps> = ({
       spokesContainerGroup.add(activeSpokesMeshGroup);
     };
 
-    stateRef.current.loadCustomGLB = (url: string, fileName: string) => {
+    stateRef.current.loadCustomGLB = (
+      url: string,
+      fileName: string,
+      source: 'official' | 'test'
+    ) => {
+      const token = ++loadToken;
       setIsLoadingCustom(true);
       setLoadError(null);
 
-      if (activeCustomUrl) {
-        URL.revokeObjectURL(activeCustomUrl);
-      }
+      releaseUrl(activeCustomUrl);
       activeCustomUrl = url;
 
       const loader = new GLTFLoader();
       loader.load(
         url,
         (gltf) => {
+          if (token !== loadToken) {
+            // A newer load or a restore superseded this one while it was in flight.
+            releaseUrl(url);
+            return;
+          }
           let triangles = 0;
           let meshCount = 0;
+          const finishMats: THREE.MeshStandardMaterial[] = [];
 
           gltf.scene.traverse((obj) => {
             if ((obj as THREE.Mesh).isMesh) {
@@ -893,13 +926,22 @@ export const Wheel3DScene: React.FC<Wheel3DSceneProps> = ({
               meshCount++;
               m.castShadow = true;
               m.receiveShadow = true;
+              const followsFinish = FINISH_MESH_PATTERN.test(m.name || '');
               if (m.material) {
                 const mats = Array.isArray(m.material) ? m.material : [m.material];
-                mats.forEach((mat) => {
+                const next = mats.map((mat) => {
                   if ('envMapIntensity' in mat) {
                     (mat as THREE.MeshStandardMaterial).envMapIntensity = 1.35;
                   }
+                  if (followsFinish && (mat as THREE.MeshStandardMaterial).isMeshStandardMaterial) {
+                    // Clone so re-tinting a named rim mesh never bleeds into bolts/caps sharing the material.
+                    const own = (mat as THREE.MeshStandardMaterial).clone();
+                    finishMats.push(own);
+                    return own;
+                  }
+                  return mat;
                 });
+                m.material = Array.isArray(m.material) ? next : next[0];
               }
               if (m.geometry) {
                 if (m.geometry.index) {
@@ -938,37 +980,69 @@ export const Wheel3DScene: React.FC<Wheel3DSceneProps> = ({
           defaultRimAssembly.visible = false;
           spinGroup.add(customRimHolder);
 
+          customFinishMats = finishMats;
+          stateRef.current.updateFinishColors(currentFinishRef.current);
+
           setCustomModelInfo({
             fileName,
             triangles: Math.round(triangles),
             meshes: meshCount,
+            source,
           });
           setIsLoadingCustom(false);
           requestRender();
         },
         undefined,
         (err) => {
-          console.error('Error loading custom GLB rim:', err);
+          if (token !== loadToken) return;
+          console.error('Error loading GLB rim:', err);
+          releaseUrl(url);
+          if (activeCustomUrl === url) activeCustomUrl = null;
           setIsLoadingCustom(false);
-          setLoadError('Failed to parse 3D file. Ensure it is a valid glTF / .glb binary model.');
+          setLoadError(
+            source === 'official'
+              ? 'Official 3D model could not be loaded. Showing the studio reference rim.'
+              : 'Failed to parse 3D file. Ensure it is a valid glTF / .glb binary model.'
+          );
           requestRender();
         }
       );
     };
 
     stateRef.current.restoreDefaultRim = () => {
-      if (activeCustomUrl) {
-        URL.revokeObjectURL(activeCustomUrl);
-        activeCustomUrl = null;
-      }
+      loadToken++; // cancel any in-flight load
+      releaseUrl(activeCustomUrl);
+      activeCustomUrl = null;
       if (customRimHolder) {
         spinGroup.remove(customRimHolder);
         customRimHolder = null;
       }
+      customFinishMats = [];
       defaultRimAssembly.visible = true;
       setCustomModelInfo(null);
       setLoadError(null);
+      setIsLoadingCustom(false);
       requestRender();
+    };
+
+    // Load (or clear) the wheel's official model from props.
+    stateRef.current.loadOfficialModel = (url: string | null) => {
+      officialModelUrl = url;
+      if (url) {
+        const fileName = url.split('/').pop() || 'official-model.glb';
+        stateRef.current.loadCustomGLB(url, fileName, 'official');
+      } else {
+        stateRef.current.restoreDefaultRim();
+      }
+    };
+
+    // After a test upload, go back to the official model if there is one, else the procedural rim.
+    stateRef.current.restoreBaseModel = () => {
+      if (officialModelUrl) {
+        stateRef.current.loadOfficialModel(officialModelUrl);
+      } else {
+        stateRef.current.restoreDefaultRim();
+      }
     };
 
     // 8. On-Demand + Software-WebGL Paced Render Loop
@@ -1140,9 +1214,8 @@ export const Wheel3DScene: React.FC<Wheel3DSceneProps> = ({
       controls.removeEventListener('change', requestRender);
       cancelAnimationFrame(frameId);
       clearTimeout(frameId);
-      if (activeCustomUrl) {
-        URL.revokeObjectURL(activeCustomUrl);
-      }
+      loadToken++;
+      releaseUrl(activeCustomUrl);
       controls.dispose();
       envTexture.dispose();
       rotorTex.dispose();
@@ -1151,6 +1224,11 @@ export const Wheel3DScene: React.FC<Wheel3DSceneProps> = ({
       renderer.dispose();
     };
   }, []);
+
+  // Load the official per-wheel model whenever it changes (runs after scene init on mount).
+  useEffect(() => {
+    stateRef.current.loadOfficialModel(modelUrl ?? null);
+  }, [modelUrl]);
 
   const currentFinishObj =
     WHEEL_FINISHES[selectedFinish] || WHEEL_FINISHES.silver;
@@ -1248,24 +1326,27 @@ export const Wheel3DScene: React.FC<Wheel3DSceneProps> = ({
         <div className="absolute top-16 left-5 z-20 flex items-center gap-2.5 px-3 py-1.5 rounded-lg bg-[#0E1511] border border-emerald-500/40 text-[11px] font-mono text-emerald-300 shadow-xl">
           <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
           <span>
-            CUSTOM 3D RIM: <strong>{customModelInfo.fileName}</strong>
+            {customModelInfo.source === 'official' ? 'OFFICIAL 3D MODEL' : 'TEST 3D RIM'}:{' '}
+            <strong>{customModelInfo.fileName}</strong>
           </span>
           <span className="text-neutral-500">·</span>
           <span>{customModelInfo.triangles.toLocaleString()} tris</span>
+          {customModelInfo.source === 'test' && (
           <button
             type="button"
-            onClick={() => stateRef.current.restoreDefaultRim()}
+            onClick={() => stateRef.current.restoreBaseModel()}
             className="ml-2 px-2 py-0.5 rounded bg-neutral-900 hover:bg-neutral-800 text-neutral-200 border border-neutral-700 hover:border-neutral-500 text-[10px] cursor-pointer"
           >
-            Restore Default Rim
+            Restore
           </button>
+          )}
         </div>
       )}
 
       {isLoadingCustom && (
         <div className="absolute top-16 left-5 z-20 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#141419] border border-[#FF5500]/40 text-[11px] font-mono text-[#FF5500]">
           <div className="w-3 h-3 rounded-full border-2 border-transparent border-t-[#FF5500] animate-spin" />
-          <span>Parsing and tessellating custom .GLB model...</span>
+          <span>Loading 3D rim model...</span>
         </div>
       )}
 

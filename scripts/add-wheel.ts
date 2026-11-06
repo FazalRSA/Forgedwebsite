@@ -8,6 +8,7 @@
  *     --series "CARBON SERIES" \
  *     --price 5250 \
  *     --image "/assets/wheels/type-60.png" \
+ *     --glb "/models/wheels/type-60.glb" \
  *     --marques "BMW,PORSCHE,FERRARI" \
  *     --make "BMW" \
  *     --model "M3" \
@@ -103,6 +104,8 @@ Options:
   --series <string>          Series label (default: "FORGED SERIES")
   --image <url|path>         Primary wheel image URL or path (e.g. "/wheels/type-60.png")
   --gallery <urls>           Comma-separated extra gallery image URLs
+  --glb <path>               Photoreal .glb rim model served from /public (e.g. "/models/wheels/type-60.glb");
+                             loads in the 360° 3D studio in place of the procedural reference rim
   --marques <list>           Comma-separated marques (default: "BMW")
   --make <string>            Store fitment vehicle make (default: "BMW")
   --model <string>           Store fitment vehicle model (default: "M3")
@@ -147,7 +150,7 @@ async function main() {
       console.log(
         `  - [${w.slug}] ${w.model} | ${w.series} — £${w.basePriceGBP} (${w.marques.join(', ')}) ${
           w.imageUrl ? `[Image: ${w.imageUrl}]` : '[Procedural 3D SVG]'
-        }`
+        } ${w.modelUrl ? `[3D: ${w.modelUrl}]` : '[3D: procedural rim]'}`
       );
     }
     return;
@@ -240,6 +243,7 @@ async function main() {
     originalPriceGBP,
     imageUrl: imageUrl || undefined,
     galleryImages,
+    modelUrl: typeof args.glb === 'string' ? args.glb : undefined,
     marques: marquesRaw.split(',').map((s) => s.trim()),
     make,
     vehicleModel,
@@ -271,6 +275,7 @@ async function main() {
   console.log(`   • Store Technical PDP  : /store/products/${storeProduct.slug}`);
   console.log(`   • Price (Set of 4)     : £${brandWheel.basePriceGBP.toLocaleString('en-GB')}`);
   console.log(`   • Image Asset          : ${brandWheel.imageUrl || 'Procedural 3D Forged SVG (' + brandWheel.geometry + ')'}`);
+  console.log(`   • 3D Model (.glb)      : ${brandWheel.modelUrl || 'none — 3D studio shows the procedural reference rim'}`);
 }
 
 main().catch((err) => {
