@@ -15,6 +15,7 @@ import {
   formatZAR,
   getStoreProductBySlug,
   findWheelBySlug,
+  getStoreProductImages,
 } from '../../data/kahnData';
 import { useKahnStore } from '../../store/useKahnStore';
 import { useRouter } from '../../utils/router';
@@ -46,6 +47,7 @@ export const TechnicalProductView: React.FC<TechnicalProductViewProps> = ({
   // Photoreal 3D model: product-level override, else the linked brand wheel's model.
   const modelUrl =
     product.modelUrl ?? findWheelBySlug(product.wheelSlug, customBrandWheels)?.modelUrl;
+  const productImages = getStoreProductImages(product, customBrandWheels);
   const [selectedFinish, setSelectedFinish] = useState<WheelFinishId>(
     product.defaultFinish
   );
@@ -99,6 +101,16 @@ export const TechnicalProductView: React.FC<TechnicalProductViewProps> = ({
     { id: 'concave-detail', label: '03 / CNC SPOKE & HUB DETAIL' },
     { id: 'barrel-profile', label: '04 / FORGED BARREL & FLANGE' },
   ];
+
+  // Front / 3/4 concave / barrel are real photographed angles; "concave-detail" reuses
+  // the 3/4 shot (WheelRenderSVG already applies a 1.18x zoom for that viewAngle), since
+  // no distinct detail angle is photographed yet — see UX roadmap Tier 1.
+  const angleImageUrls: Record<(typeof galleryAngles)[number]['id'], string> = {
+    front: productImages.images[0],
+    'three-quarter': productImages.images[1],
+    'concave-detail': productImages.images[1],
+    'barrel-profile': productImages.images[2],
+  };
 
   const handleNewsletterSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -437,7 +449,7 @@ export const TechnicalProductView: React.FC<TechnicalProductViewProps> = ({
               </div>
 
               <div className="grid grid-cols-2 border-t border-l border-[#26262E]">
-                {galleryAngles.map((angleItem, idx) => (
+                {galleryAngles.map((angleItem) => (
                   <button
                     key={angleItem.id}
                     type="button"
@@ -454,7 +466,7 @@ export const TechnicalProductView: React.FC<TechnicalProductViewProps> = ({
                         geometry={product.geometry}
                         finish={selectedFinish}
                         viewAngle={angleItem.id}
-                        imageUrl={product.galleryImages?.[idx] || product.imageUrl}
+                        imageUrl={angleImageUrls[angleItem.id]}
                         label={product.shortModel}
                       />
                     </div>
