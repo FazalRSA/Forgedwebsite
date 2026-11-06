@@ -20,6 +20,7 @@ Built with React 19, TypeScript, Vite 8, Tailwind CSS v4, Three.js, Zustand and 
 10. [Scripts](#scripts)
 11. [Deployment](#deployment)
 12. [Status and roadmap](#status-and-roadmap)
+13. [License](#license)
 
 ---
 
@@ -204,3 +205,7 @@ The catalogue, fitment finder, product pages, 3D studio and client accounts are 
 - **Admin publishing**: the admin uploader stores wheels locally; publishing goes through `customWheels.json` and a rebuild. Planned: Firebase-backed catalogue with authenticated admin writes.
 - **Industry partners**: the partner section renders placeholders pending logo assets.
 - **Legacy naming**: some internal identifiers (`useKahnStore`, `kahnData.ts`, the persisted store key) and the AI Studio metadata still carry template-era names.
+
+## License
+
+Proprietary. Copyright © 2026 FORGED Custom Wheels. All rights reserved. See [LICENSE](LICENSE). This repository is public for deployment and collaboration purposes only; no permission is granted to use, copy, modify or distribute its contents without prior written consent.

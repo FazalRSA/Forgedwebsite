@@ -1,8 +1,3 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import React, { Suspense, lazy } from 'react';
 import { RouterProvider, useRouter } from './utils/router';
 import { FirebaseProvider } from './context/FirebaseContext';
