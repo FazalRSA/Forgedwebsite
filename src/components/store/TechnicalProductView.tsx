@@ -428,10 +428,13 @@ export const TechnicalProductView: React.FC<TechnicalProductViewProps> = ({
           </main>
 
           {/* Persistent Quiet Contact Dock (WhatsApp / Instagram / Phone) — a secondary,
-              always-available affordance deliberately kept out of the primary CTA stack. */}
-          <div className="fixed bottom-6 right-6 z-30 flex flex-col items-end gap-2">
+              always-available affordance deliberately kept out of the primary CTA stack.
+              Anchored bottom-left (opposite corner) so it never overlaps the store-wide
+              live-chat widget in GlobalOverlays.tsx, which is fixed bottom-5 right-5 and
+              can expand into a 320–384px-wide panel on that same right-hand side. */}
+          <div className="fixed bottom-6 left-6 z-30 flex flex-col items-start gap-2">
             {contactActionFeedback && (
-              <p className="max-w-[240px] text-right text-[11px] font-tech-mono text-emerald-400 bg-[#0A0A0A]/95 border border-emerald-800 px-3 py-2 shadow-lg">
+              <p className="max-w-[240px] text-left text-[11px] font-tech-mono text-emerald-400 bg-[#0A0A0A]/95 border border-emerald-800 px-3 py-2 shadow-lg">
                 {contactActionFeedback}
               </p>
             )}
