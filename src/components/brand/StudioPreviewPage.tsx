@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { BrandHeader } from './BrandHeader';
 import { WheelStudio, type StudioToggles, type StudioViewId } from '../visuals/WheelStudio';
 import { Wheel3DSceneErrorBoundary } from '../visuals/Wheel3DSceneErrorBoundary';
@@ -6,7 +6,7 @@ import { WHEEL_FINISHES, type WheelFinishId } from '../../data/kahnData';
 
 /**
  * Unlisted preview of a wheel that is modelled in 3D but not yet in the catalogue.
- * It has no price, stock or enquiry details and asks search engines not to index it.
+ * It has no price, stock or enquiry details, and utils/seo.ts marks /studio pages noindex.
  * Once the wheel is added to customWheels.json with its modelUrl, its normal wheel page
  * shows the same studio and this preview can be removed.
  *
@@ -54,16 +54,6 @@ export const StudioPreviewPage: React.FC<{ slug: string }> = ({ slug }) => {
   const [opening] = useState(() => readOpeningState(window.location.search));
   const [finish, setFinish] = useState<WheelFinishId>(opening.finish);
 
-  // Keep this unlisted page out of search results while it is mounted.
-  useEffect(() => {
-    const meta = document.createElement('meta');
-    meta.name = 'robots';
-    meta.content = 'noindex, nofollow';
-    document.head.appendChild(meta);
-    return () => {
-      document.head.removeChild(meta);
-    };
-  }, []);
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-[#F5F5F7]">

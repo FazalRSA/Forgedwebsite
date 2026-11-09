@@ -174,7 +174,7 @@ export const TechnicalProductView: React.FC<TechnicalProductViewProps> = ({
                   onClick={() => navigate(`/wheels/${product.wheelSlug}`)}
                   className="text-[#FF5500] underline underline-offset-4 hover:text-[#FF6B1A] cursor-pointer font-bold"
                 >
-                  View in FORGED Custom wheels 360° Gallery →
+                  View the wheel page →
                 </button>
               </div>
             </div>

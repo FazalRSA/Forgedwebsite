@@ -8,6 +8,9 @@ interface IndustryPartnersSectionProps {
 export const IndustryPartnersSection: React.FC<IndustryPartnersSectionProps> = ({
   logos = [null, null],
 }) => {
+  // Until real partner logos are supplied there is nothing to show; an empty placeholder
+  // grid on the public home page reads as unfinished.
+  if (!logos.some(Boolean)) return null;
   return (
     <section
       id="trusted-by-bmw"

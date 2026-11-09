@@ -19,7 +19,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   const { navigate } = useRouter();
 
   return (
-    <section className="relative w-full min-h-[75vh] sm:min-h-[85vh] bg-[#0A0A0A] text-[#F5F5F7] flex flex-col justify-end overflow-hidden border-b border-[#1E1E24]">
+    <section className={`relative w-full ${videoSrc || posterSrc ? 'min-h-[75vh] sm:min-h-[85vh]' : 'min-h-[46vh] sm:min-h-[56vh]'} bg-[#0A0A0A] text-[#F5F5F7] flex flex-col justify-end overflow-hidden border-b border-[#1E1E24]`}>
       {/* Mobile-Responsive Background Video Layer */}
       <div
         aria-hidden="true"
