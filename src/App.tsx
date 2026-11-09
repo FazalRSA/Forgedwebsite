@@ -104,7 +104,12 @@ function AppRoutes() {
 
   // Give every route its own title, description, canonical URL and structured data.
   useEffect(() => {
-    applyPageMeta(metaForPath(pathname));
+    try {
+      applyPageMeta(metaForPath(pathname));
+    } catch (err) {
+      // Metadata is an enhancement: a failure here must never stop the page rendering.
+      console.error('Could not set page metadata for', pathname, err);
+    }
   }, [pathname]);
 
   // Route: /sixnine-wheels — Official Dealer of Sixnine Wheels
