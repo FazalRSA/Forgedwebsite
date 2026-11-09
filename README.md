@@ -29,7 +29,7 @@ Built with React 19, TypeScript, Vite 8, Tailwind CSS v4, Three.js, Zustand and 
 - **Editorial brand site** with a filterable wheel catalogue, a three-angle lightbox gallery with zoom and pan, client fitment galleries, a dealer application form and a POPIA-aligned privacy policy.
 - **Vehicle fitment finder**: Make → Model → Year → Part, resolving to a filtered collection of wheel sets with sale and diameter filters and price sorting.
 - **Technical product pages** with a ten-row specification table, finish selector, four-angle gallery and an interest request form in place of a cart.
-- **360° 3D wheel studio** (Three.js) on every wheel and product page. A wheel with a registered `.glb` loads its photoreal model; otherwise a procedural reference rim is shown. Finish swatches re-tint named rim meshes on loaded models.
+- **3D wheel studio** (Three.js) on every wheel and product page. A wheel with a registered `.glb` opens in the wheel studio: a light product-photography stage with physically based paint finishes, fixed camera views, an exploded view, a brake clearance check when the model includes brake meshes, and a Front / Rear switch for staggered sets. A wheel with no model yet has no 3D stage: its pages lead with photography until a model is added.
 - **Client accounts** via Google sign-in, with a saved profile and a personal garage of vehicles stored in Firestore under strict owner-only security rules. A saved preferred finish pre-selects the finish on wheel pages.
 - **Rand pricing** throughout, formatted by a single helper and shown per set of four.
 - **Catalogue tooling**: a JSON data file for inventory, a CLI to generate entries, and a passcode-gated admin uploader for local previews.
@@ -42,6 +42,7 @@ Routing is client-side (`src/utils/router.tsx`). The host must rewrite all paths
 | --- | --- | --- |
 | `/` | `BrandHomePage` | Hero, industry partners, wheel catalogue (`#catalogue`), South African client fitments |
 | `/wheels/:slug` | `WheelShowcasePDP` | Wheel page: 3D studio or three-angle photography, finish swatches, enquire |
+| `/studio/:slug` | `StudioPreviewPage` | Unlisted, noindex 3D studio preview for a modelled wheel that is not in the catalogue yet (currently `stf399`) |
 | `/client-fitments` | `ClientFitmentsPage` | Bento gallery of client commissions, two photos each |
 | `/dealer-application` | `DealerApplicationPage` | Trade partner application form |
 | `/account`, `/garage` | `AccountGaragePage` | Google sign-in, profile, garage vehicles |
@@ -100,7 +101,7 @@ No environment variables are required for local development. Firebase configurat
       ├─ store/                   Fitment finder, collection grid, product page, store header
       ├─ admin/                   Admin uploader
       ├─ shared/                  Interest request form, chat overlay, skeletons
-      └─ visuals/                 Wheel3DScene, 3D prep guide, SVG rim, vehicle silhouette
+      └─ visuals/                 WheelStudio (3D), WheelStage, SVG rim, vehicle silhouette
 ```
 
 ## Catalogue data model
@@ -140,7 +141,9 @@ The admin page at `/admin` is a local preview tool: wheels created there are sto
 
 ## 3D models
 
-A wheel or product with a `modelUrl` loads that `.glb` in the 360° studio in place of the procedural rim.
+A wheel or product with a `modelUrl` opens in the wheel studio (`src/components/visuals/WheelStudio.tsx`, mounted through `WheelStage.tsx`). Without one there is no 3D stage: the wheel page opens on its three-angle photography and the product page leads with the product photo. three.js is only downloaded on pages that show a model.
+
+A staggered set can add `"rearModelUrl"` for the rear size; the studio then shows a Front / Rear switch. Paint settings per finish live in `src/data/studioFinishes.ts`.
 
 1. Export the rim as `public/models/wheels/<slug>.glb`.
 2. Add `"modelUrl": "/models/wheels/<slug>.glb"` to the wheel (or product) record.
@@ -150,10 +153,11 @@ Model requirements (full detail in `public/models/wheels/README.md`):
 
 - Binary glTF 2.0 with embedded PBR metallic-roughness textures; bare rim only.
 - Axle bore centre at the origin, face toward +Z, up +Y, spin around Z, real metres.
-- Sub-meshes named `Rim_Barrel`, `Rim_Face_Spokes`, `Hardware_Bolts`, `Center_Cap`. Meshes whose names start with `Rim_Face`, `Rim_Barrel`, `Rim_Lip` or `Rim_Spokes` follow the finish swatches.
+- Sub-meshes named `Rim_Barrel`, `Rim_Face_Spokes`, `Hardware_Bolts`, `Center_Cap`. The barrel, face and cap take the selected finish; bolts keep their own material.
+- Optional `Brake_Rotor` and `Brake_Caliper` meshes enable the studio's brake check. They stay hidden until the visitor turns it on.
 - Keep under roughly 150k triangles for mobile.
 
-`public/models/wheels/sample-reference-rim.glb` is a low-poly test asset with the correct axes and names. The studio's "Test .GLB Rim" button previews any local file without changing data.
+`public/models/wheels/sample-reference-rim.glb` is a low-poly test asset with the correct axes and names. It is not a real product.
 
 ## Pricing
 

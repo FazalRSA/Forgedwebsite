@@ -2,8 +2,8 @@ import React from 'react';
 import { Loader2 } from 'lucide-react';
 
 /**
- * Suspense fallback for the lazy-loaded Wheel3DScene chunk (three.js + addons).
- * Matches Wheel3DScene's own container sizing so there's no layout jump once
+ * Suspense fallback for the lazy-loaded WheelStudio chunk (three.js + addons).
+ * Matches WheelStudio's own container sizing so there's no layout jump once
  * the real scene mounts.
  */
 export const Wheel3DSceneSkeleton: React.FC = () => (

@@ -55,6 +55,12 @@ const PrivacyPolicyPage = lazy(() =>
     default: m.PrivacyPolicyPage,
   }))
 );
+const StudioPreviewPage = lazy(() =>
+  import('./components/brand/StudioPreviewPage').then((m) => ({
+    default: m.StudioPreviewPage,
+  }))
+);
+
 const SixnineDealerPage = lazy(() =>
   import('./components/brand/SixnineDealerPage').then((m) => ({
     default: m.SixnineDealerPage,
@@ -145,6 +151,12 @@ function AppRoutes() {
     pathname === '/store/client-fitments'
   ) {
     return <ClientFitmentsPage />;
+  }
+
+  // Route: /studio/[slug] — unlisted 3D studio preview for a wheel not yet in the catalogue
+  if (pathname.startsWith('/studio/')) {
+    const slug = pathname.replace('/studio/', '').split('/')[0];
+    return <StudioPreviewPage slug={slug} />;
   }
 
   // Route 2: /wheels/[slug] — Editorial Wheel Showcase PDP with 360° 3D Studio
