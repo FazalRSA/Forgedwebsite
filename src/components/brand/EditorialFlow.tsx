@@ -429,7 +429,7 @@ export const EditorialFlow: React.FC = () => {
                     }}
                     className="w-full sm:w-auto border border-[#33333E] text-neutral-300 hover:text-white hover:border-[#FF5500] rounded-full px-5 py-3 text-xs font-tech-mono uppercase tracking-wider transition-colors cursor-pointer"
                   >
-                    View Wheel in 360° Studio
+                    View This Wheel
                   </button>
                 )}
 

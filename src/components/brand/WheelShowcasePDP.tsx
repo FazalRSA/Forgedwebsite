@@ -146,9 +146,9 @@ export const WheelShowcasePDP: React.FC<WheelShowcasePDPProps> = ({ slug }) => {
             <span className="text-white font-semibold">{wheel.model}</span>
           </nav>
 
-          {/* Segmented Mode Toggle: 360° 3D Studio vs Photography */}
+          {/* Segmented Mode Toggle: 3D Studio vs Photography (only when the wheel has a 3D model) */}
+          {has3D && (
           <div className="inline-flex items-center gap-1 p-1 rounded-xl bg-[#121216] border border-[#26262E] self-start sm:self-auto">
-            {has3D && (
             <button
               type="button"
               onClick={() => setViewMode('3d')}
@@ -159,9 +159,8 @@ export const WheelShowcasePDP: React.FC<WheelShowcasePDPProps> = ({ slug }) => {
               }`}
             >
               <Disc3 className="w-3.5 h-3.5" />
-              <span>360° 3D Wheel Studio</span>
+              <span>3D Wheel Studio</span>
             </button>
-            )}
 
             <button
               type="button"
@@ -176,6 +175,7 @@ export const WheelShowcasePDP: React.FC<WheelShowcasePDPProps> = ({ slug }) => {
               <span>Fitment Photography (3)</span>
             </button>
           </div>
+          )}
         </div>
 
         {/* Title & Garage Pairing Banner */}
@@ -343,7 +343,7 @@ export const WheelShowcasePDP: React.FC<WheelShowcasePDPProps> = ({ slug }) => {
         <section className="mt-16 pt-12 border-t border-[#26262E]">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-xl font-semibold tracking-tight text-white">
-              Explore Peer Forged Designs in 360° 3D
+              More forged designs
             </h3>
             <button
               type="button"
@@ -375,9 +375,11 @@ export const WheelShowcasePDP: React.FC<WheelShowcasePDPProps> = ({ slug }) => {
                         referrerPolicy="no-referrer"
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
-                      <div className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-black/80 text-[9px] font-mono text-neutral-300">
-                        360° 3D
-                      </div>
+                      {peer.modelUrl && (
+                        <div className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-black/80 text-[9px] font-mono text-neutral-300">
+                          3D
+                        </div>
+                      )}
                     </div>
                     <p className="text-xs font-mono uppercase tracking-widest mt-2 font-semibold text-[#F5F5F7] group-hover:text-[#FF5500] transition-colors truncate">
                       {peer.model}

@@ -303,7 +303,7 @@ export const SixnineDealerPage: React.FC = () => {
                       </span>
 
                       <span className="inline-flex items-center gap-1.5 text-xs font-tech-mono uppercase tracking-wider text-neutral-300 group-hover:text-[#FF5500] transition-colors">
-                        <span>Inspect 3D &amp; Specs</span>
+                        <span>View Specs</span>
                         <ArrowUpRight className="w-3.5 h-3.5" />
                       </span>
                     </div>

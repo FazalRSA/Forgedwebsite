@@ -443,7 +443,7 @@ export const ClientFitmentsPage: React.FC = () => {
                     }}
                     className="w-full py-3 px-5 rounded-full border border-[#33333E] text-[#F5F5F7] text-xs font-tech-mono font-bold uppercase tracking-[0.14em] hover:border-[#FF5500] hover:text-[#FF5500] inline-flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap transition-colors"
                   >
-                    <span>{activeItem.wheelSlug ? 'Open 360° Wheel Showcase' : 'Browse the Wheel Catalogue'}</span>
+                    <span>{activeItem.wheelSlug ? 'View This Wheel' : 'Browse the Wheel Catalogue'}</span>
                     <ArrowUpRight className="w-4 h-4 shrink-0" />
                   </button>
                 </div>

@@ -307,10 +307,10 @@ export const StoreHeader: React.FC = () => {
                       </button>
                       <button
                         type="button"
-                        onClick={() => handleNavigate('/wheels/ld-rs')}
+                        onClick={() => handleNavigate('/#catalogue')}
                         className="block w-full text-left py-1 text-neutral-400 hover:text-white cursor-pointer"
                       >
-                        360° Wheel Showcase: LD RS
+                        Wheel Catalogue
                       </button>
                     </div>
                   )}

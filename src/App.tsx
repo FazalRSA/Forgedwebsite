@@ -1,5 +1,6 @@
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useEffect } from 'react';
 import { RouterProvider, useRouter } from './utils/router';
+import { applyPageMeta, metaForPath } from './utils/seo';
 import { FirebaseProvider } from './context/FirebaseContext';
 import { BrandHeader } from './components/brand/BrandHeader';
 import { HeroSection } from './components/brand/HeroSection';
@@ -100,6 +101,11 @@ function BrandHomePage() {
 
 function AppRoutes() {
   const { pathname } = useRouter();
+
+  // Give every route its own title, description, canonical URL and structured data.
+  useEffect(() => {
+    applyPageMeta(metaForPath(pathname));
+  }, [pathname]);
 
   // Route: /sixnine-wheels — Official Dealer of Sixnine Wheels
   if (
