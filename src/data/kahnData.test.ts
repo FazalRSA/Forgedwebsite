@@ -1,8 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import customWheels from './customWheels.json';
 import {
+  BMW_M_MODEL_OPTIONS,
   BRAND_WHEELS,
   MARQUE_FILTERS,
+  VEHICLE_FITMENT_TREE,
   filterWheelsByMarque,
   getAllBrandWheels,
   getAvailableMakes,
@@ -66,6 +69,48 @@ test('resolveCollectionBySlug handles BMW M3, M2, M4, and M5 collections', () =>
   assert.equal(m5Collection.make, 'BMW');
   assert.equal(m5Collection.node.model, 'M5');
   assert.equal(m5Collection.products.length, 4);
+});
+
+test('every stock-sheet model option belongs to exactly one fitment node, and every seed wheel fits one', () => {
+  const allNodes = Object.values(VEHICLE_FITMENT_TREE).flat();
+  const allVariants = allNodes.flatMap((n) => n.variants);
+
+  assert.equal(BMW_M_MODEL_OPTIONS.length, 70);
+  assert.equal(allVariants.length, BMW_M_MODEL_OPTIONS.length);
+  for (const option of BMW_M_MODEL_OPTIONS) {
+    assert.equal(allVariants.filter((v) => v === option).length, 1, option);
+  }
+  for (const wheel of BRAND_WHEELS) {
+    assert.ok(BMW_M_MODEL_OPTIONS.includes(wheel.compatibleCars ?? ''), wheel.slug);
+  }
+
+  const slugs = allNodes.map((n) => n.collectionSlug);
+  assert.equal(new Set(slugs).size, slugs.length);
+  assert.ok(allNodes.every((n) => n.years.length > 0));
+  assert.equal(getModelsForMake('BMW').length, 26);
+});
+
+test('sheet model-line collection slugs resolve to their own node, never the M3/M2/M4/M5 shorthand', () => {
+  assert.equal(resolveCollectionBySlug('bmw-m340-alloy-wheels').node.model, 'M340');
+  assert.equal(resolveCollectionBySlug('bmw-m240-alloy-wheels').node.model, 'M240');
+  assert.equal(resolveCollectionBySlug('bmw-m440-alloy-wheels').node.model, 'M440');
+  assert.equal(resolveCollectionBySlug('bmw-m550-alloy-wheels').node.model, 'M550');
+  assert.deepEqual(resolveCollectionBySlug('bmw-x5-m-alloy-wheels').products, []);
+  assert.equal(resolveCollectionBySlug('bmw-m3-2024-alloy-wheels').node.model, 'M3');
+  assert.equal(resolveCollectionBySlug('bmw-m5-2024-onwards-alloy-wheels').node.model, 'M5');
+});
+
+test('FSA001 store product carries the 19/20 inch badge from the stock sheet', () => {
+  assert.equal(getStoreProductBySlug('bmw-m3-type-52-forged').diameterBadge, '19-20"');
+});
+
+test('customWheels.json overrides of stock-sheet wheels keep the sheet finish names', () => {
+  for (const override of customWheels.brandWheels) {
+    const seed = BRAND_WHEELS.find((w) => w.slug === override.slug);
+    if (!seed) continue; // a brand-new wheel, not a photography override
+    assert.equal(override.finishName, seed.finishName, override.slug);
+    assert.equal(override.model, seed.model, override.slug);
+  }
 });
 
 test('filterAndSortStoreProducts filters by diameter, sale flag, and price sorting', () => {

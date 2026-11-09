@@ -19,6 +19,8 @@ export const VehicleProfileRender: React.FC<VehicleProfileRenderProps> = ({
   className = 'w-full h-auto',
 }) => {
   const isSUV =
+    // BMW X1–X7, XM and iX model lines from the fitment tree
+    /^(x\d|xm|ix)\b/i.test(model.trim()) ||
     model.includes('MACAN') ||
     model.includes('GRENADIER') ||
     model.includes('DBX') ||

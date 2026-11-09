@@ -110,7 +110,7 @@ Two record types live in `src/data/kahnData.ts`:
 - **`BrandWheelItem`**: a wheel as shown on the brand site. Key fields: `slug`, `model`, `modelCode`, `finishName`, `priceZAR`, `sizesAvailable`, `compatibleCars`, `technicalSpecSheet`, `stockStatus`, `stockQuantitySets`, `images` (exactly three), `imageLabels`, `availableFinishes`, optional `modelUrl`, and `compatibleStoreProductSlug` linking to a store product.
 - **`StoreProductItem`**: a sellable set as shown in the store. Key fields: `slug`, `wheelSlug`, `make`, `model`, `yearRange`, `priceZAR`, optional `originalPriceZAR` (shown as a sale when higher), `technicalSpecs` (sizes, bolt pattern, part number, load rating, centre bore), optional `modelUrl`.
 
-Fourteen in-stock wheels are seeded in `kahnData.ts`. `src/data/customWheels.json` is merged on top by slug: an entry with a seed's slug overrides it (this is how real photography is attached), and an entry with a new slug is added. `VEHICLE_FITMENT_TREE` maps each BMW model to the store products the fitment finder lists for it.
+Fourteen in-stock wheels are seeded in `kahnData.ts`. `src/data/customWheels.json` is merged on top by slug: an entry with a seed's slug overrides it (this is how real photography is attached), and an entry with a new slug is added. `VEHICLE_FITMENT_TREE` has a node for every BMW M model line on the stock sheet; `BMW_M_MODEL_OPTIONS` holds the sheet's "Cars that this is available for" names verbatim and each belongs to exactly one node's `variants`. A node's `productSlugs` are the store products the fitment finder lists for it. The M3, M2, M4 and M5 nodes carry the in-stock sets; every other model line resolves to an enquiry-only collection until sets are allocated to it.
 
 ## Adding a wheel
 
