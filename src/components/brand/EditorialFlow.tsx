@@ -12,198 +12,52 @@ import { useKahnStore } from '../../store/useKahnStore';
 import { useRouter } from '../../utils/router';
 import { WheelRenderSVG } from '../visuals/WheelRenderSVG';
 import { LogoPlaceholder } from '../shared/LogoPlaceholder';
+import { CLIENT_FITMENTS } from '../../data/clientFitments';
 
 export interface SouthAfricaCustomerFitment {
   id: string;
   vehicleTitle: string;
   chassisCode: string;
-  wheelModel: string;
-  wheelSlug: string;
-  storeProductSlug: string;
-  staggeredSpec: string;
-  frontSpec: string;
-  rearSpec: string;
-  finishName: string;
-  city: string;
-  province: string;
+  /** What the wheels look like in the customer's photo (used when no catalogue model is recorded). */
+  wheelLook: string;
+  wheelModel?: string;
+  wheelSlug?: string;
+  storeProductSlug?: string;
+  staggeredSpec?: string;
+  frontSpec?: string;
+  rearSpec?: string;
+  finishName?: string;
+  city?: string;
+  province?: string;
   trackVenue?: string;
-  ownerName: string;
-  quote: string;
-  technicalHighlights: string[];
+  ownerName?: string;
+  quote?: string;
+  technicalHighlights?: string[];
   images: [string, string];
   imageLabels: [string, string];
 }
 
-export const SOUTH_AFRICA_FITMENTS: SouthAfricaCustomerFitment[] = [
-  {
-    id: 'sa-01',
-    vehicleTitle: 'BMW G80 M3 COMPETITION xDRIVE',
-    chassisCode: 'G80 LCI · MINT GREEN INDIVIDUAL',
-    wheelModel: 'TYPE 52 FORGED MONOBLOCK',
-    wheelSlug: 'type-52',
-    storeProductSlug: 'bmw-m3-type-52-forged',
-    staggeredSpec: '20×9.5" ET18 (F) · 21×10.5" ET20 (R)',
-    frontSpec: '20×9.5J ET18 · 275/30 R20 Michelin Pilot Sport 4S',
-    rearSpec: '21×10.5J ET20 · 295/25 R21 Michelin Pilot Sport 4S',
-    finishName: 'Brushed Liquid Silver',
-    city: 'SANDTON, JOHANNESBURG',
-    province: 'GAUTENG',
-    trackVenue: 'KYALAMI GP & SANDTON STRIP',
-    ownerName: 'Kavish N. · Sandton Collector',
-    quote:
-      '“At 1,750m altitude in Joburg, unsprung weight is everything. FORGED wheels shaved 15.2kg of rotating mass and the stance through Sandton and on the M1 highway is unmatched.”',
-    technicalHighlights: [
-      'Flush arch profile with zero chassis rubbing',
-      'Engineered for Kyalami Grand Prix Circuit lateral Gs',
-      'Direct 66.6mm hub-centric machining — zero spacers',
-    ],
-    images: [
-      '/assets/aistudio/1792612987797_635e7cff.jpg',
-      '/assets/aistudio/1792613009313_aeeb7665.jpg',
-    ],
-    imageLabels: ['Front 3/4 Studio Stance & Arch Clearance', 'Full Side Profile & Forged Spoke Milling'],
-  },
-  {
-    id: 'sa-02',
-    vehicleTitle: 'BMW G80 M3 COMPETITION SALOON',
-    chassisCode: 'G80 M3 · DRAVIT GREY INDIVIDUAL',
-    wheelModel: 'RS 3.0 HERITAGE FORGED',
-    wheelSlug: 'rs-3-0',
-    storeProductSlug: 'bmw-m3-rs-3-0',
-    staggeredSpec: '20×9.5" ET18 (F) · 21×10.5" ET20 (R)',
-    frontSpec: '20×9.5J ET18 · 275/35 R20 Michelin Cup 2',
-    rearSpec: '21×10.5J ET20 · 285/30 R21 Michelin Cup 2',
-    finishName: 'Champagne Bronze Brushed',
-    city: 'CAMPS BAY, CAPE TOWN',
-    province: 'WESTERN CAPE',
-    trackVenue: "CHAPMAN'S PEAK PASS",
-    ownerName: 'Gerrit van der M. · Atlantic Seaboard',
-    quote:
-      '“Carving Chapman’s Peak Pass with the Atlantic below—the grip, turn-in precision, and steering feel are completely transformed. FORGED is the only bespoke wheel trusted on Cape Town’s premier M cars.”',
-    technicalHighlights: [
-      'Carbon-ceramic brake calliper clearance guaranteed',
-      'TÜV Rheinland South Africa structural compliance',
-      'Forged from aerospace-grade 6061-T6 billet alloy',
-    ],
-    images: [
-      '/assets/aistudio/forged_past_install__6741d2d7.jpeg',
-      '/assets/aistudio/m3_bronze_side.jpg',
-    ],
-    imageLabels: ['Front 3/4 Studio Stance & Caliper Clearance', 'Full Side 90° Profile & Bronze Forged Concavity'],
-  },
-  {
-    id: 'sa-03',
-    vehicleTitle: 'BMW G81 M3 TOURING COMPETITION',
-    chassisCode: 'G81 TOURING · MINERAL GREY METALLIC',
-    wheelModel: 'LD RS MONOBLOCK FORGED',
-    wheelSlug: 'ld-rs',
-    storeProductSlug: 'bmw-m3-ld-rs-forged',
-    staggeredSpec: '20×9.5" ET18 (F) · 20×10.5" ET20 (R)',
-    frontSpec: '20×9.5J ET18 · 275/35 R20 Michelin PS4S',
-    rearSpec: '20×10.5J ET20 · 285/30 R20 Michelin PS4S',
-    finishName: 'Liquid Silver Diamond Cut',
-    city: 'STELLENBOSCH, WINELANDS',
-    province: 'WESTERN CAPE',
-    trackVenue: 'FRANSCHHOEK PASS',
-    ownerName: 'Pieter B. · Stellenbosch M Collector',
-    quote:
-      '“One of the first G81 M3 Tourings delivered in South Africa. FORGED calculated the rear wagon load index and flush clearances before the car even docked in Cape Town port.”',
-    technicalHighlights: [
-      'Tailored rear touring payload load index rating',
-      'Direct hub-centric machining — zero spacers',
-      'Custom mirror-cut silver stepped outer flange',
-    ],
-    images: [
-      '/assets/aistudio/m3_touring_front.jpg',
-      '/assets/aistudio/forged_customer__3198a902.jpeg',
-    ],
-    imageLabels: ['Front 3/4 Studio Stance & Muscular Haunches', 'Rear 3/4 Profile & Deep Concave Hub Detail'],
-  },
-  {
-    id: 'sa-04',
-    vehicleTitle: 'BMW G82 M4 COMPETITION COUPE',
-    chassisCode: 'G82 M4 · FROZEN BROOKLYN GREY',
-    wheelModel: 'TYPE 52 COMPETITION FORGED',
-    wheelSlug: 'type-52',
-    storeProductSlug: 'bmw-m3-type-52-forged',
-    staggeredSpec: '20×9.5" ET16 (F) · 21×10.5" ET18 (R)',
-    frontSpec: '20×9.5J ET16 · 275/35 R20 Pirelli Trofeo R',
-    rearSpec: '21×10.5J ET18 · 295/30 R21 Pirelli Trofeo R',
-    finishName: 'Satin Black Track Spec',
-    city: 'MIDRAND · KYALAMI GP CIRCUIT',
-    province: 'GAUTENG',
-    trackVenue: 'KYALAMI MOTORSPORT CLUB',
-    ownerName: 'David D. · Kyalami Cup Competitor',
-    quote:
-      '“Shaved 1.3 seconds off our best Kyalami lap. The scalloped spoke backs evacuate brake heat under heavy braking into Sunset Bend, keeping carbon pad temperatures optimal.”',
-    technicalHighlights: [
-      'Venturi aero perimeter brake thermal evacuation',
-      'Extreme lateral cornering stiffness rating',
-      'Ultralight 9.6kg per front wheel (20")',
-    ],
-    images: [
-      '/assets/aistudio/m4_coupe_front.jpg',
-      '/assets/aistudio/m4_coupe_side.jpg',
-    ],
-    imageLabels: ['Front 3/4 Studio Track Stance & Offset', 'Full Side 90° Profile & M4 Silhouette'],
-  },
-  {
-    id: 'sa-05',
-    vehicleTitle: 'BMW G87 M2 COUPE TRACK-SPEC',
-    chassisCode: 'G87 M2 · ALPINE WHITE',
-    wheelModel: 'MONDIAL RETRO MONOBLOCK',
-    wheelSlug: 'mondial-retro',
-    storeProductSlug: 'bmw-m2-mondial-retro-forged',
-    staggeredSpec: '20×9.5" ET18 (F) · 20×10.5" ET20 (R)',
-    frontSpec: '20×9.5J ET18 · 275/35 R20 Michelin Cup 2',
-    rearSpec: '20×10.5J ET20 · 295/30 R20 Michelin Cup 2',
-    finishName: 'Anthracite Gunmetal Matte',
-    city: 'WATERKLOOF, PRETORIA',
-    province: 'GAUTENG',
-    trackVenue: 'PRETORIA HIGHWAY CORRIDOR',
-    ownerName: 'Dr. Jaco S. · Pretoria East',
-    quote:
-      '“The G87 M2 has wide boxy arches that look unfinished with factory offsets. FORGED flush fitment brings the wheel face completely flush with the fender lip.”',
-    technicalHighlights: [
-      'Tailored wide-arch offset eliminates fender gap',
-      'Anti-deformation forged rim lip for uneven tarmac',
-      'Custom concave 5-window face with milled pockets',
-    ],
-    images: [
-      '/assets/aistudio/m2_coupe_front.jpg',
-      '/assets/aistudio/m2_coupe_side.jpg',
-    ],
-    imageLabels: ['Front 3/4 Studio Flared Arch Stance', 'Full Side 90° Profile & Muscular Haunches'],
-  },
-  {
-    id: 'sa-06',
-    vehicleTitle: 'BMW G90 M5 HYBRID SALOON',
-    chassisCode: 'G90 M5 · MARINA BAY BLUE METALLIC',
-    wheelModel: 'VENGEANCE DIRECTIONAL TURBINE',
-    wheelSlug: 'vengeance-wb',
-    storeProductSlug: 'bmw-m5-vengeance-forged',
-    staggeredSpec: '22×10" ET20 (F) · 22×11.5" ET22 (R)',
-    frontSpec: '22×10J ET20 · 285/35 R22 Continental SC7',
-    rearSpec: '22×11.5J ET22 · 315/30 R22 Continental SC7',
-    finishName: 'Liquid Silver Mirror Lustre',
-    city: 'UMHLANGA ARCH, DURBAN',
-    province: 'KWAZULU-NATAL',
-    trackVenue: 'DOLPHIN COAST HIGHWAY',
-    ownerName: 'Themba M. · Durban North',
-    quote:
-      '“Cruising the coastline from Ballito to Umhlanga Ridge, this stance commands absolute attention. The custom offset gives the heavy G90 a razor-sharp, athletic silhouette.”',
-    technicalHighlights: [
-      'Reinforced 1,050kg axle rating for hybrid curb weight',
-      'High-torque knurled bead seat prevents tyre slip',
-      'Ultra-deep concave spoke drop tailored to wide haunches',
-    ],
-    images: [
-      '/assets/aistudio/m5_saloon_front.jpg',
-      '/assets/aistudio/m5_saloon_side.jpg',
-    ],
-    imageLabels: ['Front 3/4 Studio Stance & 22" Monoblock Fit', 'Full Side 90° Profile & Directional Turbine Blades'],
-  },
-];
+/** How many real fitments the home carousel shows; the full set lives at /client-fitments. */
+const HOME_CAROUSEL_COUNT = 10;
+
+// Real customer fitments, generated from the shop's Drive photos (see src/data/clientFitments.ts).
+export const SOUTH_AFRICA_FITMENTS: SouthAfricaCustomerFitment[] = CLIENT_FITMENTS.slice(
+  0,
+  HOME_CAROUSEL_COUNT,
+).map((f) => ({
+  id: `sa-${f.id}`,
+  vehicleTitle: f.vehicleTitle,
+  chassisCode: f.chassisCode,
+  wheelLook: f.wheelLook,
+  wheelModel: f.wheelModel,
+  wheelSlug: f.wheelSlug,
+  storeProductSlug: f.storeProductSlug,
+  staggeredSpec: f.staggeredSpec,
+  finishName: f.finishName,
+  city: f.clientCity,
+  images: f.images,
+  imageLabels: f.imageLabels,
+}));
 
 export const EditorialFlow: React.FC = () => {
   const { openEnquiryModal } = useKahnStore();
@@ -242,7 +96,7 @@ export const EditorialFlow: React.FC = () => {
               onClick={() => navigate('/client-fitments')}
               className="text-xs font-tech-mono uppercase tracking-[0.14em] text-[#FF5500] hover:text-[#FF6B1A] flex items-center gap-1.5 py-2 transition-colors cursor-pointer"
             >
-              <span>View 16-Grid Bento Gallery</span>
+              <span>View all {CLIENT_FITMENTS.length} fitments in the gallery</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
 
@@ -377,17 +231,20 @@ export const EditorialFlow: React.FC = () => {
                 <span className="px-3 py-1 rounded-full bg-[#FF5500]/15 border border-[#FF5500] text-[#FF5500] font-semibold">
                   SOUTH AFRICA FITMENT DOSSIER
                 </span>
-                <span className="text-neutral-400 flex items-center gap-1">
-                  <MapPin className="w-3.5 h-3.5 text-[#FF5500]" />
-                  {selectedFitment.city}, {selectedFitment.province}
-                </span>
+                {selectedFitment.city && (
+                  <span className="text-neutral-400 flex items-center gap-1">
+                    <MapPin className="w-3.5 h-3.5 text-[#FF5500]" />
+                    {selectedFitment.city}
+                    {selectedFitment.province ? `, ${selectedFitment.province}` : ''}
+                  </span>
+                )}
               </div>
 
               <h3 className="text-2xl sm:text-3xl font-semibold tracking-tight text-white mb-1">
                 {selectedFitment.vehicleTitle}
               </h3>
               <p className="text-sm font-tech-mono text-[#FF5500] mb-6">
-                {selectedFitment.chassisCode} · {selectedFitment.wheelModel}
+                {selectedFitment.chassisCode} · {selectedFitment.wheelModel ?? selectedFitment.wheelLook}
               </p>
 
               {/* Large Photography Stage with Left & Right Arrows (2 Images per fitment) */}
@@ -458,55 +315,89 @@ export const EditorialFlow: React.FC = () => {
                 </div>
               </div>
 
-              {/* Detailed Technical Specifications Grid */}
+              {/* Detailed Technical Specifications Grid (rows appear as the shop fills them in) */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <div className="bg-[#18181D] border border-[#26262E] rounded-2xl p-4 space-y-2 text-xs font-tech-mono">
                   <p className="text-[#FF5500] font-semibold text-[11px] uppercase tracking-wider mb-2">
-                    STAGGERED WHEEL SPECIFICATIONS
+                    WHEEL SPECIFICATIONS
                   </p>
-                  <div className="flex justify-between py-1 border-b border-[#26262E]">
-                    <span className="text-neutral-400">Front Setup:</span>
-                    <span className="text-white font-semibold">{selectedFitment.frontSpec}</span>
+                  <div className="flex justify-between py-1 border-b border-[#26262E] gap-3">
+                    <span className="text-neutral-400">Wheels as fitted:</span>
+                    <span className="text-white font-semibold text-right">
+                      {selectedFitment.wheelModel ?? selectedFitment.wheelLook}
+                    </span>
                   </div>
-                  <div className="flex justify-between py-1 border-b border-[#26262E]">
-                    <span className="text-neutral-400">Rear Setup:</span>
-                    <span className="text-white font-semibold">{selectedFitment.rearSpec}</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-[#26262E]">
-                    <span className="text-neutral-400">Bolt Pattern (PCD):</span>
-                    <span className="text-white">5×112 (BMW Direct)</span>
-                  </div>
-                  <div className="flex justify-between py-1">
-                    <span className="text-neutral-400">Center Bore:</span>
-                    <span className="text-white">66.6mm Hub-Centric</span>
-                  </div>
+                  {selectedFitment.staggeredSpec && (
+                    <div className="flex justify-between py-1 border-b border-[#26262E] gap-3">
+                      <span className="text-neutral-400">Staggered spec:</span>
+                      <span className="text-white font-semibold text-right">{selectedFitment.staggeredSpec}</span>
+                    </div>
+                  )}
+                  {selectedFitment.frontSpec && (
+                    <div className="flex justify-between py-1 border-b border-[#26262E] gap-3">
+                      <span className="text-neutral-400">Front Setup:</span>
+                      <span className="text-white font-semibold text-right">{selectedFitment.frontSpec}</span>
+                    </div>
+                  )}
+                  {selectedFitment.rearSpec && (
+                    <div className="flex justify-between py-1 border-b border-[#26262E] gap-3">
+                      <span className="text-neutral-400">Rear Setup:</span>
+                      <span className="text-white font-semibold text-right">{selectedFitment.rearSpec}</span>
+                    </div>
+                  )}
+                  {selectedFitment.finishName && (
+                    <div className="flex justify-between py-1 border-b border-[#26262E] gap-3">
+                      <span className="text-neutral-400">Finish:</span>
+                      <span className="text-white font-semibold text-right">{selectedFitment.finishName}</span>
+                    </div>
+                  )}
+                  {selectedFitment.vehicleTitle.startsWith('BMW') && (
+                    <>
+                      <div className="flex justify-between py-1 border-b border-[#26262E]">
+                        <span className="text-neutral-400">Bolt Pattern (PCD):</span>
+                        <span className="text-white">5×112 (BMW Direct)</span>
+                      </div>
+                      <div className="flex justify-between py-1">
+                        <span className="text-neutral-400">Center Bore:</span>
+                        <span className="text-white">66.6mm Hub-Centric</span>
+                      </div>
+                    </>
+                  )}
                 </div>
 
                 <div className="bg-[#18181D] border border-[#26262E] rounded-2xl p-4 space-y-2 text-xs font-tech-mono">
                   <p className="text-[#FF5500] font-semibold text-[11px] uppercase tracking-wider mb-2">
-                    SOUTH AFRICA BUILD HIGHLIGHTS
+                    ABOUT THESE PHOTOS
                   </p>
-                  <ul className="space-y-1.5 text-neutral-300">
-                    {selectedFitment.technicalHighlights.map((hl, i) => (
-                      <li key={i} className="flex items-center gap-2">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-[#FF5500] shrink-0" />
-                        <span>{hl}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="pt-2 border-t border-[#26262E] text-neutral-400 text-[11px]">
-                    Verified by FORGED South Africa Technical Concierge
-                  </div>
+                  {selectedFitment.technicalHighlights && selectedFitment.technicalHighlights.length > 0 ? (
+                    <ul className="space-y-1.5 text-neutral-300">
+                      {selectedFitment.technicalHighlights.map((hl, i) => (
+                        <li key={i} className="flex items-center gap-2">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-[#FF5500] shrink-0" />
+                          <span>{hl}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-neutral-300 leading-relaxed">
+                      A real customer car fitted by FORGED. The studio images are re-shoots of the customer's
+                      own photo: same car, same wheels, same finish, photographed again on a clean studio set.
+                    </p>
+                  )}
                 </div>
               </div>
 
-              {/* Owner Testimonial */}
-              <blockquote className="bg-[#18181D] border-l-4 border-[#FF5500] p-4 rounded-r-2xl mb-6 text-sm text-[#C2C2CC] italic leading-relaxed">
-                {selectedFitment.quote}
-                <div className="mt-2 text-xs font-tech-mono not-italic text-[#FF5500] font-semibold">
-                  — {selectedFitment.ownerName}
-                </div>
-              </blockquote>
+              {/* Owner Testimonial (only when one has been recorded) */}
+              {selectedFitment.quote && (
+                <blockquote className="bg-[#18181D] border-l-4 border-[#FF5500] p-4 rounded-r-2xl mb-6 text-sm text-[#C2C2CC] italic leading-relaxed">
+                  {selectedFitment.quote}
+                  {selectedFitment.ownerName && (
+                    <div className="mt-2 text-xs font-tech-mono not-italic text-[#FF5500] font-semibold">
+                      — {selectedFitment.ownerName}
+                    </div>
+                  )}
+                </blockquote>
+              )}
 
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row items-center justify-end gap-3 pt-4 border-t border-[#26262E]">
@@ -516,27 +407,29 @@ export const EditorialFlow: React.FC = () => {
                     const fit = selectedFitment;
                     setSelectedFitment(null);
                     openEnquiryModal({
-                      subject: `Commission ${fit.wheelModel} for ${fit.vehicleTitle} (${fit.city})`,
+                      subject: `Commission ${fit.wheelModel ?? fit.wheelLook} for ${fit.vehicleTitle}${fit.city ? ` (${fit.city})` : ''}`,
                       domain: 'brand',
                     });
                   }}
                   className="w-full sm:w-auto bg-[#FF5500] text-white hover:bg-[#FF6B1A] rounded-full px-6 py-3 text-xs font-tech-mono uppercase tracking-wider font-semibold flex items-center justify-center gap-2 transition-all shadow-[0_0_20px_rgba(255,85,0,0.35)] cursor-pointer"
                 >
-                  <span>I want to a custom set</span>
+                  <span>I want a custom set</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    const slug = selectedFitment.wheelSlug;
-                    setSelectedFitment(null);
-                    navigate(`/wheels/${slug}`);
-                  }}
-                  className="w-full sm:w-auto border border-[#33333E] text-neutral-300 hover:text-white hover:border-[#FF5500] rounded-full px-5 py-3 text-xs font-tech-mono uppercase tracking-wider transition-colors cursor-pointer"
-                >
-                  View Wheel in 360° Studio
-                </button>
+                {selectedFitment.wheelSlug && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const slug = selectedFitment.wheelSlug;
+                      setSelectedFitment(null);
+                      navigate(`/wheels/${slug}`);
+                    }}
+                    className="w-full sm:w-auto border border-[#33333E] text-neutral-300 hover:text-white hover:border-[#FF5500] rounded-full px-5 py-3 text-xs font-tech-mono uppercase tracking-wider transition-colors cursor-pointer"
+                  >
+                    View Wheel in 360° Studio
+                  </button>
+                )}
 
                 <button
                   type="button"
