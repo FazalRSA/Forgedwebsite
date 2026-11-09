@@ -8,7 +8,7 @@ const AddWheelModal = lazy(() =>
 );
 
 export const GlobalOverlays: React.FC = () => {
-  const { pathname } = useRouter();
+  const { pathname, navigate } = useRouter();
   const {
     isAddWheelModalOpen,
     enquiryModal,
@@ -328,10 +328,24 @@ export const GlobalOverlays: React.FC = () => {
                   >
                     Submit Interest Request
                   </button>
-                  <div className="flex items-center justify-center gap-2 mt-3 text-[11px] font-tech-mono text-neutral-400">
-                    <ShieldCheck className="w-3.5 h-3.5 text-[#FF5500]" />
-                    <span>TÜV Certified Fitment Guarantee · Direct Factory Consultation</span>
-                  </div>
+                  <p className="flex items-start justify-center gap-2 mt-3 text-[11px] font-tech-mono text-neutral-400 text-center">
+                    <ShieldCheck className="w-3.5 h-3.5 text-[#FF5500] shrink-0 mt-0.5" />
+                    <span>
+                      By submitting, you consent to FORGED Custom Wheels using these details to respond
+                      to your request, as described in our{' '}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          handleCloseEnquiry();
+                          navigate('/privacy-policy');
+                        }}
+                        className="text-[#FF5500] hover:underline cursor-pointer"
+                      >
+                        Privacy Notice
+                      </button>
+                      .
+                    </span>
+                  </p>
                 </div>
               </form>
             )}

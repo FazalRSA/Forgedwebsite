@@ -652,7 +652,15 @@ export const DealerApplicationPage: React.FC = () => {
 
                 <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <p className="text-xs font-tech-mono text-neutral-400">
-                    STRICTLY CONFIDENTIAL · REVIEWED BY FORGED CUSTOM WHEELS UK TRADE BOARD
+                    STRICTLY CONFIDENTIAL · BY SUBMITTING YOU CONSENT TO US PROCESSING THESE DETAILS TO
+                    ASSESS YOUR APPLICATION, AS SET OUT IN OUR{' '}
+                    <button
+                      type="button"
+                      onClick={() => navigate('/privacy-policy')}
+                      className="text-[#FF5500] hover:underline cursor-pointer"
+                    >
+                      PRIVACY NOTICE
+                    </button>
                   </p>
                   <button
                     type="submit"
