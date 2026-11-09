@@ -11,186 +11,23 @@ import {
 import { BrandHeader } from './BrandHeader';
 import { useRouter } from '../../utils/router';
 import { useKahnStore } from '../../store/useKahnStore';
+import {
+  CLIENT_FITMENTS,
+  FITMENT_FAMILIES,
+  type ClientFitment,
+} from '../../data/clientFitments';
 
-export interface ClientFitmentItem {
-  id: string;
-  slotLabel: string;
-  vehicleTitle: string;
-  chassisCode: string;
-  wheelModel: string;
-  wheelSlug: string;
-  storeProductSlug: string;
-  staggeredSpec: string;
-  finishName: string;
-  clientCity: string;
-  bentoClass: string;
-  accentHex: string;
-  images: [string, string];
-  imageLabels: [string, string];
-}
+/** Kept for backwards compatibility with earlier imports; the data now lives in src/data/clientFitments.ts. */
+export type ClientFitmentItem = ClientFitment;
+export const CLIENT_FITMENT_ITEMS: ClientFitmentItem[] = CLIENT_FITMENTS;
 
-export const CLIENT_FITMENT_ITEMS: ClientFitmentItem[] = [
-  // 1. BMW G80 M3 Competition (Mint / Tiffany Blue)
-  {
-    id: 'fitment-01',
-    slotLabel: '01 / 08',
-    vehicleTitle: 'BMW G80 M3 COMPETITION — MINT INDIVIDUAL',
-    chassisCode: 'G80 · MINT GREEN / CYAN INDIVIDUAL',
-    wheelModel: 'TYPE 52 FORGED',
-    wheelSlug: 'type-52',
-    storeProductSlug: 'bmw-m3-type-52-forged',
-    staggeredSpec: '20x9.5" ET18 / 21x10.5" ET20',
-    finishName: 'Brushed Liquid Silver',
-    clientCity: 'SANDTON, JOHANNESBURG',
-    bentoClass: 'min-h-[300px] sm:min-h-[340px]',
-    accentHex: '#43C59E',
-    images: [
-      '/assets/aistudio/1792612987797_635e7cff.jpg',
-      '/assets/aistudio/1792613009313_aeeb7665.jpg',
-    ],
-    imageLabels: ['Front 3/4 Studio Stance & Arch Clearance', 'Full Side 90° Profile & Forged Monoblock Detail'],
-  },
-  // 2. BMW G80 M3 Competition (Dravit Grey) — User Uploaded Commission
-  {
-    id: 'fitment-02',
-    slotLabel: '02 / 08',
-    vehicleTitle: 'BMW G80 M3 COMPETITION — DRAVIT GREY',
-    chassisCode: 'G80 · DRAVIT GREY METALLIC',
-    wheelModel: 'RS 3.0 HERITAGE FORGED',
-    wheelSlug: 'rs-3-0',
-    storeProductSlug: 'bmw-m3-rs-3-0',
-    staggeredSpec: '20x9.5" ET18 / 21x10.5" ET20',
-    finishName: 'Champagne Bronze Brushed',
-    clientCity: 'CAMPS BAY, CAPE TOWN',
-    bentoClass: 'min-h-[300px] sm:min-h-[340px]',
-    accentHex: '#C5B095',
-    images: [
-      '/assets/aistudio/forged_past_install__6741d2d7.jpeg',
-      '/assets/aistudio/m3_bronze_side.jpg',
-    ],
-    imageLabels: ['Front 3/4 Studio Stance & Carbon Caliper Clearance', 'Full Side 90° Profile & Flush Stance'],
-  },
-  // 3. BMW G81 M3 Touring Competition (Mineral Grey) — User Uploaded Commission
-  {
-    id: 'fitment-03',
-    slotLabel: '03 / 08',
-    vehicleTitle: 'BMW G81 M3 TOURING COMPETITION',
-    chassisCode: 'G81 · MINERAL GREY METALLIC',
-    wheelModel: 'LD RS MONOBLOCK FORGED',
-    wheelSlug: 'ld-rs',
-    storeProductSlug: 'bmw-m3-ld-rs-forged',
-    staggeredSpec: '20x9.5" ET18 / 20x10.5" ET20',
-    finishName: 'Liquid Silver Diamond Cut',
-    clientCity: 'STELLENBOSCH, WINELANDS',
-    bentoClass: 'min-h-[300px] sm:min-h-[340px]',
-    accentHex: '#8E959E',
-    images: [
-      '/assets/aistudio/m3_touring_front.jpg',
-      '/assets/aistudio/forged_customer__3198a902.jpeg',
-    ],
-    imageLabels: ['Front 3/4 Studio Stance & Touring Haunches', 'Rear 3/4 Profile & Deep Concave Hub Detail'],
-  },
-  // 4. BMW G82 M4 Competition Coupe (Frozen Brooklyn Grey)
-  {
-    id: 'fitment-04',
-    slotLabel: '04 / 08',
-    vehicleTitle: 'BMW G82 M4 COMPETITION COUPE',
-    chassisCode: 'G82 · FROZEN BROOKLYN GREY',
-    wheelModel: 'TYPE 52 COMPETITION FORGED',
-    wheelSlug: 'type-52',
-    storeProductSlug: 'bmw-m3-type-52-forged',
-    staggeredSpec: '20x9.5" ET16 / 21x10.5" ET18',
-    finishName: 'Satin Black',
-    clientCity: 'MUNICH, GERMANY',
-    bentoClass: 'min-h-[300px] sm:min-h-[340px]',
-    accentHex: '#2B2D42',
-    images: [
-      '/assets/aistudio/m4_coupe_front.jpg',
-      '/assets/aistudio/m4_coupe_side.jpg',
-    ],
-    imageLabels: ['Front 3/4 Studio Track Stance & Offset', 'Full Side 90° Profile & M4 Coupe Silhouette'],
-  },
-  // 5. BMW G87 M2 Coupe Track-Spec (Alpine White)
-  {
-    id: 'fitment-05',
-    slotLabel: '05 / 08',
-    vehicleTitle: 'BMW G87 M2 COUPE TRACK-SPEC',
-    chassisCode: 'G87 · ALPINE WHITE',
-    wheelModel: 'MONDIAL RETRO MONOBLOCK',
-    wheelSlug: 'mondial-retro',
-    storeProductSlug: 'bmw-m2-mondial-retro-forged',
-    staggeredSpec: '20x9.5" ET18 / 20x10.5" ET20',
-    finishName: 'Anthracite Gunmetal Matte',
-    clientCity: 'KYALAMI GP CIRCUIT, MIDRAND',
-    bentoClass: 'min-h-[320px] sm:min-h-[360px]',
-    accentHex: '#4A4E54',
-    images: [
-      '/assets/aistudio/m2_coupe_front.jpg',
-      '/assets/aistudio/m2_coupe_side.jpg',
-    ],
-    imageLabels: ['Front 3/4 Studio Flared Arch Stance', 'Full Side 90° Profile & Muscular Silhouette'],
-  },
-  // 6. BMW G90 M5 Hybrid Saloon (Marina Bay Blue)
-  {
-    id: 'fitment-06',
-    slotLabel: '06 / 08',
-    vehicleTitle: 'BMW G90 M5 HYBRID SALOON',
-    chassisCode: 'G90 · MARINA BAY BLUE METALLIC',
-    wheelModel: 'VENGEANCE DIRECTIONAL TURBINE',
-    wheelSlug: 'vengeance-wb',
-    storeProductSlug: 'bmw-m5-vengeance-forged',
-    staggeredSpec: '22x10.0" ET20 / 22x11.5" ET22',
-    finishName: 'Liquid Silver Mirror Lustre',
-    clientCity: 'UMHLANGA ARCH, DURBAN',
-    bentoClass: 'min-h-[320px] sm:min-h-[360px]',
-    accentHex: '#1D3557',
-    images: [
-      '/assets/aistudio/m5_saloon_front.jpg',
-      '/assets/aistudio/m5_saloon_side.jpg',
-    ],
-    imageLabels: ['Front 3/4 Studio Stance & 22" Monoblock Fit', 'Full Side 90° Profile & Directional Turbine Blades'],
-  },
-  // 7. BMW G80 M3 Competition — Champagne Bronze Staggered
-  {
-    id: 'fitment-07',
-    slotLabel: '07 / 08',
-    vehicleTitle: 'BMW G80 M3 CS COMPETITION',
-    chassisCode: 'G80 · DRAVIT GREY CARBON ARCH',
-    wheelModel: 'RS 3.0 HERITAGE FORGED',
-    wheelSlug: 'rs-3-0',
-    storeProductSlug: 'bmw-m3-rs-3-0',
-    staggeredSpec: '20x9.5" ET18 / 21x10.5" ET20',
-    finishName: 'Champagne Bronze Brushed',
-    clientCity: 'SILVERSTONE, UK',
-    bentoClass: 'min-h-[320px] sm:min-h-[360px]',
-    accentHex: '#C5B095',
-    images: [
-      '/assets/aistudio/forged_past_install__6741d2d7.jpeg',
-      '/assets/aistudio/m3_bronze_side.jpg',
-    ],
-    imageLabels: ['Front 3/4 Studio Stance & Track Offset', 'Full Side 90° Profile & Spoke Detailing'],
-  },
-  // 8. BMW G81 M3 Touring Edition — Liquid Silver Staggered
-  {
-    id: 'fitment-08',
-    slotLabel: '08 / 08',
-    vehicleTitle: 'BMW G81 M3 TOURING ATELIER SPEC',
-    chassisCode: 'G81 · MINERAL GREY INDIVIDUAL',
-    wheelModel: 'LD RS MONOBLOCK FORGED',
-    wheelSlug: 'ld-rs',
-    storeProductSlug: 'bmw-m3-ld-rs-forged',
-    staggeredSpec: '20x9.5" ET18 / 20x10.5" ET20',
-    finishName: 'Liquid Silver Diamond Cut',
-    clientCity: 'ZURICH, SWITZERLAND',
-    bentoClass: 'min-h-[320px] sm:min-h-[360px]',
-    accentHex: '#8E959E',
-    images: [
-      '/assets/aistudio/m3_touring_front.jpg',
-      '/assets/aistudio/forged_customer__3198a902.jpeg',
-    ],
-    imageLabels: ['Front 3/4 Studio Stance & Touring Haunches', 'Rear 3/4 Profile & Deep Concave Hub Detail'],
-  },
-];
+/** Filter pill label for a model family, e.g. "BMW M3" or "AUDI RS3". */
+const familyLabel = (family: string): string => {
+  const make = CLIENT_FITMENTS.find((f) => f.family === family)?.make ?? '';
+  return `${make.toUpperCase()} ${family}`.trim();
+};
+
+// The previous hardcoded placeholder list has been replaced by generated data (see src/data/clientFitments.ts).
 
 export const ClientFitmentsPage: React.FC = () => {
   const { navigate } = useRouter();
@@ -198,13 +35,15 @@ export const ClientFitmentsPage: React.FC = () => {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [modalPhotoIndex, setModalPhotoIndex] = useState<0 | 1>(0);
   const [cardPhotoIndices, setCardPhotoIndices] = useState<Record<string, 0 | 1>>({});
-  const [filterModel, setFilterModel] = useState<'ALL' | 'M3' | 'M4' | 'M2' | 'M5'>('ALL');
+  const [filterModel, setFilterModel] = useState<string>('ALL');
   const [customImagesBySlot, setCustomImagesBySlot] = useState<Record<string, [string?, string?]>>({});
+
+  const filterOptions: string[] = ['ALL', ...FITMENT_FAMILIES];
 
   const visibleItems =
     filterModel === 'ALL'
       ? CLIENT_FITMENT_ITEMS
-      : CLIENT_FITMENT_ITEMS.filter((item) => item.vehicleTitle.includes(filterModel));
+      : CLIENT_FITMENT_ITEMS.filter((item) => item.family === filterModel);
 
   const activeItem =
     selectedIndex !== null ? visibleItems[selectedIndex] ?? null : null;
@@ -289,7 +128,7 @@ export const ClientFitmentsPage: React.FC = () => {
 
           {/* BMW Chassis Filter Pills */}
           <div className="flex flex-wrap items-center gap-2">
-            {(['ALL', 'M3', 'M4', 'M2', 'M5'] as const).map((model) => {
+            {filterOptions.map((model) => {
               const active = filterModel === model;
               return (
                 <button
@@ -305,7 +144,7 @@ export const ClientFitmentsPage: React.FC = () => {
                       : 'border border-[#33333E] text-neutral-300 hover:border-[#FF5500] hover:text-[#FF5500]'
                   }`}
                 >
-                  {model === 'ALL' ? 'ALL BMW (16)' : `BMW ${model}`}
+                  {model === 'ALL' ? `ALL (${CLIENT_FITMENT_ITEMS.length})` : familyLabel(model)}
                 </button>
               );
             })}
@@ -313,7 +152,7 @@ export const ClientFitmentsPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Scrollable 4x4 Bento Grid of 16 Clean Fitments */}
+      {/* Scrollable bento grid of client fitments (data: src/data/clientFitments.ts) */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 py-12">
         <div
           data-testid="client-fitments-bento-grid"
@@ -512,7 +351,7 @@ export const ClientFitmentsPage: React.FC = () => {
                 <div className="space-y-5">
                   <div>
                     <p className="text-[11px] font-tech-mono uppercase tracking-[0.18em] text-[#FF5500]">
-                      BMW FITMENT SPECIFICATION
+                      {activeItem.make.toUpperCase()} FITMENT SPECIFICATION
                     </p>
                     <h2 className="text-xl sm:text-2xl font-bold uppercase tracking-tight mt-1 text-white">
                       {activeItem.vehicleTitle}
@@ -521,25 +360,45 @@ export const ClientFitmentsPage: React.FC = () => {
 
                   <div className="divide-y divide-[#26262E] border-y border-[#26262E] text-xs font-tech-mono">
                     <div className="py-2.5 flex items-center justify-between gap-2">
-                      <span className="text-neutral-400">WHEEL MODEL</span>
-                      <span className="font-semibold text-white">{activeItem.wheelModel}</span>
+                      <span className="text-neutral-400">VEHICLE</span>
+                      <span className="font-semibold text-white uppercase text-right">
+                        {activeItem.chassisCode.split(' · ')[0]} {activeItem.bodyStyle}
+                      </span>
                     </div>
                     <div className="py-2.5 flex items-center justify-between gap-2">
-                      <span className="text-neutral-400">STAGGERED SPEC</span>
-                      <span className="font-semibold text-white">{activeItem.staggeredSpec}</span>
+                      <span className="text-neutral-400">PAINT</span>
+                      <span className="font-semibold text-white uppercase text-right">{activeItem.paint}</span>
                     </div>
                     <div className="py-2.5 flex items-center justify-between gap-2">
-                      <span className="text-neutral-400">FINISH</span>
-                      <span className="font-semibold text-[#FF5500] uppercase">{activeItem.finishName}</span>
+                      <span className="text-neutral-400">WHEELS AS FITTED</span>
+                      <span className="font-semibold text-[#FF5500] uppercase text-right">
+                        {activeItem.wheelModel ?? activeItem.wheelLook}
+                      </span>
                     </div>
-                    <div className="py-2.5 flex items-center justify-between gap-2">
-                      <span className="text-neutral-400">HUB BORE</span>
-                      <span className="font-semibold text-white">66.6MM DIRECT HUB-CENTRIC</span>
-                    </div>
-                    <div className="py-2.5 flex items-center justify-between gap-2">
-                      <span className="text-neutral-400">BOLT PATTERN</span>
-                      <span className="font-semibold text-white">5 × 112 DIRECT BOLT-ON</span>
-                    </div>
+                    {activeItem.staggeredSpec && (
+                      <div className="py-2.5 flex items-center justify-between gap-2">
+                        <span className="text-neutral-400">STAGGERED SPEC</span>
+                        <span className="font-semibold text-white">{activeItem.staggeredSpec}</span>
+                      </div>
+                    )}
+                    {activeItem.finishName && (
+                      <div className="py-2.5 flex items-center justify-between gap-2">
+                        <span className="text-neutral-400">FINISH</span>
+                        <span className="font-semibold text-[#FF5500] uppercase">{activeItem.finishName}</span>
+                      </div>
+                    )}
+                    {activeItem.make === 'BMW' && (
+                      <>
+                        <div className="py-2.5 flex items-center justify-between gap-2">
+                          <span className="text-neutral-400">HUB BORE</span>
+                          <span className="font-semibold text-white">66.6MM DIRECT HUB-CENTRIC</span>
+                        </div>
+                        <div className="py-2.5 flex items-center justify-between gap-2">
+                          <span className="text-neutral-400">BOLT PATTERN</span>
+                          <span className="font-semibold text-white">5 × 112 DIRECT BOLT-ON</span>
+                        </div>
+                      </>
+                    )}
                   </div>
 
                   {/* Upload custom replacement for active photo */}
@@ -564,7 +423,7 @@ export const ClientFitmentsPage: React.FC = () => {
                     onClick={() => {
                       setSelectedIndex(null);
                       openEnquiryModal({
-                        subject: `Fitment Specification: ${activeItem.vehicleTitle} (${activeItem.wheelModel})`,
+                        subject: `Fitment Specification: ${activeItem.vehicleTitle} (${activeItem.wheelModel ?? activeItem.wheelLook})`,
                         finish: activeItem.finishName,
                         domain: 'brand',
                       });
@@ -580,11 +439,11 @@ export const ClientFitmentsPage: React.FC = () => {
                     onClick={() => {
                       const target = activeItem.wheelSlug;
                       setSelectedIndex(null);
-                      navigate(`/wheels/${target}`);
+                      navigate(target ? `/wheels/${target}` : '/#catalogue');
                     }}
                     className="w-full py-3 px-5 rounded-full border border-[#33333E] text-[#F5F5F7] text-xs font-tech-mono font-bold uppercase tracking-[0.14em] hover:border-[#FF5500] hover:text-[#FF5500] inline-flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap transition-colors"
                   >
-                    <span>Open 360° Wheel Showcase</span>
+                    <span>{activeItem.wheelSlug ? 'Open 360° Wheel Showcase' : 'Browse the Wheel Catalogue'}</span>
                     <ArrowUpRight className="w-4 h-4 shrink-0" />
                   </button>
                 </div>
