@@ -12,6 +12,8 @@ import {
   filterAndSortStoreProducts,
   formatZAR,
   getStoreProductBySlug,
+  getStoreProductImages,
+  STORE_PRODUCTS,
 } from './kahnData';
 
 test('MARQUE_FILTERS and getAvailableMakes expose only BMW as the car brand option', () => {
@@ -158,4 +160,73 @@ test('findWheelBySlug has no silent fallback and modelUrl flows through the whee
   const withoutModel = createWheelAndProductEntries({ name: 'TYPE 98', priceZAR: 1000 });
   assert.equal(withoutModel.brandWheel.modelUrl, undefined);
   assert.equal(withoutModel.storeProduct.modelUrl, undefined);
+});
+
+test('getStoreProductImages resolves every STORE_PRODUCTS wheelSlug to real photography when it exists', () => {
+  assert.equal(STORE_PRODUCTS.length, 8);
+
+  // Verified by reading src/data/customWheels.json: these wheelSlugs resolve to
+  // BrandWheelItem entries (via getAllBrandWheels(), which merges customWheels.json
+  // on top of the FSA seed catalogue) carrying a real `images` array under
+  // /images/wheels/..., not a generated placeholder. fsa002-gold and fsa004-silver
+  // are included here too — customWheels.json now overrides those two seed slugs
+  // with real renders as well, in addition to the four FF-1/FF-3 products shot
+  // this session.
+  const wheelSlugsWithRealPhotography = [
+    'fsa002-gold',
+    'fsa004-silver',
+    'ff-1-silver',
+    'ff-1-liquid-metal',
+    'ff-3-pure-bronze',
+    'ff-3-liquid-metal',
+  ];
+
+  for (const wheelSlug of wheelSlugsWithRealPhotography) {
+    const product = STORE_PRODUCTS.find((p) => p.wheelSlug === wheelSlug);
+    assert.ok(product, `expected a STORE_PRODUCTS entry with wheelSlug "${wheelSlug}"`);
+
+    const { images, labels } = getStoreProductImages(product!, []);
+    assert.equal(images.length, 3);
+    for (const image of images) {
+      assert.ok(
+        image.startsWith(`/images/wheels/${wheelSlug}/`),
+        `expected a real render path for "${wheelSlug}", got "${image}"`
+      );
+      assert.ok(!image.startsWith('data:image/svg+xml'), `"${wheelSlug}" should not fall back to a placeholder`);
+    }
+    assert.equal(labels.length, 3);
+  }
+});
+
+test('getStoreProductImages degrades to a placeholder, not undefined or a throw, for wheelSlugs with no real photography yet', () => {
+  // fsa001-black-matte and fsa003-silver are seed-only FSA entries: no
+  // customWheels.json override and no imageUrl/galleryImages of their own exist
+  // for them. This is a known, out-of-scope content gap (not a wiring bug), so
+  // getStoreProductImages must keep degrading gracefully to a generated
+  // placeholder rather than throwing or returning undefined images.
+  const wheelSlugsWithoutRealPhotographyYet = ['fsa001-black-matte', 'fsa003-silver'];
+
+  for (const wheelSlug of wheelSlugsWithoutRealPhotographyYet) {
+    const product = STORE_PRODUCTS.find((p) => p.wheelSlug === wheelSlug);
+    assert.ok(product, `expected a STORE_PRODUCTS entry with wheelSlug "${wheelSlug}"`);
+
+    const { images, labels } = getStoreProductImages(product!, []);
+    assert.equal(images.length, 3);
+    for (const image of images) {
+      assert.ok(
+        image.startsWith('data:image/svg+xml'),
+        `expected "${wheelSlug}" to degrade to a placeholder data URL, got "${image.slice(0, 40)}..."`
+      );
+    }
+    assert.equal(labels.length, 3);
+  }
+});
+
+test('getStoreProductImages degrades to a placeholder rather than throwing when wheelSlug matches no BrandWheelItem at all', () => {
+  const productWithUnknownWheel = { ...STORE_PRODUCTS[0], wheelSlug: 'does-not-exist-slug' };
+
+  const { images, labels } = getStoreProductImages(productWithUnknownWheel, []);
+  assert.equal(images.length, 3);
+  assert.ok(images.every((image) => image.startsWith('data:image/svg+xml')));
+  assert.equal(labels.length, 3);
 });
