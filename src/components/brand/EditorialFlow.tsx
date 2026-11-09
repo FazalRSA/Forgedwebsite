@@ -18,6 +18,7 @@ export interface SouthAfricaCustomerFitment {
   id: string;
   vehicleTitle: string;
   chassisCode: string;
+  make: string;
   /** What the wheels look like in the customer's photo (used when no catalogue model is recorded). */
   wheelLook: string;
   wheelModel?: string;
@@ -48,6 +49,7 @@ export const SOUTH_AFRICA_FITMENTS: SouthAfricaCustomerFitment[] = CLIENT_FITMEN
   id: `sa-${f.id}`,
   vehicleTitle: f.vehicleTitle,
   chassisCode: f.chassisCode,
+  make: f.make,
   wheelLook: f.wheelLook,
   wheelModel: f.wheelModel,
   wheelSlug: f.wheelSlug,
@@ -351,7 +353,7 @@ export const EditorialFlow: React.FC = () => {
                       <span className="text-white font-semibold text-right">{selectedFitment.finishName}</span>
                     </div>
                   )}
-                  {selectedFitment.vehicleTitle.startsWith('BMW') && (
+                  {selectedFitment.make === 'BMW' && (
                     <>
                       <div className="flex justify-between py-1 border-b border-[#26262E]">
                         <span className="text-neutral-400">Bolt Pattern (PCD):</span>
