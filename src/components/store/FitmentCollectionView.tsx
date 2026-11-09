@@ -165,8 +165,8 @@ export const FitmentCollectionView: React.FC<FitmentCollectionViewProps> = ({
               SALE
             </button>
 
-            {/* Wheel Diameter Pills (20", 20-21", 22") */}
-            {(['20"', '20-21"', '22"'] as const).map((diam) => {
+            {/* Wheel Diameter Pills (19-20", 20", 20-21", 22") */}
+            {(['19-20"', '20"', '20-21"', '22"'] as const).map((diam) => {
               const active = selectedDiameter === diam;
               return (
                 <button
@@ -224,7 +224,9 @@ export const FitmentCollectionView: React.FC<FitmentCollectionViewProps> = ({
                   }`}
                 >
                   <span className="block font-bold">{mKey} {n.model}</span>
-                  <span className="text-[10px] text-neutral-400">{n.years[0]} · {n.productSlugs.length} SETS</span>
+                  <span className="text-[10px] text-neutral-400">
+                    {n.years[0]} · {n.productSlugs.length > 0 ? `${n.productSlugs.length} SETS` : 'ENQUIRE'}
+                  </span>
                 </button>
               ))
             )}
@@ -234,7 +236,42 @@ export const FitmentCollectionView: React.FC<FitmentCollectionViewProps> = ({
 
       {/* Brutalist 2-Column Product Grid (1px solid #26262E) */}
       <main className="max-w-7xl mx-auto px-4 sm:px-8 py-8">
-        {filteredProducts.length === 0 ? (
+        {products.length === 0 ? (
+          <div
+            className="border border-[#26262E] p-12 text-center space-y-4 bg-[#121215]"
+            data-testid="fitment-plp-empty"
+          >
+            <p className="text-base font-bold uppercase tracking-wider text-[#F5F5F7]">
+              NO IN-STOCK SETS LISTED FOR THE {make} {node.model} YET
+            </p>
+            <p className="text-sm text-[#C2C2CC] leading-relaxed max-w-xl mx-auto">
+              This model is on our fitment list, but no complete sets are currently allocated to
+              it. Send an enquiry with your chassis code and we will confirm sizing, offsets and
+              lead time.
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={() =>
+                  openEnquiryModal({
+                    subject: `${make} ${node.model} alloy wheel fitment enquiry`,
+                    domain: 'store',
+                  })
+                }
+                className="px-6 py-3 bg-[#FF5500] text-white text-xs font-tech-mono uppercase tracking-wider cursor-pointer hover:bg-[#FF6B1A]"
+              >
+                ENQUIRE ABOUT {make} {node.model}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowVehicleSwitcher(true)}
+                className="px-6 py-3 border border-[#26262E] text-[#F5F5F7] text-xs font-tech-mono uppercase tracking-wider cursor-pointer hover:border-[#FF5500]"
+              >
+                SWITCH VEHICLE
+              </button>
+            </div>
+          </div>
+        ) : filteredProducts.length === 0 ? (
           <div className="border border-[#26262E] p-12 text-center space-y-4 bg-[#121215]">
             <p className="text-base font-bold uppercase tracking-wider text-[#F5F5F7]">
               NO WHEELS MATCH THE SELECTED DIAMETER / SALE FILTER

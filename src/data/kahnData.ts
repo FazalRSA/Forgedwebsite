@@ -600,7 +600,7 @@ export const STORE_PRODUCTS: StoreProductItem[] = [
     isLatest: true,
     isReserve: true,
     setLabel: 'IN STOCK · 1 SET',
-    diameterBadge: '20-21"',
+    diameterBadge: '19-20"',
     geometry: 'y-spoke-forged',
     spokeCount: 10,
     defaultFinish: 'satin-black',
@@ -908,16 +908,328 @@ export interface FitmentModelNode {
   bannerColorHex: string;
   bannerAccentHex: string;
   vehicleLabel: string;
+  /** Stock-sheet "Cars that this is available for" names grouped under this model line. */
+  variants: string[];
   seoDescriptionShort: string;
   seoDescriptionFull: string;
   productSlugs: string[];
 }
+
+/**
+ * The "Cars that this is available for" options, verbatim from pages 2–3 of the BMW M /
+ * M Performance stock sheet. Every `BrandWheelItem.compatibleCars` value must be one of
+ * these, and every entry belongs to exactly one fitment node below (via `variants`).
+ */
+export const BMW_M_MODEL_OPTIONS: readonly string[] = [
+  'M135i xDrive / M135 xDrive (F40 / F70)',
+  'M235i xDrive Gran Coupe (F44 / F74)',
+  'M240i Coupe (G42)',
+  'M240i xDrive Coupe (G42)',
+  'M2 Coupe (G87)',
+  'M2 CS (G87)',
+  'M340i Sedan (G20)',
+  'M340i xDrive Sedan (G20)',
+  'M340i xDrive Touring (G21)',
+  'M340d xDrive Sedan / Touring (G20 / G21)',
+  'M3 Sedan (G80)',
+  'M3 Competition Sedan (G80)',
+  'M3 Competition M xDrive Sedan (G80)',
+  'M3 Competition M xDrive Touring (G81)',
+  'M3 CS (G80)',
+  'M3 CS Touring (G81)',
+  'M440i Coupe (G22)',
+  'M440i xDrive Coupe (G22)',
+  'M440i Convertible (G23)',
+  'M440i xDrive Convertible (G23)',
+  'M440i Gran Coupe (G26)',
+  'M440i xDrive Gran Coupe (G26)',
+  'M440d xDrive (G22 / G23 / G26)',
+  'M4 Coupe (G82)',
+  'M4 Competition Coupe (G82)',
+  'M4 Competition M xDrive Coupe (G82)',
+  'M4 Competition Convertible (G83)',
+  'M4 Competition M xDrive Convertible (G83)',
+  'M4 CS (G82)',
+  'M4 CSL (G82)',
+  'M550i xDrive Sedan (G30)',
+  'M5 Sedan (G90)',
+  'M5 Touring (G99)',
+  'M760e xDrive (G70)',
+  'M850i xDrive Coupe (G15)',
+  'M850i xDrive Convertible (G14)',
+  'M850i xDrive Gran Coupe (G16)',
+  'M8 Competition Coupe (F92)',
+  'M8 Competition Convertible (F91)',
+  'M8 Competition Gran Coupe (F93)',
+  'Z4 M40i Roadster (G29)',
+  'X1 M35i xDrive (U11)',
+  'X2 M35i xDrive (U10)',
+  'X3 M40i / X3 M40d (G01)',
+  'X3 M50 xDrive (G45)',
+  'X3 M (F97)',
+  'X3 M Competition (F97)',
+  'X4 M40i / X4 M40d (G02)',
+  'X4 M (F98)',
+  'X4 M Competition (F98)',
+  'X5 M50i / X5 M50d (G05)',
+  'X5 M60i xDrive (G05)',
+  'X5 M (F95)',
+  'X5 M Competition (F95)',
+  'X6 M50i / X6 M50d (G06)',
+  'X6 M60i xDrive (G06)',
+  'X6 M (F96)',
+  'X6 M Competition (F96)',
+  'X7 M50i / X7 M50d (G07)',
+  'X7 M60i xDrive (G07)',
+  'XM (G09)',
+  'XM Label / Label Red (G09)',
+  'XM 50e (G09)',
+  'i4 M50 (G26)',
+  'i4 M60 xDrive (G26)',
+  'i5 M60 xDrive Sedan (G60)',
+  'i5 M60 xDrive Touring (G61)',
+  'i7 M70 xDrive (G70)',
+  'iX M60 (I20)',
+  'iX M70 xDrive (I20)',
+];
+
+interface SheetModelFamily {
+  /** Short model-line name shown in the fitment finder's MODEL step. */
+  model: string;
+  /** Production windows offered in the YEAR step, newest first. */
+  years: string[];
+  /** Human label used in the collection banner, e.g. "M340i / M340d (G20 / G21)". */
+  vehicleLabel: string;
+  /** Entries from BMW_M_MODEL_OPTIONS that belong to this model line. */
+  variants: string[];
+}
+
+/**
+ * Stock-sheet model lines with no in-stock allocation yet. Each resolves to an enquiry-only
+ * collection so the fitment finder knows every car on the sheet. Move a line into a
+ * hand-written node above (with `productSlugs`) once sets are allocated to it.
+ */
+const SHEET_ENQUIRY_FAMILIES: SheetModelFamily[] = [
+  {
+    model: 'M135',
+    years: ['2024 ONWARDS', '2019 - 2024'],
+    vehicleLabel: 'M135 (F40 / F70)',
+    variants: ['M135i xDrive / M135 xDrive (F40 / F70)'],
+  },
+  {
+    model: 'M235',
+    years: ['2024 ONWARDS', '2020 - 2024'],
+    vehicleLabel: 'M235 GRAN COUPE (F44 / F74)',
+    variants: ['M235i xDrive Gran Coupe (F44 / F74)'],
+  },
+  {
+    model: 'M240',
+    years: ['2021 ONWARDS'],
+    vehicleLabel: 'M240i COUPE (G42)',
+    variants: ['M240i Coupe (G42)', 'M240i xDrive Coupe (G42)'],
+  },
+  {
+    model: 'M340',
+    years: ['2019 ONWARDS'],
+    vehicleLabel: 'M340i / M340d (G20 / G21)',
+    variants: [
+      'M340i Sedan (G20)',
+      'M340i xDrive Sedan (G20)',
+      'M340i xDrive Touring (G21)',
+      'M340d xDrive Sedan / Touring (G20 / G21)',
+    ],
+  },
+  {
+    model: 'M440',
+    years: ['2020 ONWARDS'],
+    vehicleLabel: 'M440i / M440d (G22 / G23 / G26)',
+    variants: [
+      'M440i Coupe (G22)',
+      'M440i xDrive Coupe (G22)',
+      'M440i Convertible (G23)',
+      'M440i xDrive Convertible (G23)',
+      'M440i Gran Coupe (G26)',
+      'M440i xDrive Gran Coupe (G26)',
+      'M440d xDrive (G22 / G23 / G26)',
+    ],
+  },
+  {
+    model: 'M550',
+    years: ['2017 - 2023'],
+    vehicleLabel: 'M550i xDRIVE (G30)',
+    variants: ['M550i xDrive Sedan (G30)'],
+  },
+  {
+    model: 'M760',
+    years: ['2023 ONWARDS'],
+    vehicleLabel: 'M760e xDRIVE (G70)',
+    variants: ['M760e xDrive (G70)'],
+  },
+  {
+    model: 'M850',
+    years: ['2019 ONWARDS'],
+    vehicleLabel: 'M850i xDRIVE (G14 / G15 / G16)',
+    variants: [
+      'M850i xDrive Coupe (G15)',
+      'M850i xDrive Convertible (G14)',
+      'M850i xDrive Gran Coupe (G16)',
+    ],
+  },
+  {
+    model: 'M8',
+    years: ['2019 ONWARDS'],
+    vehicleLabel: 'M8 COMPETITION (F91 / F92 / F93)',
+    variants: [
+      'M8 Competition Coupe (F92)',
+      'M8 Competition Convertible (F91)',
+      'M8 Competition Gran Coupe (F93)',
+    ],
+  },
+  {
+    model: 'Z4 M40i',
+    years: ['2019 ONWARDS'],
+    vehicleLabel: 'Z4 M40i (G29)',
+    variants: ['Z4 M40i Roadster (G29)'],
+  },
+  {
+    model: 'X1 M35i',
+    years: ['2023 ONWARDS'],
+    vehicleLabel: 'X1 M35i (U11)',
+    variants: ['X1 M35i xDrive (U11)'],
+  },
+  {
+    model: 'X2 M35i',
+    years: ['2024 ONWARDS'],
+    vehicleLabel: 'X2 M35i (U10)',
+    variants: ['X2 M35i xDrive (U10)'],
+  },
+  {
+    model: 'X3 M',
+    years: ['2024 ONWARDS', '2018 - 2024'],
+    vehicleLabel: 'X3 M40i / M50 / X3 M (G01 / G45 / F97)',
+    variants: [
+      'X3 M40i / X3 M40d (G01)',
+      'X3 M50 xDrive (G45)',
+      'X3 M (F97)',
+      'X3 M Competition (F97)',
+    ],
+  },
+  {
+    model: 'X4 M',
+    years: ['2018 - 2025'],
+    vehicleLabel: 'X4 M40i / X4 M (G02 / F98)',
+    variants: ['X4 M40i / X4 M40d (G02)', 'X4 M (F98)', 'X4 M Competition (F98)'],
+  },
+  {
+    model: 'X5 M',
+    years: ['2019 ONWARDS'],
+    vehicleLabel: 'X5 M50i / M60i / X5 M (G05 / F95)',
+    variants: [
+      'X5 M50i / X5 M50d (G05)',
+      'X5 M60i xDrive (G05)',
+      'X5 M (F95)',
+      'X5 M Competition (F95)',
+    ],
+  },
+  {
+    model: 'X6 M',
+    years: ['2020 ONWARDS'],
+    vehicleLabel: 'X6 M50i / M60i / X6 M (G06 / F96)',
+    variants: [
+      'X6 M50i / X6 M50d (G06)',
+      'X6 M60i xDrive (G06)',
+      'X6 M (F96)',
+      'X6 M Competition (F96)',
+    ],
+  },
+  {
+    model: 'X7 M',
+    years: ['2019 ONWARDS'],
+    vehicleLabel: 'X7 M50i / M60i (G07)',
+    variants: ['X7 M50i / X7 M50d (G07)', 'X7 M60i xDrive (G07)'],
+  },
+  {
+    model: 'XM',
+    years: ['2023 ONWARDS'],
+    vehicleLabel: 'XM (G09)',
+    variants: ['XM (G09)', 'XM Label / Label Red (G09)', 'XM 50e (G09)'],
+  },
+  {
+    model: 'i4 M',
+    years: ['2022 ONWARDS'],
+    vehicleLabel: 'i4 M50 / M60 (G26)',
+    variants: ['i4 M50 (G26)', 'i4 M60 xDrive (G26)'],
+  },
+  {
+    model: 'i5 M',
+    years: ['2023 ONWARDS'],
+    vehicleLabel: 'i5 M60 (G60 / G61)',
+    variants: ['i5 M60 xDrive Sedan (G60)', 'i5 M60 xDrive Touring (G61)'],
+  },
+  {
+    model: 'i7 M',
+    years: ['2023 ONWARDS'],
+    vehicleLabel: 'i7 M70 (G70)',
+    variants: ['i7 M70 xDrive (G70)'],
+  },
+  {
+    model: 'iX M',
+    years: ['2022 ONWARDS'],
+    vehicleLabel: 'iX M60 / M70 (I20)',
+    variants: ['iX M60 (I20)', 'iX M70 xDrive (I20)'],
+  },
+];
+
+const ENQUIRY_BANNER_PALETTE: Array<[string, string]> = [
+  ['#1F2A44', '#3D5A99'],
+  ['#3A1F1F', '#8A3B3B'],
+  ['#1E3A2F', '#3C7A5E'],
+  ['#2E2A1E', '#7A6A3C'],
+  ['#26262E', '#5C6080'],
+];
+
+function slugifyFitmentModel(model: string): string {
+  return model
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function buildEnquiryFitmentNode(family: SheetModelFamily, index: number): FitmentModelNode {
+  const [bannerColorHex, bannerAccentHex] =
+    ENQUIRY_BANNER_PALETTE[index % ENQUIRY_BANNER_PALETTE.length];
+  return {
+    model: family.model,
+    years: family.years,
+    parts: ['ALLOY WHEELS'],
+    collectionSlug: `bmw-${slugifyFitmentModel(family.model)}-alloy-wheels`,
+    bannerColorHex,
+    bannerAccentHex,
+    vehicleLabel: `BMW ${family.vehicleLabel} - ALLOY WHEELS`,
+    variants: family.variants,
+    seoDescriptionShort: `Forged alloy wheel fitment for the BMW ${family.vehicleLabel}. No in-stock sets are allocated to this model yet; enquire for availability.`,
+    seoDescriptionFull: `FORGED Custom Wheels lists the BMW ${family.vehicleLabel} as a supported fitment (${family.variants.join(
+      ', '
+    )}). No complete sets are currently allocated to this model in stock. Send an enquiry with your chassis code and we will confirm sizing, offsets, centre bore and lead time.`,
+    productSlugs: [],
+  };
+}
+
+const SHEET_ENQUIRY_NODES: FitmentModelNode[] = SHEET_ENQUIRY_FAMILIES.map(buildEnquiryFitmentNode);
 
 export const VEHICLE_FITMENT_TREE: Record<string, FitmentModelNode[]> = {
   BMW: [
     {
       model: 'M3',
       years: ['2024 ONWARDS', '2020 - 2023'],
+      variants: [
+        'M3 Sedan (G80)',
+        'M3 Competition Sedan (G80)',
+        'M3 Competition M xDrive Sedan (G80)',
+        'M3 Competition M xDrive Touring (G81)',
+        'M3 CS (G80)',
+        'M3 CS Touring (G81)',
+      ],
       parts: ['ALLOY WHEELS'],
       collectionSlug: 'bmw-m3-2024-onwards-alloy-wheels',
       bannerColorHex: '#0F4C35',
@@ -938,6 +1250,7 @@ export const VEHICLE_FITMENT_TREE: Record<string, FitmentModelNode[]> = {
     {
       model: 'M2',
       years: ['2023 ONWARDS'],
+      variants: ['M2 Coupe (G87)', 'M2 CS (G87)'],
       parts: ['ALLOY WHEELS'],
       collectionSlug: 'bmw-m2-2023-onwards-alloy-wheels',
       bannerColorHex: '#1D3557',
@@ -957,6 +1270,15 @@ export const VEHICLE_FITMENT_TREE: Record<string, FitmentModelNode[]> = {
     {
       model: 'M4',
       years: ['2024 ONWARDS'],
+      variants: [
+        'M4 Coupe (G82)',
+        'M4 Competition Coupe (G82)',
+        'M4 Competition M xDrive Coupe (G82)',
+        'M4 Competition Convertible (G83)',
+        'M4 Competition M xDrive Convertible (G83)',
+        'M4 CS (G82)',
+        'M4 CSL (G82)',
+      ],
       parts: ['ALLOY WHEELS'],
       collectionSlug: 'bmw-m4-2024-onwards-alloy-wheels',
       bannerColorHex: '#2B2D42',
@@ -977,6 +1299,7 @@ export const VEHICLE_FITMENT_TREE: Record<string, FitmentModelNode[]> = {
     {
       model: 'M5',
       years: ['2024 ONWARDS'],
+      variants: ['M5 Sedan (G90)', 'M5 Touring (G99)'],
       parts: ['ALLOY WHEELS'],
       collectionSlug: 'bmw-m5-2024-onwards-alloy-wheels',
       bannerColorHex: '#1A1B1E',
@@ -993,6 +1316,7 @@ export const VEHICLE_FITMENT_TREE: Record<string, FitmentModelNode[]> = {
         'bmw-m3-type-52-forged',
       ],
     },
+    ...SHEET_ENQUIRY_NODES,
   ],
 };
 
@@ -1108,19 +1432,24 @@ export function resolveCollectionBySlug(
   products: StoreProductItem[];
 } {
   const normalized = slug.toLowerCase();
-  for (const [make, nodes] of Object.entries(VEHICLE_FITMENT_TREE)) {
-    for (const node of nodes) {
-      if (
-        node.collectionSlug === normalized ||
-        (normalized.includes('bmw-m3') && node.model === 'M3') ||
-        (normalized.includes('bmw-m2') && node.model === 'M2') ||
-        (normalized.includes('bmw-m4') && node.model === 'M4') ||
-        (normalized.includes('bmw-m5') && node.model === 'M5')
-      ) {
-        const products = getMatchingProductsForFitment(make, node.model, runtimeCustomProducts);
-        return { node, make, products };
-      }
-    }
+  const allNodes = Object.entries(VEHICLE_FITMENT_TREE).flatMap(([make, nodes]) =>
+    nodes.map((node) => ({ make, node }))
+  );
+  // 1. Exact collection slug. 2. Legacy shorthand such as "bmw-m3-2024-alloy-wheels": the
+  // slug must start with "<make>-<model>-" as a whole segment, so "bmw-m340-…" can never
+  // resolve to the M3 node.
+  const match =
+    allNodes.find(({ node }) => node.collectionSlug === normalized) ||
+    allNodes.find(({ make, node }) =>
+      normalized.startsWith(`${make.toLowerCase()}-${slugifyFitmentModel(node.model)}-`)
+    );
+  if (match) {
+    const products = getMatchingProductsForFitment(
+      match.make,
+      match.node.model,
+      runtimeCustomProducts
+    );
+    return { node: match.node, make: match.make, products };
   }
   const fallbackNode = VEHICLE_FITMENT_TREE.BMW[0];
   const fallbackProducts = getMatchingProductsForFitment(
