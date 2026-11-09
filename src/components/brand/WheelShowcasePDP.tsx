@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Suspense } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ArrowRight,
   ChevronLeft,
@@ -23,15 +23,7 @@ import { useFirebaseAuth } from '../../context/FirebaseContext';
 import { BrandHeader } from './BrandHeader';
 import { WheelLightboxModal } from './WheelLightboxModal';
 import { SafeImage } from '../shared/SafeImage';
-import { Wheel3DSceneSkeleton } from '../visuals/Wheel3DSceneSkeleton';
-import { Wheel3DSceneErrorBoundary } from '../visuals/Wheel3DSceneErrorBoundary';
-import { lazyWithRetry } from '../../utils/lazyWithRetry';
-
-// Defers the three.js bundle (core + OrbitControls + RoomEnvironment + GLTFLoader) until
-// a visitor actually opens the 3D tab, instead of shipping it in every PDP's main chunk.
-const Wheel3DScene = lazyWithRetry(() =>
-  import('../visuals/Wheel3DScene').then((m) => ({ default: m.Wheel3DScene }))
-);
+import { WheelStage } from '../visuals/WheelStage';
 
 interface WheelShowcasePDPProps {
   slug: string;
@@ -48,7 +40,9 @@ export const WheelShowcasePDP: React.FC<WheelShowcasePDPProps> = ({ slug }) => {
   const [selectedFinish, setSelectedFinish] = useState<WheelFinishId>(
     wheel.defaultFinish
   );
-  const [viewMode, setViewMode] = useState<'3d' | 'photos'>('3d');
+  // The 3D studio exists only for wheels with a real model; the rest open on photography.
+  const has3D = Boolean(wheel.modelUrl);
+  const [viewMode, setViewMode] = useState<'3d' | 'photos'>(has3D ? '3d' : 'photos');
   const [activePhotoIdx, setActivePhotoIdx] = useState<0 | 1 | 2>(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
 
@@ -63,7 +57,7 @@ export const WheelShowcasePDP: React.FC<WheelShowcasePDPProps> = ({ slug }) => {
     }
     setActivePhotoIdx(0);
     setLightboxOpen(false);
-    setViewMode('3d');
+    setViewMode(wheel.modelUrl ? '3d' : 'photos');
   }, [wheel, profile?.preferredFinish]);
 
   // Keyboard navigation for Left/Right arrow photo cycling when in photo mode
@@ -154,6 +148,7 @@ export const WheelShowcasePDP: React.FC<WheelShowcasePDPProps> = ({ slug }) => {
 
           {/* Segmented Mode Toggle: 360° 3D Studio vs Photography */}
           <div className="inline-flex items-center gap-1 p-1 rounded-xl bg-[#121216] border border-[#26262E] self-start sm:self-auto">
+            {has3D && (
             <button
               type="button"
               onClick={() => setViewMode('3d')}
@@ -166,6 +161,7 @@ export const WheelShowcasePDP: React.FC<WheelShowcasePDPProps> = ({ slug }) => {
               <Disc3 className="w-3.5 h-3.5" />
               <span>360° 3D Wheel Studio</span>
             </button>
+            )}
 
             <button
               type="button"
@@ -209,22 +205,19 @@ export const WheelShowcasePDP: React.FC<WheelShowcasePDPProps> = ({ slug }) => {
 
         {/* Main Interactive Stage: 360° 3D Three.js Scene OR 3-Angle Photography */}
         <section className="mb-14">
-          {viewMode === '3d' ? (
-            <Wheel3DSceneErrorBoundary>
-              <Suspense fallback={<Wheel3DSceneSkeleton />}>
-                <Wheel3DScene
-                  wheelModel={wheel.model}
-                  wheelSeries={wheel.series}
-                  spokeStyle={wheel.geometry}
-                  selectedFinish={selectedFinish}
-                  availableFinishes={wheel.availableFinishes}
-                  onSelectFinish={setSelectedFinish}
-                  onEnquire={handleEnquireWheel}
-                  userVehicleLabel={userVehicleLabel}
-                  modelUrl={wheel.modelUrl}
-                />
-              </Suspense>
-            </Wheel3DSceneErrorBoundary>
+          {viewMode === '3d' && has3D ? (
+            <WheelStage
+              wheelModel={wheel.model}
+              wheelSeries={wheel.series}
+              selectedFinish={selectedFinish}
+              availableFinishes={wheel.availableFinishes}
+              onSelectFinish={setSelectedFinish}
+              onEnquire={handleEnquireWheel}
+              userVehicleLabel={userVehicleLabel}
+              modelUrl={wheel.modelUrl}
+              rearModelUrl={wheel.rearModelUrl}
+              specFront={wheel.technicalSpecSheet}
+            />
           ) : (
             <div className="flex flex-col items-center">
               <div

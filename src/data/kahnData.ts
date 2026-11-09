@@ -101,6 +101,8 @@ export interface BrandWheelItem {
   galleryImages?: string[];
   /** Photoreal .glb rim model served from /public, e.g. "/models/wheels/fsa002-gold.glb". */
   modelUrl?: string;
+  /** Second .glb for the rear axle of a staggered set; adds a Front / Rear switch in the 3D studio. */
+  rearModelUrl?: string;
   images?: [string, string, string];
   imageLabels?: [string, string, string];
   specs: {

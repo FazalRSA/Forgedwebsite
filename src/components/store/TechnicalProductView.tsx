@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Suspense } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Bookmark,
   MessageCircle,
@@ -21,17 +21,11 @@ import { useKahnStore } from '../../store/useKahnStore';
 import { useRouter } from '../../utils/router';
 import { StoreHeader } from './StoreHeader';
 import { WheelRenderSVG } from '../visuals/WheelRenderSVG';
-import { Wheel3DSceneSkeleton } from '../visuals/Wheel3DSceneSkeleton';
-import { Wheel3DSceneErrorBoundary } from '../visuals/Wheel3DSceneErrorBoundary';
+import { WheelStage } from '../visuals/WheelStage';
+import { SafeImage } from '../shared/SafeImage';
 import { TechnicalProductViewSkeleton } from '../shared/SkeletonLoaders';
 import { LogoPlaceholder } from '../shared/LogoPlaceholder';
-import { lazyWithRetry } from '../../utils/lazyWithRetry';
 
-// Defers the three.js bundle (core + OrbitControls + RoomEnvironment + GLTFLoader) until
-// the PDP actually renders the 3D stage, instead of shipping it in every PDP's main chunk.
-const Wheel3DScene = lazyWithRetry(() =>
-  import('../visuals/Wheel3DScene').then((m) => ({ default: m.Wheel3DScene }))
-);
 
 interface TechnicalProductViewProps {
   productSlug: string;
@@ -55,6 +49,9 @@ export const TechnicalProductView: React.FC<TechnicalProductViewProps> = ({
   // Photoreal 3D model: product-level override, else the linked brand wheel's model.
   const modelUrl =
     product.modelUrl ?? findWheelBySlug(product.wheelSlug, customBrandWheels)?.modelUrl;
+  const rearModelUrl = product.modelUrl
+    ? undefined
+    : findWheelBySlug(product.wheelSlug, customBrandWheels)?.rearModelUrl;
   const productImages = getStoreProductImages(product, customBrandWheels);
   const [selectedFinish, setSelectedFinish] = useState<WheelFinishId>(
     product.defaultFinish
@@ -188,19 +185,28 @@ export const TechnicalProductView: React.FC<TechnicalProductViewProps> = ({
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
               {/* Left Column: Interactive 360° 3D Wheel Studio */}
               <div className="lg:col-span-7 space-y-4">
-                <Wheel3DSceneErrorBoundary>
-                  <Suspense fallback={<Wheel3DSceneSkeleton />}>
-                    <Wheel3DScene
-                      wheelModel={product.shortModel}
-                      wheelSeries={product.technicalSpecs.construction}
-                      spokeStyle={product.geometry}
-                      selectedFinish={selectedFinish}
-                      availableFinishes={product.availableFinishes}
-                      onSelectFinish={setSelectedFinish}
-                      modelUrl={modelUrl}
+                {modelUrl ? (
+                  <WheelStage
+                    wheelModel={product.shortModel}
+                    wheelSeries={product.technicalSpecs.construction}
+                    selectedFinish={selectedFinish}
+                    availableFinishes={product.availableFinishes}
+                    onSelectFinish={setSelectedFinish}
+                    modelUrl={modelUrl}
+                    rearModelUrl={rearModelUrl}
+                  />
+                ) : (
+                  // No 3D model for this wheel yet: lead with its photography.
+                  <div className="relative w-full aspect-square max-h-[860px] bg-[#121215] border border-[#26262E] rounded-3xl overflow-hidden">
+                    <SafeImage
+                      src={productImages.images[0]}
+                      alt={`${product.title} — ${productImages.labels[0]}`}
+                      fallbackLabel={productImages.labels[0]}
+                      referrerPolicy="no-referrer"
+                      className="w-full h-full object-cover"
                     />
-                  </Suspense>
-                </Wheel3DSceneErrorBoundary>
+                  </div>
+                )}
 
                 {/* Finish Swatch Selector Bar */}
                 <div className="p-4 border border-[#26262E] bg-[#121215] flex flex-wrap items-center justify-between gap-4">
