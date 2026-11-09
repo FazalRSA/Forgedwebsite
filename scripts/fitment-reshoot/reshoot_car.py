@@ -192,7 +192,10 @@ def backdrop_artifact_score(raw_bytes, band=0.20, thr=6.0):
     A clean seamless backdrop scores about 0.1-0.3; a drawn ceiling, softbox or wall
     edge scores 0.8 and up (calibrated on the 2026-11-09 batch)."""
     import numpy as np
-    a = np.asarray(Image.open(io.BytesIO(raw_bytes)).convert("L")).astype(float)
+    try:
+        a = np.asarray(Image.open(io.BytesIO(raw_bytes)).convert("L")).astype(float)
+    except (OSError, ValueError) as e:
+        raise RuntimeError(f"model returned an undecodable image: {e}") from None
     h = a.shape[0]; top = a[: int(h * band), :]
     g = np.zeros_like(top); g[:-1, :] += np.abs(np.diff(top, axis=0)); g[:, :-1] += np.abs(np.diff(top, axis=1))
     return float((g > thr).mean() * 100)
@@ -277,12 +280,18 @@ def main():
         for attempt in range(1, args.max_tries + 1):
             raw, cost = generate(api_key, args.model, prompt, call_refs, args.resolution, args.aspect)
             total_cost += float(cost or 0)
-            score = backdrop_artifact_score(raw)
+            try:
+                score = backdrop_artifact_score(raw)
+            except RuntimeError as e:
+                log(f"{args.slug}: {angle} attempt {attempt} discarded ({e})")
+                continue
             log(f"{args.slug}: {angle} attempt {attempt} backdrop score {score:.2f} (clean <= {args.clean_threshold})")
             if best is None or score < best[0]:
                 best = (score, raw, cost)
             if score <= args.clean_threshold:
                 break
+        if best is None:
+            sys.exit(f"reshoot: every attempt for {args.slug} {angle} returned an undecodable image")
         score, raw, cost = best
         if score > args.clean_threshold:
             log(f"{args.slug}: WARNING {angle} still shows backdrop artifacts (score {score:.2f}) after {args.max_tries} tries; keeping the best")
