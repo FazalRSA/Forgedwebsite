@@ -144,6 +144,7 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
 │  ├─ legacy-pages.json           The removed addresses that still get a redirect page
 │  ├─ generate-llms.ts            Writes dist/llms.txt
 │  └─ fitment-reshoot/            Pipeline for the install studio re-shoots
+├─ docs/installs-pipeline.md      How the Installs gallery is made, with animated diagrams
 ├─ components/ui/                 Shared UI primitives (button, input, label, icons)
 └─ src/
    ├─ App.tsx                     Providers, route switch, lazy-loaded pages, page metadata

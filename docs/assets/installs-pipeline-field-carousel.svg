@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="560" viewBox="0 0 900 560" role="img" aria-labelledby="t d">
+  <title id="t">Fields of one job in jobs.json</title>
+  <desc id="d">A job entry is shown on the left; each field group is highlighted in turn with an explanation on the right: slug, the car identity fields, wheelLook, car, sources, extra, plates and the optional shop-filled fields.</desc>
+  <style>
+    text { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; }
+    /* N=8, T=12s, slot=1.5s */
+    @keyframes hl  { 0%,12%{opacity:1} 15%,100%{opacity:0} }
+    .hl { fill: #ffffff; fill-opacity: 0.12; opacity: 0; }
+    .hl0 { animation: hl 12s ease-in-out infinite 0s; }
+    .hl1 { animation: hl 12s ease-in-out infinite 1.5s; }
+    .hl2 { animation: hl 12s ease-in-out infinite 3s; }
+    .hl3 { animation: hl 12s ease-in-out infinite 4.5s; }
+    .hl4 { animation: hl 12s ease-in-out infinite 6s; }
+    .hl5 { animation: hl 12s ease-in-out infinite 7.5s; }
+    .hl6 { animation: hl 12s ease-in-out infinite 9s; }
+    .hl7 { animation: hl 12s ease-in-out infinite 10.5s; }
+    .tip { opacity: 0; }
+    .tip0 { animation: hl 12s ease-in-out infinite 0s; }
+    .tip1 { animation: hl 12s ease-in-out infinite 1.5s; }
+    .tip2 { animation: hl 12s ease-in-out infinite 3s; }
+    .tip3 { animation: hl 12s ease-in-out infinite 4.5s; }
+    .tip4 { animation: hl 12s ease-in-out infinite 6s; }
+    .tip5 { animation: hl 12s ease-in-out infinite 7.5s; }
+    .tip6 { animation: hl 12s ease-in-out infinite 9s; }
+    .tip7 { animation: hl 12s ease-in-out infinite 10.5s; }
+    .k { fill: #4a9eff; } .s { fill: #79c0ff; } .n { fill: #ff9900; } .p { fill: #e6edf3; } .c { fill: #8b949e; }
+    .tt { font-size: 12px; fill: #8b949e; } .th { font-size: 13px; font-weight: bold; fill: #4a9eff; } .te { font-size: 11px; fill: #79c0ff; }
+  </style>
+  <rect width="900" height="560" fill="#0d1117"/>
+  <text x="20" y="34" class="c" style="font-size:12px">scripts/fitment-reshoot/jobs.json, one entry of "jobs"</text>
+  <rect x="20" y="48" width="420" height="440" rx="8" fill="#161b22" stroke="#30363d"/>
+
+  <!-- highlight rects (line height 24, first line baseline y=78) -->
+  <rect class="hl hl0" x="26" y="86"  width="408" height="24" rx="4" style="opacity:0"/>
+  <rect class="hl hl1" x="26" y="110" width="408" height="72" rx="4" style="opacity:0"/>
+  <rect class="hl hl2" x="26" y="182" width="408" height="24" rx="4" style="opacity:0"/>
+  <rect class="hl hl3" x="26" y="206" width="408" height="48" rx="4" style="opacity:0"/>
+  <rect class="hl hl4" x="26" y="254" width="408" height="24" rx="4" style="opacity:0"/>
+  <rect class="hl hl5" x="26" y="278" width="408" height="48" rx="4" style="opacity:0"/>
+  <rect class="hl hl6" x="26" y="326" width="408" height="24" rx="4" style="opacity:0"/>
+  <rect class="hl hl7" x="26" y="350" width="408" height="120" rx="4" style="opacity:0"/>
+
+  <!-- JSON text -->
+  <text x="32" y="78"  class="p">{</text>
+  <text x="32" y="102"><tspan class="k">"slug"</tspan><tspan class="p">: </tspan><tspan class="s">"g80-m3-mint-green-silver"</tspan><tspan class="p">,</tspan></text>
+  <text x="32" y="126"><tspan class="k">"make"</tspan><tspan class="p">: </tspan><tspan class="s">"BMW"</tspan><tspan class="p">, </tspan><tspan class="k">"family"</tspan><tspan class="p">: </tspan><tspan class="s">"M3"</tspan><tspan class="p">,</tspan></text>
+  <text x="32" y="150"><tspan class="k">"chassis"</tspan><tspan class="p">: </tspan><tspan class="s">"G80"</tspan><tspan class="p">, </tspan><tspan class="k">"body"</tspan><tspan class="p">: </tspan><tspan class="s">"Sedan"</tspan><tspan class="p">,</tspan></text>
+  <text x="32" y="174"><tspan class="k">"paint"</tspan><tspan class="p">: </tspan><tspan class="s">"Mint Green"</tspan><tspan class="p">, </tspan><tspan class="k">"accentHex"</tspan><tspan class="p">: </tspan><tspan class="s">"#9FE2C4"</tspan><tspan class="p">,</tspan></text>
+  <text x="32" y="198"><tspan class="k">"wheelLook"</tspan><tspan class="p">: </tspan><tspan class="s">"Brushed silver multi-spoke"</tspan><tspan class="p">,</tspan></text>
+  <text x="32" y="222"><tspan class="k">"car"</tspan><tspan class="p">: </tspan><tspan class="s">"BMW G80 M3 Competition sedan in Mint</tspan></text>
+  <text x="32" y="246"><tspan class="s">        Green with brushed silver forged wheels"</tspan><tspan class="p">,</tspan></text>
+  <text x="32" y="270"><tspan class="k">"sources"</tspan><tspan class="p">: [</tspan><tspan class="s">"IMG-20251023-WA0013.jpg"</tspan><tspan class="p">],</tspan></text>
+  <text x="32" y="294"><tspan class="k">"extra"</tspan><tspan class="p">: </tspan><tspan class="s">"Keep the carbon roof; the source</tspan></text>
+  <text x="32" y="318"><tspan class="s">        photo is under a carport."</tspan><tspan class="p">,</tspan></text>
+  <text x="32" y="342"><tspan class="k">"plates"</tspan><tspan class="p">: [[</tspan><tspan class="n">24</tspan><tspan class="p">, </tspan><tspan class="n">44</tspan><tspan class="p">, </tspan><tspan class="n">42</tspan><tspan class="p">, </tspan><tspan class="n">52</tspan><tspan class="p">]],</tspan></text>
+  <text x="32" y="366"><tspan class="c">// optional, shown on the site only when filled in</tspan></text>
+  <text x="32" y="390"><tspan class="k">"wheelModel"</tspan><tspan class="p">: </tspan><tspan class="s">"..."</tspan><tspan class="p">, </tspan><tspan class="k">"wheelSlug"</tspan><tspan class="p">: </tspan><tspan class="s">"..."</tspan><tspan class="p">,</tspan></text>
+  <text x="32" y="414"><tspan class="k">"staggeredSpec"</tspan><tspan class="p">: </tspan><tspan class="s">"..."</tspan><tspan class="p">, </tspan><tspan class="k">"finishName"</tspan><tspan class="p">: </tspan><tspan class="s">"..."</tspan><tspan class="p">,</tspan></text>
+  <text x="32" y="438"><tspan class="k">"clientCity"</tspan><tspan class="p">: </tspan><tspan class="s">"..."</tspan></text>
+  <text x="32" y="462" class="p">}</text>
+
+  <!-- tooltips, one visible at a time, all at the same position -->
+  <g class="tip tip0">
+    <rect x="455" y="120" width="420" height="110" rx="6" fill="#161b22" stroke="#4a9eff" stroke-width="1.5"/>
+    <text x="475" y="142" class="th">slug</text>
+    <text x="475" y="162" class="tt">The install's id. Names the output folder, the asset</text>
+    <text x="475" y="178" class="tt">folder under public/ and the React key. Keep it honest:</text>
+    <text x="475" y="194" class="tt">it should describe the car and the wheel finish.</text>
+    <rect x="455" y="204" width="420" height="22" rx="3" fill="#0d2233"/><text x="475" y="219" class="te">public/assets/fitments/g80-m3-mint-green-silver/</text>
+  </g>
+  <g class="tip tip1">
+    <rect x="455" y="120" width="420" height="110" rx="6" fill="#161b22" stroke="#4a9eff" stroke-width="1.5"/>
+    <text x="475" y="142" class="th">make, family, chassis, body, paint, accentHex</text>
+    <text x="475" y="162" class="tt">What the site prints: the title, the filter pill and the</text>
+    <text x="475" y="178" class="tt">paint line. Read off the phone photo at first, so the shop</text>
+    <text x="475" y="194" class="tt">should confirm them. BMW is implied; other makes are named.</text>
+    <rect x="455" y="204" width="420" height="22" rx="3" fill="#0d2233"/><text x="475" y="219" class="te">G80 M3 - MINT GREEN  ·  family pill "M3"</text>
+  </g>
+  <g class="tip tip2">
+    <rect x="455" y="120" width="420" height="110" rx="6" fill="#161b22" stroke="#4a9eff" stroke-width="1.5"/>
+    <text x="475" y="142" class="th">wheelLook</text>
+    <text x="475" y="162" class="tt">What the wheels look like in the photo, in plain words.</text>
+    <text x="475" y="178" class="tt">Shown as "Wheels" until wheelModel names the catalogue</text>
+    <text x="475" y="194" class="tt">wheel. If this is wrong the render is probably wrong too.</text>
+    <rect x="455" y="204" width="420" height="22" rx="3" fill="#0d2233"/><text x="475" y="219" class="te">Wheels: Brushed silver multi-spoke</text>
+  </g>
+  <g class="tip tip3">
+    <rect x="455" y="120" width="420" height="110" rx="6" fill="#161b22" stroke="#4a9eff" stroke-width="1.5"/>
+    <text x="475" y="142" class="th">car</text>
+    <text x="475" y="162" class="tt">The one-sentence description handed to the image model.</text>
+    <text x="475" y="178" class="tt">The model follows the photo over this text, so a wrong</text>
+    <text x="475" y="194" class="tt">colour here mislabels the car rather than repainting it.</text>
+    <rect x="455" y="204" width="420" height="22" rx="3" fill="#0d2233"/><text x="475" y="219" class="te">"The car is a {car}." opens every prompt</text>
+  </g>
+  <g class="tip tip4">
+    <rect x="455" y="120" width="420" height="110" rx="6" fill="#161b22" stroke="#4a9eff" stroke-width="1.5"/>
+    <text x="475" y="142" class="th">sources</text>
+    <text x="475" y="162" class="tt">File names of the phone photos in raw/, as named in Drive.</text>
+    <text x="475" y="178" class="tt">The first one becomes original.webp on the site and is</text>
+    <text x="475" y="194" class="tt">passed to the model as the main reference image.</text>
+    <rect x="455" y="204" width="420" height="22" rx="3" fill="#0d2233"/><text x="475" y="219" class="te">HEIC works with pillow-heif installed</text>
+  </g>
+  <g class="tip tip5">
+    <rect x="455" y="120" width="420" height="110" rx="6" fill="#161b22" stroke="#4a9eff" stroke-width="1.5"/>
+    <text x="475" y="142" class="th">extra</text>
+    <text x="475" y="162" class="tt">Job-specific prompt instructions: what to ignore in the</text>
+    <text x="475" y="178" class="tt">photo, parts the model must keep or must not invent, the</text>
+    <text x="475" y="194" class="tt">exact wheel finish when the first render got it wrong.</text>
+    <rect x="455" y="204" width="420" height="22" rx="3" fill="#0d2233"/><text x="475" y="219" class="te">"There is NO rear wing on this car."</text>
+  </g>
+  <g class="tip tip6">
+    <rect x="455" y="120" width="420" height="110" rx="6" fill="#161b22" stroke="#4a9eff" stroke-width="1.5"/>
+    <text x="475" y="142" class="th">plates</text>
+    <text x="475" y="162" class="tt">Number plates to pixelate in the published phone photo:</text>
+    <text x="475" y="178" class="tt">[left, top, right, bottom] in percent of the rotated</text>
+    <text x="475" y="194" class="tt">photo. Use [] when none is visible. Required.</text>
+    <rect x="455" y="204" width="420" height="22" rx="3" fill="#0d2233"/><text x="475" y="219" class="te">[[24, 44, 42, 52]]  ·  the renders never show a plate</text>
+  </g>
+  <g class="tip tip7">
+    <rect x="455" y="120" width="420" height="110" rx="6" fill="#161b22" stroke="#4a9eff" stroke-width="1.5"/>
+    <text x="475" y="142" class="th">wheelModel, wheelSlug, staggeredSpec, finishName, clientCity</text>
+    <text x="475" y="162" class="tt">Filled in by the shop when known. Each adds a row to the</text>
+    <text x="475" y="178" class="tt">lightbox (Wheels, Sizes, Finish, Location); wheelSlug turns</text>
+    <text x="475" y="194" class="tt">"See wheels in stock" into a link to that wheel's page.</text>
+    <rect x="455" y="204" width="420" height="22" rx="3" fill="#0d2233"/><text x="475" y="219" class="te">Leave them out rather than guess</text>
+  </g>
+
+  <text x="455" y="270" class="tt">Each field group lights up in turn (12 s loop).</text>
+  <text x="455" y="300" class="tt">After editing: re-render only if car, sources or extra</text>
+  <text x="455" y="316" class="tt">changed; otherwise run build_site_data.py alone.</text>
+</svg>
