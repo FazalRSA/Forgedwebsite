@@ -231,6 +231,10 @@ interface RawInventorySeed {
   stockStatus: string;
   stockQuantitySets: number;
   technicalSpecSheet: string;
+  /** Served .glb for the 3D studio (front axle); omit when the wheel has no model yet. */
+  modelUrl?: string;
+  /** Served .glb for the rear axle of a staggered set. */
+  rearModelUrl?: string;
   defaultFinish: WheelFinishId;
   availableFinishes: WheelFinishId[];
   geometry: SpokeGeometryType;
@@ -238,6 +242,18 @@ interface RawInventorySeed {
   swatchHex: string;
   compatibleStoreProductSlug: string;
 }
+
+/**
+ * One traced 3D model per wheel design; every finish of a design shares it and the
+ * studio repaints it. FSA001 sets its own front/rear pair on the seed instead.
+ */
+export const MODEL_URL_BY_CODE: Partial<Record<RawInventorySeed['modelCode'], string>> = {
+  FSA002: '/models/wheels/fsa002.glb',
+  FSA003: '/models/wheels/fsa003.glb',
+  FSA004: '/models/wheels/fsa004.glb',
+  'FF-1': '/models/wheels/ff-1.glb',
+  'FF-3': '/models/wheels/ff-3.glb',
+};
 
 const INVENTORY_SEEDS: RawInventorySeed[] = [
   {
@@ -253,6 +269,8 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     stockStatus: 'In Stock',
     stockQuantitySets: 1,
     technicalSpecSheet: 'PCD 5×112 · ET8/15 · CB66.6',
+    modelUrl: '/models/wheels/stf399-front.glb',
+    rearModelUrl: '/models/wheels/stf399-rear.glb',
     defaultFinish: 'satin-black',
     availableFinishes: ['satin-black'],
     geometry: 'y-spoke-forged',
@@ -540,6 +558,8 @@ export const BRAND_WHEELS: BrandWheelItem[] = INVENTORY_SEEDS.map((seed) => {
     stockStatus: seed.stockStatus,
     stockQuantitySets: seed.stockQuantitySets,
     technicalSpecSheet: seed.technicalSpecSheet,
+    modelUrl: seed.modelUrl ?? MODEL_URL_BY_CODE[seed.modelCode],
+    rearModelUrl: seed.rearModelUrl,
     images: [
       createWheelPlaceholderDataUrl(
         seed.slot,

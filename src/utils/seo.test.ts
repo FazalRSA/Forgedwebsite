@@ -9,8 +9,10 @@ import {
   SITE_ORIGIN,
   absoluteUrl,
   absolutiseJsonLd,
+  buildSitemapXml,
   homeJsonLd,
   metaForPath,
+  sitemapPaths,
   wheelBrand,
 } from './seo';
 import { BRAND_WHEELS, STORE_PRODUCTS, VEHICLE_FITMENT_TREE, getAllStoreProducts } from '../data/catalogue';
@@ -158,4 +160,20 @@ test('link-preview images are real files in public/', () => {
     const image = metaForPath(`/wheels/${wheel.slug}`).image;
     if (image) assert.ok(existsSync(path.join(PUBLIC_DIR, image)), image);
   }
+});
+
+test('the sitemap lists every wheel once, only indexable canonical pages, on the production domain', () => {
+  const paths = sitemapPaths();
+  assert.equal(new Set(paths).size, paths.length);
+  assert.ok(paths.includes('/'));
+  for (const wheel of BRAND_WHEELS) assert.ok(paths.includes(`/wheels/${wheel.slug}`), wheel.slug);
+  for (const p of paths) {
+    const m = metaForPath(p);
+    assert.equal(m.noindex, false, p);
+    assert.equal(m.canonicalPath, p);
+  }
+  assert.ok(!paths.some((p) => p.startsWith('/admin') || p.startsWith('/account') || p.startsWith('/studio')));
+  const xml = buildSitemapXml('https://example.test');
+  assert.equal((xml.match(/<loc>/g) ?? []).length, paths.length);
+  assert.ok(xml.includes('<loc>https://example.test/</loc>'));
 });

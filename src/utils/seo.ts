@@ -4,6 +4,8 @@ import {
   getAllStoreProducts,
   getWheelImages,
   resolveCollectionBySlug,
+  BRAND_WHEELS,
+  VEHICLE_FITMENT_TREE,
   type BrandWheelItem,
 } from '../data/catalogue';
 import { SITE } from '../config/site';
@@ -294,4 +296,35 @@ export function applyPageMeta(meta: PageMeta, origin: string = SITE_ORIGIN): voi
   script.setAttribute('type', 'application/ld+json');
   script.textContent = JSON.stringify(absolutised);
   if (!existing) document.head.appendChild(script);
+}
+
+/** Every indexable page path: the fixed pages plus one per wheel, product and car collection. */
+export function sitemapPaths(): string[] {
+  const candidates = [
+    '/',
+    '/store',
+    '/client-fitments',
+    '/sixnine-wheels',
+    '/dealer-application',
+    '/privacy-policy',
+    ...BRAND_WHEELS.map((w) => `/wheels/${w.slug}`),
+    ...getAllStoreProducts().map((p) => `/store/products/${p.slug}`),
+    ...Object.values(VEHICLE_FITMENT_TREE).flatMap((nodes) =>
+      nodes.map((n) => `/store/collections/${n.collectionSlug}`)
+    ),
+  ];
+  // Keep only pages that are their own canonical URL and are allowed in search results.
+  const paths = candidates.filter((path) => {
+    const meta = metaForPath(path);
+    return !meta.noindex && meta.canonicalPath === path;
+  });
+  return [...new Set(paths)];
+}
+
+/** sitemap.xml for the production domain in config/site.ts. */
+export function buildSitemapXml(origin: string = `https://${SITE.domain}`): string {
+  const urls = sitemapPaths()
+    .map((path) => `  <url><loc>${origin}${path === '/' ? '/' : path}</loc></url>`)
+    .join('\n');
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
 }
