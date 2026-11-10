@@ -102,7 +102,7 @@ No environment variables are required for local development. Firebase configurat
       ├─ brand/                   Home, catalogue, lightbox, wheel page, fitments, dealer, account, privacy
       ├─ store/                   Fitment finder, collection grid, product page, store header
       ├─ admin/                   Admin uploader
-      ├─ shared/                  Interest request form, chat overlay, skeletons
+      ├─ shared/                  Interest request form, skeletons
       └─ visuals/                 WheelStudio (3D), WheelStage, SVG rim, vehicle silhouette
 ```
 
@@ -207,7 +207,7 @@ Production build chunks are split per vendor (`react`, `motion`, `three`, `fireb
 The catalogue, fitment finder, product pages, 3D studio and client accounts are working. The following are not yet connected and are tracked for follow-up:
 
 - **Lead delivery**: interest requests, dealer applications and newsletter sign-ups are currently stored only in the visitor's browser. Planned: write to Firestore and fan out through n8n to email, Google Sheets, WhatsApp and the CRM.
-- **Contact buttons**: the WhatsApp, Instagram and phone buttons on product pages do not yet open external channels.
+- **Contact channels**: WhatsApp, phone, Instagram and Facebook links read from `src/config/site.ts`. Until a value is set there, the WhatsApp and phone buttons fall back to the interest request form and the social icons are hidden.
 - **Admin publishing**: the admin uploader stores wheels locally; publishing goes through `customWheels.json` and a rebuild. Planned: Firebase-backed catalogue with authenticated admin writes.
 - **Industry partners**: the partner section renders placeholders pending logo assets.
 
