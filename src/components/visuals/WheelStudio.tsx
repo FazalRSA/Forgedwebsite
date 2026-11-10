@@ -24,8 +24,9 @@ import {
  * a soft contact shadow, physically based paint, fixed camera views, and a Front / Rear switch for
  * wheels with a second model. The wheel pages mount it only after the visitor taps "View in 3D".
  *
- * The default (simple) stage is for customers: views, Front / Rear, a visible "Close 3D" button.
- * `advanced` adds the exploded, wireframe and brake-check toggles used on the unlisted /studio preview.
+ * The default (simple) stage is for customers: views, Front / Rear, the exploded view and a visible
+ * "Close 3D" button. `advanced` adds the wireframe, brake-check and other toggles used on the unlisted
+ * /studio preview.
  *
  * GLBs are meshopt-compressed (see public/models/wheels/README.md), so the loader gets the decoder.
  */
@@ -76,7 +77,7 @@ export interface WheelStudioProps {
   initialToggles?: Partial<StudioToggles>;
   /** Shows a visible "Close 3D" button (and closes on Escape) when given. */
   onClose?: () => void;
-  /** Adds the exploded, wireframe, brake and other toggles. */
+  /** Adds the wireframe, brake and other toggles (the exploded view is on both stages). */
   advanced?: boolean;
   /** Tailwind sizing for the stage. */
   className?: string;
@@ -789,19 +790,37 @@ export const WheelStudio: React.FC<WheelStudioProps> = ({
         className="absolute inset-x-2 bottom-2 z-20 mx-auto max-w-3xl rounded-2xl border border-black/10 bg-white/90 backdrop-blur-md shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden"
       >
         <div className="px-2.5 py-2 space-y-1.5 max-h-[42vh] overflow-y-auto">
-          {rearModelUrl && (
+          {(rearModelUrl || !advanced) && (
             <ControlRow label="Wheel" showLabel={advanced}>
-              {(['front', 'rear'] as const).map((a) => (
+              {rearModelUrl &&
+                (['front', 'rear'] as const).map((a) => (
+                  <button
+                    key={a}
+                    type="button"
+                    aria-pressed={axle === a}
+                    onClick={() => setAxle(a)}
+                    className={`${chipBase} ${axle === a ? chipOn : chipOff}`}
+                  >
+                    {a === 'front' ? 'Front' : 'Rear'}
+                  </button>
+                ))}
+              {/* The simple stage offers the exploded view on its own; the advanced stage keeps it
+                  with the other toggles in the Show row. */}
+              {!advanced && (
                 <button
-                  key={a}
                   type="button"
-                  aria-pressed={axle === a}
-                  onClick={() => setAxle(a)}
-                  className={`${chipBase} ${axle === a ? chipOn : chipOff}`}
+                  aria-pressed={toggles.explode}
+                  onClick={() => flipToggle('explode')}
+                  className={`${chipBase} ${toggles.explode ? chipOn : chipOff} ${rearModelUrl ? 'ml-auto' : ''}`}
                 >
-                  {a === 'front' ? 'Front' : 'Rear'}
+                  <span
+                    className={`inline-block w-[7px] h-[7px] rounded-full mr-1.5 ${
+                      toggles.explode ? 'bg-emerald-400' : 'bg-neutral-400'
+                    }`}
+                  />
+                  Exploded
                 </button>
-              ))}
+              )}
             </ControlRow>
           )}
 
