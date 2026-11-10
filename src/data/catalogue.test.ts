@@ -286,3 +286,18 @@ test('buildPartNumber is deterministic and encodes model, finish and diameters',
   assert.equal(a.storeProduct.technicalSpecs.partNo, b.storeProduct.technicalSpecs.partNo);
   assert.ok(!a.storeProduct.technicalSpecs.partNo.startsWith('WAK'));
 });
+
+test('FSA001 carries front and rear 3D models that exist in /public; wheels without a model stay photo-only', async () => {
+  const { existsSync } = await import('node:fs');
+  const fsa001 = BRAND_WHEELS.find((w) => w.slug === 'fsa001-black-matte');
+  assert.ok(fsa001);
+  assert.equal(fsa001.modelUrl, '/models/wheels/stf399-front.glb');
+  assert.equal(fsa001.rearModelUrl, '/models/wheels/stf399-rear.glb');
+  for (const url of [fsa001.modelUrl, fsa001.rearModelUrl]) {
+    assert.ok(existsSync(`public${url}`), `${url} is missing from public/`);
+  }
+  for (const wheel of BRAND_WHEELS) {
+    if (wheel.modelUrl) assert.ok(existsSync(`public${wheel.modelUrl}`), `${wheel.slug}: ${wheel.modelUrl} missing`);
+  }
+  assert.equal(BRAND_WHEELS.find((w) => w.slug === 'fsa002-gold')?.modelUrl, undefined);
+});

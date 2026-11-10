@@ -231,6 +231,10 @@ interface RawInventorySeed {
   stockStatus: string;
   stockQuantitySets: number;
   technicalSpecSheet: string;
+  /** Served .glb for the 3D studio (front axle); omit when the wheel has no model yet. */
+  modelUrl?: string;
+  /** Served .glb for the rear axle of a staggered set. */
+  rearModelUrl?: string;
   defaultFinish: WheelFinishId;
   availableFinishes: WheelFinishId[];
   geometry: SpokeGeometryType;
@@ -253,6 +257,8 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     stockStatus: 'In Stock',
     stockQuantitySets: 1,
     technicalSpecSheet: 'PCD 5×112 · ET8/15 · CB66.6',
+    modelUrl: '/models/wheels/stf399-front.glb',
+    rearModelUrl: '/models/wheels/stf399-rear.glb',
     defaultFinish: 'satin-black',
     availableFinishes: ['satin-black'],
     geometry: 'y-spoke-forged',
@@ -540,6 +546,8 @@ export const BRAND_WHEELS: BrandWheelItem[] = INVENTORY_SEEDS.map((seed) => {
     stockStatus: seed.stockStatus,
     stockQuantitySets: seed.stockQuantitySets,
     technicalSpecSheet: seed.technicalSpecSheet,
+    modelUrl: seed.modelUrl,
+    rearModelUrl: seed.rearModelUrl,
     images: [
       createWheelPlaceholderDataUrl(
         seed.slot,
