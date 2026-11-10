@@ -34,10 +34,10 @@ export const SITE: SiteConfig = {
   /** Human-readable telephone, e.g. '+27 82 000 0000'. */
   phoneDisplay: '+27 83 447 2654',
 
-  /** Trade / dealer desk email. Falls back to privacyEmail when empty. */
+  /** Trade / dealer desk email. Falls back to privacyEmail when empty. Must be on `domain`. */
   tradeEmail: '',
-  /** Information Officer / privacy contact (published in the privacy notice). */
-  privacyEmail: 'privacy@forgedcustomwheels.com',
+  /** Privacy contact email, shown in the privacy notice when set. Must be on `domain`; leave empty until the mailbox exists. */
+  privacyEmail: '',
 
   instagramUrl: '',
   facebookUrl: '',

@@ -8,6 +8,8 @@ import { BrandHeader } from './components/brand/BrandHeader';
 import { HeroSection } from './components/brand/HeroSection';
 import { EditorialFlow } from './components/brand/EditorialFlow';
 import { WheelCatalogue } from './components/brand/WheelCatalogue';
+import { IndustryPartnersSection } from './components/brand/IndustryPartnersSection';
+import { AskAiSection } from './components/brand/AskAiSection';
 import { GlobalOverlays } from './components/shared/GlobalOverlays';
 import { StackedCircularFooter } from '@/components/ui/stacked-circular-footer';
 
@@ -25,6 +27,11 @@ const ClientFitmentsPage = lazy(() =>
 const ContactPage = lazy(() =>
   import('./components/brand/ContactPage').then((m) => ({
     default: m.ContactPage,
+  }))
+);
+const SixnineDealerPage = lazy(() =>
+  import('./components/brand/SixnineDealerPage').then((m) => ({
+    default: m.SixnineDealerPage,
   }))
 );
 const WheelShowcasePDP = lazy(() =>
@@ -73,6 +80,8 @@ function BrandHomePage() {
         <HeroSection />
         <WheelCatalogue />
         <EditorialFlow />
+        <IndustryPartnersSection />
+        <AskAiSection />
       </main>
     </div>
   );
@@ -105,6 +114,9 @@ function AppRoutes() {
   // /installs: real customer cars on the wheels
   if (path === '/installs') return <ClientFitmentsPage />;
 
+  // /sixnine-wheels: the shop's page as an official Sixnine Wheels dealer
+  if (path === '/sixnine-wheels') return <SixnineDealerPage />;
+
   // /contact: WhatsApp, phone, address, areas served
   if (path === '/contact') return <ContactPage />;
 
@@ -119,7 +131,7 @@ function AppRoutes() {
   // Unlisted: /admin and anything under it. Not linked from anywhere on the site.
   if (path === '/admin' || path.startsWith('/admin/')) return <AdminWheelUploader />;
 
-  // /: in-stock wheels, then proof of work
+  // /: in-stock wheels, then proof of work, then industry partners
   if (isHomePath(path)) return <BrandHomePage />;
 
   // Anything else is not a page on this site.

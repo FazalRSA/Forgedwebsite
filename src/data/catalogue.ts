@@ -628,6 +628,27 @@ export function getSiblingListings(
   );
 }
 
+/** How long a colour that is not in stock takes to arrive, as told to customers. */
+export const TO_ORDER_LEAD_TIME = '3 months';
+
+/** The notice shown wherever a colour that is not in stock is offered. */
+export const TO_ORDER_NOTICE = `Colours not in stock are made to order. A lead time of ${TO_ORDER_LEAD_TIME} applies.`;
+
+/**
+ * The colours of this wheel's design that are not in stock: every colour in WHEEL_FINISHES that
+ * no in-stock listing of the same design has. They can be ordered, with TO_ORDER_LEAD_TIME.
+ */
+export function getToOrderFinishes(
+  wheel: BrandWheelItem,
+  runtimeCustomWheels: BrandWheelItem[] = []
+): WheelFinishOption[] {
+  const inStock = new Set<WheelFinishId>([
+    wheel.defaultFinish,
+    ...getSiblingListings(wheel, runtimeCustomWheels).map((w) => w.defaultFinish),
+  ]);
+  return Object.values(WHEEL_FINISHES).filter((finish) => !inStock.has(finish.id));
+}
+
 export function filterWheelsByMarque(
   marque: MarqueFilter,
   runtimeCustomWheels: BrandWheelItem[] = []

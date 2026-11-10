@@ -163,6 +163,12 @@ export function metaForPath(rawPath: string): PageMeta {
         'Customer BMW M cars on forged wheel sets, shown as studio re-shoots of each customer’s own photo.',
         path
       );
+    case '/sixnine-wheels':
+      return page(
+        'Official Sixnine Wheels dealer',
+        `${SITE_NAME} is an official dealer of Sixnine forged wheels. See the FF-1 and FF-3 sets in stock, with sizes and Rand prices.`,
+        path
+      );
     case '/contact':
       return page(
         'Contact us about forged wheels',
@@ -311,12 +317,13 @@ export function applyPageMeta(meta: PageMeta, origin: string = SITE_ORIGIN): voi
   if (!existing) document.head.appendChild(script);
 }
 
-/** Every indexable page path: the home page, one page per in-stock wheel, installs, contact and the privacy policy. */
+/** Every indexable page path: the home page, one page per in-stock wheel, installs, the Sixnine dealer page, contact and the privacy policy. */
 export function sitemapPaths(): string[] {
   const candidates = [
     '/',
     ...getAllBrandWheels().map((w) => `/wheels/${w.slug}`),
     '/installs',
+    '/sixnine-wheels',
     '/contact',
     '/privacy-policy',
   ];

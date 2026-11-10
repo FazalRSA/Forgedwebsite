@@ -2,14 +2,15 @@
 
 The website for **FORGED Custom Wheels**, a South African supplier of forged alloy wheel sets for BMW M cars.
 
-It shows the wheels that are in stock, each in photography and an interactive 3D viewer, shows past customer installs, and takes enquiries. There is no online checkout: every call to action is an enquiry.
+It shows the wheels that are in stock, each in photography and an interactive 3D viewer, shows past customer installs, and takes enquiries. There is no online checkout: every call to action opens the enquiry form, which sends the enquiry to the business through n8n and, with a WhatsApp number configured, then opens WhatsApp with the message typed in.
 
-**Stock rule.** A wheel appears on the site only when its `stockStatus` is `In Stock` and `stockQuantitySets` is above zero. Anything else is hidden, never greyed out or sold as made to order. Each listing is one design in one finish; the other finishes of a design are separate listings.
+**Stock rule.** A wheel appears on the site only when its `stockStatus` is `In Stock` and `stockQuantitySets` is above zero. Each listing is one design in one finish; the other in-stock finishes of a design are separate listings. Colours a design has no stock of are offered on its wheel page as made to order, always with the notice that a lead time of 3 months applies.
 
 | | |
 | --- | --- |
-| **Production domain** | `forgedsa.co.za` (set in `src/config/site.ts`) |
-| **Stack** | React 19 · TypeScript · Vite 8 · Tailwind CSS v4 · Three.js · Zustand · Firebase |
+| **Live site** | [forged-custom-wheels-gu3l.onrender.com](https://forged-custom-wheels-gu3l.onrender.com) (Render, redeploys on every push to `main`) |
+| **Production domain** | `forgedsa.co.za` (set in `src/config/site.ts`). The domain still serves the business's existing WordPress site; its DNS has not been moved to this app yet |
+| **Stack** | React 19 · TypeScript · Vite 8 · Tailwind CSS v4 · Three.js · Zustand |
 | **Type** | Static single-page app with client-side routing |
 | **Inventory** | 14 in-stock wheel listings across 6 designs, priced in South African Rand per set of four |
 | **Licence** | Proprietary, all rights reserved |
@@ -23,34 +24,39 @@ It shows the wheels that are in stock, each in photography and an interactive 3D
 3. [Scripts](#scripts)
 4. [Routes](#routes)
 5. [Project structure](#project-structure)
-6. [Inventory](#inventory)
-7. [Catalogue data model](#catalogue-data-model)
-8. [Adding or changing a wheel](#adding-or-changing-a-wheel)
-9. [3D wheel studio](#3d-wheel-studio)
-10. [Search and sharing](#search-and-sharing)
-11. [Business details and contact channels](#business-details-and-contact-channels)
-12. [Firebase](#firebase)
-13. [Testing](#testing)
-14. [Deployment](#deployment)
-15. [Known limitations and roadmap](#known-limitations-and-roadmap)
-16. [Contributing](#contributing)
-17. [Licence](#licence)
+6. [Design system](#design-system)
+7. [Inventory](#inventory)
+8. [Catalogue data model](#catalogue-data-model)
+9. [Adding or changing a wheel](#adding-or-changing-a-wheel)
+10. [3D wheel studio](#3d-wheel-studio)
+11. [Search and sharing](#search-and-sharing)
+    - [For AI assistants and coding agents](#for-ai-assistants-and-coding-agents)
+12. [Business details and contact channels](#business-details-and-contact-channels)
+13. [Firebase](#firebase)
+14. [Testing](#testing)
+15. [Deployment](#deployment)
+16. [Known limitations and roadmap](#known-limitations-and-roadmap)
+17. [Contributing](#contributing)
+18. [Licence](#licence)
 
 ---
 
 ## What the site does
 
-Four pages, plus the privacy policy:
+Five pages, plus the privacy notice:
 
-- **Home (`/`).** What is in stock, as a grid you can filter by design, then customer installs.
-- **Wheel page (`/wheels/:slug`).** One in-stock listing: photos, price per set of four, sizes, specification and the other in-stock finishes of the same design. The 3D viewer loads only when the visitor taps "View in 3D". The enquiry button opens WhatsApp with the design, finish and sizes filled in.
-- **Installs (`/installs`).** Customer BMW M cars on FORGED wheels, shown as studio re-shoots of each customer's own photo.
+- **Home (`/`).** What is in stock, as a grid you can filter by design, then customer installs, the industry partners strip (SIXNINE Wheels and BMW) and "Ask AI about us".
+- **Wheel page (`/wheels/:slug`).** One in-stock listing: photos, price per set of four, sizes and specification. Colours come in two groups: the design's finishes that are **in stock** (each links to its own listing), and its **other colours, to order**, always shown with the notice that a lead time of 3 months applies. The 3D viewer loads only when the visitor taps "View in 3D" and can preview the to-order colours. The enquiry button opens the enquiry form with the design, finish and sizes filled in; a to-order colour prefills the colour and the lead time. The form logs the enquiry through n8n and then opens WhatsApp (see [Lead delivery](#lead-delivery-n8n)).
+- **Installs (`/installs`).** Customer BMW M cars on FORGED wheels. Each install opens to three photos: two studio re-shoots made from the customer's own photo, then that photo itself with the number plate pixelated.
+- **Sixnine dealer page (`/sixnine-wheels`).** FORGED as an official Sixnine Wheels dealer: the Sixnine sets in stock and a fitment summary. Every number on it is worked out from the catalogue.
 - **Contact (`/contact`).** WhatsApp, phone, address and areas served; any channel not set in `src/config/site.ts` is hidden.
+- **Privacy notice (`/privacy-policy`).** Describes what the site does today: no accounts, no cookies, nothing stored in the browser, contact by WhatsApp or phone.
 - **Search-ready pages.** Per-route titles, descriptions, canonical URLs, link-preview tags, structured data and a generated sitemap.
+- **AI-ready.** `/llms.txt` gives AI assistants the stock list, prices and contact details as plain text (see [For AI assistants and coding agents](#for-ai-assistants-and-coding-agents)).
 
 The 3D viewer is a Three.js studio with physically based paint finishes, fixed camera views (face, 3/4, side, back, top), an exploded view and, for staggered sets with two models, a Front / Rear switch.
 
-Removed in the simplification: the store and its fitment finder, collections and product pages, the Sixnine dealer page, dealer applications, and client accounts with a garage. Their old addresses redirect (see [Routes](#routes)).
+Removed in the simplification: the store and its fitment finder, collections and product pages, dealer applications, and client accounts with a garage. Their old addresses redirect (see [Routes](#routes)).
 
 ## Quick start
 
@@ -69,17 +75,17 @@ npm install --legacy-peer-deps
 
 Do not commit `package-lock.json`; the repository tracks `bun.lock` only.
 
-No environment variables are needed for local development. Firebase configuration is read from `firebase-applet-config.json`.
+No environment variables are needed. On Render the build reads `RENDER_EXTERNAL_URL`, which Render sets itself, for the links in `llms.txt`.
 
 ## Scripts
 
 | Script | What it does |
 | --- | --- |
 | `bun run dev` | Vite dev server on port 3000 |
-| `bun run build` | Regenerates `public/sitemap.xml` from the catalogue, then builds to `dist/` |
+| `bun run build` | Five steps, in order: regenerate `public/sitemap.xml` and the page rules in `render.yaml` from the catalogue; build to `dist/`; write each page's own HTML file with its title and share image (`prerender-meta.ts`); write a redirect page for every removed address (`legacy-shells.ts`); write `dist/llms.txt` (`generate-llms.ts`) |
 | `bun run preview` | Serves the production build locally |
 | `bun run lint` | Type-check with `tsc --noEmit` |
-| `bun run test` | Data, SEO, 3D-studio and security-rules tests (`node:test` via `tsx`) |
+| `bun run test` | Data, SEO, redirect, business-details, `llms.txt`, 3D-studio and security-rules tests (`node:test` via `tsx`) |
 | `bun run add-wheel` | Catalogue CLI (`--help` for options) |
 | `bun run clean` | Removes `dist/` |
 
@@ -87,24 +93,26 @@ Run `lint`, `test` and `build` before every pull request. The repository has no 
 
 ## Routes
 
-Routing is client-side (`src/utils/router.tsx`). The host must rewrite every path to `index.html`.
+Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also gets its own HTML file at build time, so link previews show that page. The host serves those files for their paths and rewrites every other path to `index.html`.
 
 | Route | Component | Purpose |
 | --- | --- | --- |
-| `/` | `BrandHomePage` | Hero, wheels in stock (`#catalogue`), customer installs |
-| `/wheels/:slug` | `WheelShowcasePDP` | Wheel page: photos, 3D viewer, price, sizes, enquire. A sold or unknown slug shows the 404 page |
+| `/` | `BrandHomePage` | Hero, wheels in stock (`#catalogue`), customer installs, partners strip (`#partners`), Ask AI (`#ask-ai`) |
+| `/wheels/:slug` | `WheelShowcasePDP` | Wheel page: photos, 3D viewer, price, sizes, in-stock and to-order colours, enquire. A sold or unknown slug shows the 404 page |
 | `/installs` | `ClientFitmentsPage` | Customer cars on the wheels |
+| `/sixnine-wheels` | `SixnineDealerPage` | Official Sixnine dealer page: Sixnine sets in stock, fitment summary |
 | `/contact` | `ContactPage` | WhatsApp, phone, address, areas served |
-| `/privacy-policy` | `PrivacyPolicyPage` | Data governance and cookie disclosure |
+| `/privacy-policy` | `PrivacyPolicyPage` | Privacy notice (POPIA): what is collected, by whom, and how to make a request |
 | `/studio/:slug` | `StudioPreviewPage` | Unlisted, noindex 3D preview (currently `stf399`) |
 | `/admin`, `/admin/*` | `AdminWheelUploader` | Unlisted, passcode-gated, local preview only |
 | anything else | `NotFoundPage` | Not found, noindex |
 
-**Old addresses** are redirected in the browser by `redirectFor()` in `src/utils/redirects.ts`, using `history.replaceState` so the Back button is not trapped:
+**Old addresses** are redirected in the browser by `redirectFor()` in `src/utils/redirects.ts`, using `history.replaceState` so the Back button is not trapped. The build also writes a small redirect page for each of the 43 addresses in `scripts/legacy-pages.json` (`scripts/legacy-shells.ts`), so an old link still lands on the right page when the host serves a file for it. A test checks that every address in that list has a redirect.
 
 | Old address | Goes to |
 | --- | --- |
-| `/store`, `/store/*`, `/sixnine-wheels*`, `/official-dealer-sixnine-wheels*`, `/wheels` | `/#catalogue` |
+| `/store`, `/store/*`, `/wheels` | `/#catalogue` |
+| `/official-dealer-sixnine-wheels*` | `/sixnine-wheels` |
 | `/client-fitments`, `/store/client-fitments` | `/installs` |
 | `/account`, `/garage`, `/dealer-application`, `/store/dealer-application` | `/contact` |
 
@@ -113,6 +121,7 @@ Routing is client-side (`src/utils/router.tsx`). The host must rewrite every pat
 ```
 .
 ├─ index.html                     Single-page shell and static share tags
+├─ AGENTS.md                      Commands and project rules for AI coding agents
 ├─ firebase-applet-config.json    Firebase project config (public web keys)
 ├─ firebase-blueprint.json        JSON Schema for the Firestore documents
 ├─ firestore.rules                Firestore security rules
@@ -121,35 +130,56 @@ Routing is client-side (`src/utils/router.tsx`). The host must rewrite every pat
 ├─ public/
 │  ├─ images/wheels/<slug>/       front.webp · hero.webp · profile.webp per wheel
 │  ├─ models/wheels/              .glb models for the 3D viewer
-│  ├─ assets/fitments/            Customer install photography
+│  ├─ assets/fitments/<slug>/     front34.webp · side.webp · original.webp per install
+│  ├─ images/partners/            Partner logos (transparent WebP)
 │  ├─ robots.txt
 │  └─ sitemap.xml                 Generated on every build
 ├─ scripts/
 │  ├─ add-wheel.ts                CLI that writes src/data/customWheels.json
 │  ├─ generate-sitemap.ts         Writes public/sitemap.xml and the page rules in render.yaml
 │  ├─ prerender-meta.ts           Bakes each page's title and share image into dist/
+│  ├─ legacy-shells.ts            Writes a redirect page for each address in legacy-pages.json
+│  ├─ legacy-pages.json           The removed addresses that still get a redirect page
+│  ├─ generate-llms.ts            Writes dist/llms.txt
 │  └─ fitment-reshoot/            Pipeline for the install studio re-shoots
 ├─ components/ui/                 Global footer and shared UI primitives
 └─ src/
    ├─ App.tsx                     Providers, route switch, lazy-loaded pages, page metadata
    ├─ config/site.ts              Business identity and contact channels
-   ├─ data/catalogue.ts           Types, the 14 stock listings, in-stock filter, siblings, helpers
+   ├─ data/catalogue.ts           Types, the 14 stock listings, in-stock filter, siblings, to-order colours, helpers
    ├─ data/customWheels.json      Photography for stock listings, and listings added by the CLI
    ├─ data/studioFinishes.ts      Paint settings per finish for the 3D viewer
    ├─ data/clientFitments.ts      Customer installs data
+   ├─ data/partners.ts            Industry partners shown on the home page
    ├─ store/                      Zustand store (enquiry form, admin preview) in localStorage
-   ├─ context/FirebaseContext.tsx Firebase provider
+   ├─ context/FirebaseContext.tsx Firebase provider (kept, not mounted by any page)
    ├─ utils/router.tsx            pushState router and crawlable <Link>
+   ├─ utils/lazyWithRetry.ts      React.lazy with retries, for the 3D viewer's code
    ├─ utils/redirects.ts          Old address to new address
    ├─ utils/seo.ts                Per-route metadata, structured data, sitemap paths
+   ├─ utils/llms.ts               Builds llms.txt from the catalogue, installs and site config
+   ├─ utils/askAi.ts              The "Ask AI about us" links and their question
    ├─ utils/wheelStudioParts.ts   Part classification and camera maths for the viewer
    ├─ utils/wheelBuilder.ts       Builds a stock listing from a short input
    └─ components/
-      ├─ brand/                   Home, catalogue, wheel page, installs, contact, privacy
+      ├─ brand/                   Home, catalogue, wheel page, installs, Sixnine dealer page, partners strip, Ask AI, contact, privacy
       ├─ admin/                   Admin uploader
-      ├─ shared/                  Enquiry form
-      └─ visuals/                 WheelStudio (3D), WheelStage
+      ├─ shared/                  Enquiry form, SafeImage
+      └─ visuals/                 WheelStudio (3D), WheelStage, its loading skeleton and error boundary
 ```
+
+## Design system
+
+The look is dark, restrained and technical. Keep new work inside it.
+
+- **Colour tokens** live in `src/index.css`: onyx surfaces (`#0A0A0A`, `#121215`, `#18181D`), borders (`#26262E`), text greys and one accent, electric orange (`#FF5500`). Do not add new colours; WhatsApp green and Instagram pink appear only on those channels' own buttons.
+- **Three typefaces**, each with one job:
+  - **Fraunces italic** (`--font-serif`, via `.font-editorial-serif`) for editorial headlines.
+  - **Geist Sans** (`--font-sans`) for body text.
+  - **Geist Mono** (`--font-mono`, via `.font-tech-mono`) for specifications and uppercase labels.
+- **Reuse these components** rather than the plain HTML element:
+  - `SafeImage` (`src/components/shared/`) instead of `<img>` for wheel photography. A broken image URL shows the site's placeholder card instead of the browser's broken-image icon.
+  - `WheelStage` for any 3D view. It downloads Three.js only when it's needed.
 
 ## Inventory
 
@@ -166,13 +196,15 @@ The catalogue mirrors the stock sheet. All prices are South African Rand for a c
 
 All fitments are BMW M3 (G80), 5×112, centre bore 66.6. Stock counts live in the data, not in this file.
 
+**Colours to order.** The table lists the finishes in stock. On each wheel page, every colour in `WHEEL_FINISHES` that the design has no stock of is offered as made to order, with the notice in `TO_ORDER_NOTICE` ("Colours not in stock are made to order. A lead time of 3 months applies."). `getToOrderFinishes(wheel)` returns them. A to-order colour has no listing, no page and no price of its own; the visitor asks about it on WhatsApp. Never show one as in stock or without the notice.
+
 ## Catalogue data model
 
 One record type lives in `src/data/catalogue.ts`:
 
 - **`BrandWheelItem`**: one listing, which is one design in one finish. Key fields: `slug`, `model`, `modelCode` (the design), `finishName`, `priceZAR`, `sizesAvailable`, `compatibleCars`, `technicalSpecSheet`, `stockStatus`, `stockQuantitySets`, `images` (exactly three), `defaultFinish`, `availableFinishes` (only the listing's own finish), `modelUrl`, optional `rearModelUrl`.
 
-Fourteen listings are seeded in `INVENTORY_SEEDS`. What the site can show comes only from `getAllBrandWheels()`, which drops anything that is not in stock. `getSiblingListings(wheel)` returns the other in-stock listings of the same design, and `findWheelBySlug()` returns undefined for a sold or unknown wheel.
+Fourteen listings are seeded in `INVENTORY_SEEDS`. What the site can show comes only from `getAllBrandWheels()`, which drops anything that is not in stock. `getSiblingListings(wheel)` returns the other in-stock listings of the same design, `getToOrderFinishes(wheel)` returns the colours of that design that are not in stock, and `findWheelBySlug()` returns undefined for a sold or unknown wheel.
 
 `src/data/customWheels.json` is merged by slug. An entry with a seed's slug only adds to that listing (today: the three photos, so the stock sheet stays the source for names, sizes, prices and stock). An entry with a new slug is a complete listing, as written by `npm run add-wheel`.
 
@@ -180,7 +212,7 @@ Fourteen listings are seeded in `INVENTORY_SEEDS`. What the site can show comes 
 
 ## Adding or changing a wheel
 
-Change stock, prices and sizes in `INVENTORY_SEEDS` in `src/data/catalogue.ts`; set `stockQuantitySets` to 0 (or remove the seed) when a set sells and the wheel disappears from the site.
+Change stock, prices and sizes in `INVENTORY_SEEDS` in `src/data/catalogue.ts`; set `stockQuantitySets` to 0 (or remove the seed) when a set sells and the listing disappears from the site. If that was the design's last set in a colour, the colour moves to the design's to-order group on its remaining wheel pages. The lead time is `TO_ORDER_LEAD_TIME` in the same file.
 
 To attach photos or add a new listing:
 
@@ -211,13 +243,14 @@ The admin page at `/admin` is a local preview tool: wheels created there are sto
 
 ## 3D wheel studio
 
-A wheel with a `modelUrl` opens in the studio (`src/components/visuals/WheelStudio.tsx`, mounted through `WheelStage.tsx`). Three.js is downloaded only after the visitor taps "View in 3D". If a model fails to load, the studio shows a message with a retry button.
+A wheel with a `modelUrl` opens in the studio (`src/components/visuals/WheelStudio.tsx`, mounted through `WheelStage.tsx`). Three.js is downloaded only after the visitor taps "View in 3D". If a model fails to load, the studio shows a message with a retry button. If the studio's own code fails to download, `lazyWithRetry` tries twice more, then `Wheel3DSceneErrorBoundary` shows a reload card instead of breaking the page.
 
 **How models are assigned**
 
 - One model per wheel **design**. `MODEL_URL_BY_CODE` in `catalogue.ts` maps a model code to its `.glb`; every finish of that design shares the file and the studio repaints it. Photo-backed entries in `customWheels.json` carry the same `modelUrl`.
 - FSA001 sets its own front and rear pair on its seed (`modelUrl` and `rearModelUrl`), which enables the Front / Rear switch.
 - Paint settings per finish live in `src/data/studioFinishes.ts`.
+- On a wheel page the studio offers the listing's own finish plus the design's to-order colours. While a to-order colour is selected, the page shows the lead-time notice under the viewer.
 
 **Model requirements** (full detail in `public/models/wheels/README.md`)
 
@@ -225,12 +258,10 @@ A wheel with a `modelUrl` opens in the studio (`src/components/visuals/WheelStud
 - Axle bore centre at the origin, face toward +Z, real metres.
 - Sub-meshes named `Rim_Barrel`, `Rim_Face_Spokes`, `Hardware_Bolts`, `Center_Cap`. The barrel, face and cap take the selected finish; bolts keep their own material. A wheel with no cap may omit `Center_Cap`.
 - Optional `Brake_Rotor` and `Brake_Caliper` meshes enable the brake clearance check.
-- Baked textures are not needed: the studio applies its own paint, so models ship without them to keep downloads small (3–4 MB each).
+- Baked textures are not needed: the studio applies its own paint, so models ship without them to keep downloads small (0.4 to 0.8 MB each today).
 - Keep under roughly 150k triangles for mobile.
 
 **Accuracy of the current models.** The FSA002, FSA003, FSA004, FF-1 and FF-3 models were traced from face-on product photos. Spoke layout, window shapes, bolt positions and hubs follow the photos; spoke sculpting, cap logos and engraving are simplified, and depth is estimated except on FSA002. Replacing them with 3D scans of the physical wheels is the planned upgrade. The FSA001 brake meshes use assumed G80 brake dimensions, not a measured caliper.
-
-`public/models/wheels/sample-reference-rim.glb` is a low-poly test asset with the correct axes and names. It is not a real product.
 
 ## Search and sharing
 
@@ -238,17 +269,27 @@ All search metadata is produced by `src/utils/seo.ts` and applied on every route
 
 - **Titles and descriptions** per route, with titles capped at 60 characters. The home title is "Forged wheels for BMW M cars in stock | FORGED Custom Wheels".
 - **Canonical URLs** always on the production domain in `src/config/site.ts`.
-- **Link previews**: Open Graph and Twitter tags on every route, plus static tags in `index.html` for crawlers that do not run JavaScript.
+- **Link previews**: Open Graph and Twitter tags on every route. Link-preview bots and crawlers that do not run JavaScript read the same tags from each page's own HTML file, written by `scripts/prerender-meta.ts`. `index.html` keeps generic tags because it is also the fallback for unknown paths.
 - **Structured data**: `Organization` and `WebSite` on the home page; `Product` with the Rand price, in stock, on wheel pages.
-- **Sitemap**: `public/sitemap.xml` is regenerated from the catalogue on every build. It lists `/`, one page per in-stock wheel, `/installs`, `/contact` and `/privacy-policy`, and nothing else.
+- **Sitemap**: `public/sitemap.xml` is regenerated from the catalogue on every build. It lists `/`, one page per in-stock wheel, `/installs`, `/sixnine-wheels`, `/contact` and `/privacy-policy`, and nothing else.
 - **Noindex**: admin, preview, sold or unknown wheels, and unknown addresses. `public/robots.txt` keeps crawlers out of `/admin` and `/studio/`.
 - **Crawlable navigation**: header, footer and catalogue links are real anchors (`Link` in `src/utils/router.tsx`).
+
+### For AI assistants and coding agents
+
+- **`/llms.txt`** follows the [llmstxt.org](https://llmstxt.org) format. `scripts/generate-llms.ts` writes it into `dist/` at the end of every build, from `src/utils/llms.ts`: every in-stock set with its Rand price, sizes and fitment, the to-order lead time, contact details and the main pages. Assistants cannot run this single-page app, so this file is what they can read. Nothing in it is typed by hand. Its links use the address Render publishes the build at (`RENDER_EXTERNAL_URL`), and fall back to the domain in `src/config/site.ts`.
+- **"Ask AI about us"** (`AskAiSection`, links built in `src/utils/askAi.ts`) is a row of buttons on the home page for ChatGPT, Claude, Perplexity and Google AI. Each opens that assistant in a new tab with a question typed in that points at `/llms.txt` on the address the visitor is on. The site sends nothing itself, and the question asks for facts only.
+- **`AGENTS.md`** at the repository root gives AI coding agents the commands and the rules that are easy to break. Keep it in step with this file.
 
 ## Business details and contact channels
 
 `src/config/site.ts` is the single source of truth for the business name, domain, address, WhatsApp, phone, email and social links.
 
-A value left empty is never shown: the related button falls back to the enquiry form and the icon or address line is hidden. Fill a value in only once it is confirmed.
+A value left empty is never shown: the related button falls back to the enquiry form and the icon or address line is hidden. Fill a value in only once it is confirmed. Email addresses must be on the business's own domain (`SITE.domain`); a test fails otherwise. `privacyEmail` and `tradeEmail` are empty today, so the privacy notice gives WhatsApp and phone as the contact.
+
+**Partners.** The home page strip reads `src/data/partners.ts` and shows nothing when the list is empty. Add a partner only with the owner's confirmation that the logo may be shown.
+
+**Privacy notice.** `PrivacyPolicyPage` must describe the site as it is. If you add anything that collects, stores or sends visitor data (a form backend, analytics, cookies, a new third party), update the notice in the same pull request. A test fails if the notice mentions features the site no longer has.
 
 **Content rule.** Public copy states only what the business can evidence. Do not add certifications, warranty terms, delivery promises, response times, load ratings or dealer status without a source from the owner.
 
@@ -270,7 +311,7 @@ Emails go out through the Gmail credential attached to the workflow. To point a 
 
 ## Firebase
 
-Client accounts and the garage are gone from the site, but the Firebase provider (`src/context/FirebaseContext.tsx`), `firestore.rules` and their tests are kept as they were. `firestore.rules` denies everything by default and allows owner-only access with a verified email, exact key sets, bounded string sizes, enum allow-lists, server timestamps and immutable identity fields. `security_spec.md` documents the invariants and the adversarial payloads each rule rejects.
+Client accounts and the garage are gone from the site and no page loads Firebase. The Firebase provider (`src/context/FirebaseContext.tsx`), `firestore.rules` and their tests are kept as they were, for a possible later return of accounts. `firestore.rules` denies everything by default and allows owner-only access with a verified email, exact key sets, bounded string sizes, enum allow-lists, server timestamps and immutable identity fields. `security_spec.md` documents the invariants and the adversarial payloads each rule rejects.
 
 ```bash
 firebase deploy --only firestore:rules
@@ -280,15 +321,17 @@ firebase deploy --only firestore:rules
 
 ## Testing
 
-`bun run test` runs six suites with `node:test`:
+`bun run test` runs eight test files (73 tests) with `node:test`. The files are listed by name in the `test` script in `package.json`, so a new test file does not run until it is added there.
 
 | Suite | Covers |
 | --- | --- |
-| `src/data/catalogue.test.ts` | The stock rule (every exported wheel is in stock, 14 listings across 6 designs, one finish each), siblings, no store exports, wheel builder, and that every listed wheel has a 3D model and photos that exist |
+| `src/data/catalogue.test.ts` | The stock rule (every exported wheel is in stock, 14 listings across 6 designs, one finish each), siblings, to-order colours (never a colour the design has in stock), no store exports, wheel builder, and that every listed wheel has a 3D model and photos that exist |
 | `src/data/clientFitments.test.ts` | Customer installs data |
 | `src/utils/wheelStudioParts.test.ts` | Viewer part classification, exploded-view offsets, camera distance |
 | `src/utils/seo.test.ts` | Per-route metadata, canonical URLs, structured data, share images, sitemap (no removed route), `render.yaml` |
-| `src/utils/redirects.test.ts` | Old address to new address, `replaceState` and no loops |
+| `src/utils/redirects.test.ts` | Old address to new address, `replaceState`, no loops, and every address in `scripts/legacy-pages.json` has a redirect |
+| `src/config/site.test.ts` | Published emails are empty or on the business domain; the privacy notice does not describe removed features |
+| `src/utils/llms.test.ts` | `llms.txt` shape, one link and price per in-stock wheel, contact details from the site config, no unbacked claims; the Ask AI links carry the question |
 | `firestore.rules.test.ts` | Structure of the Firestore security rules |
 
 There are no browser-level tests. Check 3D and layout changes by hand on a phone-sized viewport before merging.
@@ -299,14 +342,20 @@ There are no browser-level tests. Check 3D and layout changes by hand on a phone
 
 | Host | Config file | How to deploy |
 | --- | --- | --- |
-| **Render** (static site) | `render.yaml` | Render dashboard → New → Blueprint → select this repository |
+| **Render** (static site, in use) | `render.yaml` | Already deployed as `forged-custom-wheels-gu3l`. To recreate it: Render dashboard → New → Blueprint → select this repository |
 | **Vercel** | `vercel.json` | Vercel dashboard → Add New → Project → import this repository |
 
 Both configurations install with `npm install --legacy-peer-deps`, run `npm run build`, publish `dist/`, apply the single-page rewrite, and cache fingerprinted assets for a year and models and images for a day. Every push to `main` redeploys.
 
-After the first deploy, add `forgedsa.co.za` as a custom domain in the host's dashboard and point the DNS records it gives you at the domain registrar. Canonical URLs and the sitemap already use that domain.
+The page rules in `render.yaml` are written by the build. Do not edit the block between `BEGIN generated page routes` and `END generated page routes` by hand; run `bun run build` and commit the result.
 
-Vercel's free Hobby plan is for non-commercial use only, so a business site needs Vercel Pro. Render's static sites are free to deploy; check the bandwidth included with the workspace plan against traffic, since each 3D model is 3–4 MB.
+**After a deploy, check old links.** Twice, straight after a deploy, Render served an empty page for some removed addresses (for example `/client-fitments`). Redeploying once with the build cache cleared fixed it both times. The service also still carries rewrite rules from an earlier `render.yaml` that the file no longer controls; they can be tidied under Redirects/Rewrites in the Render dashboard.
+
+**Checking a deploy.** Render's CDN caches each page's HTML for up to five minutes, so a visitor can see the previous version briefly after a deploy goes live. To check a new deploy straight away, add any query string to the URL, for example `/installs?check=1`.
+
+**Moving the domain.** To go live on `forgedsa.co.za`, add it as a custom domain in the host's dashboard and point the DNS records it gives you at the domain registrar. Canonical URLs and the sitemap already use that domain. `llms.txt` links use Render's own address while Render sets `RENDER_EXTERNAL_URL`; change `scripts/generate-llms.ts` to prefer the domain once it is connected. The domain currently serves the business's existing WordPress site, which the DNS change replaces, so keep anything still needed from it first.
+
+Vercel's free Hobby plan is for non-commercial use only, so a business site needs Vercel Pro. Render's static sites are free to deploy; check the bandwidth included with the workspace plan against traffic.
 
 For Firebase Hosting instead:
 
@@ -323,19 +372,28 @@ Build chunks are split per vendor (`react`, `motion`, `three`, `firebase`, `luci
 | **Lead delivery** | Every enquiry is posted to n8n, which logs it and emails the business (see [Lead delivery](#lead-delivery-n8n)); with a WhatsApp number set, the form also opens WhatsApp. The inbox is set inside the n8n workflow. | Route leads into a CRM from the same workflow |
 | **Contact channels** | Set in `src/config/site.ts`; any channel left empty there is hidden (Instagram, Facebook and trade email are empty today) | Fill in once confirmed |
 | **3D accuracy** | Five designs are traced from photos with simplified surfaces | Replace with scans of the physical wheels |
-| **Photography** | Six listings have no product photos and show a plain drawn stand-in (FSA001, FSA002 Hyper Black and Polished Face, FSA003 Silver, FSA004 Hyper Black and Gloss Black) | Shoot and add |
+| **Photography** | Five listings have no product photos and show a plain drawn stand-in (FSA002 Hyper Black and Polished Face, FSA003 Silver, FSA004 Hyper Black and Gloss Black) | Shoot and add |
 | **Link previews** | The app is client-rendered; `npm run build` bakes each page's title and share image into its own HTML file so chat apps show the right preview for the pages in the sitemap | Server-render if more pages are added |
-| **Old links** | Redirected in the browser, not with an HTTP 301 | Add 301 rules on the host |
+| **Old links** | Redirected in the browser and by a redirect page per removed address, not with an HTTP 301 | Add 301 rules on the host |
+| **Unknown addresses** | Show the noindex not-found page, but the host still answers HTTP 200 | Return HTTP 404 from the host for unknown paths |
+| **Domain** | The new site is live only at its Render address; `forgedsa.co.za` still serves the old WordPress site | Move the domain's DNS to the host (see [Deployment](#deployment)) |
 | **Admin publishing** | The uploader stores wheels locally; publishing is a data-file change and rebuild | Firebase-backed catalogue with authenticated admin writes |
 | **Stock** | Counts are edited in `INVENTORY_SEEDS` and need a rebuild | Read from the stock sheet |
+| **To-order colours** | Every design offers the same four swatch colours to order, with one lead time and no price | Confirm with the owner which colours each design can be ordered in, and their prices |
+| **Dealer status** | The Sixnine page says "Official dealer" on the owner's word; no certificate is shown | Add the dealer certificate and the wording it supports |
+| **Privacy notice** | Matches the site, but the retention periods are carried over from an older version, and no Information Officer or registration number is named | Owner to confirm, and have it legally reviewed |
+| **Ask AI buttons** | The link formats follow each assistant's documented pattern; they have not been clicked through signed in | Test each once on the live site |
 
 ## Contributing
 
 1. Branch from `main`.
-2. Keep changes small and focused; update tests with the behaviour you change.
+2. Keep changes small and focused; update tests with the behaviour you change, and add any new test file to the `test` script in `package.json`.
 3. Run `bun run lint`, `bun run test` and `bun run build`.
 4. Open a pull request against `main` describing what changed and how it was checked.
 5. Follow the content rule above for anything customer-facing.
+6. Do not push to `main`: every push deploys to the live site.
+
+AI coding agents should read `AGENTS.md` first.
 
 ## Licence
 

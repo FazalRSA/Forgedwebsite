@@ -286,3 +286,17 @@ test('FSA001 carries front and rear 3D models that exist in /public; every listi
   for (const [code, urls] of byCode) assert.equal(urls.size, 1, `${code} finishes disagree on the model`);
   assert.equal(all.find((w) => w.slug === 'fsa002-gold')?.modelUrl, '/models/wheels/fsa002.glb');
 });
+
+test('to-order colours are exactly the palette colours a design has no stock of', async () => {
+  const { getAllBrandWheels, getSiblingListings, getToOrderFinishes, WHEEL_FINISHES, TO_ORDER_NOTICE, TO_ORDER_LEAD_TIME } =
+    await import('./catalogue');
+  const palette = Object.keys(WHEEL_FINISHES).sort();
+  for (const wheel of getAllBrandWheels()) {
+    const inStock = [wheel, ...getSiblingListings(wheel)].map((w) => w.defaultFinish);
+    const toOrder = getToOrderFinishes(wheel).map((f) => f.id);
+    for (const id of toOrder) assert.ok(!inStock.includes(id), `${wheel.slug}: ${id} is in stock but offered to order`);
+    assert.deepEqual([...new Set([...inStock, ...toOrder])].sort(), palette, `${wheel.slug}: palette not covered`);
+  }
+  assert.equal(TO_ORDER_LEAD_TIME, '3 months');
+  assert.ok(TO_ORDER_NOTICE.includes('3 months'));
+});

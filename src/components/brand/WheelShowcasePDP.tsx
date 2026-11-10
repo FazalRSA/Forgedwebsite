@@ -3,10 +3,14 @@ import { ArrowLeft, ChevronLeft, ChevronRight, MessageCircle, Play } from 'lucid
 import {
   BrandWheelItem,
   WHEEL_FINISHES,
+  WheelFinishOption,
   findWheelBySlug,
   formatZAR,
   getAllBrandWheels,
   getSiblingListings,
+  getToOrderFinishes,
+  TO_ORDER_LEAD_TIME,
+  TO_ORDER_NOTICE,
   getWheelImages,
 } from '../../data/catalogue';
 import { whatsappLink } from '../../config/site';
@@ -79,6 +83,10 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
   const has3D = Boolean(wheel.modelUrl);
   const photos = realPhotos(wheel);
   const siblings = getSiblingListings(wheel, customBrandWheels);
+  const toOrderFinishes = getToOrderFinishes(wheel, customBrandWheels);
+  // The colour shown in the 3D view: the stocked one, or a to-order colour being previewed.
+  const [previewFinish, setPreviewFinish] = useState(wheel.defaultFinish);
+  const previewingToOrder = previewFinish !== wheel.defaultFinish;
   const others = getAllBrandWheels(customBrandWheels)
     .filter((w) => w.slug !== wheel.slug)
     .slice(0, 4);
@@ -165,10 +173,10 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
               <>
                 <WheelStage
                   wheelModel={wheel.model}
-                  selectedFinish={wheel.defaultFinish}
-                  availableFinishes={[wheel.defaultFinish]}
-                  onSelectFinish={() => {}}
-                  finishName={finishLabel}
+                  selectedFinish={previewFinish}
+                  availableFinishes={[wheel.defaultFinish, ...toOrderFinishes.map((f) => f.id)]}
+                  onSelectFinish={setPreviewFinish}
+                  finishName={previewingToOrder ? WHEEL_FINISHES[previewFinish]?.name ?? finishLabel : finishLabel}
                   modelUrl={wheel.modelUrl}
                   rearModelUrl={wheel.rearModelUrl}
                   onClose={closeStudio}
@@ -176,6 +184,11 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
                 <p className="mt-2 text-xs text-neutral-400">
                   The 3D view is a guide to shape and finish. The photos show the real wheels.
                 </p>
+                {previewingToOrder && (
+                  <p className="mt-1 text-xs text-[#FF8A4D]">
+                    This colour is not in stock. {TO_ORDER_NOTICE}
+                  </p>
+                )}
               </>
             ) : photos.length > 0 ? (
               <PhotoGallery
@@ -203,30 +216,49 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
             </p>
             {stock && <p className="mt-1 text-sm text-[#FF8A4D]">{stock}</p>}
 
-            {siblings.length > 0 && (
-              <div className="mt-5">
-                <p className="text-sm text-neutral-400">Finish</p>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  <span
-                    aria-current="true"
-                    className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white bg-white/10 px-4 text-sm font-medium text-white"
+            <div className="mt-5" data-testid="finish-options">
+              <p className="text-sm text-neutral-400">In stock</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                <span
+                  aria-current="true"
+                  className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white bg-white/10 px-4 text-sm font-medium text-white"
+                >
+                  <Swatch hex={WHEEL_FINISHES[wheel.defaultFinish]?.swatchHex} />
+                  {finishLabel}
+                </span>
+                {siblings.map((s) => (
+                  <Link
+                    key={s.slug}
+                    to={`/wheels/${s.slug}`}
+                    className="inline-flex min-h-11 items-center gap-2 rounded-full border border-[#33333E] px-4 text-sm text-neutral-200 hover:border-[#FF5500] hover:text-white"
                   >
-                    <Swatch hex={WHEEL_FINISHES[wheel.defaultFinish]?.swatchHex} />
-                    {finishLabel}
-                  </span>
-                  {siblings.map((s) => (
-                    <Link
-                      key={s.slug}
-                      to={`/wheels/${s.slug}`}
-                      className="inline-flex min-h-11 items-center gap-2 rounded-full border border-[#33333E] px-4 text-sm text-neutral-200 hover:border-[#FF5500] hover:text-white"
-                    >
-                      <Swatch hex={WHEEL_FINISHES[s.defaultFinish]?.swatchHex} />
-                      {s.finishName ?? WHEEL_FINISHES[s.defaultFinish]?.name}
-                    </Link>
-                  ))}
-                </div>
+                    <Swatch hex={WHEEL_FINISHES[s.defaultFinish]?.swatchHex} />
+                    {s.finishName ?? WHEEL_FINISHES[s.defaultFinish]?.name}
+                  </Link>
+                ))}
               </div>
-            )}
+
+              {toOrderFinishes.length > 0 && (
+                <div className="mt-4" data-testid="to-order-finishes">
+                  <p className="text-sm text-neutral-400">
+                    Other colours, to order ({TO_ORDER_LEAD_TIME} lead time)
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {toOrderFinishes.map((finish) => (
+                      <ToOrderChip
+                        key={finish.id}
+                        design={design}
+                        finish={finish}
+                        onEnquire={(subject) => openEnquiryModal({ subject, finish: finish.name, domain: 'brand' })}
+                      />
+                    ))}
+                  </div>
+                  <p className="mt-2 text-sm text-neutral-300">
+                    {TO_ORDER_NOTICE} Tap a colour to ask about it.
+                  </p>
+                </div>
+              )}
+            </div>
 
             {has3D && !studioOpen && photos.length > 0 && (
               <button
@@ -299,6 +331,32 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
         {enquireButton}
       </div>
     </div>
+  );
+};
+
+const TO_ORDER_CHIP =
+  'inline-flex min-h-11 items-center gap-2 rounded-full border border-dashed border-[#4A4A57] px-4 text-sm text-neutral-200 hover:border-[#FF5500] hover:text-white cursor-pointer';
+
+/**
+ * A colour that is not in stock. Tapping it opens the enquiry form with the lead time stated; the
+ * form logs the enquiry through n8n and then opens WhatsApp when a number is configured.
+ */
+const ToOrderChip: React.FC<{
+  design: string;
+  finish: WheelFinishOption;
+  onEnquire: (subject: string) => void;
+}> = ({ design, finish, onEnquire }) => {
+  const message = `Hi, I'd like the ${design} in ${finish.name}. I understand this colour is made to order, with a lead time of ${TO_ORDER_LEAD_TIME}.`;
+  return (
+    <button
+      type="button"
+      onClick={() => onEnquire(message)}
+      aria-label={`Ask about ${finish.name}, made to order, ${TO_ORDER_LEAD_TIME} lead time`}
+      className={TO_ORDER_CHIP}
+    >
+      <Swatch hex={finish.swatchHex} />
+      {finish.name}
+    </button>
   );
 };
 
