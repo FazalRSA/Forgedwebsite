@@ -10,18 +10,23 @@ const ALL = 'All';
 
 const FOCUSABLE = 'a[href], button:not([disabled])';
 
+const PHOTO_COUNT = 3;
+
 /** Photos of one customer car, with the details that are known and a way to ask about the setup. */
 const InstallLightbox: React.FC<{ fitment: ClientFitment; onClose: () => void }> = ({
   fitment,
   onClose,
 }) => {
-  const [photo, setPhoto] = useState<0 | 1>(0);
+  const [photo, setPhoto] = useState(0);
   const dialogRef = useRef<HTMLDivElement | null>(null);
   const closeRef = useRef<HTMLButtonElement | null>(null);
 
   const title = fitmentTitle(fitment);
   const wheels = fitmentWheels(fitment);
-  const otherPhoto = () => setPhoto((current) => (current === 0 ? 1 : 0));
+  const previousPhoto = () => setPhoto((current) => (current + PHOTO_COUNT - 1) % PHOTO_COUNT);
+  const nextPhoto = () => setPhoto((current) => (current + 1) % PHOTO_COUNT);
+  // The studio re-shoots are 4:3; the owner's own photo can be any shape, so it is shown whole.
+  const isOwnerPhoto = photo === PHOTO_COUNT - 1;
 
   useEffect(() => {
     const opener = document.activeElement as HTMLElement | null;
@@ -33,8 +38,10 @@ const InstallLightbox: React.FC<{ fitment: ClientFitment; onClose: () => void }>
       if (event.key === 'Escape') {
         event.preventDefault();
         onClose();
-      } else if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
-        setPhoto((current) => (current === 0 ? 1 : 0));
+      } else if (event.key === 'ArrowLeft') {
+        setPhoto((current) => (current + PHOTO_COUNT - 1) % PHOTO_COUNT);
+      } else if (event.key === 'ArrowRight') {
+        setPhoto((current) => (current + 1) % PHOTO_COUNT);
       } else if (event.key === 'Tab' && dialogRef.current) {
         // Keep keyboard focus inside the open window.
         const items = Array.from(dialogRef.current.querySelectorAll<HTMLElement>(FOCUSABLE));
@@ -96,15 +103,15 @@ const InstallLightbox: React.FC<{ fitment: ClientFitment; onClose: () => void }>
             <div className="relative">
               <img
                 src={fitment.images[photo]}
-                alt={`${title} on forged wheels, photo ${photo + 1} of 2`}
+                alt={`${title} on forged wheels, ${fitment.imageLabels[photo].toLowerCase()} (photo ${photo + 1} of ${PHOTO_COUNT})`}
                 width={1600}
                 height={1200}
                 decoding="async"
-                className="w-full aspect-[4/3] object-cover"
+                className={`w-full aspect-[4/3] ${isOwnerPhoto ? 'object-contain' : 'object-cover'}`}
               />
               <button
                 type="button"
-                onClick={otherPhoto}
+                onClick={previousPhoto}
                 aria-label="Previous photo"
                 className="absolute left-3 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-black/70 text-white flex items-center justify-center cursor-pointer hover:bg-black"
               >
@@ -112,7 +119,7 @@ const InstallLightbox: React.FC<{ fitment: ClientFitment; onClose: () => void }>
               </button>
               <button
                 type="button"
-                onClick={otherPhoto}
+                onClick={nextPhoto}
                 aria-label="Next photo"
                 className="absolute right-3 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-black/70 text-white flex items-center justify-center cursor-pointer hover:bg-black"
               >
@@ -124,8 +131,8 @@ const InstallLightbox: React.FC<{ fitment: ClientFitment; onClose: () => void }>
                 <button
                   key={src}
                   type="button"
-                  onClick={() => setPhoto(index as 0 | 1)}
-                  aria-label={`Show photo ${index + 1}`}
+                  onClick={() => setPhoto(index)}
+                  aria-label={`Show photo ${index + 1}: ${fitment.imageLabels[index]}`}
                   aria-pressed={photo === index}
                   className={`w-16 h-12 rounded-md overflow-hidden border-2 cursor-pointer ${
                     photo === index ? 'border-white' : 'border-transparent opacity-60 hover:opacity-100'
@@ -174,7 +181,7 @@ const InstallLightbox: React.FC<{ fitment: ClientFitment; onClose: () => void }>
             </div>
 
             <p className="text-xs text-neutral-400">
-              Studio pictures are made from the owner&apos;s own photo of the car.
+              The studio pictures are made from the owner&apos;s own photo of the car, shown as the third photo.
             </p>
           </div>
         </div>

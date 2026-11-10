@@ -2,19 +2,19 @@
  "_notes": "One job per past install photo in Drive > 'Gallery - Past installations'. The car fields were read off the phone photo by Claude on 2026-11-09 and are a best reading, not a confirmed spec: correct make/model/paint before publishing. `car` is the description given to the image model. `extra` adds job-specific prompt instructions. Wheel model, finish name, sizes and city are unknown from the photos and left for the shop to fill in (`wheelModel`, `wheelSlug`, `staggeredSpec`, `finishName`, `clientCity`).",
  "jobs": [
   {
-   "slug": "g80-m3-brooklyn-grey-bronze",
+   "slug": "g80-m3-brooklyn-grey-silver",
    "make": "BMW",
    "family": "M3",
    "chassis": "G80",
    "body": "Sedan",
    "paint": "Brooklyn Grey",
-   "wheelLook": "Bronze multi-spoke, red calipers",
+   "wheelLook": "Brushed silver multi-spoke, red calipers",
    "accentHex": "#8E959E",
-   "car": "BMW G80 M3 Competition sedan in Brooklyn Grey with bronze multi-spoke forged wheels and red brake calipers",
+   "car": "BMW G80 M3 Competition sedan in Brooklyn Grey with brushed silver multi-spoke forged wheels (many thin spokes, polished lip) and red brake calipers",
    "sources": [
     "20250425_151440.jpg"
    ],
-   "extra": "The source photo was taken indoors in a showroom; ignore the showroom entirely."
+   "extra": "The source photo was taken indoors in a showroom; ignore the showroom entirely. The wheels are brushed silver / light titanium with a polished lip, NOT bronze, gold or black: copy the thin many-spoke design (about twenty spokes) exactly as photographed."
   },
   {
    "slug": "f80-m3-yas-marina-blue",
@@ -113,13 +113,13 @@
    "chassis": "G80",
    "body": "Sedan",
    "paint": "Black Sapphire",
-   "wheelLook": "Bronze multi-spoke",
+   "wheelLook": "Bronze two-piece split-spoke, polished lip",
    "accentHex": "#C5B095",
-   "car": "BMW G80 M3 Competition sedan in Black Sapphire with bronze multi-spoke forged wheels",
+   "car": "BMW G80 M3 Competition sedan in Black Sapphire with two-piece forged wheels: bronze-gold concave five-split-spoke centres and a polished silver step lip, red brake calipers",
    "sources": [
     "20260523_155120.jpg"
    ],
-   "extra": "The source photo was taken at an outdoor event with people, gazebos and other cars; remove every person and every other object."
+   "extra": "The source photo was taken at an outdoor event with people, gazebos and other cars; remove every person and every other object. There is NO large rear wing on this car: the boot is standard with at most the small factory lip spoiler. The wheels are two-piece with a polished silver outer lip around bronze-gold centres; keep that lip visible."
   },
   {
    "slug": "g80-m3-brooklyn-grey-black",

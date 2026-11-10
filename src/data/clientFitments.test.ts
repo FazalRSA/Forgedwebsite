@@ -9,18 +9,21 @@ test('the gallery is not empty and has at least one model family', () => {
   assert.ok(FITMENT_FAMILIES.length > 0, 'FITMENT_FAMILIES must not be empty');
 });
 
-test('every client fitment has a unique id and exactly two studio images', () => {
+test('every client fitment has a unique id, two studio images and the original photo', () => {
   const ids = new Set(CLIENT_FITMENTS.map((f) => f.id));
   assert.equal(ids.size, CLIENT_FITMENTS.length);
   for (const f of CLIENT_FITMENTS) {
-    assert.equal(f.images.length, 2, `${f.id} must have two images`);
+    assert.equal(f.images.length, 3, `${f.id} must have three images`);
+    assert.equal(f.imageLabels.length, 3, `${f.id} must label all three images`);
     assert.ok(f.images[0].endsWith('/front34.webp'), `${f.id} image 1 is the front 3/4 shot`);
     assert.ok(f.images[1].endsWith('/side.webp'), `${f.id} image 2 is the side profile`);
+    assert.ok(f.images[2].endsWith('/original.webp'), `${f.id} image 3 is the customer's own photo`);
+    assert.ok(f.images.every((img) => img.startsWith(`/assets/fitments/${f.id}/`)), `${f.id} images live in its own folder`);
     assert.ok(f.vehicleTitle.length > 0 && f.wheelLook.length > 0 && f.paint.length > 0);
   }
 });
 
-test('every referenced studio image exists under public/', () => {
+test('every referenced image exists under public/', () => {
   for (const f of CLIENT_FITMENTS) {
     for (const img of f.images) {
       const path = join(process.cwd(), 'public', img);

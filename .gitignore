@@ -8,5 +8,10 @@ coverage/
 .env*
 !.env.example
 
+# Re-shoot pipeline working files (phone photos, renders, logs)
+scripts/fitment-reshoot/raw/
+scripts/fitment-reshoot/out/
+scripts/fitment-reshoot/logs/
+
 # Local agent-session tooling artifacts, not project source
 .cto-toolkit/
