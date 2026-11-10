@@ -1,8 +1,6 @@
 User-agent: *
 Allow: /
 Disallow: /admin
-Disallow: /account
-Disallow: /garage
 Disallow: /studio/
 
-Sitemap: https://forgedcustomwheels.com/sitemap.xml
+Sitemap: https://forgedsa.co.za/sitemap.xml

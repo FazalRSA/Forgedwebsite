@@ -18,22 +18,58 @@ import {
   withRenderPageRoutes,
   wheelBrand,
 } from './seo';
-import { BRAND_WHEELS, STORE_PRODUCTS, VEHICLE_FITMENT_TREE, getAllStoreProducts } from '../data/catalogue';
+import { findWheelBySlug, getAllBrandWheels, isInStock } from '../data/catalogue';
 import { SITE } from '../config/site';
 
 const PUBLIC_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'public');
 
-test('home page metadata names the business and stays indexable', () => {
+const WHEELS = getAllBrandWheels();
+
+/** Addresses that were pages before the site was cut down to home, wheel, installs and contact. */
+const REMOVED_ROUTES = [
+  '/store',
+  '/store/collections/bmw-m3-2024-onwards-alloy-wheels',
+  '/store/products/bmw-m3-type-52-forged',
+  '/store/client-fitments',
+  '/client-fitments',
+  '/sixnine-wheels',
+  '/official-dealer-sixnine-wheels',
+  '/dealer-application',
+  '/store/dealer-application',
+  '/account',
+  '/garage',
+];
+
+test('home page metadata matches what people search for and stays indexable', () => {
   const m = metaForPath('/');
-  assert.ok(m.title.startsWith(SITE_NAME));
+  assert.match(m.title, /forged wheels for BMW M cars/i);
+  assert.match(m.title, /in stock/i);
+  assert.ok(m.title.includes(SITE_NAME));
+  assert.match(m.description, /South Africa/);
   assert.equal(m.canonicalPath, '/');
   assert.equal(m.noindex, false);
   assert.ok(m.description.length >= 50 && m.description.length <= 170);
+  // The page-shell fallbacks in index.html say the same as the home page.
+  const shell = readFileSync(path.join(PUBLIC_DIR, '..', 'index.html'), 'utf8');
+  assert.ok(shell.includes(`<title>${m.title}</title>`), 'index.html title matches the home page');
+  assert.ok(shell.includes(`content="${m.description}"`), 'index.html description matches the home page');
+});
+
+test('installs and contact are indexable pages with their own title and canonical URL', () => {
+  for (const p of ['/installs', '/contact', '/privacy-policy']) {
+    for (const variant of [p, `${p}/`, `${p}?x=1#top`]) {
+      const m = metaForPath(variant);
+      assert.equal(m.canonicalPath, p, variant);
+      assert.equal(m.noindex, false, variant);
+      assert.equal(m.jsonLd, undefined, variant);
+    }
+  }
+  assert.notEqual(metaForPath('/installs').title, metaForPath('/contact').title);
 });
 
 test('every catalogue wheel gets a unique title, a Rand price and Product structured data', () => {
   const titles = new Set<string>();
-  for (const wheel of BRAND_WHEELS) {
+  for (const wheel of WHEELS) {
     const m = metaForPath(`/wheels/${wheel.slug}`);
     assert.equal(m.canonicalPath, `/wheels/${wheel.slug}`);
     assert.equal(m.noindex, false);
@@ -43,67 +79,46 @@ test('every catalogue wheel gets a unique title, a Rand price and Product struct
     assert.equal(ld['@type'], 'Product');
     assert.equal(ld.offers.price, wheel.priceZAR);
     assert.equal(ld.offers.priceCurrency, 'ZAR');
-    assert.match(ld.offers.availability, /^https:\/\/schema\.org\/(InStock|PreOrder)$/);
+    assert.equal(ld.offers.availability, 'https://schema.org/InStock');
+    assert.match(m.description, /in stock/i);
     titles.add(m.title);
   }
-  assert.equal(titles.size, BRAND_WHEELS.length);
+  assert.equal(titles.size, WHEELS.length);
 });
 
-test('an unknown wheel or product slug is kept out of search results', () => {
+test('an unknown wheel slug is kept out of search results', () => {
   assert.equal(metaForPath('/wheels/not-a-real-wheel').noindex, true);
-  assert.equal(metaForPath('/store/products/not-a-real-product').noindex, true);
+  assert.equal(metaForPath('/wheels/not-a-real-wheel').jsonLd, undefined);
 });
 
-test('store product pages use the product title and canonical slug', () => {
-  const product = STORE_PRODUCTS[0];
-  const m = metaForPath(`/store/products/${product.slug}/`);
-  assert.ok(m.title.includes(product.title));
-  assert.equal(m.canonicalPath, `/store/products/${product.slug}`);
-  assert.equal(m.noindex, false);
-});
-
-test('private and preview pages are noindex; alias routes share one canonical path', () => {
-  for (const p of ['/account', '/garage', '/admin', '/admin/wheels', '/studio/stf399']) {
-    assert.equal(metaForPath(p).noindex, true, p);
+test('removed routes are no longer pages: they are noindex "not found" and never a store or dealer page', () => {
+  for (const p of REMOVED_ROUTES) {
+    const m = metaForPath(p);
+    assert.equal(m.noindex, true, p);
+    assert.ok(m.title.startsWith('Page not found'), `${p}: ${m.title}`);
+    assert.equal(m.jsonLd, undefined, p);
+    assert.doesNotMatch(`${m.title} ${m.description}`, /store|dealer|sixnine|garage|account/i, p);
   }
-  assert.equal(metaForPath('/store/client-fitments').canonicalPath, '/client-fitments');
-  assert.equal(metaForPath('/official-dealer-sixnine-wheels/').canonicalPath, '/sixnine-wheels');
-  assert.equal(metaForPath('/client-fitments?x=1#top').canonicalPath, '/client-fitments');
+});
+
+test('private and preview pages are noindex and carry no structured data', () => {
+  for (const p of ['/admin', '/admin/wheels', '/studio/stf399']) {
+    const m = metaForPath(p);
+    assert.equal(m.noindex, true, p);
+    assert.equal(m.jsonLd, undefined, p);
+  }
 });
 
 test('titles fit in a search result and no two indexable pages share one', () => {
-  const paths = [
-    '/',
-    '/store',
-    '/client-fitments',
-    '/sixnine-wheels',
-    '/dealer-application',
-    '/privacy-policy',
-    ...BRAND_WHEELS.map((w) => `/wheels/${w.slug}`),
-    ...getAllStoreProducts().map((p) => `/store/products/${p.slug}`),
-  ];
+  const paths = ['/', '/installs', '/contact', '/privacy-policy', ...WHEELS.map((w) => `/wheels/${w.slug}`)];
   const titles = new Set<string>();
   for (const p of paths) {
     const m = metaForPath(p);
     assert.ok(m.title.length <= 60, `${p}: "${m.title}" is ${m.title.length} characters`);
-    assert.ok(m.description.length >= 50 && m.description.length <= 170, `${p}: description length`);
+    assert.ok(m.description.length >= 50 && m.description.length <= 170, `${p}: description length ${m.description.length}`);
     titles.add(m.title);
   }
   assert.equal(titles.size, paths.length);
-});
-
-test('a car collection is indexable under its own slug only', () => {
-  const node = Object.values(VEHICLE_FITMENT_TREE)[0][0];
-  const known = metaForPath(`/store/collections/${node.collectionSlug}`);
-  assert.equal(known.noindex, false);
-  assert.equal(known.canonicalPath, `/store/collections/${node.collectionSlug}`);
-  assert.equal(metaForPath('/store/collections/not-a-real-collection').noindex, true);
-});
-
-test('pages kept out of search results carry no structured data', () => {
-  for (const p of ['/wheels/not-a-real-wheel', '/store/collections/not-a-real-collection', '/admin']) {
-    assert.equal(metaForPath(p).jsonLd, undefined, p);
-  }
 });
 
 test('home page structured data describes the organisation and website from site config only', () => {
@@ -124,7 +139,7 @@ test('home page structured data describes the organisation and website from site
 });
 
 test('Sixnine wheels name their brand; other wheels do not guess one', () => {
-  for (const wheel of BRAND_WHEELS) {
+  for (const wheel of WHEELS) {
     const ld = metaForPath(`/wheels/${wheel.slug}`).jsonLd as { brand?: { '@type': string; name: string } };
     if (wheel.modelCode === 'FF-1' || wheel.modelCode === 'FF-3') {
       assert.equal(wheelBrand(wheel), 'Sixnine');
@@ -140,7 +155,7 @@ test('Sixnine wheels name their brand; other wheels do not guess one', () => {
 
 test('structured data and canonical URLs are absolute on the production domain', () => {
   assert.equal(SITE_ORIGIN, `https://${SITE.domain}`);
-  assert.equal(absoluteUrl('/store'), `${SITE_ORIGIN}/store`);
+  assert.equal(absoluteUrl('/installs'), `${SITE_ORIGIN}/installs`);
   assert.equal(absoluteUrl('https://example.com/x'), 'https://example.com/x');
 
   const home = absolutiseJsonLd(homeJsonLd()) as { '@graph': Array<{ '@id': string; url: string; publisher?: { '@id': string } }> };
@@ -148,7 +163,7 @@ test('structured data and canonical URLs are absolute on the production domain',
   assert.equal(home['@graph'][1].url, `${SITE_ORIGIN}/`);
   assert.equal(home['@graph'][1].publisher?.['@id'], `${SITE_ORIGIN}/#organization`);
 
-  const wheel = BRAND_WHEELS[0];
+  const wheel = WHEELS[0];
   const product = absolutiseJsonLd(metaForPath(`/wheels/${wheel.slug}`).jsonLd!, 'https://example.test') as {
     url: string;
     offers: { url: string };
@@ -159,26 +174,41 @@ test('structured data and canonical URLs are absolute on the production domain',
 
 test('link-preview images are real files in public/', () => {
   assert.ok(existsSync(path.join(PUBLIC_DIR, DEFAULT_SHARE_IMAGE)), DEFAULT_SHARE_IMAGE);
-  for (const wheel of BRAND_WHEELS) {
+  for (const wheel of WHEELS) {
     const image = metaForPath(`/wheels/${wheel.slug}`).image;
     if (image) assert.ok(existsSync(path.join(PUBLIC_DIR, image)), image);
   }
 });
 
-test('the sitemap lists every wheel once, only indexable canonical pages, on the production domain', () => {
+test('the sitemap lists the home page, every in-stock wheel once, installs, contact and the privacy policy, and nothing else', () => {
   const paths = sitemapPaths();
   assert.equal(new Set(paths).size, paths.length);
-  assert.ok(paths.includes('/'));
-  for (const wheel of BRAND_WHEELS) assert.ok(paths.includes(`/wheels/${wheel.slug}`), wheel.slug);
+  assert.deepEqual(
+    [...paths].sort(),
+    ['/', '/contact', '/installs', '/privacy-policy', ...WHEELS.map((w) => `/wheels/${w.slug}`)].sort()
+  );
+  assert.equal(paths.length, 4 + 14);
+  for (const p of paths.filter((x) => x.startsWith('/wheels/'))) {
+    const wheel = findWheelBySlug(p.slice('/wheels/'.length));
+    assert.ok(wheel && isInStock(wheel), `${p} must be an in-stock wheel`);
+  }
   for (const p of paths) {
     const m = metaForPath(p);
     assert.equal(m.noindex, false, p);
     assert.equal(m.canonicalPath, p);
   }
-  assert.ok(!paths.some((p) => p.startsWith('/admin') || p.startsWith('/account') || p.startsWith('/studio')));
+
+  // No removed route, store page, dealer page, account page or unlisted page is listed.
+  const banned = /^\/(store|sixnine-wheels|official-dealer|dealer-application|account|garage|client-fitments|admin|studio)/;
+  assert.ok(!paths.some((p) => banned.test(p)));
   const xml = buildSitemapXml('https://example.test');
   assert.equal((xml.match(/<loc>/g) ?? []).length, paths.length);
   assert.ok(xml.includes('<loc>https://example.test/</loc>'));
+  assert.ok(xml.includes('<loc>https://example.test/installs</loc>'));
+  assert.ok(xml.includes('<loc>https://example.test/contact</loc>'));
+  for (const removed of REMOVED_ROUTES) assert.ok(!xml.includes(`example.test${removed}<`), removed);
+  const onDisk = readFileSync(path.join(PUBLIC_DIR, 'sitemap.xml'), 'utf8');
+  assert.equal(onDisk, buildSitemapXml(), 'run `npm run build` to regenerate public/sitemap.xml');
 });
 
 test('an address that is not a page is a noindex "not found", while home paths stay the home page', () => {
@@ -195,7 +225,7 @@ test('an address that is not a page is a noindex "not found", while home paths s
 
 test('renderPageHtml bakes a page\'s own title, description, canonical, image and structured data into the shell', () => {
   const shell = readFileSync(path.join(PUBLIC_DIR, '..', 'index.html'), 'utf8');
-  const wheel = BRAND_WHEELS.find((w) => w.slug === 'fsa002-gold')!;
+  const wheel = WHEELS.find((w) => w.slug === 'fsa002-gold')!;
   const meta = metaForPath(`/wheels/${wheel.slug}`);
   const html = renderPageHtml(shell, meta, 'https://example.test');
 
@@ -225,6 +255,8 @@ test('render.yaml has a rewrite rule to the prerendered file for every sitemap p
     assert.ok(renderYaml.includes(`source: ${p}\n`), p);
     assert.ok(renderYaml.includes(`destination: ${p}.html\n`), p);
   }
+  // Nothing is served for a removed page; the app redirects those addresses itself.
+  for (const removed of REMOVED_ROUTES) assert.ok(!renderYaml.includes(`source: ${removed}\n`), removed);
   // The catch-all for the single-page app must stay after the per-page rules.
   assert.ok(renderYaml.indexOf('source: /*') > renderYaml.indexOf('# END generated page routes'));
   assert.throws(() => withRenderPageRoutes('services: []'), /markers/);

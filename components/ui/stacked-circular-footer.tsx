@@ -1,167 +1,116 @@
 import * as React from "react"
-import { Icons } from "@/components/ui/icons"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Facebook, Instagram, Linkedin, Twitter, ArrowUpRight, CheckCircle2 } from "lucide-react"
-import { SITE } from "@/src/config/site"
+import { Facebook, Instagram } from "lucide-react"
+import { SITE, telLink, whatsappLink } from "@/src/config/site"
 import { Link } from "@/src/utils/router"
 import { LogoPlaceholder } from "@/src/components/shared/LogoPlaceholder"
 
 export interface StackedCircularFooterProps {
+  /** Accepted so existing callers still compile; links now navigate through <Link>. */
   onNavigate?: (path: string) => void;
+  /** Accepted so existing callers still compile; there is one set of links. */
   useBrandLinks?: boolean;
 }
 
-function StackedCircularFooter({ onNavigate, useBrandLinks = false }: StackedCircularFooterProps) {
-  const [email, setEmail] = React.useState("")
-  const [subscribed, setSubscribed] = React.useState(false)
+const FOOTER_LINKS = [
+  { label: "Wheels", to: "/#catalogue" },
+  { label: "Installs", to: "/installs" },
+  { label: "Contact", to: "/contact" },
+  { label: "Privacy policy", to: "/privacy-policy" },
+] as const
 
-  const handleSubscribe = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (email.trim()) {
-      setSubscribed(true)
-      setEmail("")
-      setTimeout(() => setSubscribed(false), 4000)
-    }
-  }
+const linkClass =
+  "inline-flex items-center min-h-11 text-sm text-neutral-300 hover:text-white transition-colors"
+
+/** Footer: the same three pages as the header, the privacy policy, and whichever contact details are set. */
+function StackedCircularFooter(_props: StackedCircularFooterProps) {
+  const phoneHref = telLink()
+  const whatsappHref = whatsappLink()
+
+  // Only channels that are filled in src/config/site.ts appear.
+  const contactItems: { key: string; label: string; href: string; external?: boolean }[] = []
+  if (whatsappHref) contactItems.push({ key: "whatsapp", label: "WhatsApp", href: whatsappHref, external: true })
+  if (phoneHref && SITE.phoneDisplay) contactItems.push({ key: "phone", label: SITE.phoneDisplay, href: phoneHref })
+  if (SITE.tradeEmail) contactItems.push({ key: "email", label: SITE.tradeEmail, href: `mailto:${SITE.tradeEmail}` })
 
   return (
-    <footer className="bg-[#0A0A0A] text-[#F5F5F7] border-t border-[#26262E] py-16">
-      <div className="container mx-auto px-4 md:px-6">
-        <div className="flex flex-col items-center text-center">
-          
-          {/* Minimal Brand Mark */}
-          <div className="mb-8 flex items-center justify-center">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-neutral-900 border border-neutral-800 flex items-center justify-center text-white font-bold text-sm tracking-wider font-mono">
-                F
-              </div>
-              <div className="text-left">
-                <span className="text-xs font-semibold uppercase tracking-[0.22em] text-neutral-200 block">FORGED</span>
-                <span className="text-[10px] text-neutral-500 uppercase tracking-widest block">Custom Wheels</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Navigation Links */}
-          <nav className="mb-8 flex flex-wrap justify-center items-center gap-6 text-xs text-neutral-400">
-            {useBrandLinks && onNavigate ? (
-              <>
-                <Link
-                  to="/#catalogue"
-                  className="hover:text-white transition-colors cursor-pointer"
-                >
-                  Catalogue
-                </Link>
-                <Link
-                  to="/sixnine-wheels"
-                  className="hover:text-white transition-colors cursor-pointer"
-                >
-                  Official Dealer of Sixnine Wheels
-                </Link>
-                <Link
-                  to="/client-fitments"
-                  className="hover:text-white transition-colors cursor-pointer"
-                >
-                  Installations
-                </Link>
-                <Link
-                  to="/dealer-application"
-                  className="hover:text-white transition-colors cursor-pointer"
-                >
-                  Dealer Application
-                </Link>
-                <Link
-                  to="/store"
-                  className="hover:text-white transition-colors cursor-pointer flex items-center gap-1.5"
-                >
-                  <span>Vehicle Configurator</span>
-                  <ArrowUpRight className="w-3 h-3 text-neutral-500" />
-                </Link>
-                <Link
-                  to="/privacy-policy"
-                  className="hover:text-white transition-colors cursor-pointer"
-                >
-                  Privacy
-                </Link>
-              </>
-            ) : (
-              <>
-                <a href="#" className="hover:text-white transition-colors">Home</a>
-                <a href="#catalogue" className="hover:text-white transition-colors">Collection</a>
-                <a href="/client-fitments" className="hover:text-white transition-colors">Fitments</a>
-                <a href="/privacy-policy" className="hover:text-white transition-colors">Privacy</a>
-              </>
-            )}
-          </nav>
-
-          {/* Social Icons: rendered only for channels configured in src/config/site.ts */}
-          {(SITE.facebookUrl || SITE.instagramUrl) && (
-            <div className="mb-8 flex space-x-3">
-              {SITE.facebookUrl && (
-                <a
-                  href={SITE.facebookUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="FORGED Custom Wheels on Facebook"
-                  className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-neutral-900/60 border border-neutral-800 text-neutral-400 hover:text-white hover:border-neutral-700 hover:bg-neutral-800 transition-colors"
-                >
-                  <Facebook className="h-3.5 w-3.5" />
-                </a>
-              )}
-              {SITE.instagramUrl && (
-                <a
-                  href={SITE.instagramUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="FORGED Custom Wheels on Instagram"
-                  className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-neutral-900/60 border border-neutral-800 text-neutral-400 hover:text-white hover:border-neutral-700 hover:bg-neutral-800 transition-colors"
-                >
-                  <Instagram className="h-3.5 w-3.5" />
-                </a>
-              )}
-            </div>
-          )}
-
-          {/* Email Subscription Form */}
-          <div className="mb-8 w-full max-w-sm">
-            {subscribed ? (
-              <div className="p-2.5 bg-neutral-900/80 border border-neutral-800 text-neutral-300 text-xs font-mono rounded-lg flex items-center justify-center gap-2">
-                <CheckCircle2 className="w-3.5 h-3.5 text-neutral-400" />
-                <span>Thank you for subscribing.</span>
-              </div>
-            ) : (
-              <form onSubmit={handleSubscribe} className="flex gap-2">
-                <div className="flex-grow">
-                  <Label htmlFor="email" className="sr-only">Email</Label>
-                  <Input
-                    id="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter email for allocation alerts"
-                    type="email"
-                    required
-                    className="h-9 text-xs rounded-lg bg-neutral-900/80 border-neutral-800 text-white placeholder:text-neutral-500 focus-visible:ring-1 focus-visible:ring-neutral-600 focus-visible:border-neutral-600"
-                  />
-                </div>
-                <Button
-                  type="submit"
-                  className="h-9 px-4 rounded-lg bg-white text-black hover:bg-neutral-200 text-xs font-medium cursor-pointer transition-colors"
-                >
-                  Join
-                </Button>
-              </form>
-            )}
-          </div>
-
-          {/* Copyright */}
-          <div className="text-center">
-            <p className="text-[11px] font-mono text-neutral-600">
-              © {new Date().getFullYear()} FORGED Custom Wheels. All rights reserved.
-            </p>
-          </div>
+    <footer className="bg-[#0A0A0A] text-[#F5F5F7] border-t border-[#26262E]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 py-12 grid gap-10 md:grid-cols-[1fr_auto_auto] md:gap-16">
+        <div className="space-y-3">
+          <Link to="/" aria-label="FORGED Custom Wheels, home" className="inline-flex items-center min-h-11">
+            <LogoPlaceholder variant="dark" />
+          </Link>
+          <p className="text-sm text-neutral-400 max-w-xs">
+            Forged wheels for BMW M cars, supplied in {SITE.country}.
+          </p>
         </div>
+
+        {/* Side by side on a phone so the footer stays short */}
+        <div className="grid grid-cols-2 gap-6 md:contents">
+        <nav aria-label="Footer">
+          <ul>
+            {FOOTER_LINKS.map((item) => (
+              <li key={item.to}>
+                <Link to={item.to} className={linkClass}>
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        {(contactItems.length > 0 || SITE.addressLine || SITE.instagramUrl || SITE.facebookUrl) && (
+          <div>
+            <ul>
+              {contactItems.map((item) => (
+                <li key={item.key}>
+                  <a
+                    href={item.href}
+                    {...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                    className={linkClass}
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+              {SITE.instagramUrl && (
+                <li>
+                  <a
+                    href={SITE.instagramUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`${linkClass} gap-2`}
+                  >
+                    <Instagram aria-hidden="true" className="w-4 h-4" />
+                    Instagram
+                  </a>
+                </li>
+              )}
+              {SITE.facebookUrl && (
+                <li>
+                  <a
+                    href={SITE.facebookUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`${linkClass} gap-2`}
+                  >
+                    <Facebook aria-hidden="true" className="w-4 h-4" />
+                    Facebook
+                  </a>
+                </li>
+              )}
+            </ul>
+            {SITE.addressLine && (
+              <p className="mt-2 text-sm text-neutral-400 max-w-xs">{SITE.addressLine}</p>
+            )}
+          </div>
+        )}
+        </div>
+      </div>
+
+      <div className="border-t border-[#1E1E26]">
+        <p className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 py-5 text-xs text-neutral-500">
+          © {new Date().getFullYear()} {SITE.name}
+        </p>
       </div>
     </footer>
   )

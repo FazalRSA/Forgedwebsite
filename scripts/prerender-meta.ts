@@ -7,7 +7,7 @@
  * same app shell; the browser loads the app as usual.
  *
  * Output: dist/<path>.html for every path in the sitemap except the home page, e.g.
- * dist/wheels/fsa002-gold.html. Hosts that serve "clean URLs" return that file for
+ * dist/wheels/fsa002-gold.html and dist/installs.html. Hosts that serve "clean URLs" return that file for
  * /wheels/fsa002-gold; hosts that do not fall back to the single-page rewrite, as before.
  *
  * dist/index.html is left untouched on purpose: it is also the fallback served for every

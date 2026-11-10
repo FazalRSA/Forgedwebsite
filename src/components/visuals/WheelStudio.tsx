@@ -2,7 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { ChevronDown, ChevronUp, AlertTriangle, Loader2 } from 'lucide-react';
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+import { AlertTriangle, Loader2, X } from 'lucide-react';
 import { WHEEL_FINISHES, type WheelFinishId } from '../../data/catalogue';
 import { getStudioFinish } from '../../data/studioFinishes';
 import {
@@ -11,6 +12,8 @@ import {
   cameraDistanceScale,
   classifyStudioPart,
   explodeOffsets,
+  isMatteFinishName,
+  prefersReducedMotion,
   type StudioPart,
 } from '../../utils/wheelStudioParts';
 
@@ -18,9 +21,13 @@ import {
  * 3D wheel studio for wheels that have a real .glb model.
  *
  * A light product-photography stage: studio reflections built in code (no HDR download),
- * a soft contact shadow, physically based paint finishes, fixed camera views, an exploded
- * view and, when the model carries brake meshes, a brake clearance check that ghosts the
- * barrel. Wheels with a second model (staggered rear size) get a Front / Rear switch.
+ * a soft contact shadow, physically based paint, fixed camera views, and a Front / Rear switch for
+ * wheels with a second model. The wheel pages mount it only after the visitor taps "View in 3D".
+ *
+ * The default (simple) stage is for customers: views, Front / Rear, a visible "Close 3D" button.
+ * `advanced` adds the exploded, wireframe and brake-check toggles used on the unlisted /studio preview.
+ *
+ * GLBs are meshopt-compressed (see public/models/wheels/README.md), so the loader gets the decoder.
  */
 
 export type StudioViewId = 'face' | 'three' | 'side' | 'back' | 'top';
@@ -47,21 +54,32 @@ export const DEFAULT_STUDIO_TOGGLES: StudioToggles = {
 
 export interface WheelStudioProps {
   wheelModel: string;
-  wheelSeries: string;
+  /** Shown under the name on the advanced stage only. */
+  wheelSeries?: string;
   selectedFinish: WheelFinishId;
+  /**
+   * The paint choices offered. A single entry shows no finish row, which is how the wheel pages
+   * keep the stage to the finish that is actually in stock.
+   */
   availableFinishes: WheelFinishId[];
   onSelectFinish: (finish: WheelFinishId) => void;
-  onEnquire?: () => void;
-  userVehicleLabel?: string | null;
+  /** The wheel's own finish name, e.g. "Black Matte"; a matte name gives the paint a matte sheen. */
+  finishName?: string;
   /** Served path to the wheel's .glb, e.g. "/models/wheels/stf399-front.glb". */
   modelUrl: string;
   /** Optional second model for the rear axle of a staggered set. */
   rearModelUrl?: string | null;
-  /** One-line spec shown in the badge, e.g. "19 × 9.5 · ET 17 · 5×112". */
+  /** One-line spec shown in the badge on the advanced stage, e.g. "19 × 9.5 · ET 17 · 5×112". */
   specFront?: string;
   specRear?: string;
   initialView?: StudioViewId;
   initialToggles?: Partial<StudioToggles>;
+  /** Shows a visible "Close 3D" button (and closes on Escape) when given. */
+  onClose?: () => void;
+  /** Adds the exploded, wireframe, brake and other toggles. */
+  advanced?: boolean;
+  /** Tailwind sizing for the stage. */
+  className?: string;
 }
 
 interface LoadedModelInfo {
@@ -72,7 +90,7 @@ interface LoadedModelInfo {
 
 interface StudioEngine {
   load: (url: string) => void;
-  setFinish: (finishId: WheelFinishId) => void;
+  setFinish: (finishId: WheelFinishId, finishName?: string) => void;
   setToggles: (toggles: StudioToggles) => void;
   goView: (view: StudioViewId, instant?: boolean) => void;
   /** Height in CSS pixels of the control panel covering the bottom of the stage. */
@@ -155,7 +173,12 @@ function buildStudioEnvironment(renderer: THREE.WebGLRenderer): THREE.Texture {
   return texture;
 }
 
-function createStudioEngine(mount: HTMLDivElement, callbacks: EngineCallbacks): StudioEngine {
+function createStudioEngine(
+  mount: HTMLDivElement,
+  callbacks: EngineCallbacks,
+  options: { ariaLabel: string }
+): StudioEngine {
+  const reduceMotion = prefersReducedMotion();
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -164,7 +187,11 @@ function createStudioEngine(mount: HTMLDivElement, callbacks: EngineCallbacks): 
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.domElement.style.display = 'block';
+  // Dragging the picture must not scroll the page. This is safe because the engine only exists
+  // after the visitor has tapped "View in 3D"; the Close 3D button leaves it again.
   renderer.domElement.style.touchAction = 'none';
+  renderer.domElement.setAttribute('role', 'img');
+  renderer.domElement.setAttribute('aria-label', options.ariaLabel);
   mount.appendChild(renderer.domElement);
 
   const scene = new THREE.Scene();
@@ -173,19 +200,20 @@ function createStudioEngine(mount: HTMLDivElement, callbacks: EngineCallbacks): 
 
   const camera = new THREE.PerspectiveCamera(32, 1, 0.02, 20);
   const controls = new OrbitControls(camera, renderer.domElement);
-  controls.enableDamping = true;
+  controls.enableDamping = !reduceMotion;
   controls.dampingFactor = 0.08;
   controls.minDistance = 0.35;
   controls.maxDistance = 4;
   controls.maxPolarAngle = Math.PI * 0.62;
   controls.enablePan = false;
-  controls.autoRotate = true;
+  controls.autoRotate = !reduceMotion;
   controls.autoRotateSpeed = 1.2;
 
   const keyLight = new THREE.DirectionalLight(0xffffff, 3.2);
   keyLight.position.set(1.2, 2.2, 1.0);
   keyLight.castShadow = true;
-  keyLight.shadow.mapSize.set(2048, 2048);
+  const shadowSize = window.innerWidth < 768 ? 1024 : 2048; // lighter on phones
+  keyLight.shadow.mapSize.set(shadowSize, shadowSize);
   keyLight.shadow.camera.left = -0.9;
   keyLight.shadow.camera.right = 0.9;
   keyLight.shadow.camera.top = 0.9;
@@ -207,13 +235,18 @@ function createStudioEngine(mount: HTMLDivElement, callbacks: EngineCallbacks): 
   // Paint materials: barrel is separate from face so the brake check can ghost it alone.
   const barrelMat = new THREE.MeshPhysicalMaterial();
   const faceMat = new THREE.MeshPhysicalMaterial();
-  const applyFinishTo = (mat: THREE.MeshPhysicalMaterial, finishId: WheelFinishId) => {
+  const applyFinishTo = (
+    mat: THREE.MeshPhysicalMaterial,
+    finishId: WheelFinishId,
+    finishName?: string
+  ) => {
     const f = getStudioFinish(finishId);
+    const matte = isMatteFinishName(finishName);
     mat.color.set(f.hex);
-    mat.metalness = f.metalness;
-    mat.roughness = f.roughness;
-    mat.clearcoat = f.clearcoat;
-    mat.clearcoatRoughness = f.clearcoatRoughness;
+    mat.metalness = matte ? Math.min(f.metalness, 0.2) : f.metalness;
+    mat.roughness = matte ? Math.max(f.roughness, 0.6) : f.roughness;
+    mat.clearcoat = matte ? Math.min(f.clearcoat, 0.05) : f.clearcoat;
+    mat.clearcoatRoughness = matte ? 0.6 : f.clearcoatRoughness;
     mat.envMapIntensity = f.envMapIntensity;
     mat.needsUpdate = true;
   };
@@ -230,10 +263,12 @@ function createStudioEngine(mount: HTMLDivElement, callbacks: EngineCallbacks): 
   }
 
   const loader = new GLTFLoader();
+  loader.setMeshoptDecoder(MeshoptDecoder);
   const modelCache = new Map<string, THREE.Group>();
   let rig: Rig | null = null;
   let loadToken = 0;
   let currentFinish: WheelFinishId = 'silver';
+  let currentFinishName: string | undefined;
   let toggles: StudioToggles = { ...DEFAULT_STUDIO_TOGGLES };
   let currentView: StudioViewId = 'three';
   let explodeNow = 0;
@@ -299,7 +334,7 @@ function createStudioEngine(mount: HTMLDivElement, callbacks: EngineCallbacks): 
     rig.ownMaterials.forEach((m) => {
       if ('wireframe' in m) (m as THREE.MeshStandardMaterial).wireframe = toggles.wire;
     });
-    controls.autoRotate = toggles.orbit;
+    controls.autoRotate = toggles.orbit && !reduceMotion;
   };
 
   const viewPose = (view: StudioViewId) => {
@@ -328,7 +363,7 @@ function createStudioEngine(mount: HTMLDivElement, callbacks: EngineCallbacks): 
     currentView = view;
     if (!rig) return;
     const pose = viewPose(view);
-    if (instant) {
+    if (instant || reduceMotion) {
       tween = null;
       camera.position.copy(pose.pos);
       controls.target.copy(pose.target);
@@ -411,8 +446,8 @@ function createStudioEngine(mount: HTMLDivElement, callbacks: EngineCallbacks): 
     removeRig();
     const diameter = Math.max(size.x, size.y, size.z);
     rig = { spinGroup, staticGroup, parts, homes, ownMaterials, axis, centre, diameter };
-    applyFinishTo(barrelMat, currentFinish);
-    applyFinishTo(faceMat, currentFinish);
+    applyFinishTo(barrelMat, currentFinish, currentFinishName);
+    applyFinishTo(faceMat, currentFinish, currentFinishName);
     applyToggles();
     explodeNow = toggles.explode ? 1 : 0;
     applyExplode();
@@ -504,7 +539,9 @@ function createStudioEngine(mount: HTMLDivElement, callbacks: EngineCallbacks): 
     }
     const explodeTarget = toggles.explode ? 1 : 0;
     if (Math.abs(explodeTarget - explodeNow) > 0.001) {
-      explodeNow += (explodeTarget - explodeNow) * Math.min(1, dt * 6);
+      explodeNow = reduceMotion
+        ? explodeTarget
+        : explodeNow + (explodeTarget - explodeNow) * Math.min(1, dt * 6);
       applyExplode();
     }
     if (rig && toggles.spin) rig.spinGroup.rotateOnWorldAxis(rig.axis, -dt * 1.6);
@@ -516,10 +553,11 @@ function createStudioEngine(mount: HTMLDivElement, callbacks: EngineCallbacks): 
   return {
     load,
     goView,
-    setFinish: (finishId) => {
+    setFinish: (finishId, finishName) => {
       currentFinish = finishId;
-      applyFinishTo(barrelMat, finishId);
-      applyFinishTo(faceMat, finishId);
+      currentFinishName = finishName;
+      applyFinishTo(barrelMat, finishId, finishName);
+      applyFinishTo(faceMat, finishId, finishName);
     },
     setToggles: (next) => {
       toggles = { ...next };
@@ -565,7 +603,7 @@ function createStudioEngine(mount: HTMLDivElement, callbacks: EngineCallbacks): 
 }
 
 const chipBase =
-  'shrink-0 whitespace-nowrap rounded-full border px-3 py-1.5 text-[13px] leading-none transition-colors cursor-pointer';
+  'shrink-0 whitespace-nowrap rounded-full border px-4 min-h-[44px] text-sm leading-none transition-colors cursor-pointer';
 const chipOff = 'border-black/10 bg-white/70 text-[#14161a] hover:bg-white';
 const chipOn = 'border-[#14161a] bg-[#14161a] text-white';
 
@@ -575,14 +613,16 @@ export const WheelStudio: React.FC<WheelStudioProps> = ({
   selectedFinish,
   availableFinishes,
   onSelectFinish,
-  onEnquire,
-  userVehicleLabel,
+  finishName,
   modelUrl,
   rearModelUrl,
   specFront,
   specRear,
   initialView = 'three',
   initialToggles,
+  onClose,
+  advanced = false,
+  className = 'h-[76vh] min-h-[540px] max-h-[860px]',
 }) => {
   const mountRef = useRef<HTMLDivElement | null>(null);
   const panelRef = useRef<HTMLDivElement | null>(null);
@@ -590,11 +630,11 @@ export const WheelStudio: React.FC<WheelStudioProps> = ({
 
   const [axle, setAxle] = useState<'front' | 'rear'>('front');
   const [view, setView] = useState<StudioViewId>(initialView);
-  const [toggles, setToggles] = useState<StudioToggles>({
+  const [toggles, setToggles] = useState<StudioToggles>(() => ({
     ...DEFAULT_STUDIO_TOGGLES,
+    orbit: !prefersReducedMotion(),
     ...initialToggles,
-  });
-  const [collapsed, setCollapsed] = useState(false);
+  }));
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<LoadedModelInfo | null>(null);
@@ -609,21 +649,25 @@ export const WheelStudio: React.FC<WheelStudioProps> = ({
     if (!mount) return;
     let engine: StudioEngine;
     try {
-      engine = createStudioEngine(mount, {
-        onLoaded: (loaded) => {
-          setInfo(loaded);
-          setLoading(false);
-          setError(null);
+      engine = createStudioEngine(
+        mount,
+        {
+          onLoaded: (loaded) => {
+            setInfo(loaded);
+            setLoading(false);
+            setError(null);
+          },
+          onError: (message) => {
+            setError(message);
+            setLoading(false);
+          },
+          onUserDrag: () => {
+            setHintVisible(false);
+            setToggles((t) => (t.orbit ? { ...t, orbit: false } : t));
+          },
         },
-        onError: (message) => {
-          setError(message);
-          setLoading(false);
-        },
-        onUserDrag: () => {
-          setHintVisible(false);
-          setToggles((t) => (t.orbit ? { ...t, orbit: false } : t));
-        },
-      });
+        { ariaLabel: `Interactive 3D view of ${wheelModel}. Drag to rotate, pinch to zoom.` }
+      );
     } catch (err) {
       console.error('WheelStudio: WebGL is not available', err);
       setError('3D view is not available on this device.');
@@ -647,7 +691,7 @@ export const WheelStudio: React.FC<WheelStudioProps> = ({
       engine.dispose();
       engineRef.current = null;
     };
-    // initialView is read once on mount by design
+    // initialView and the label are read once on mount by design
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -661,8 +705,8 @@ export const WheelStudio: React.FC<WheelStudioProps> = ({
   }, [activeUrl, retryCount]);
 
   useEffect(() => {
-    engineRef.current?.setFinish(selectedFinish);
-  }, [selectedFinish]);
+    engineRef.current?.setFinish(selectedFinish, finishName);
+  }, [selectedFinish, finishName]);
 
   useEffect(() => {
     engineRef.current?.setToggles(toggles);
@@ -681,114 +725,102 @@ export const WheelStudio: React.FC<WheelStudioProps> = ({
 
   return (
     <div
-      className="relative w-full h-[76vh] min-h-[540px] max-h-[860px] border border-[#26262E] rounded-3xl overflow-hidden select-none text-[#14161a]"
+      className={`relative w-full overflow-hidden rounded-2xl border border-[#26262E] select-none text-[#14161a] ${className}`}
       style={{
         background: 'radial-gradient(120% 90% at 50% 35%, #f6f7f9 0%, #e3e6eb 60%, #cfd3da 100%)',
       }}
+      onKeyDown={(e) => {
+        if (e.key === 'Escape' && onClose) onClose();
+      }}
     >
-      <div
-        ref={mountRef}
-        role="img"
-        aria-label={`Interactive 3D view of ${wheelModel}`}
-        className="absolute inset-0 cursor-grab active:cursor-grabbing"
-      />
+      <div ref={mountRef} className="absolute inset-0 cursor-grab active:cursor-grabbing" />
 
-      {/* Title and spec badge */}
-      <div className="absolute top-0 inset-x-0 z-10 flex items-start justify-between gap-3 p-4 pointer-events-none">
-        <div className="min-w-0">
-          <div className="text-lg font-bold tracking-wide truncate">{wheelModel}</div>
-          <div className="hidden sm:block text-xs text-neutral-500 mt-0.5 truncate">{wheelSeries}</div>
-          {userVehicleLabel && (
-            <div className="mt-1.5 inline-block rounded-lg border border-[#FF5500]/40 bg-white/80 px-2 py-1 text-[11px] font-mono text-[#c2410c]">
-              Matched to your Garage: {userVehicleLabel}
-            </div>
+      {/* Name, spec badge (advanced only) and the always-visible Close 3D button */}
+      <div className="absolute top-0 inset-x-0 z-40 flex items-start justify-between gap-3 p-3 pointer-events-none">
+        <div className="min-w-0 pt-2 pl-1">
+          <div className="text-sm font-semibold tracking-wide truncate">{wheelModel}</div>
+          {advanced && wheelSeries && (
+            <div className="text-xs text-neutral-500 mt-0.5 truncate">{wheelSeries}</div>
           )}
         </div>
-        {(specLine || info) && (
-          <div className="shrink-0 rounded-xl border border-black/10 bg-white/85 backdrop-blur px-2.5 py-2 text-right text-[11px] leading-relaxed text-neutral-500">
-            {specLine && (
-              <div>
-                {rearModelUrl && (
-                  <b className="font-semibold text-[#14161a]">{axle === 'rear' ? 'Rear ' : 'Front '}</b>
-                )}
-                {specLine}
-              </div>
-            )}
-            {info && (
-              <div>
-                Model: ⌀{info.diameterMm} × {info.widthMm} mm
-              </div>
-            )}
-          </div>
-        )}
+        <div className="flex items-start gap-2 shrink-0">
+          {advanced && (specLine || info) && (
+            <div className="rounded-xl border border-black/10 bg-white/85 backdrop-blur px-2.5 py-2 text-right text-[11px] leading-relaxed text-neutral-500">
+              {specLine && (
+                <div>
+                  {rearModelUrl && (
+                    <b className="font-semibold text-[#14161a]">{axle === 'rear' ? 'Rear ' : 'Front '}</b>
+                  )}
+                  {specLine}
+                </div>
+              )}
+              {info && (
+                <div>
+                  Model: ⌀{info.diameterMm} × {info.widthMm} mm
+                </div>
+              )}
+            </div>
+          )}
+          {onClose && (
+            <button
+              type="button"
+              onClick={onClose}
+              autoFocus
+              className="pointer-events-auto inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-[#14161a] px-4 text-sm font-semibold text-white shadow-md cursor-pointer hover:bg-black"
+            >
+              <X className="w-4 h-4" aria-hidden="true" />
+              Close 3D
+            </button>
+          )}
+        </div>
       </div>
 
       {hintVisible && !loading && !error && (
-        <div className="hidden sm:block absolute inset-x-0 top-16 z-10 text-center text-xs text-neutral-500 pointer-events-none">
-          Drag to rotate · pinch or scroll to zoom
+        <div className="absolute inset-x-0 top-16 z-10 text-center text-xs text-neutral-500 pointer-events-none">
+          Drag to rotate · pinch to zoom
         </div>
       )}
 
       {/* Controls */}
       <div
         ref={panelRef}
-        className="absolute inset-x-2 bottom-2 z-20 mx-auto max-w-3xl rounded-2xl border border-black/10 bg-white/85 backdrop-blur-md shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden">
-        <div className="flex items-center justify-between gap-3 px-3.5 py-2.5">
-          <div className="flex items-center gap-2">
-            {rearModelUrl && (
-              <div className="inline-flex rounded-full bg-black/[0.07] p-[3px]" role="group" aria-label="Axle">
-                {(['front', 'rear'] as const).map((a) => (
-                  <button
-                    key={a}
-                    type="button"
-                    aria-pressed={axle === a}
-                    onClick={() => setAxle(a)}
-                    className={`rounded-full px-4 py-1.5 text-[13px] font-semibold cursor-pointer transition-colors ${
-                      axle === a ? 'bg-[#14161a] text-white' : 'text-[#14161a]'
-                    }`}
-                  >
-                    {a === 'front' ? 'Front' : 'Rear'}
-                  </button>
-                ))}
-              </div>
-            )}
-            {onEnquire && (
-              <button
-                type="button"
-                onClick={onEnquire}
-                className="rounded-full bg-[#FF5500] hover:bg-[#FF6B1A] px-4 py-1.5 text-[13px] font-semibold text-white cursor-pointer transition-colors"
-              >
-                Enquire
-              </button>
-            )}
-          </div>
-          <button
-            type="button"
-            onClick={() => setCollapsed((c) => !c)}
-            aria-expanded={!collapsed}
-            className="inline-flex items-center gap-1 text-xs text-neutral-500 cursor-pointer"
-          >
-            Controls {collapsed ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-          </button>
-        </div>
-
-        {!collapsed && (
-          <div className="px-3.5 pb-3 max-h-[42vh] overflow-y-auto">
-            <ControlRow label="View">
-              {VIEWS.map((v) => (
+        role="group"
+        aria-label="3D view controls"
+        className="absolute inset-x-2 bottom-2 z-20 mx-auto max-w-3xl rounded-2xl border border-black/10 bg-white/90 backdrop-blur-md shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden"
+      >
+        <div className="px-2.5 py-2 space-y-1.5 max-h-[42vh] overflow-y-auto">
+          {rearModelUrl && (
+            <ControlRow label="Wheel" showLabel={advanced}>
+              {(['front', 'rear'] as const).map((a) => (
                 <button
-                  key={v.id}
+                  key={a}
                   type="button"
-                  aria-pressed={view === v.id}
-                  onClick={() => chooseView(v.id)}
-                  className={`${chipBase} ${view === v.id ? chipOn : chipOff}`}
+                  aria-pressed={axle === a}
+                  onClick={() => setAxle(a)}
+                  className={`${chipBase} ${axle === a ? chipOn : chipOff}`}
                 >
-                  {v.label}
+                  {a === 'front' ? 'Front' : 'Rear'}
                 </button>
               ))}
             </ControlRow>
+          )}
 
-            <ControlRow label="Finish">
+          <ControlRow label="View" showLabel={advanced}>
+            {VIEWS.map((v) => (
+              <button
+                key={v.id}
+                type="button"
+                aria-pressed={view === v.id}
+                onClick={() => chooseView(v.id)}
+                className={`${chipBase} ${view === v.id ? chipOn : chipOff}`}
+              >
+                {v.label}
+              </button>
+            ))}
+          </ControlRow>
+
+          {availableFinishes.length > 1 && (
+            <ControlRow label="Finish" showLabel={advanced}>
               {availableFinishes.map((id) => {
                 const finish = WHEEL_FINISHES[id];
                 if (!finish) return null;
@@ -811,8 +843,10 @@ export const WheelStudio: React.FC<WheelStudioProps> = ({
                 );
               })}
             </ControlRow>
+          )}
 
-            <ControlRow label="Show">
+          {advanced && (
+            <ControlRow label="Show" showLabel>
               {visibleToggles.map((t) => (
                 <button
                   key={t.id}
@@ -830,21 +864,27 @@ export const WheelStudio: React.FC<WheelStudioProps> = ({
                 </button>
               ))}
             </ControlRow>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {loading && !error && (
-        <div className="absolute inset-0 z-30 flex items-center justify-center bg-[#f0f2f5]/90">
+        <div
+          role="status"
+          className="absolute inset-0 z-30 flex items-center justify-center bg-[#f0f2f5]/90"
+        >
           <div className="flex items-center gap-2 text-sm font-semibold tracking-wide text-neutral-600">
-            <Loader2 className="w-4 h-4 animate-spin text-[#FF5500]" />
+            <Loader2 className="w-4 h-4 animate-spin motion-reduce:animate-none text-[#FF5500]" />
             Loading wheel…
           </div>
         </div>
       )}
 
       {error && (
-        <div className="absolute inset-0 z-30 flex items-center justify-center bg-[#f0f2f5]/95 px-6">
+        <div
+          role="alert"
+          className="absolute inset-0 z-30 flex items-center justify-center bg-[#f0f2f5]/95 px-6"
+        >
           <div className="flex flex-col items-center gap-3 text-center">
             <AlertTriangle className="w-6 h-6 text-[#FF5500]" />
             <p className="text-sm text-neutral-700 max-w-xs">{error}</p>
@@ -852,7 +892,7 @@ export const WheelStudio: React.FC<WheelStudioProps> = ({
               <button
                 type="button"
                 onClick={() => setRetryCount((n) => n + 1)}
-                className="rounded-full border border-black/15 bg-white px-4 py-1.5 text-[13px] cursor-pointer hover:bg-neutral-50"
+                className="rounded-full border border-black/15 bg-white px-5 min-h-[44px] text-sm cursor-pointer hover:bg-neutral-50"
               >
                 Try again
               </button>
@@ -864,9 +904,17 @@ export const WheelStudio: React.FC<WheelStudioProps> = ({
   );
 };
 
-const ControlRow: React.FC<{ label: string; children: React.ReactNode }> = ({ label, children }) => (
-  <div className="flex items-center gap-2 mt-2">
-    <div className="w-12 sm:w-14 shrink-0 text-[11px] uppercase tracking-wider text-neutral-500">{label}</div>
+const ControlRow: React.FC<{ label: string; showLabel: boolean; children: React.ReactNode }> = ({
+  label,
+  showLabel,
+  children,
+}) => (
+  <div className="flex items-center gap-2">
+    {showLabel && (
+      <div className="w-12 sm:w-14 shrink-0 text-[11px] uppercase tracking-wider text-neutral-500">
+        {label}
+      </div>
+    )}
     <div className="flex min-w-0 flex-1 gap-1.5 overflow-x-auto sm:flex-wrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       {children}
     </div>

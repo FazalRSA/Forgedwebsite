@@ -1,329 +1,145 @@
 import React, { useEffect, useRef, useState } from 'react';
-import {
-  ArrowUpRight,
-  ChevronDown,
-  X,
-  Layers,
-  Disc3,
-  Car,
-  User as UserIcon,
-} from 'lucide-react';
-import { Link } from '../../utils/router';
-import { displayAddress } from '../../config/site';
-import { useForgedStore } from '../../store/useForgedStore';
-import { useFirebaseAuth } from '../../context/FirebaseContext';
+import { Menu, X } from 'lucide-react';
+import { Link, useRouter } from '../../utils/router';
 import { LogoPlaceholder } from '../shared/LogoPlaceholder';
+import { ContactCta } from './ContactCta';
 
 interface BrandHeaderProps {
+  /** Kept so existing callers still compile; the header has one look. */
   forceLight?: boolean;
 }
 
+const NAV_ITEMS = [
+  { label: 'Wheels', to: '/#catalogue' },
+  { label: 'Installs', to: '/installs' },
+  { label: 'Contact', to: '/contact' },
+] as const;
+
+const HEADER_MESSAGE = "Hi, I'd like to ask about your wheels.";
+
+const HEADER_CTA_CLASS =
+  'inline-flex items-center justify-center gap-2 min-h-11 px-4 sm:px-5 rounded-full bg-[#FF5500] text-white text-sm font-medium hover:bg-[#FF6B1A] transition-colors cursor-pointer whitespace-nowrap';
+
 export const BrandHeader: React.FC<BrandHeaderProps> = () => {
-  const { openEnquiryModal } = useForgedStore();
-  const { user, profile } = useFirebaseAuth();
+  const { pathname } = useRouter();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const toggleRef = useRef<HTMLButtonElement | null>(null);
+  const menuRef = useRef<HTMLElement | null>(null);
 
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [wheelsDropdownOpen, setWheelsDropdownOpen] = useState(false);
-  const [drawerWheelsExpanded, setDrawerWheelsExpanded] = useState(true);
-
-  const dropdownRef = useRef<HTMLDivElement | null>(null);
-  const drawerRef = useRef<HTMLDivElement | null>(null);
-
-  // Close dropdown on outside click
+  // A new page always starts with the menu shut.
   useEffect(() => {
-    const handleOutsideClick = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setWheelsDropdownOpen(false);
+    setMenuOpen(false);
+  }, [pathname]);
+
+  // Escape closes the menu and hands focus back to the button that opened it.
+  useEffect(() => {
+    if (!menuOpen) return;
+    // Move focus into the menu so keyboard and screen reader users land on it.
+    menuRef.current?.querySelector('a')?.focus();
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setMenuOpen(false);
+        toggleRef.current?.focus();
       }
     };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [menuOpen]);
 
-    if (wheelsDropdownOpen) {
-      document.addEventListener('mousedown', handleOutsideClick);
-    }
-    return () => {
-      document.removeEventListener('mousedown', handleOutsideClick);
-    };
-  }, [wheelsDropdownOpen]);
-
-  // Lock body scroll when drawer is open & handle Esc key
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setDrawerOpen(false);
-        setWheelsDropdownOpen(false);
-      }
-    };
-
-    if (drawerOpen) {
-      document.body.style.overflow = 'hidden';
-      window.addEventListener('keydown', handleKeyDown);
-    } else {
-      document.body.style.overflow = '';
-    }
-
-    return () => {
-      document.body.style.overflow = '';
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [drawerOpen]);
-
-  const closeMenus = () => {
-    setDrawerOpen(false);
-    setWheelsDropdownOpen(false);
+  // Wheels is the current section on the home page and on every wheel page.
+  const isCurrent = (to: string) => {
+    if (to === '/#catalogue') return pathname === '/' || pathname.startsWith('/wheels/');
+    return pathname === to || pathname.startsWith(`${to}/`);
   };
+
+  const closeMenu = () => setMenuOpen(false);
+
+  const linkClass = (to: string) =>
+    `inline-flex items-center min-h-11 px-3 text-sm font-medium transition-colors ${
+      isCurrent(to) ? 'text-white' : 'text-[#C2C2CC] hover:text-white'
+    }`;
 
   return (
     <>
-      <header className="sticky top-0 z-50 h-16 px-6 md:px-10 flex items-center justify-between gap-6 bg-[#0A0A0A]/95 backdrop-blur-md text-[#F5F5F7] border-b border-[#26262E]">
-        {/* Left: Brand Logo Wireframe */}
+      <header className="sticky top-0 z-50 h-16 px-4 sm:px-6 md:px-10 flex items-center justify-between gap-3 bg-[#0A0A0A] text-[#F5F5F7] border-b border-[#26262E]">
         <Link
           to="/"
-          onClick={closeMenus}
-          aria-label="FORGED Custom wheels Home"
-          className="shrink-0 cursor-pointer text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#FF5500] flex items-center gap-3"
+          onClick={closeMenu}
+          aria-label="FORGED Custom Wheels, home"
+          className="shrink-0 inline-flex items-center min-h-11"
         >
-          <LogoPlaceholder label="IMAGE PLACEHOLDER · LOGO" variant="dark" />
+          <LogoPlaceholder variant="dark" />
         </Link>
 
-        {/* Center / Primary Navigation Controls */}
-        <div className="flex items-center gap-4 sm:gap-6">
-          {/* Direct Wheel Catalogue Link */}
-          <Link
-            to="/#catalogue"
-            onClick={closeMenus}
-            className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-[#F5F5F7] hover:text-[#FF5500] transition-colors cursor-pointer"
-          >
-            <Disc3 className="w-3.5 h-3.5 text-[#FF5500] shrink-0" />
-            <span>Wheel Catalogue</span>
-          </Link>
+        <div className="flex items-center gap-1 sm:gap-2">
+          {/* Desktop links */}
+          <nav aria-label="Main" className="hidden md:flex items-center gap-1 mr-3">
+            {NAV_ITEMS.map((item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                aria-current={isCurrent(item.to) ? 'page' : undefined}
+                className={linkClass(item.to)}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
 
-          {/* Client Fitments Link (Desktop) */}
-          <Link
-            to="/client-fitments"
-            onClick={closeMenus}
-            className="hidden md:inline-flex text-xs sm:text-sm font-medium text-[#C2C2CC] hover:text-[#FF5500] transition-colors cursor-pointer"
-          >
-            Client Fitments
-          </Link>
-
-          {/* Official Dealer of Sixnine Wheels Link (Desktop) */}
-          <Link
-            to="/sixnine-wheels"
-            onClick={closeMenus}
-            className="hidden lg:inline-flex text-xs sm:text-sm font-medium text-[#C2C2CC] hover:text-[#FF5500] transition-colors cursor-pointer whitespace-nowrap shrink-0"
-          >
-            Sixnine Wheels
-          </Link>
-
-          {/* Quick Store Pill */}
-          <Link
-            to="/store"
-            onClick={closeMenus}
-            className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-[#FF5500]/40 bg-[#FF5500]/10 text-[#FF5500] hover:bg-[#FF5500] hover:text-white text-xs font-semibold uppercase tracking-wider transition-all duration-200 cursor-pointer shadow-[0_0_12px_rgba(255,85,0,0.15)]"
-          >
-            <span>Store</span>
-            <ArrowUpRight className="w-3.5 h-3.5" />
-          </Link>
-
-          {/* My Account & Garage Button */}
-          <Link
-            to="/account"
-            onClick={closeMenus}
-            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#26262E] bg-[#141418] hover:border-[#FF5500] text-[#F5F5F7] text-xs font-mono transition-colors cursor-pointer"
-          >
-            {user ? (
-              <>
-                <Car className="w-3.5 h-3.5 text-[#FF5500]" />
-                <span className="hidden md:inline">
-                  {profile?.primaryModel || 'My Garage'}
-                </span>
-              </>
-            ) : (
-              <>
-                <UserIcon className="w-3.5 h-3.5 text-[#FF5500]" />
-                <span>Account</span>
-              </>
-            )}
-          </Link>
-
-          {/* Slide-out Menu Trigger */}
-          <button
-            type="button"
-            onClick={() => setDrawerOpen(true)}
-            aria-label="Open Navigation Menu"
-            aria-expanded={drawerOpen}
-            className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full border border-[#26262E] bg-[#121215] hover:border-[#FF5500] text-[#F5F5F7] text-xs font-tech-mono uppercase tracking-[0.14em] cursor-pointer transition-all hover:shadow-[0_0_15px_rgba(255,85,0,0.2)] select-none"
-          >
-            <span className="font-semibold">MENU</span>
-            <div className="flex flex-col gap-1 w-4">
-              <span className="block h-[1.5px] w-4 bg-[#F5F5F7] rounded-full" />
-              <span className="block h-[1.5px] w-2.5 bg-[#FF5500] rounded-full self-end" />
-            </div>
-          </button>
-        </div>
-      </header>
-
-      {/* Slide-out Drawer Menu */}
-      {drawerOpen && (
-        <div className="fixed inset-0 z-50 overflow-hidden">
-          {/* Dimmed Backdrop Scrim */}
-          <div
-            className="fixed inset-0 bg-black/80 backdrop-blur-md transition-opacity duration-300"
-            onClick={() => setDrawerOpen(false)}
-            aria-hidden="true"
+          <ContactCta
+            message={HEADER_MESSAGE}
+            enquirySubject="Wheel enquiry"
+            label="WhatsApp"
+            fallbackLabel="Enquire"
+            onActivate={closeMenu}
+            className={HEADER_CTA_CLASS}
           />
 
-          {/* Right Sliding Drawer Panel */}
-          <aside
-            ref={drawerRef}
-            role="dialog"
-            aria-modal="true"
-            aria-label="Navigation Menu"
-            className="fixed inset-y-0 right-0 max-w-full w-full sm:w-[460px] bg-[#0E0E12] border-l border-[#26262E] text-[#F5F5F7] flex flex-col justify-between shadow-[0_0_60px_rgba(0,0,0,0.9)] z-50 overflow-y-auto animate-in slide-in-from-right duration-300"
+          {/* Phone menu button: three links live behind it, nothing else */}
+          <button
+            ref={toggleRef}
+            type="button"
+            onClick={() => setMenuOpen((open) => !open)}
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-menu"
+            className="md:hidden inline-flex items-center justify-center w-11 h-11 rounded-full text-[#F5F5F7] hover:text-white cursor-pointer"
           >
-            {/* Top Bar inside Drawer */}
-            <div className="p-6 sm:p-8 border-b border-[#26262E] flex items-center justify-between">
-              <span className="text-xs font-tech-mono uppercase tracking-[0.16em] text-[#FF5500] font-semibold">
-                FORGED ATELIER
-              </span>
-
-              {/* Close Button */}
-              <button
-                type="button"
-                onClick={() => setDrawerOpen(false)}
-                aria-label="Close menu"
-                className="w-9 h-9 rounded-full border border-[#26262E] bg-[#141418] hover:border-[#FF5500] text-neutral-400 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
-              >
-                <X className="w-4 h-4 text-[#FF5500]" />
-              </button>
-            </div>
-
-            {/* Navigation Links Body: Clean, Minimalist Typography */}
-            <div className="p-6 sm:p-8 space-y-1 flex-1">
-              {/* 1. Wheel Catalogue */}
-              <Link
-                to="/#catalogue"
-                onClick={closeMenus}
-                className="w-full py-4 border-b border-[#26262E] text-left text-2xl font-light tracking-tight hover:text-[#FF5500] transition-colors cursor-pointer flex items-center justify-between"
-              >
-                <span>Wheel Catalogue</span>
-                <Disc3 className="w-5 h-5 text-[#FF5500]" />
-              </Link>
-
-              {/* 2. Official Dealer of Sixnine Wheels */}
-              <Link
-                to="/sixnine-wheels"
-                onClick={closeMenus}
-                className="w-full py-4 border-b border-[#26262E] text-left text-2xl font-light tracking-tight hover:text-[#FF5500] transition-colors cursor-pointer flex items-center justify-between"
-              >
-                <span>Official Dealer of Sixnine Wheels</span>
-                <ArrowUpRight className="w-5 h-5 text-[#FF5500]" />
-              </Link>
-
-              {/* 3. Wheel Store */}
-              <Link
-                to="/store"
-                onClick={closeMenus}
-                className="w-full py-4 border-b border-[#26262E] text-left text-2xl font-light tracking-tight hover:text-[#FF5500] transition-colors cursor-pointer flex items-center justify-between"
-              >
-                <span>Wheel Store</span>
-                <ArrowUpRight className="w-5 h-5 text-[#FF5500]" />
-              </Link>
-
-              {/* 4. My Account & Vehicle Garage */}
-              <Link
-                to="/account"
-                onClick={closeMenus}
-                className="w-full py-4 border-b border-[#26262E] text-left text-2xl font-light tracking-tight hover:text-[#FF5500] transition-colors cursor-pointer flex items-center justify-between"
-              >
-                <span>My Account &amp; Garage</span>
-                <Car className="w-5 h-5 text-[#FF5500]" />
-              </Link>
-
-              {/* 5. Client Fitments */}
-              <Link
-                to="/client-fitments"
-                onClick={closeMenus}
-                className="block w-full py-4 border-b border-[#26262E] text-left text-2xl font-light tracking-tight hover:text-[#FF5500] transition-colors cursor-pointer"
-              >
-                Client Fitments
-              </Link>
-
-              {/* 6. Dealer Application */}
-              <Link
-                to="/dealer-application"
-                onClick={closeMenus}
-                className="block w-full py-4 border-b border-[#26262E] text-left text-2xl font-light tracking-tight hover:text-[#FF5500] transition-colors cursor-pointer"
-              >
-                Dealer Application
-              </Link>
-
-              {/* 4. Admin Uploader */}
-              <Link
-                to="/admin/wheels"
-                onClick={closeMenus}
-                className="block w-full py-4 border-b border-[#26262E] text-left text-2xl font-light tracking-tight hover:text-[#FF5500] transition-colors cursor-pointer"
-              >
-                Admin Uploader
-              </Link>
-
-              {/* 5. Contact */}
-              <button
-                type="button"
-                onClick={() => {
-                  setDrawerOpen(false);
-                  openEnquiryModal({
-                    subject: 'Studio Consultation & Fitment Brief',
-                    domain: 'brand',
-                  });
-                }}
-                className="block w-full py-4 border-b border-[#26262E] text-left text-2xl font-light tracking-tight hover:text-[#FF5500] transition-colors cursor-pointer"
-              >
-                Contact
-              </button>
-
-              {/* 6. Privacy Policy */}
-              <Link
-                to="/privacy-policy"
-                onClick={closeMenus}
-                className="block w-full py-4 border-b border-[#26262E] text-left text-2xl font-light tracking-tight hover:text-[#FF5500] transition-colors cursor-pointer"
-              >
-                Privacy Policy
-              </Link>
-            </div>
-
-            {/* Drawer Bottom Details: Clean, with Two Logo Placeholders */}
-            <div className="p-6 sm:p-8 border-t border-[#26262E] bg-[#0A0A0A] space-y-5">
-              {/* Two Logo Placeholders Side-by-Side as Requested */}
-              <div className="flex items-center justify-center gap-4 py-1">
-                <LogoPlaceholder label="IMAGE PLACEHOLDER · LOGO 01" variant="dark" />
-                <LogoPlaceholder label="IMAGE PLACEHOLDER · LOGO 02" variant="dark" />
-              </div>
-
-              {/* Quiet Architectural Atelier Address */}
-              <div className="text-center">
-                <p className="text-xs font-tech-mono text-neutral-400">
-                  {displayAddress()}
-                </p>
-              </div>
-
-              {/* Clean Understated Action Button */}
-              <button
-                type="button"
-                onClick={() => {
-                  setDrawerOpen(false);
-                  openEnquiryModal({
-                    subject: 'Technical Fitment Consultation Request',
-                    domain: 'brand',
-                  });
-                }}
-                className="w-full py-3 px-5 rounded-full bg-[#FF5500] hover:bg-[#FF6B1A] text-white text-xs font-tech-mono uppercase tracking-wider font-semibold transition-all shadow-[0_0_15px_rgba(255,85,0,0.25)] cursor-pointer"
-              >
-                Request Technical Consultation
-              </button>
-            </div>
-          </aside>
+            {menuOpen ? <X aria-hidden="true" className="w-5 h-5" /> : <Menu aria-hidden="true" className="w-5 h-5" />}
+          </button>
         </div>
+
+        {menuOpen && (
+          <nav
+            ref={menuRef}
+            id="mobile-menu"
+            aria-label="Main"
+            className="md:hidden absolute top-full inset-x-0 bg-[#0A0A0A] border-b border-[#26262E] px-4 sm:px-6 pb-2"
+          >
+            {NAV_ITEMS.map((item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                onClick={closeMenu}
+                aria-current={isCurrent(item.to) ? 'page' : undefined}
+                className={`flex items-center min-h-14 text-xl font-light tracking-tight border-t border-[#1E1E26] first:border-t-0 ${
+                  isCurrent(item.to) ? 'text-white' : 'text-[#C2C2CC]'
+                }`}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+        )}
+      </header>
+
+      {/* Tapping outside the open menu closes it */}
+      {menuOpen && (
+        <div
+          aria-hidden="true"
+          onClick={closeMenu}
+          className="md:hidden fixed inset-0 top-16 z-40 bg-black/60"
+        />
       )}
     </>
   );

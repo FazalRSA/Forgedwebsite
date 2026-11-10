@@ -1,7 +1,7 @@
 /**
  * Writes public/sitemap.xml from the catalogue data, for the domain in src/config/site.ts.
  * Runs before every production build (see "build" in package.json), so the sitemap always
- * matches the wheels, products and car collections that are actually in the catalogue.
+ * lists the home page, one page per wheel that is in stock, /installs, /contact and /privacy-policy.
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';

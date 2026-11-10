@@ -1,8 +1,11 @@
 import React from 'react';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { AlertTriangle, RefreshCw, X } from 'lucide-react';
 
 interface Props {
   children: React.ReactNode;
+  className?: string;
+  /** When given, the failure message offers Close 3D as well as a reload. */
+  onClose?: () => void;
 }
 
 interface State {
@@ -11,11 +14,12 @@ interface State {
 
 /**
  * Catches a failed dynamic import() of the lazy-loaded WheelStudio chunk
- * (after lazyWithRetry's own retries are exhausted) so the PDP degrades to a
+ * (after lazyWithRetry's own retries are exhausted) so the page degrades to a
  * message instead of crashing. React.lazy caches a rejected import for the
  * lifetime of that lazy() instance, so "retry" is a full reload rather than
- * a state reset — resetting local state would just re-throw the same
- * cached rejection.
+ * a state reset: resetting local state would just re-throw the same
+ * cached rejection. (A failed GLB download is a different case: the studio
+ * handles it itself and offers "Try again" without a reload.)
  */
 export class Wheel3DSceneErrorBoundary extends React.Component<Props, State> {
   state: State = { hasError: false };
@@ -30,21 +34,35 @@ export class Wheel3DSceneErrorBoundary extends React.Component<Props, State> {
 
   render() {
     if (this.state.hasError) {
+      const { className = 'h-[76vh] min-h-[540px] max-h-[860px]', onClose } = this.props;
       return (
-        <div className="relative w-full h-[76vh] min-h-[540px] max-h-[860px] bg-[#0A0A0A] border border-[#26262E] rounded-3xl overflow-hidden flex items-center justify-center">
-          <div className="flex flex-col items-center gap-3 text-neutral-400 text-center px-6">
+        <div
+          role="alert"
+          className={`relative w-full overflow-hidden rounded-2xl border border-[#26262E] bg-[#121215] flex items-center justify-center ${className}`}
+        >
+          <div className="flex flex-col items-center gap-3 text-neutral-300 text-center px-6">
             <AlertTriangle className="w-6 h-6 text-[#FF5500]" />
-            <p className="text-xs font-mono uppercase tracking-[0.14em]">
-              3D studio failed to load
-            </p>
-            <button
-              type="button"
-              onClick={() => window.location.reload()}
-              className="inline-flex items-center gap-1.5 text-xs font-mono text-[#FF5500] hover:text-[#FF6B1A] cursor-pointer"
-            >
-              <RefreshCw className="w-3.5 h-3.5" />
-              <span>Reload page</span>
-            </button>
+            <p className="text-sm">The 3D view could not load. Check your connection and try again.</p>
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              <button
+                type="button"
+                onClick={() => window.location.reload()}
+                className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-[#FF5500] px-5 text-sm font-semibold text-[#0A0A0A] cursor-pointer hover:bg-[#FF6B1A]"
+              >
+                <RefreshCw className="w-4 h-4" aria-hidden="true" />
+                <span>Reload page</span>
+              </button>
+              {onClose && (
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full border border-[#33333E] px-5 text-sm font-semibold text-white cursor-pointer hover:border-[#FF5500]"
+                >
+                  <X className="w-4 h-4" aria-hidden="true" />
+                  <span>Close 3D</span>
+                </button>
+              )}
+            </div>
           </div>
         </div>
       );

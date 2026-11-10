@@ -1,457 +1,271 @@
-import React, { useEffect, useState } from 'react';
-import {
-  X,
-  Maximize2,
-  ChevronLeft,
-  ChevronRight,
-  ArrowUpRight,
-  Upload,
-  Check,
-} from 'lucide-react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { BrandHeader } from './BrandHeader';
-import { useRouter } from '../../utils/router';
-import { useForgedStore } from '../../store/useForgedStore';
-import {
-  CLIENT_FITMENTS,
-  FITMENT_FAMILIES,
-  type ClientFitment,
-} from '../../data/clientFitments';
+import { ContactCta, CTA_PRIMARY_CLASS, CTA_SECONDARY_CLASS } from './ContactCta';
+import { fitmentCar, fitmentMessage, fitmentTitle, fitmentWheels } from './fitmentFormat';
+import { Link } from '../../utils/router';
+import { CLIENT_FITMENTS, FITMENT_FAMILIES, type ClientFitment } from '../../data/clientFitments';
 
-/** Kept for backwards compatibility with earlier imports; the data now lives in src/data/clientFitments.ts. */
-export type ClientFitmentItem = ClientFitment;
-export const CLIENT_FITMENT_ITEMS: ClientFitmentItem[] = CLIENT_FITMENTS;
+const ALL = 'All';
 
-/** Filter pill label for a model family, e.g. "BMW M3" or "AUDI RS3". */
-const familyLabel = (family: string): string => {
-  const make = CLIENT_FITMENTS.find((f) => f.family === family)?.make ?? '';
-  return `${make.toUpperCase()} ${family}`.trim();
-};
+const FOCUSABLE = 'a[href], button:not([disabled])';
 
-// The previous hardcoded placeholder list has been replaced by generated data (see src/data/clientFitments.ts).
+/** Photos of one customer car, with the details that are known and a way to ask about the setup. */
+const InstallLightbox: React.FC<{ fitment: ClientFitment; onClose: () => void }> = ({
+  fitment,
+  onClose,
+}) => {
+  const [photo, setPhoto] = useState<0 | 1>(0);
+  const dialogRef = useRef<HTMLDivElement | null>(null);
+  const closeRef = useRef<HTMLButtonElement | null>(null);
 
-export const ClientFitmentsPage: React.FC = () => {
-  const { navigate } = useRouter();
-  const { openEnquiryModal } = useForgedStore();
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-  const [modalPhotoIndex, setModalPhotoIndex] = useState<0 | 1>(0);
-  const [cardPhotoIndices, setCardPhotoIndices] = useState<Record<string, 0 | 1>>({});
-  const [filterModel, setFilterModel] = useState<string>('ALL');
-  const [customImagesBySlot, setCustomImagesBySlot] = useState<Record<string, [string?, string?]>>({});
+  const title = fitmentTitle(fitment);
+  const wheels = fitmentWheels(fitment);
+  const otherPhoto = () => setPhoto((current) => (current === 0 ? 1 : 0));
 
-  const filterOptions: string[] = ['ALL', ...FITMENT_FAMILIES];
-
-  const visibleItems =
-    filterModel === 'ALL'
-      ? CLIENT_FITMENT_ITEMS
-      : CLIENT_FITMENT_ITEMS.filter((item) => item.family === filterModel);
-
-  const activeItem =
-    selectedIndex !== null ? visibleItems[selectedIndex] ?? null : null;
-
-  // Handle keyboard navigation: Left/Right to toggle the 2 photos for that fitment
   useEffect(() => {
-    if (selectedIndex === null) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setSelectedIndex(null);
-      } else if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
-        // Toggle between photo 0 and photo 1 for the currently active fitment
-        setModalPhotoIndex((prev) => (prev === 0 ? 1 : 0));
+    const opener = document.activeElement as HTMLElement | null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    closeRef.current?.focus();
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        onClose();
+      } else if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+        setPhoto((current) => (current === 0 ? 1 : 0));
+      } else if (event.key === 'Tab' && dialogRef.current) {
+        // Keep keyboard focus inside the open window.
+        const items = Array.from(dialogRef.current.querySelectorAll<HTMLElement>(FOCUSABLE));
+        if (items.length === 0) return;
+        const first = items[0];
+        const last = items[items.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
       }
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedIndex]);
-
-  // When opening a card, sync modal photo index to card's current photo index
-  const handleOpenFitment = (idx: number, itemId: string) => {
-    const currentCardPhoto = cardPhotoIndices[itemId] ?? 0;
-    setModalPhotoIndex(currentCardPhoto);
-    setSelectedIndex(idx);
-  };
-
-  const handleNextCardPhoto = (e: React.MouseEvent, itemId: string) => {
-    e.stopPropagation();
-    setCardPhotoIndices((prev) => ({
-      ...prev,
-      [itemId]: prev[itemId] === 1 ? 0 : 1,
-    }));
-  };
-
-  const handlePrevCardPhoto = (e: React.MouseEvent, itemId: string) => {
-    e.stopPropagation();
-    setCardPhotoIndices((prev) => ({
-      ...prev,
-      [itemId]: prev[itemId] === 1 ? 0 : 1,
-    }));
-  };
-
-  const handleUploadPhoto = (
-    slotId: string,
-    photoIdx: 0 | 1,
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === 'string') {
-        setCustomImagesBySlot((prev) => {
-          const current = prev[slotId] || [];
-          const updated: [string?, string?] = [current[0], current[1]];
-          updated[photoIdx] = reader.result as string;
-          return {
-            ...prev,
-            [slotId]: updated,
-          };
-        });
-      }
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      document.body.style.overflow = previousOverflow;
+      opener?.focus();
     };
-    reader.readAsDataURL(file);
-  };
+  }, [onClose]);
+
+  // Details are listed only when they are known.
+  const details: { label: string; value: string }[] = [
+    { label: 'Wheels', value: wheels },
+    ...(fitment.finishName ? [{ label: 'Finish', value: fitment.finishName }] : []),
+    ...(fitment.staggeredSpec ? [{ label: 'Sizes', value: fitment.staggeredSpec }] : []),
+    ...(fitment.clientCity ? [{ label: 'Location', value: fitment.clientCity }] : []),
+  ];
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-[#F5F5F7] pb-24">
-      <BrandHeader forceLight={false} />
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={`Photos of ${title}`}
+      data-testid="client-fitment-lightbox"
+      className="fixed inset-0 z-50 bg-black/90 overflow-y-auto"
+      onClick={onClose}
+    >
+      <div className="min-h-full flex items-center justify-center sm:p-6">
+        <div
+          ref={dialogRef}
+          onClick={(event) => event.stopPropagation()}
+          className="relative w-full max-w-5xl bg-[#121215] sm:rounded-2xl overflow-hidden md:grid md:grid-cols-[3fr_2fr]"
+        >
+          <button
+            ref={closeRef}
+            type="button"
+            onClick={onClose}
+            aria-label="Close photos"
+            className="absolute top-3 right-3 z-10 w-11 h-11 rounded-full bg-black/70 text-white flex items-center justify-center cursor-pointer hover:bg-black"
+          >
+            <X aria-hidden="true" className="w-5 h-5" />
+          </button>
 
-      {/* Editorial Header */}
-      <section className="bg-[#0A0A0A] text-[#F5F5F7] border-b border-[#26262E] px-6 md:px-10 py-14 md:py-20">
-        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row lg:items-end justify-between gap-8">
-          <div className="space-y-3">
-            <p className="text-xs font-tech-mono uppercase tracking-[0.18em] text-[#FF5500]">
-              FORGED CUSTOM WHEELS · CLIENT FITMENT ARCHIVE
-            </p>
-            <h1 className="text-4xl sm:text-6xl md:text-7xl font-light tracking-[-0.03em] leading-none text-white">
-              Client <span className="font-editorial-serif italic font-normal text-[#FF5500]">Fitments</span>.
-            </h1>
-          </div>
-
-          {/* BMW Chassis Filter Pills */}
-          <div className="flex flex-wrap items-center gap-2">
-            {filterOptions.map((model) => {
-              const active = filterModel === model;
-              return (
+          {/* Photo */}
+          <div className="bg-[#18181D]">
+            <div className="relative">
+              <img
+                src={fitment.images[photo]}
+                alt={`${title} on forged wheels, photo ${photo + 1} of 2`}
+                width={1600}
+                height={1200}
+                decoding="async"
+                className="w-full aspect-[4/3] object-cover"
+              />
+              <button
+                type="button"
+                onClick={otherPhoto}
+                aria-label="Previous photo"
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-black/70 text-white flex items-center justify-center cursor-pointer hover:bg-black"
+              >
+                <ChevronLeft aria-hidden="true" className="w-5 h-5" />
+              </button>
+              <button
+                type="button"
+                onClick={otherPhoto}
+                aria-label="Next photo"
+                className="absolute right-3 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-black/70 text-white flex items-center justify-center cursor-pointer hover:bg-black"
+              >
+                <ChevronRight aria-hidden="true" className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="flex items-center gap-2 p-3">
+              {fitment.images.map((src, index) => (
                 <button
-                  key={model}
+                  key={src}
                   type="button"
-                  onClick={() => {
-                    setSelectedIndex(null);
-                    setFilterModel(model);
-                  }}
-                  className={`rounded-full px-5 py-2 text-xs font-tech-mono uppercase tracking-[0.14em] transition-all cursor-pointer ${
-                    active
-                      ? 'bg-[#FF5500] text-white font-bold shadow-[0_0_12px_rgba(255,85,0,0.35)]'
-                      : 'border border-[#33333E] text-neutral-300 hover:border-[#FF5500] hover:text-[#FF5500]'
+                  onClick={() => setPhoto(index as 0 | 1)}
+                  aria-label={`Show photo ${index + 1}`}
+                  aria-pressed={photo === index}
+                  className={`w-16 h-12 rounded-md overflow-hidden border-2 cursor-pointer ${
+                    photo === index ? 'border-white' : 'border-transparent opacity-60 hover:opacity-100'
                   }`}
                 >
-                  {model === 'ALL' ? `ALL (${CLIENT_FITMENT_ITEMS.length})` : familyLabel(model)}
+                  <img src={src} alt="" className="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Details */}
+          <div className="p-5 sm:p-7 flex flex-col gap-6">
+            <div>
+              <h2 className="text-2xl font-light tracking-tight text-white">{fitmentCar(fitment)}</h2>
+              {fitment.paint && <p className="mt-1 text-neutral-300">{fitment.paint}</p>}
+            </div>
+
+            <dl className="divide-y divide-[#26262E] border-y border-[#26262E] text-sm">
+              {details.map((row) => (
+                <div key={row.label} className="py-3 flex justify-between gap-4">
+                  <dt className="text-neutral-400">{row.label}</dt>
+                  <dd className="text-white text-right">{row.value}</dd>
+                </div>
+              ))}
+            </dl>
+
+            <div className="flex flex-col gap-3">
+              <ContactCta
+                message={fitmentMessage(fitment)}
+                enquirySubject={`Ask about this setup: ${title} (${wheels})`}
+                label="Ask about this setup"
+                fallbackLabel="Ask about this setup"
+                onActivate={onClose}
+                className={CTA_PRIMARY_CLASS}
+              />
+              {fitment.wheelSlug ? (
+                <Link to={`/wheels/${fitment.wheelSlug}`} onClick={onClose} className={CTA_SECONDARY_CLASS}>
+                  See this wheel
+                </Link>
+              ) : (
+                <Link to="/#catalogue" onClick={onClose} className={CTA_SECONDARY_CLASS}>
+                  See wheels in stock
+                </Link>
+              )}
+            </div>
+
+            <p className="text-xs text-neutral-400">
+              Studio pictures are made from the owner&apos;s own photo of the car.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export const ClientFitmentsPage: React.FC = () => {
+  const [family, setFamily] = useState<string>(ALL);
+  const [openId, setOpenId] = useState<string | null>(null);
+
+  const visibleItems = useMemo(
+    () => (family === ALL ? CLIENT_FITMENTS : CLIENT_FITMENTS.filter((item) => item.family === family)),
+    [family],
+  );
+  const openItem = openId ? CLIENT_FITMENTS.find((item) => item.id === openId) ?? null : null;
+  const closeLightbox = useCallback(() => setOpenId(null), []);
+
+  return (
+    <div className="min-h-screen bg-[#0A0A0A] text-[#F5F5F7]">
+      <BrandHeader />
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 py-10 sm:py-14">
+        <h1 className="text-4xl sm:text-5xl font-light tracking-[-0.03em] leading-tight text-white">
+          Installs
+        </h1>
+        <p className="mt-3 max-w-xl text-neutral-300">
+          Customer cars on our wheels. Tap a car for photos and to ask about the setup.
+        </p>
+
+        {FITMENT_FAMILIES.length > 1 && (
+          <div role="group" aria-label="Filter by car" className="mt-6 flex flex-wrap gap-2">
+            {[ALL, ...FITMENT_FAMILIES].map((option) => {
+              const active = family === option;
+              return (
+                <button
+                  key={option}
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() => {
+                    setOpenId(null);
+                    setFamily(option);
+                  }}
+                  className={`min-h-11 px-4 rounded-full text-sm font-medium transition-colors cursor-pointer ${
+                    active
+                      ? 'bg-[#F5F5F7] text-[#0A0A0A]'
+                      : 'border border-[#33333E] text-neutral-300 hover:border-neutral-500 hover:text-white'
+                  }`}
+                >
+                  {option}
                 </button>
               );
             })}
           </div>
-        </div>
-      </section>
+        )}
 
-      {/* Scrollable bento grid of client fitments (data: src/data/clientFitments.ts) */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 py-12">
-        <div
+        <ul
           data-testid="client-fitments-bento-grid"
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"
+          className="mt-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-3 sm:gap-x-5 gap-y-8"
         >
-          {visibleItems.map((item, idx) => {
-            const activePhotoIdx = cardPhotoIndices[item.id] ?? 0;
-            const customUploaded = customImagesBySlot[item.id]?.[activePhotoIdx];
-            const displayImg = customUploaded || item.images[activePhotoIdx];
-
-            return (
-              <div
-                key={item.id}
-                role="button"
-                tabIndex={0}
-                data-testid={`fitment-bento-card-${idx + 1}`}
-                onClick={() => handleOpenFitment(idx, item.id)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleOpenFitment(idx, item.id);
-                  }
-                }}
-                className={`group relative w-full ${item.bentoClass} rounded-3xl bg-[#121215] border border-[#26262E] overflow-hidden text-left flex flex-col justify-between p-5 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:border-[#FF5500] cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#FF5500] select-none`}
-              >
-                {/* Full-bleed Photography (Dual Photos) */}
-                <img
-                  src={displayImg}
-                  alt={`${item.vehicleTitle} - Photo ${activePhotoIdx + 1}`}
-                  loading="lazy"
-                  referrerPolicy="no-referrer"
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-
-                {/* Ambient dark gradient overlay to ensure perfect contrast */}
-                <div
-                  aria-hidden="true"
-                  className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A]/30 to-black/50 pointer-events-none"
-                />
-
-                {/* Left & Right Navigation Arrows on the Component for Dual Photos */}
-                <div className="absolute inset-y-0 inset-x-2 flex items-center justify-between z-20 pointer-events-none">
-                  <button
-                    type="button"
-                    aria-label={`Previous photo for ${item.vehicleTitle}`}
-                    onClick={(e) => handlePrevCardPhoto(e, item.id)}
-                    className="pointer-events-auto w-8 h-8 rounded-full bg-black/70 border border-white/20 text-white hover:text-[#FF5500] hover:border-[#FF5500] flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 hover:scale-110 cursor-pointer shadow-lg"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-
-                  <button
-                    type="button"
-                    aria-label={`Next photo for ${item.vehicleTitle}`}
-                    onClick={(e) => handleNextCardPhoto(e, item.id)}
-                    className="pointer-events-auto w-8 h-8 rounded-full bg-black/70 border border-white/20 text-white hover:text-[#FF5500] hover:border-[#FF5500] flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 hover:scale-110 cursor-pointer shadow-lg"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
-
-                {/* Top Bar: Expand Icon Only */}
-                <div className="relative z-10 flex items-center justify-end gap-2 w-full">
-                  <span className="w-8 h-8 rounded-full bg-[#FF5500] text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-md">
-                    <Maximize2 className="w-3.5 h-3.5" />
-                  </span>
-                </div>
-
-                {/* Bottom Card Title Only — Text Placeholders Removed as Requested */}
-                <div className="relative z-10 mt-auto pt-6">
-                  <div className="rounded-2xl bg-[#0A0A0A]/90 backdrop-blur-md border border-[#26262E] px-4 py-3 transition-colors duration-300 group-hover:border-[#FF5500]">
-                    <h2 className="text-xs sm:text-sm font-semibold uppercase tracking-tight truncate text-white group-hover:text-[#FF5500] transition-colors">
-                      {item.vehicleTitle}
-                    </h2>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </main>
-
-      {/* Centered Screen Lightbox Modal when any Fitment is clicked */}
-      {activeItem && selectedIndex !== null && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label={`Client Fitment Image Window - ${activeItem.vehicleTitle}`}
-          data-testid="client-fitment-lightbox"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/90 backdrop-blur-md animate-in fade-in duration-200"
-          onClick={() => setSelectedIndex(null)}
-        >
-          <div
-            className="relative w-full max-w-5xl bg-[#121215] text-[#F5F5F7] rounded-3xl border border-[#26262E] shadow-2xl overflow-hidden my-auto"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Modal Top Header */}
-            <div className="px-6 py-4 bg-[#0A0A0A] text-white flex items-center justify-between gap-4 border-b border-[#26262E]">
-              <div className="flex items-center gap-3">
-                <span className="px-2.5 py-0.5 bg-[#FF5500] text-white text-[10px] font-tech-mono font-bold uppercase tracking-widest rounded-sm">
-                  {activeItem.slotLabel}
-                </span>
-                <span className="text-xs font-tech-mono uppercase tracking-wider text-neutral-300">
-                  {activeItem.vehicleTitle}
-                </span>
-              </div>
-
-              {/* Close Button */}
+          {visibleItems.map((item, index) => (
+            <li key={item.id} data-testid={`fitment-bento-card-${index + 1}`}>
               <button
                 type="button"
-                onClick={() => setSelectedIndex(null)}
-                aria-label="Close Fitment Image Window"
-                className="w-8 h-8 rounded-full bg-[#1E1E24] border border-[#33333E] flex items-center justify-center text-neutral-300 hover:text-white hover:border-[#FF5500] cursor-pointer"
+                onClick={() => setOpenId(item.id)}
+                aria-label={`Open photos of ${fitmentTitle(item)}`}
+                className="group block w-full text-left cursor-pointer"
               >
-                <X className="w-4 h-4" />
+                <div className="aspect-[4/3] overflow-hidden rounded-xl bg-[#18181D]">
+                  <img
+                    src={item.images[0]}
+                    alt=""
+                    width={1600}
+                    height={1200}
+                    loading={index < 4 ? 'eager' : 'lazy'}
+                    decoding="async"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <span className="mt-3 block text-base font-medium text-white group-hover:underline underline-offset-4">
+                  {fitmentCar(item)}
+                </span>
+                <span className="block text-sm text-neutral-300">{item.paint}</span>
               </button>
-            </div>
+            </li>
+          ))}
+        </ul>
+      </main>
 
-            {/* Main Stage: Left & Right Photo Navigation */}
-            <div className="grid grid-cols-1 md:grid-cols-12">
-              {/* Photo Display Stage with Prominent Left & Right Navigation Arrows */}
-              <div className="md:col-span-8 relative bg-[#0A0A0A] min-h-[380px] sm:min-h-[480px] flex items-center justify-center border-b md:border-b-0 md:border-r border-[#26262E] overflow-hidden group select-none">
-                {/* Active Photo */}
-                <img
-                  src={
-                    customImagesBySlot[activeItem.id]?.[modalPhotoIndex] ||
-                    activeItem.images[modalPhotoIndex]
-                  }
-                  alt={`${activeItem.vehicleTitle} - Angle ${modalPhotoIndex + 1}`}
-                  referrerPolicy="no-referrer"
-                  className="w-full h-full max-h-[500px] object-cover transition-all duration-300"
-                />
-
-                {/* Left Navigation Arrow */}
-                <button
-                  type="button"
-                  onClick={() => setModalPhotoIndex((prev) => (prev === 0 ? 1 : 0))}
-                  aria-label="Previous photo for this fitment"
-                  className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-[#0A0A0A]/80 hover:bg-[#FF5500] border border-white/20 hover:border-[#FF5500] text-white flex items-center justify-center transition-all duration-200 hover:scale-110 cursor-pointer shadow-2xl z-20"
-                >
-                  <ChevronLeft className="w-6 h-6" />
-                </button>
-
-                {/* Right Navigation Arrow */}
-                <button
-                  type="button"
-                  onClick={() => setModalPhotoIndex((prev) => (prev === 0 ? 1 : 0))}
-                  aria-label="Next photo for this fitment"
-                  className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-[#0A0A0A]/80 hover:bg-[#FF5500] border border-white/20 hover:border-[#FF5500] text-white flex items-center justify-center transition-all duration-200 hover:scale-110 cursor-pointer shadow-2xl z-20"
-                >
-                  <ChevronRight className="w-6 h-6" />
-                </button>
-
-                {/* Bottom Overlay: Photo Index & Perspective Label */}
-                <div className="absolute bottom-4 inset-x-4 flex flex-col sm:flex-row items-center justify-between gap-3 pointer-events-none z-20">
-                  <div className="pointer-events-auto bg-[#0A0A0A]/85 backdrop-blur-md border border-[#26262E] px-4 py-2 rounded-full flex items-center gap-3 text-xs font-tech-mono">
-                    <span className="text-[#FF5500] font-bold">
-                      PHOTO {modalPhotoIndex + 1} OF 2
-                    </span>
-                    <span className="text-neutral-400">·</span>
-                    <span className="text-neutral-200">
-                      {activeItem.imageLabels[modalPhotoIndex]}
-                    </span>
-                  </div>
-
-                  {/* 2-Photo Direct Selector Pills */}
-                  <div className="pointer-events-auto flex items-center gap-2 bg-[#0A0A0A]/85 backdrop-blur-md border border-[#26262E] p-1.5 rounded-full">
-                    <button
-                      type="button"
-                      onClick={() => setModalPhotoIndex(0)}
-                      className={`px-3 py-1 rounded-full text-[11px] font-tech-mono uppercase tracking-wider transition-all cursor-pointer ${
-                        modalPhotoIndex === 0
-                          ? 'bg-[#FF5500] text-white font-bold shadow-md'
-                          : 'text-neutral-400 hover:text-white'
-                      }`}
-                    >
-                      Photo 1
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setModalPhotoIndex(1)}
-                      className={`px-3 py-1 rounded-full text-[11px] font-tech-mono uppercase tracking-wider transition-all cursor-pointer ${
-                        modalPhotoIndex === 1
-                          ? 'bg-[#FF5500] text-white font-bold shadow-md'
-                          : 'text-neutral-400 hover:text-white'
-                      }`}
-                    >
-                      Photo 2
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Column: Clean Fitment Specifications & Actions */}
-              <div className="md:col-span-4 p-6 sm:p-8 flex flex-col justify-between space-y-6 bg-[#121215]">
-                <div className="space-y-5">
-                  <div>
-                    <p className="text-[11px] font-tech-mono uppercase tracking-[0.18em] text-[#FF5500]">
-                      {activeItem.make.toUpperCase()} FITMENT SPECIFICATION
-                    </p>
-                    <h2 className="text-xl sm:text-2xl font-bold uppercase tracking-tight mt-1 text-white">
-                      {activeItem.vehicleTitle}
-                    </h2>
-                  </div>
-
-                  <div className="divide-y divide-[#26262E] border-y border-[#26262E] text-xs font-tech-mono">
-                    <div className="py-2.5 flex items-center justify-between gap-2">
-                      <span className="text-neutral-400">VEHICLE</span>
-                      <span className="font-semibold text-white uppercase text-right">
-                        {activeItem.chassisCode.split(' · ')[0]} {activeItem.bodyStyle}
-                      </span>
-                    </div>
-                    <div className="py-2.5 flex items-center justify-between gap-2">
-                      <span className="text-neutral-400">PAINT</span>
-                      <span className="font-semibold text-white uppercase text-right">{activeItem.paint}</span>
-                    </div>
-                    <div className="py-2.5 flex items-center justify-between gap-2">
-                      <span className="text-neutral-400">WHEELS AS FITTED</span>
-                      <span className="font-semibold text-[#FF5500] uppercase text-right">
-                        {activeItem.wheelModel ?? activeItem.wheelLook}
-                      </span>
-                    </div>
-                    {activeItem.staggeredSpec && (
-                      <div className="py-2.5 flex items-center justify-between gap-2">
-                        <span className="text-neutral-400">STAGGERED SPEC</span>
-                        <span className="font-semibold text-white">{activeItem.staggeredSpec}</span>
-                      </div>
-                    )}
-                    {activeItem.finishName && (
-                      <div className="py-2.5 flex items-center justify-between gap-2">
-                        <span className="text-neutral-400">FINISH</span>
-                        <span className="font-semibold text-[#FF5500] uppercase">{activeItem.finishName}</span>
-                      </div>
-                    )}
-                    {activeItem.make === 'BMW' && (
-                      <>
-                        <div className="py-2.5 flex items-center justify-between gap-2">
-                          <span className="text-neutral-400">HUB BORE</span>
-                          <span className="font-semibold text-white">66.6MM DIRECT HUB-CENTRIC</span>
-                        </div>
-                        <div className="py-2.5 flex items-center justify-between gap-2">
-                          <span className="text-neutral-400">BOLT PATTERN</span>
-                          <span className="font-semibold text-white">5 × 112 DIRECT BOLT-ON</span>
-                        </div>
-                      </>
-                    )}
-                  </div>
-
-                  {/* Upload custom replacement for active photo */}
-                  <div>
-                    <label className="w-full py-2.5 px-4 rounded-xl bg-[#18181D] border border-[#26262E] hover:border-[#FF5500] hover:text-[#FF5500] text-[11px] font-tech-mono uppercase tracking-wider inline-flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap text-neutral-300 transition-colors">
-                      <Upload className="w-3.5 h-3.5 text-[#FF5500]" />
-                      <span>Upload Custom Photo ({modalPhotoIndex === 0 ? 'Photo 1' : 'Photo 2'})</span>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => handleUploadPhoto(activeItem.id, modalPhotoIndex, e)}
-                        className="hidden"
-                      />
-                    </label>
-                  </div>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="space-y-2.5 pt-4">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSelectedIndex(null);
-                      openEnquiryModal({
-                        subject: `Fitment Specification: ${activeItem.vehicleTitle} (${activeItem.wheelModel ?? activeItem.wheelLook})`,
-                        finish: activeItem.finishName,
-                        domain: 'brand',
-                      });
-                    }}
-                    className="w-full py-3.5 px-5 rounded-full bg-[#FF5500] text-white text-xs font-tech-mono font-bold uppercase tracking-[0.14em] hover:bg-[#FF6B1A] shadow-[0_0_15px_rgba(255,85,0,0.3)] inline-flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap transition-all"
-                  >
-                    <span>Register Interest in Fitment</span>
-                    <ArrowUpRight className="w-4 h-4 shrink-0" />
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const target = activeItem.wheelSlug;
-                      setSelectedIndex(null);
-                      navigate(target ? `/wheels/${target}` : '/#catalogue');
-                    }}
-                    className="w-full py-3 px-5 rounded-full border border-[#33333E] text-[#F5F5F7] text-xs font-tech-mono font-bold uppercase tracking-[0.14em] hover:border-[#FF5500] hover:text-[#FF5500] inline-flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap transition-colors"
-                  >
-                    <span>{activeItem.wheelSlug ? 'View This Wheel' : 'Browse the Wheel Catalogue'}</span>
-                    <ArrowUpRight className="w-4 h-4 shrink-0" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {openItem && <InstallLightbox key={openItem.id} fitment={openItem} onClose={closeLightbox} />}
     </div>
   );
 };

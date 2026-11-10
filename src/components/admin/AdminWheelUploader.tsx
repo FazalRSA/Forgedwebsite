@@ -16,10 +16,10 @@ import { BrandHeader } from '../brand/BrandHeader';
 import { useForgedStore } from '../../store/useForgedStore';
 import { useRouter } from '../../utils/router';
 import {
+  BMW_M_MODEL_OPTIONS,
   SpokeGeometryType,
   WHEEL_FINISHES,
   WheelFinishId,
-  getModelsForMake,
   formatZAR,
 } from '../../data/catalogue';
 import { WheelRenderSVG } from '../visuals/WheelRenderSVG';
@@ -41,7 +41,7 @@ export const AdminWheelUploader: React.FC = () => {
     isAdminAuthenticated,
     loginAdmin,
     logoutAdmin,
-    addCustomWheelAndProduct,
+    addCustomWheel,
     customBrandWheels,
     removeCustomWheel,
   } = useForgedStore();
@@ -54,15 +54,13 @@ export const AdminWheelUploader: React.FC = () => {
   const [name, setName] = useState('');
   const [price, setPrice] = useState('75000');
   const [brand] = useState<'BMW'>('BMW');
-  const [bmwModel, setBmwModel] = useState('M3');
+  const [compatibleCars, setCompatibleCars] = useState('M3 Competition Sedan (G80)');
   const [series, setSeries] = useState('FORGED SERIES');
-  const [diameterBadge, setDiameterBadge] = useState<'20"' | '20-21"' | '22"' | '23"'>('20-21"');
+  const [sizesAvailable, setSizesAvailable] = useState('20 inch / 21 inch');
   const [defaultFinish, setDefaultFinish] = useState<WheelFinishId>('satin-black');
   const [geometry, setGeometry] = useState<SpokeGeometryType>('y-spoke-forged');
-  const [partNo, setPartNo] = useState('');
-  const [description, setDescription] = useState(
-    'Direct hub-centric 6061-T6 forged aluminium monoblock wheel set engineered exclusively for BMW M architecture.'
-  );
+  const [stockSets, setStockSets] = useState('1');
+  const [description, setDescription] = useState('');
 
   // Image Upload Placeholder State
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string>('');
@@ -74,12 +72,9 @@ export const AdminWheelUploader: React.FC = () => {
   const [formError, setFormError] = useState<string | null>(null);
   const [createdWheel, setCreatedWheel] = useState<{
     wheelSlug: string;
-    productSlug: string;
     model: string;
     priceZAR: number;
   } | null>(null);
-
-  const bmwModels = getModelsForMake('BMW');
 
   const handleAuthSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -134,32 +129,28 @@ export const AdminWheelUploader: React.FC = () => {
     }
 
     try {
-      const { brandWheel, storeProduct } = addCustomWheelAndProduct({
+      const brandWheel = addCustomWheel({
         name: trimmedName,
         series,
         priceZAR: numericPrice,
         imageUrl: imagePreviewUrl.trim() || undefined,
         marques: ['BMW'],
-        make: 'BMW',
-        vehicleModel: bmwModel,
-        yearRange: bmwModel === 'M2' ? '2023 ONWARDS' : '2024 ONWARDS',
-        diameterBadge,
+        compatibleCars,
+        sizesAvailable,
         defaultFinish,
         geometry,
-        partNo: partNo.trim() || undefined,
-        description,
+        description: description.trim() || undefined,
+        stockQuantitySets: Number(stockSets),
       });
 
       setCreatedWheel({
         wheelSlug: brandWheel.slug,
-        productSlug: storeProduct.slug,
         model: brandWheel.model,
         priceZAR: brandWheel.priceZAR,
       });
 
-      // Reset primary name & partNo for next entry
+      // Reset the name for the next entry
       setName('');
-      setPartNo('');
     } catch (err) {
       setFormError(err instanceof Error ? err.message : 'Unable to add wheel entry.');
     }
@@ -286,13 +277,13 @@ export const AdminWheelUploader: React.FC = () => {
               <div className="space-y-1.5">
                 <div className="inline-flex items-center gap-2 text-xs font-tech-mono uppercase tracking-[0.14em] text-[#25D366]">
                   <CheckCircle2 className="w-4 h-4" />
-                  <span>NEW BMW WHEEL PUBLISHED LIVE</span>
+                  <span>WHEEL ADDED IN THIS BROWSER</span>
                 </div>
                 <h2 className="text-2xl font-medium tracking-tight text-[#F5F5F7]">
                   {createdWheel.model} — {formatZAR(createdWheel.priceZAR)} (BMW)
                 </h2>
                 <p className="text-xs font-tech-mono text-[#C2C2CC]">
-                  Synchronised across the FORGED Custom wheels 360° Catalogue and BMW Storefront.
+                  Shown on the site only while it has sets in stock. To add it for every visitor, use npm run add-wheel.
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-3 shrink-0">
@@ -301,15 +292,7 @@ export const AdminWheelUploader: React.FC = () => {
                   onClick={() => navigate(`/wheels/${createdWheel.wheelSlug}`)}
                   className="bg-[#FF5500] text-white hover:bg-[#FF6B1A] rounded-full px-5 py-2.5 text-xs font-tech-mono font-bold uppercase tracking-wider inline-flex items-center gap-1.5 cursor-pointer shadow-md"
                 >
-                  <span>360° Brand Showcase</span>
-                  <ArrowUpRight className="w-3.5 h-3.5" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => navigate(`/store/products/${createdWheel.productSlug}`)}
-                  className="border border-[#26262E] bg-[#18181D] hover:border-[#FF5500] hover:text-[#FF5500] text-[#F5F5F7] rounded-full px-5 py-2.5 text-xs font-tech-mono font-bold uppercase tracking-wider inline-flex items-center gap-1.5 cursor-pointer"
-                >
-                  <span>Store Technical PDP</span>
+                  <span>Open wheel page</span>
                   <ArrowUpRight className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -522,17 +505,17 @@ export const AdminWheelUploader: React.FC = () => {
                       htmlFor="admin-bmw-model"
                       className="block text-[11px] font-tech-mono uppercase tracking-[0.12em] text-[#C2C2CC] mb-1.5"
                     >
-                      BMW CHASSIS MODEL
+                      FITS
                     </label>
                     <select
                       id="admin-bmw-model"
-                      value={bmwModel}
-                      onChange={(e) => setBmwModel(e.target.value)}
+                      value={compatibleCars}
+                      onChange={(e) => setCompatibleCars(e.target.value)}
                       className="w-full h-11 px-3.5 bg-[#18181D] border border-[#26262E] rounded-xl text-xs font-tech-mono uppercase text-[#F5F5F7] focus:outline-none focus:border-[#FF5500]"
                     >
-                      {bmwModels.map((mod) => (
-                        <option key={mod} value={mod}>
-                          BMW {mod}
+                      {BMW_M_MODEL_OPTIONS.map((car) => (
+                        <option key={car} value={car}>
+                          BMW {car}
                         </option>
                       ))}
                     </select>
@@ -560,25 +543,20 @@ export const AdminWheelUploader: React.FC = () => {
                       htmlFor="admin-wheel-diameter"
                       className="block text-[11px] font-tech-mono uppercase tracking-[0.12em] text-[#C2C2CC] mb-1.5"
                     >
-                      DIAMETER SPEC
+                      SIZES
                     </label>
-                    <select
+                    <input
                       id="admin-wheel-diameter"
-                      value={diameterBadge}
-                      onChange={(e) =>
-                        setDiameterBadge(e.target.value as '20"' | '20-21"' | '22"' | '23"')
-                      }
-                      className="w-full h-11 px-3.5 bg-[#18181D] border border-[#26262E] rounded-xl text-xs font-tech-mono uppercase text-[#F5F5F7] focus:outline-none focus:border-[#FF5500]"
-                    >
-                      <option value='20"'>20&quot; SQUARE</option>
-                      <option value='20-21"'>20-21&quot; STAGGERED</option>
-                      <option value='22"'>22&quot; MONOBLOCK</option>
-                      <option value='23"'>23&quot; COMPETITION</option>
-                    </select>
+                      type="text"
+                      value={sizesAvailable}
+                      onChange={(e) => setSizesAvailable(e.target.value)}
+                      placeholder="20 inch / 21 inch"
+                      className="w-full h-11 px-3.5 bg-[#18181D] border border-[#26262E] rounded-xl text-xs font-tech-mono text-[#F5F5F7] focus:outline-none focus:border-[#FF5500]"
+                    />
                   </div>
                 </div>
 
-                {/* Finish, Spoke Geometry & Part Number */}
+                {/* Finish, Spoke Geometry & Sets in stock */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
                     <label
@@ -624,18 +602,19 @@ export const AdminWheelUploader: React.FC = () => {
 
                   <div>
                     <label
-                      htmlFor="admin-wheel-partno"
+                      htmlFor="admin-wheel-sets"
                       className="block text-[11px] font-tech-mono uppercase tracking-[0.12em] text-[#C2C2CC] mb-1.5"
                     >
-                      PART NUMBER (OPTIONAL)
+                      SETS IN STOCK
                     </label>
                     <input
-                      id="admin-wheel-partno"
-                      type="text"
-                      value={partNo}
-                      onChange={(e) => setPartNo(e.target.value)}
-                      placeholder="AUTO-GENERATED IF BLANK"
-                      className="w-full h-11 px-3.5 bg-[#18181D] border border-[#26262E] rounded-xl text-xs font-tech-mono uppercase text-[#F5F5F7] focus:outline-none focus:border-[#FF5500]"
+                      id="admin-wheel-sets"
+                      type="number"
+                      min="0"
+                      step="1"
+                      value={stockSets}
+                      onChange={(e) => setStockSets(e.target.value)}
+                      className="w-full h-11 px-3.5 bg-[#18181D] border border-[#26262E] rounded-xl text-xs font-tech-mono tabular-nums text-[#F5F5F7] focus:outline-none focus:border-[#FF5500]"
                     />
                   </div>
                 </div>
@@ -646,7 +625,7 @@ export const AdminWheelUploader: React.FC = () => {
                     htmlFor="admin-wheel-description"
                     className="block text-[11px] font-tech-mono uppercase tracking-[0.12em] text-[#C2C2CC] mb-1.5"
                   >
-                    TECHNICAL / EDITORIAL SUMMARY
+                    SHORT DESCRIPTION (OPTIONAL)
                   </label>
                   <textarea
                     id="admin-wheel-description"
@@ -683,13 +662,13 @@ export const AdminWheelUploader: React.FC = () => {
                     UPLOADED CUSTOM BMW WHEELS ({customBrandWheels.length})
                   </h3>
                   <span className="text-xs font-tech-mono text-[#C2C2CC]">
-                    PERSISTED IN LOCAL CATALOGUE
+                    SAVED IN THIS BROWSER ONLY
                   </span>
                 </div>
 
                 {customBrandWheels.length === 0 ? (
                   <p className="text-xs font-tech-mono text-neutral-500 py-4">
-                    No custom wheels uploaded in this session yet. Use the uploader above to publish a new BMW wheel.
+                    No wheels added in this browser yet.
                   </p>
                 ) : (
                   <div className="divide-y divide-[#26262E]">
@@ -705,7 +684,7 @@ export const AdminWheelUploader: React.FC = () => {
                             <span className="text-[#C2C2CC] font-normal">{wheel.series}</span>
                           </p>
                           <p className="text-xs font-tech-mono text-[#FF5500]">
-                            BRAND: BMW · {formatZAR(wheel.priceZAR)}
+                            BMW · {formatZAR(wheel.priceZAR)} · {wheel.stockQuantitySets ?? 0} in stock
                           </p>
                         </div>
 
@@ -715,16 +694,7 @@ export const AdminWheelUploader: React.FC = () => {
                             onClick={() => navigate(`/wheels/${wheel.slug}`)}
                             className="px-3.5 py-1.5 rounded-full border border-[#26262E] hover:border-[#FF5500] hover:text-[#FF5500] text-xs font-tech-mono uppercase cursor-pointer text-[#F5F5F7]"
                           >
-                            Inspect 360°
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              navigate(`/store/products/${wheel.compatibleStoreProductSlug}`)
-                            }
-                            className="px-3.5 py-1.5 rounded-full bg-[#18181D] border border-[#26262E] hover:border-[#FF5500] hover:text-[#FF5500] text-white text-xs font-tech-mono uppercase cursor-pointer"
-                          >
-                            Store PDP
+                            Open
                           </button>
                           <button
                             type="button"

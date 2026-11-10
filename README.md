@@ -2,11 +2,13 @@
 
 The website for **FORGED Custom Wheels**, a South African supplier of forged alloy wheel sets for BMW M cars.
 
-It presents the in-stock inventory, helps a visitor find wheels for their BMW model, shows every wheel in photography and an interactive 3D studio, and takes enquiries. There is no online checkout: every call to action leads to an interest request.
+It shows the wheels that are in stock, each in photography and an interactive 3D viewer, shows past customer installs, and takes enquiries. There is no online checkout: every call to action is an enquiry.
+
+**Stock rule.** A wheel appears on the site only when its `stockStatus` is `In Stock` and `stockQuantitySets` is above zero. Anything else is hidden, never greyed out or sold as made to order. Each listing is one design in one finish; the other finishes of a design are separate listings.
 
 | | |
 | --- | --- |
-| **Production domain** | `forgedcustomwheels.com` |
+| **Production domain** | `forgedsa.co.za` (set in `src/config/site.ts`) |
 | **Stack** | React 19 · TypeScript · Vite 8 · Tailwind CSS v4 · Three.js · Zustand · Firebase |
 | **Type** | Static single-page app with client-side routing |
 | **Inventory** | 14 in-stock wheel listings across 6 designs, priced in South African Rand per set of four |
@@ -27,7 +29,7 @@ It presents the in-stock inventory, helps a visitor find wheels for their BMW mo
 9. [3D wheel studio](#3d-wheel-studio)
 10. [Search and sharing](#search-and-sharing)
 11. [Business details and contact channels](#business-details-and-contact-channels)
-12. [Accounts and Firebase](#accounts-and-firebase)
+12. [Firebase](#firebase)
 13. [Testing](#testing)
 14. [Deployment](#deployment)
 15. [Known limitations and roadmap](#known-limitations-and-roadmap)
@@ -38,14 +40,17 @@ It presents the in-stock inventory, helps a visitor find wheels for their BMW mo
 
 ## What the site does
 
-- **Wheel catalogue.** A filterable grid of in-stock wheel sets, each with its own page, a three-angle gallery with zoom and pan, finish swatches and an enquiry button.
-- **3D wheel studio.** Every listed wheel opens in an interactive Three.js studio with physically based paint finishes, fixed camera views (face, 3/4, side, back, top), an exploded view and, for staggered sets with two models, a Front / Rear switch.
-- **Vehicle fitment finder.** Make → Model → Year → Part, resolving to a collection of wheel sets with sale and diameter filters and price sorting.
-- **Technical product pages.** A specification table, finish selector, gallery and an interest request form in place of a cart.
-- **Client fitments gallery.** Client BMW M cars on FORGED wheel sets, shown as studio re-shoots of each customer's own photo.
-- **Trade applications.** A dealer and workshop application form.
-- **Client accounts.** Google sign-in with a saved profile and a personal garage of vehicles, stored in Firestore under owner-only security rules.
-- **Search-ready pages.** Per-route titles, descriptions, canonical URLs, link-preview tags, structured data, a generated sitemap and crawlable navigation links.
+Four pages, plus the privacy policy:
+
+- **Home (`/`).** What is in stock, as a grid you can filter by design, then customer installs.
+- **Wheel page (`/wheels/:slug`).** One in-stock listing: photos, price per set of four, sizes, specification and the other in-stock finishes of the same design. The 3D viewer loads only when the visitor taps "View in 3D". The enquiry button opens WhatsApp with the design, finish and sizes filled in.
+- **Installs (`/installs`).** Customer BMW M cars on FORGED wheels, shown as studio re-shoots of each customer's own photo.
+- **Contact (`/contact`).** WhatsApp, phone, address and areas served; any channel not set in `src/config/site.ts` is hidden.
+- **Search-ready pages.** Per-route titles, descriptions, canonical URLs, link-preview tags, structured data and a generated sitemap.
+
+The 3D viewer is a Three.js studio with physically based paint finishes, fixed camera views (face, 3/4, side, back, top), an exploded view and, for staggered sets with two models, a Front / Rear switch.
+
+Removed in the simplification: the store and its fitment finder, collections and product pages, the Sixnine dealer page, dealer applications, and client accounts with a garage. Their old addresses redirect (see [Routes](#routes)).
 
 ## Quick start
 
@@ -86,18 +91,22 @@ Routing is client-side (`src/utils/router.tsx`). The host must rewrite every pat
 
 | Route | Component | Purpose |
 | --- | --- | --- |
-| `/` | `BrandHomePage` | Hero, wheel catalogue (`#catalogue`), client fitments |
-| `/wheels/:slug` | `WheelShowcasePDP` | Wheel page: 3D studio, three-angle photography, finishes, enquire |
-| `/sixnine-wheels`, `/official-dealer-sixnine-wheels` | `SixnineDealerPage` | Sixnine FF-1 and FF-3 range |
-| `/client-fitments` | `ClientFitmentsPage` | Gallery of client cars |
-| `/dealer-application` | `DealerApplicationPage` | Trade application form |
-| `/store` | `VehicleFitmentWidget` | Fitment finder and featured collections |
-| `/store/collections/:slug` | `FitmentCollectionView` | Product grid for a BMW model |
-| `/store/products/:slug` | `TechnicalProductView` | Technical product page with 3D studio and interest request |
-| `/account`, `/garage` | `AccountGaragePage` | Google sign-in, profile, garage vehicles |
-| `/studio/:slug` | `StudioPreviewPage` | Unlisted, noindex 3D preview page (currently `stf399`) |
-| `/admin`, `/admin/wheels` | `AdminWheelUploader` | Passcode-gated uploader, local preview only |
+| `/` | `BrandHomePage` | Hero, wheels in stock (`#catalogue`), customer installs |
+| `/wheels/:slug` | `WheelShowcasePDP` | Wheel page: photos, 3D viewer, price, sizes, enquire. A sold or unknown slug shows the 404 page |
+| `/installs` | `ClientFitmentsPage` | Customer cars on the wheels |
+| `/contact` | `ContactPage` | WhatsApp, phone, address, areas served |
 | `/privacy-policy` | `PrivacyPolicyPage` | Data governance and cookie disclosure |
+| `/studio/:slug` | `StudioPreviewPage` | Unlisted, noindex 3D preview (currently `stf399`) |
+| `/admin`, `/admin/*` | `AdminWheelUploader` | Unlisted, passcode-gated, local preview only |
+| anything else | `NotFoundPage` | Not found, noindex |
+
+**Old addresses** are redirected in the browser by `redirectFor()` in `src/utils/redirects.ts`, using `history.replaceState` so the Back button is not trapped:
+
+| Old address | Goes to |
+| --- | --- |
+| `/store`, `/store/*`, `/sixnine-wheels*`, `/official-dealer-sixnine-wheels*`, `/wheels` | `/#catalogue` |
+| `/client-fitments`, `/store/client-fitments` | `/installs` |
+| `/account`, `/garage`, `/dealer-application`, `/store/dealer-application` | `/contact` |
 
 ## Project structure
 
@@ -105,39 +114,40 @@ Routing is client-side (`src/utils/router.tsx`). The host must rewrite every pat
 .
 ├─ index.html                     Single-page shell and static share tags
 ├─ firebase-applet-config.json    Firebase project config (public web keys)
-├─ firebase-blueprint.json        JSON Schema for UserProfile and UserVehicle
+├─ firebase-blueprint.json        JSON Schema for the Firestore documents
 ├─ firestore.rules                Firestore security rules
 ├─ firestore.rules.test.ts        Structural tests for the rules
 ├─ security_spec.md               Rules invariants and adversarial payloads
 ├─ public/
 │  ├─ images/wheels/<slug>/       front.webp · hero.webp · profile.webp per wheel
-│  ├─ models/wheels/              .glb models for the 3D studio
-│  ├─ assets/aistudio/            Client fitment photography
+│  ├─ models/wheels/              .glb models for the 3D viewer
+│  ├─ assets/fitments/            Customer install photography
 │  ├─ robots.txt
 │  └─ sitemap.xml                 Generated on every build
 ├─ scripts/
 │  ├─ add-wheel.ts                CLI that writes src/data/customWheels.json
-│  ├─ generate-sitemap.ts         Writes public/sitemap.xml from the catalogue
-│  └─ fitment-reshoot/            Pipeline for the client fitment studio re-shoots
-├─ components/ui/                 Button, input, label, icons, global footer
+│  ├─ generate-sitemap.ts         Writes public/sitemap.xml and the page rules in render.yaml
+│  ├─ prerender-meta.ts           Bakes each page's title and share image into dist/
+│  └─ fitment-reshoot/            Pipeline for the install studio re-shoots
+├─ components/ui/                 Global footer and shared UI primitives
 └─ src/
    ├─ App.tsx                     Providers, route switch, lazy-loaded pages, page metadata
    ├─ config/site.ts              Business identity and contact channels
-   ├─ data/catalogue.ts           Types, 14 seed wheels, store products, fitment tree, helpers
-   ├─ data/customWheels.json      Inventory overrides and additions
-   ├─ data/studioFinishes.ts      Paint settings per finish for the 3D studio
-   ├─ data/clientFitments.ts      Client fitment gallery data
-   ├─ store/                      Zustand store persisted to localStorage
-   ├─ context/FirebaseContext.tsx Auth, profile and garage data
+   ├─ data/catalogue.ts           Types, the 14 stock listings, in-stock filter, siblings, helpers
+   ├─ data/customWheels.json      Photography for stock listings, and listings added by the CLI
+   ├─ data/studioFinishes.ts      Paint settings per finish for the 3D viewer
+   ├─ data/clientFitments.ts      Customer installs data
+   ├─ store/                      Zustand store (enquiry form, admin preview) in localStorage
+   ├─ context/FirebaseContext.tsx Firebase provider
    ├─ utils/router.tsx            pushState router and crawlable <Link>
+   ├─ utils/redirects.ts          Old address to new address
    ├─ utils/seo.ts                Per-route metadata, structured data, sitemap paths
-   ├─ utils/wheelStudioParts.ts   Part classification and camera maths for the studio
-   ├─ utils/wheelBuilder.ts       Builds a wheel and store product from a short input
+   ├─ utils/wheelStudioParts.ts   Part classification and camera maths for the viewer
+   ├─ utils/wheelBuilder.ts       Builds a stock listing from a short input
    └─ components/
-      ├─ brand/                   Home, catalogue, wheel page, Sixnine, fitments, dealer, account, privacy
-      ├─ store/                   Fitment finder, collection grid, product page
+      ├─ brand/                   Home, catalogue, wheel page, installs, contact, privacy
       ├─ admin/                   Admin uploader
-      ├─ shared/                  Interest request form, skeletons
+      ├─ shared/                  Enquiry form
       └─ visuals/                 WheelStudio (3D), WheelStage
 ```
 
@@ -158,16 +168,21 @@ All fitments are BMW M3 (G80), 5×112, centre bore 66.6. Stock counts live in th
 
 ## Catalogue data model
 
-Two record types live in `src/data/catalogue.ts`:
+One record type lives in `src/data/catalogue.ts`:
 
-- **`BrandWheelItem`**: a wheel as shown on the brand site. Key fields: `slug`, `model`, `modelCode`, `finishName`, `priceZAR`, `sizesAvailable`, `compatibleCars`, `technicalSpecSheet`, `stockStatus`, `stockQuantitySets`, `images` (exactly three), `availableFinishes`, `modelUrl`, optional `rearModelUrl`, and `compatibleStoreProductSlug`.
-- **`StoreProductItem`**: a sellable set as shown in the store. Key fields: `slug`, `wheelSlug`, `make`, `model`, `yearRange`, `priceZAR`, optional `originalPriceZAR` (shown as a sale when higher), `technicalSpecs`, optional `modelUrl`.
+- **`BrandWheelItem`**: one listing, which is one design in one finish. Key fields: `slug`, `model`, `modelCode` (the design), `finishName`, `priceZAR`, `sizesAvailable`, `compatibleCars`, `technicalSpecSheet`, `stockStatus`, `stockQuantitySets`, `images` (exactly three), `defaultFinish`, `availableFinishes` (only the listing's own finish), `modelUrl`, optional `rearModelUrl`.
 
-Fourteen wheels are seeded in `INVENTORY_SEEDS`. `src/data/customWheels.json` is merged on top by slug: an entry with a seed's slug overrides it (this is how real photography is attached), and an entry with a new slug is added.
+Fourteen listings are seeded in `INVENTORY_SEEDS`. What the site can show comes only from `getAllBrandWheels()`, which drops anything that is not in stock. `getSiblingListings(wheel)` returns the other in-stock listings of the same design, and `findWheelBySlug()` returns undefined for a sold or unknown wheel.
+
+`src/data/customWheels.json` is merged by slug. An entry with a seed's slug only adds to that listing (today: the three photos, so the stock sheet stays the source for names, sizes, prices and stock). An entry with a new slug is a complete listing, as written by `npm run add-wheel`.
 
 **Pricing.** Prices are whole Rand in `priceZAR`. `formatZAR()` is the only formatter. There is no currency conversion.
 
 ## Adding or changing a wheel
+
+Change stock, prices and sizes in `INVENTORY_SEEDS` in `src/data/catalogue.ts`; set `stockQuantitySets` to 0 (or remove the seed) when a set sells and the wheel disappears from the site.
+
+To attach photos or add a new listing:
 
 1. **Choose a slug**: lowercase model code plus finish, for example `fsa003-pure-bronze`. It becomes the URL and the image folder.
 2. **Add photos** as three square WebP files (2000×2000 recommended, under 400 KB each, consistent background and framing):
@@ -178,25 +193,25 @@ Fourteen wheels are seeded in `INVENTORY_SEEDS`. `src/data/customWheels.json` is
    public/images/wheels/fsa003-pure-bronze/profile.webp
    ```
 
-3. **Add the record** to `brandWheels` in `src/data/customWheels.json`. Copy an existing entry and change the slug, names, price, sizes, finishes, spec sheet, stock and image paths. Reference images as `/images/wheels/<slug>/front.webp` (leading slash, no `public/`).
-4. **Add the 3D model** (see below) by setting `modelUrl`.
-5. **Store product**: if the wheel needs its own part number and sizes, add an entry to `storeProducts` in the same file, point the wheel's `compatibleStoreProductSlug` at it, and add its slug to the right model's `productSlugs` in `VEHICLE_FITMENT_TREE`.
-6. Run `bun run lint`, `bun run test` and `bun run dev`, check `/wheels/<slug>` and `/#catalogue`, then open a pull request.
+3. **Point to them.** For a stock-sheet listing, add `{ "slug": ..., "images": [...], "imageLabels": [...] }` to `brandWheels` in `src/data/customWheels.json`. For a new listing use the CLI below. Reference images as `/images/wheels/<slug>/front.webp` (leading slash, no `public/`).
+4. **Add the 3D model** (see below) by setting `modelUrl`, or add the design to `MODEL_URL_BY_CODE`.
+5. Run `bun run lint`, `bun run test` and `bun run dev`, check `/wheels/<slug>` and `/#catalogue`, then open a pull request.
 
-The CLI can draft an entry:
+The CLI writes a complete new listing (sets in stock default to 1; `--sets 0` hides it):
 
 ```bash
-bun run add-wheel -- --name "TYPE 60" --price 75000 --model M3 --finish satin-black \
-  --image /images/wheels/type-60/front.webp --glb /models/wheels/type-60.glb
+bun run add-wheel -- --name "TYPE 60 BRONZE" --price 75000 --sets 1 \
+  --cars "M3 Competition Sedan (G80)" --sizes "20 inch / 21 inch" --finish champagne-bronze \
+  --image /images/wheels/type-60-bronze/front.webp --glb /models/wheels/type-60.glb
 bun run add-wheel -- --list
-bun run add-wheel -- --remove type-60
+bun run add-wheel -- --remove type-60-bronze
 ```
 
 The admin page at `/admin` is a local preview tool: wheels created there are stored only in that browser's localStorage and are not published.
 
 ## 3D wheel studio
 
-A wheel or product with a `modelUrl` opens in the studio (`src/components/visuals/WheelStudio.tsx`, mounted through `WheelStage.tsx`). Three.js is downloaded only on pages that show a model. If a model fails to load, the studio shows a message with a retry button.
+A wheel with a `modelUrl` opens in the studio (`src/components/visuals/WheelStudio.tsx`, mounted through `WheelStage.tsx`). Three.js is downloaded only after the visitor taps "View in 3D". If a model fails to load, the studio shows a message with a retry button.
 
 **How models are assigned**
 
@@ -221,12 +236,12 @@ A wheel or product with a `modelUrl` opens in the studio (`src/components/visual
 
 All search metadata is produced by `src/utils/seo.ts` and applied on every route change.
 
-- **Titles and descriptions** per route, with titles capped at 60 characters.
-- **Canonical URLs** always on `https://forgedcustomwheels.com`.
+- **Titles and descriptions** per route, with titles capped at 60 characters. The home title is "Forged wheels for BMW M cars in stock | FORGED Custom Wheels".
+- **Canonical URLs** always on the production domain in `src/config/site.ts`.
 - **Link previews**: Open Graph and Twitter tags on every route, plus static tags in `index.html` for crawlers that do not run JavaScript.
-- **Structured data**: `Organization` and `WebSite` on the home page; `Product` with the Rand price and stock status on wheel pages.
-- **Sitemap**: `public/sitemap.xml` is regenerated from the catalogue on every build and lists only indexable, canonical pages.
-- **Noindex**: account, admin, preview and unknown-slug pages. `public/robots.txt` keeps crawlers out of account and admin paths.
+- **Structured data**: `Organization` and `WebSite` on the home page; `Product` with the Rand price, in stock, on wheel pages.
+- **Sitemap**: `public/sitemap.xml` is regenerated from the catalogue on every build. It lists `/`, one page per in-stock wheel, `/installs`, `/contact` and `/privacy-policy`, and nothing else.
+- **Noindex**: admin, preview, sold or unknown wheels, and unknown addresses. `public/robots.txt` keeps crawlers out of `/admin` and `/studio/`.
 - **Crawlable navigation**: header, footer and catalogue links are real anchors (`Link` in `src/utils/router.tsx`).
 
 ## Business details and contact channels
@@ -237,31 +252,27 @@ A value left empty is never shown: the related button falls back to the enquiry 
 
 **Content rule.** Public copy states only what the business can evidence. Do not add certifications, warranty terms, delivery promises, response times, load ratings or dealer status without a source from the owner.
 
-## Accounts and Firebase
+## Firebase
 
-Client accounts use Firebase Authentication (Google provider) and Firestore:
-
-- `users/{uid}`: the client's profile and primary vehicle (`UserProfile` in `firebase-blueprint.json`).
-- `users/{uid}/vehicles/{vehicleId}`: garage vehicles (`UserVehicle`).
-
-`firestore.rules` denies everything by default and allows owner-only access with a verified email, exact key sets, bounded string sizes, enum allow-lists, server timestamps and immutable identity fields. `security_spec.md` documents the invariants and the adversarial payloads each rule rejects.
+Client accounts and the garage are gone from the site, but the Firebase provider (`src/context/FirebaseContext.tsx`), `firestore.rules` and their tests are kept as they were. `firestore.rules` denies everything by default and allows owner-only access with a verified email, exact key sets, bounded string sizes, enum allow-lists, server timestamps and immutable identity fields. `security_spec.md` documents the invariants and the adversarial payloads each rule rejects.
 
 ```bash
 firebase deploy --only firestore:rules
 ```
 
-`firebase-applet-config.json` holds the public web configuration for the Firebase project. To point the site at another project, replace the values in that file and redeploy the rules there.
+`firebase-applet-config.json` holds the public web configuration for the Firebase project.
 
 ## Testing
 
-`bun run test` runs five suites with `node:test`:
+`bun run test` runs six suites with `node:test`:
 
 | Suite | Covers |
 | --- | --- |
-| `src/data/catalogue.test.ts` | Inventory, fitment tree, pricing, wheel builder, and that every listed wheel has a 3D model file that exists |
-| `src/data/clientFitments.test.ts` | Client fitment gallery data |
-| `src/utils/wheelStudioParts.test.ts` | Studio part classification, exploded-view offsets, camera distance |
-| `src/utils/seo.test.ts` | Per-route metadata, canonical URLs, structured data, share images, sitemap |
+| `src/data/catalogue.test.ts` | The stock rule (every exported wheel is in stock, 14 listings across 6 designs, one finish each), siblings, no store exports, wheel builder, and that every listed wheel has a 3D model and photos that exist |
+| `src/data/clientFitments.test.ts` | Customer installs data |
+| `src/utils/wheelStudioParts.test.ts` | Viewer part classification, exploded-view offsets, camera distance |
+| `src/utils/seo.test.ts` | Per-route metadata, canonical URLs, structured data, share images, sitemap (no removed route), `render.yaml` |
+| `src/utils/redirects.test.ts` | Old address to new address, `replaceState` and no loops |
 | `firestore.rules.test.ts` | Structure of the Firestore security rules |
 
 There are no browser-level tests. Check 3D and layout changes by hand on a phone-sized viewport before merging.
@@ -277,7 +288,7 @@ There are no browser-level tests. Check 3D and layout changes by hand on a phone
 
 Both configurations install with `npm install --legacy-peer-deps`, run `npm run build`, publish `dist/`, apply the single-page rewrite, and cache fingerprinted assets for a year and models and images for a day. Every push to `main` redeploys.
 
-After the first deploy, add `forgedcustomwheels.com` as a custom domain in the host's dashboard and point the DNS records it gives you at the domain registrar. Canonical URLs and the sitemap already use that domain.
+After the first deploy, add `forgedsa.co.za` as a custom domain in the host's dashboard and point the DNS records it gives you at the domain registrar. Canonical URLs and the sitemap already use that domain.
 
 Vercel's free Hobby plan is for non-commercial use only, so a business site needs Vercel Pro. Render's static sites are free to deploy; check the bandwidth included with the workspace plan against traffic, since each 3D model is 3–4 MB.
 
@@ -293,15 +304,14 @@ Build chunks are split per vendor (`react`, `motion`, `three`, `firebase`, `luci
 
 | Area | Today | Planned |
 | --- | --- | --- |
-| **Lead delivery** | Interest requests, dealer applications and newsletter sign-ups are stored only in the visitor's browser. Nothing reaches the business. | Write to Firestore and fan out to email, Google Sheets, WhatsApp and the CRM |
-| **Contact channels** | Address, WhatsApp, phone and social links are empty in `src/config/site.ts`, so those elements are hidden | Fill in once confirmed |
+| **Lead delivery** | The enquiry button opens WhatsApp with the wheel filled in. The fallback enquiry form stores its entries only in the visitor's browser; nothing reaches the business from it. | Send form entries to the business (email or Google Sheets) |
+| **Contact channels** | Set in `src/config/site.ts`; any channel left empty there is hidden (Instagram, Facebook and trade email are empty today) | Fill in once confirmed |
 | **3D accuracy** | Five designs are traced from photos with simplified surfaces | Replace with scans of the physical wheels |
-| **Photography** | Six listings have no product photos (FSA001, FSA002 Hyper Black and Polished Face, FSA003 Silver, FSA004 Hyper Black and Gloss Black) | Shoot and add |
-| **Link previews** | The app is client-rendered, so chat apps show the home title and image for every URL | Prerender or server-render |
-| **Unknown URLs** | Render the home page with HTTP 200 | Not-found page and host configuration |
-| **Store URLs** | Some product slugs are legacy names that do not match the product | Rename with redirects |
+| **Photography** | Six listings have no product photos and show a plain drawn stand-in (FSA001, FSA002 Hyper Black and Polished Face, FSA003 Silver, FSA004 Hyper Black and Gloss Black) | Shoot and add |
+| **Link previews** | The app is client-rendered; `npm run build` bakes each page's title and share image into its own HTML file so chat apps show the right preview for the pages in the sitemap | Server-render if more pages are added |
+| **Old links** | Redirected in the browser, not with an HTTP 301 | Add 301 rules on the host |
 | **Admin publishing** | The uploader stores wheels locally; publishing is a data-file change and rebuild | Firebase-backed catalogue with authenticated admin writes |
-| **Partners section** | Renders nothing until logo assets are supplied | Add logos |
+| **Stock** | Counts are edited in `INVENTORY_SEEDS` and need a rebuild | Read from the stock sheet |
 
 ## Contributing
 
