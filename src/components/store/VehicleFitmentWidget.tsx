@@ -72,9 +72,10 @@ export const VehicleFitmentWidget: React.FC = () => {
       <StoreHeader />
 
       {/* Full-Bleed Hero & Vehicle Fitment Engine */}
-      <section className="relative bg-[#0A0A0A] text-[#F5F5F7] overflow-hidden border-b border-[#26262E]">
-        {/* Background Studio Vehicle Silhouette with Measured Scrim */}
-        <div className="absolute inset-0 opacity-30 pointer-events-none flex items-center justify-end pr-4">
+      <section className="relative bg-[#0A0A0A] text-[#F5F5F7] border-b border-[#26262E]">
+        {/* Background Studio Vehicle Silhouette with Measured Scrim. The clipping lives here,
+            not on the section, so an open fitment dropdown can extend past the hero. */}
+        <div className="absolute inset-0 overflow-hidden opacity-30 pointer-events-none flex items-center justify-end pr-4">
           <div className="w-full max-w-5xl">
             <VehicleProfileRender
               make={selectedMake || 'BMW'}
@@ -117,6 +118,7 @@ export const VehicleFitmentWidget: React.FC = () => {
                 {/* Step 1: MAKE */}
                 <div className="flex flex-col gap-1.5">
                   <label
+                    id="fitment-make-label"
                     htmlFor="fitment-make"
                     className="text-[11px] font-tech-mono uppercase tracking-[0.14em] text-[#C2C2CC]"
                   >
@@ -124,6 +126,7 @@ export const VehicleFitmentWidget: React.FC = () => {
                   </label>
                   <StyledSelect
                     id="fitment-make"
+                    labelId="fitment-make-label"
                     value={selectedMake}
                     onChange={setSelectedMake}
                     placeholder="SELECT MAKE..."
@@ -137,6 +140,7 @@ export const VehicleFitmentWidget: React.FC = () => {
                 {/* Step 2: MODEL */}
                 <div className="flex flex-col gap-1.5">
                   <label
+                    id="fitment-model-label"
                     htmlFor="fitment-model"
                     className="text-[11px] font-tech-mono uppercase tracking-[0.14em] text-[#C2C2CC]"
                   >
@@ -144,6 +148,7 @@ export const VehicleFitmentWidget: React.FC = () => {
                   </label>
                   <StyledSelect
                     id="fitment-model"
+                    labelId="fitment-model-label"
                     value={selectedModel}
                     disabled={!selectedMake}
                     onChange={setSelectedModel}
@@ -158,6 +163,7 @@ export const VehicleFitmentWidget: React.FC = () => {
                 {/* Step 3: YEAR */}
                 <div className="flex flex-col gap-1.5">
                   <label
+                    id="fitment-year-label"
                     htmlFor="fitment-year"
                     className="text-[11px] font-tech-mono uppercase tracking-[0.14em] text-[#C2C2CC]"
                   >
@@ -165,6 +171,7 @@ export const VehicleFitmentWidget: React.FC = () => {
                   </label>
                   <StyledSelect
                     id="fitment-year"
+                    labelId="fitment-year-label"
                     value={selectedYear}
                     disabled={!selectedModel}
                     onChange={setSelectedYear}
@@ -179,6 +186,7 @@ export const VehicleFitmentWidget: React.FC = () => {
                 {/* Step 4: PART (OPTIONAL) */}
                 <div className="flex flex-col gap-1.5">
                   <label
+                    id="fitment-part-label"
                     htmlFor="fitment-part"
                     className="text-[11px] font-tech-mono uppercase tracking-[0.14em] text-[#C2C2CC]"
                   >
@@ -186,6 +194,7 @@ export const VehicleFitmentWidget: React.FC = () => {
                   </label>
                   <StyledSelect
                     id="fitment-part"
+                    labelId="fitment-part-label"
                     value={selectedPart}
                     disabled={!selectedModel}
                     onChange={setSelectedPart}
