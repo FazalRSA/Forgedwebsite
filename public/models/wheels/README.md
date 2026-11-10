@@ -13,6 +13,9 @@ meshes use assumed G80/G82 M3/M4 brake dimensions, not a measured caliper.
 `fsa002.glb`, `fsa003.glb`, `fsa004.glb`, `ff-1.glb` and `ff-3.glb` are one model per design, shared
 by every finish of that design (see `MODEL_URL_BY_CODE` in `src/data/catalogue.ts`). They were traced
 from face-on product photos and ship without baked textures, because the studio applies its own paint.
+On a wheel page the studio offers the listing's own finish and the design's to-order colours
+(`getToOrderFinishes` in `src/data/catalogue.ts`); the page shows the 3-month lead-time notice while a
+to-order colour is selected.
 
 ## How a wheel gets its model
 
