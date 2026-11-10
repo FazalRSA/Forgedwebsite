@@ -1,14 +1,13 @@
 import React from 'react';
-import { ArrowLeft, Lock, Mail, MapPin, Phone, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, Lock, MapPin, MessageCircle, Phone, ShieldCheck } from 'lucide-react';
 import { BrandHeader } from './BrandHeader';
 import { useRouter } from '../../utils/router';
-import { useForgedStore } from '../../store/useForgedStore';
-import { SITE } from '../../config/site';
+import { SITE, telLink, whatsappLink } from '../../config/site';
 
 /**
  * Responsible-party details published in the notice (POPIA s18(1)(b)).
- * Fill in the registration number, physical address and Information Officer
- * name once confirmed; empty strings are simply not rendered.
+ * Fill in the registration number and Information Officer name once confirmed;
+ * empty strings are simply not rendered.
  */
 const RESPONSIBLE_PARTY = {
   tradingName: SITE.name,
@@ -16,10 +15,9 @@ const RESPONSIBLE_PARTY = {
   physicalAddress: SITE.addressLine,
   country: SITE.country,
   informationOfficerName: '',
-  privacyEmail: SITE.privacyEmail,
 };
 
-const LAST_REVISED = '9 November 2026';
+const LAST_REVISED = '10 November 2026';
 
 const REGULATOR = {
   name: 'Information Regulator (South Africa)',
@@ -31,6 +29,8 @@ const REGULATOR = {
   portal: 'https://eservices.inforegulator.org.za/complaints/default.aspx',
   site: 'https://inforegulator.org.za',
 };
+
+const LINK_CLASS = 'text-[#FF5500] font-tech-mono hover:underline';
 
 const Section: React.FC<{ index: string; title: string; children: React.ReactNode }> = ({
   index,
@@ -61,9 +61,47 @@ const Strong: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <strong className="text-[#F5F5F7] font-semibold">{children}</strong>
 );
 
+/** The ways to reach the business that are actually configured: WhatsApp, phone, and email if set. */
+const ContactChannels: React.FC = () => {
+  const wa = whatsappLink();
+  const tel = telLink();
+  const parts: React.ReactNode[] = [];
+  if (wa) {
+    parts.push(
+      <a key="wa" href={wa} target="_blank" rel="noopener noreferrer" className={LINK_CLASS}>
+        WhatsApp {SITE.phoneDisplay}
+      </a>,
+    );
+  }
+  if (tel) {
+    parts.push(
+      <a key="tel" href={tel} className={LINK_CLASS}>
+        call {SITE.phoneDisplay}
+      </a>,
+    );
+  }
+  if (SITE.privacyEmail) {
+    parts.push(
+      <a key="mail" href={`mailto:${SITE.privacyEmail}`} className={LINK_CLASS}>
+        email {SITE.privacyEmail}
+      </a>,
+    );
+  }
+  return (
+    <>
+      {parts.map((part, i) => (
+        <React.Fragment key={i}>
+          {i > 0 ? (i === parts.length - 1 ? ', or ' : ', ') : null}
+          {part}
+        </React.Fragment>
+      ))}
+    </>
+  );
+};
+
 export const PrivacyPolicyPage: React.FC = () => {
   const { navigate } = useRouter();
-  const { openEnquiryModal } = useForgedStore();
+  const requestLink = whatsappLink('Privacy request (access / correction / deletion / objection)');
 
   const toc: Array<[string, string]> = [
     ['01', 'Who we are'],
@@ -75,7 +113,7 @@ export const PrivacyPolicyPage: React.FC = () => {
     ['07', 'How long we keep it'],
     ['08', 'How we protect it'],
     ['09', 'Your rights'],
-    ['10', 'Direct marketing'],
+    ['10', 'Contacting you'],
     ['11', 'Children'],
     ['12', 'Complaints to the Information Regulator'],
     ['13', 'Changes to this notice'],
@@ -114,15 +152,15 @@ export const PrivacyPolicyPage: React.FC = () => {
           <div className="flex flex-wrap items-center gap-4 text-xs font-tech-mono text-neutral-400">
             <span>LAST REVISED: {LAST_REVISED.toUpperCase()}</span>
             <span>·</span>
-            <span>APPLIES TO FORGEDCUSTOMWHEELS WEBSITE, STORE AND CLIENT ACCOUNTS</span>
+            <span>APPLIES TO THIS WEBSITE</span>
           </div>
 
           <p className="text-sm sm:text-base text-[#C2C2CC] leading-relaxed pt-2">
             This notice explains what personal information {RESPONSIBLE_PARTY.tradingName} (&quot;we&quot;,
-            &quot;us&quot;) collects when you use this website, why we collect it, who we share it with,
-            how long we keep it, and the rights you have under the Protection of Personal Information
-            Act, 2013 (POPIA). It is written to meet the disclosure requirements of section 18 of POPIA.
-            Please read it before submitting an enquiry, applying as a dealer or creating an account.
+            &quot;us&quot;) handles when you use this website or contact us, why, who else sees it, how
+            long we keep it, and the rights you have under the Protection of Personal Information Act,
+            2013 (POPIA). This website has no accounts, no sign-in and no forms that send your details
+            to us. Contact happens on WhatsApp or by phone.
           </p>
 
           <nav aria-label="Contents" className="pt-4">
@@ -141,7 +179,7 @@ export const PrivacyPolicyPage: React.FC = () => {
         <div className="space-y-10 text-sm leading-relaxed text-neutral-300">
           <Section index="01" title="Who we are">
             <p>
-              The responsible party for personal information processed through this website is{' '}
+              The responsible party for personal information handled through this website is{' '}
               <Strong>{RESPONSIBLE_PARTY.tradingName}</Strong>
               {RESPONSIBLE_PARTY.registrationNumber
                 ? ` (registration number ${RESPONSIBLE_PARTY.registrationNumber})`
@@ -150,66 +188,42 @@ export const PrivacyPolicyPage: React.FC = () => {
               {RESPONSIBLE_PARTY.physicalAddress ? ` Our address is ${RESPONSIBLE_PARTY.physicalAddress}.` : ''}
             </p>
             <p>
-              Questions, access requests and complaints about personal information go to our
-              Information Officer
-              {RESPONSIBLE_PARTY.informationOfficerName ? `, ${RESPONSIBLE_PARTY.informationOfficerName},` : ''}{' '}
-              at{' '}
-              <a
-                href={`mailto:${RESPONSIBLE_PARTY.privacyEmail}`}
-                className="text-[#FF5500] font-tech-mono hover:underline"
-              >
-                {RESPONSIBLE_PARTY.privacyEmail}
-              </a>
-              . You can also use the request button in section 09.
+              Questions, access requests and complaints about personal information go to us here:{' '}
+              <ContactChannels />.
+              {RESPONSIBLE_PARTY.informationOfficerName
+                ? ` Our Information Officer is ${RESPONSIBLE_PARTY.informationOfficerName}.`
+                : ''}{' '}
+              You can also use the button in section 09.
             </p>
           </Section>
 
           <Section index="02" title="What we collect and where it comes from">
-            <p>We only collect personal information that you give us directly, or that Google passes to us when you choose to sign in with your Google account.</p>
+            <p>
+              We only receive personal information that you choose to send us, plus the technical
+              information any website receives.
+            </p>
             <Bullets
               items={[
                 <>
-                  <Strong>Interest requests and specification enquiries</Strong> (the &quot;State your
-                  interest&quot; form): your full name, email address, telephone or WhatsApp number,
-                  vehicle model and year, the wheel, part number and finish you were viewing, your
-                  preferred finish and build timeline, and any notes you add. Name, email and telephone
-                  are required so that we can respond; the rest is voluntary.
+                  <Strong>Messages and calls to us</Strong>: when you message us on WhatsApp or phone
+                  us, we see your phone number, your WhatsApp profile name, and whatever you tell us,
+                  such as your name, your car and the wheels you are asking about. The &quot;WhatsApp&quot;
+                  buttons on this website only open WhatsApp with a message already typed in. Nothing is
+                  sent until you press send in WhatsApp, and this website does not receive your message.
                 </>,
                 <>
-                  <Strong>Dealer and trade applications</Strong>: company and trading name, country and
-                  city, website, the primary contact&apos;s name, role, email and telephone, VAT number,
-                  facility type, expected monthly volume, workshop capabilities and notes. Company name,
-                  city, contact name, email and telephone are required to assess an application.
-                </>,
-                <>
-                  <Strong>Client accounts and the Garage</Strong>: when you sign in with Google we
-                  receive your Google account identifier, display name, email address and whether that
-                  email is verified. You may then save a profile (city, primary vehicle make, model,
-                  year and chassis code, exterior paint, brake system, preferred wheel finish) and one or
-                  more garage vehicles with the same fields plus your own notes.
-                </>,
-                <>
-                  <Strong>Newsletter</Strong>: your email address, if you subscribe to allocation alerts.
-                </>,
-                <>
-                  <Strong>Technical information</Strong>: like every website, our hosting and
-                  authentication providers record the IP address, browser type and pages requested in
-                  server logs for security and capacity purposes. We do not run advertising or analytics
-                  trackers.
-                </>,
-                <>
-                  <Strong>Preferences stored on your device</Strong>: a copy of enquiries you have
-                  submitted, and wheels previewed in the admin tool, are kept in your browser&apos;s
-                  local storage (see section 06). These stay on your device
-                  and are not transmitted to us by that mechanism.
+                  <Strong>Technical information</Strong>: like every website, our hosting provider
+                  (Render) may record your IP address, browser type and the pages requested in server
+                  logs for security and capacity purposes. Page fonts are loaded from Google Fonts, which
+                  receives your IP address and browser details when a page loads.
                 </>,
               ]}
             />
             <p className="pt-1">
-              We do not collect special personal information (such as health, religious or biometric
-              data) or information about children. No law requires you to provide information to us;
-              if you choose not to, we may be unable to respond to your enquiry, assess your application
-              or offer you an account.
+              We do not run accounts, sign-in or mailing lists, and we do not use advertising or
+              analytics trackers. We do not collect special personal information (such as health,
+              religious or biometric data) or information about children. No law requires you to
+              contact us; if you choose not to, we simply cannot answer your question.
             </p>
           </Section>
 
@@ -218,25 +232,16 @@ export const PrivacyPolicyPage: React.FC = () => {
               items={[
                 <>
                   <Strong>To respond to you and take steps towards a sale at your request</Strong>:
-                  verifying fitment for your vehicle, preparing a specification and quotation, arranging
-                  a consultation, and following up on your enquiry (POPIA s11(1)(b) and (d)).
+                  checking fitment for your vehicle, giving you a quotation, and following up on your
+                  enquiry (POPIA s11(1)(b)).
                 </>,
                 <>
-                  <Strong>To assess and manage dealer and trade relationships</Strong>, including
-                  verifying business and VAT details (s11(1)(b), (c) and (f)).
+                  <Strong>To keep business records</Strong> that South African tax, company and consumer
+                  protection law require us to keep, where an enquiry becomes a sale (s11(1)(c)).
                 </>,
                 <>
-                  <Strong>To provide your account and Garage</Strong>, which exist only because you asked
-                  us to create them; you can delete them at any time (s11(1)(a) and (b)).
-                </>,
-                <>
-                  <Strong>To send allocation alerts and news</Strong> where you have subscribed (s11(1)(a);
-                  see section 10).
-                </>,
-                <>
-                  <Strong>To keep the website secure, prevent abuse and keep business records</Strong>{' '}
-                  that South African tax, company and consumer protection law require us to keep
-                  (s11(1)(c) and (f)).
+                  <Strong>To keep the website secure and prevent abuse</Strong>, which is in our
+                  legitimate interest (s11(1)(f)).
                 </>,
               ]}
             />
@@ -247,32 +252,20 @@ export const PrivacyPolicyPage: React.FC = () => {
           </Section>
 
           <Section index="04" title="Who we share it with">
-            <p>We share personal information only with the categories of recipients below, and only to the extent needed for the purposes in section 03.</p>
+            <p>We share personal information only with the recipients below, and only to the extent needed for the purposes in section 03.</p>
             <Bullets
               items={[
                 <>
-                  <Strong>Our infrastructure providers</Strong>: this website, client accounts and the
-                  Garage run on Google LLC services (Firebase Authentication, Cloud Firestore and Google
-                  hosting). Page fonts are loaded from Google Fonts, which receives your IP address when
-                  the page loads. Google acts as our operator under its data processing terms.
+                  <Strong>WhatsApp (Meta Platforms)</Strong>: carries the messages you send us and
+                  handles them under its own terms and privacy policy.
                 </>,
                 <>
-                  <Strong>The business tools we use to receive and act on enquiries</Strong>: when you
-                  submit an interest request, dealer application or newsletter sign-up, the details may
-                  be routed to the systems our team works in, which may include our email provider, our
-                  WhatsApp Business account (operated by Meta Platforms), our customer relationship
-                  management system, a spreadsheet and the workflow automation service that connects them.
-                  Each acts on our instructions.
+                  <Strong>Our website providers</Strong>: Render hosts this website, and Google Fonts
+                  supplies its typefaces (see section 02).
                 </>,
                 <>
-                  <Strong>Fitment and installation partners</Strong>: if you ask us to arrange fitment at
-                  a partner workshop, we share the contact and vehicle details needed to book it, and
-                  only after confirming that with you.
-                </>,
-                <>
-                  <Strong>Professional advisers and authorities</Strong>: our accountants, lawyers and
-                  insurers where necessary, and public bodies where the law requires it or to establish,
-                  exercise or defend legal claims.
+                  <Strong>Professional advisers and authorities</Strong>: only where the law requires
+                  it, or to establish, exercise or defend legal claims.
                 </>,
               ]}
             />
@@ -280,39 +273,21 @@ export const PrivacyPolicyPage: React.FC = () => {
 
           <Section index="05" title="Transfers outside South Africa">
             <p>
-              Some of the providers in section 04, including Google and Meta, store and process
-              information on servers outside South Africa, for example in the United States or the
-              European Union. Section 72 of POPIA allows this where the recipient is subject to a law,
-              binding corporate rules or a binding agreement that provides substantially similar
-              protection to POPIA, where the transfer is necessary to perform a contract with you or to
-              take steps at your request before a contract, or where you consent. We rely on our
-              providers&apos; binding data processing terms and, for enquiries you send us, on the
-              transfer being necessary to respond to your request.
+              Some of the providers in section 04, including Meta, Google and our hosting provider,
+              store and process information on servers outside South Africa. Section 72 of POPIA allows
+              this where the recipient is subject to a law, binding corporate rules or a binding
+              agreement that provides substantially similar protection to POPIA, where the transfer is
+              necessary to perform a contract with you or to take steps at your request before a
+              contract, or where you consent. For messages you send us, the transfer is necessary to
+              respond to your request.
             </p>
           </Section>
 
           <Section index="06" title="Cookies and local storage">
             <p>
-              We do not use advertising, analytics or third-party tracking cookies. The website uses
-              the following strictly necessary storage in your browser:
-            </p>
-            <Bullets
-              items={[
-                <>
-                  <Strong>Local storage</Strong>: admin preview wheels and a record of enquiries you
-                  have submitted, so that they survive a page reload.
-                  This data never leaves your device through this mechanism.
-                </>,
-                <>
-                  <Strong>Authentication session</Strong>: when you sign in with Google, Firebase
-                  Authentication stores a session token in your browser so you stay signed in.
-                </>,
-              ]}
-            />
-            <p className="pt-1">
-              You can clear this storage at any time through your browser settings. Doing so signs you
-              out and resets your saved preferences, but does not delete any account or Garage you
-              created earlier. To have those deleted, write to us at the privacy address in section 09.
+              This website does not set cookies and does not store anything in your browser&apos;s local
+              storage. We do not use advertising, analytics or third-party tracking cookies. When you
+              open WhatsApp from this website, WhatsApp applies its own cookie and privacy practices.
             </p>
           </Section>
 
@@ -320,9 +295,9 @@ export const PrivacyPolicyPage: React.FC = () => {
             <Bullets
               items={[
                 <>
-                  <Strong>Enquiries and dealer applications</Strong>: for as long as needed to respond
-                  and follow up, and then for up to five years from our last contact with you, so that
-                  we can honour quotations and answer later questions about a specification.
+                  <Strong>Messages and enquiries</Strong>: for as long as needed to respond and follow
+                  up, and then for up to five years from our last contact with you, so that we can honour
+                  quotations and answer later questions about a specification.
                 </>,
                 <>
                   <Strong>Transaction records</Strong>: where an enquiry leads to a sale, invoices and
@@ -330,15 +305,8 @@ export const PrivacyPolicyPage: React.FC = () => {
                   generally five to seven years.
                 </>,
                 <>
-                  <Strong>Accounts and the Garage</Strong>: until you delete them. We may delete accounts
-                  that have been inactive for 24 months after notifying the email address on the account.
-                </>,
-                <>
-                  <Strong>Newsletter</Strong>: until you unsubscribe.
-                </>,
-                <>
                   <Strong>Server logs</Strong>: retained by our hosting providers for their standard
-                  security retention periods, typically no longer than 12 months.
+                  security retention periods.
                 </>,
               ]}
             />
@@ -346,13 +314,10 @@ export const PrivacyPolicyPage: React.FC = () => {
 
           <Section index="08" title="How we protect it">
             <p>
-              All traffic to this website is encrypted in transit. Account and Garage data in Cloud
-              Firestore is protected by security rules that allow each record to be read or changed only
-              by the signed-in account that owns it, and only with a verified email address; nobody can
-              list other clients&apos; records. Access within our business is limited to the people who
-              need it to respond to you. If a security compromise affects your personal information we
-              will notify the Information Regulator and, where required, you, as section 22 of POPIA
-              requires.
+              All traffic to this website is encrypted in transit. Access within our business is limited
+              to the people who need it to respond to you. If a security compromise affects your
+              personal information we will notify the Information Regulator and, where required, you, as
+              section 22 of POPIA requires.
             </p>
           </Section>
 
@@ -364,56 +329,47 @@ export const PrivacyPolicyPage: React.FC = () => {
                 <>have inaccurate, incomplete or out-of-date information corrected, and to have information deleted or destroyed where we are no longer entitled to keep it;</>,
                 <>object, on reasonable grounds, to processing based on our legitimate interests;</>,
                 <>withdraw consent at any time where processing relies on it, without affecting what was done before;</>,
-                <>object to direct marketing and to be removed from our mailing list;</>,
+                <>object to direct marketing and to be removed from any list we message;</>,
                 <>not be subject to a decision based solely on automated processing that significantly affects you;</>,
                 <>complain to the Information Regulator (section 12).</>,
               ]}
             />
             <p className="pt-2">
-              To exercise any of these rights, email our Information Officer at{' '}
-              <a
-                href={`mailto:${RESPONSIBLE_PARTY.privacyEmail}`}
-                className="text-[#FF5500] font-tech-mono hover:underline"
-              >
-                {RESPONSIBLE_PARTY.privacyEmail}
-              </a>{' '}
-              or use the button below. Requests under the Promotion of Access to Information Act may be
-              made on the prescribed forms, which we will supply on request. We may ask you to confirm
-              your identity before acting, and we will respond without undue delay and within the
-              statutory periods. Access and correction requests are free unless the law allows a fee.
+              To exercise any of these rights, contact us using the details in section 01
+              {requestLink ? ' or use the button below' : ''}. Requests under the Promotion of Access to
+              Information Act may be made on the prescribed forms, which we will supply on request. We
+              may ask you to confirm your identity before acting, and we will respond without undue delay
+              and within the statutory periods. Access and correction requests are free unless the law
+              allows a fee.
             </p>
-            <div className="pt-3">
-              <button
-                type="button"
-                onClick={() =>
-                  openEnquiryModal({
-                    subject: 'POPIA data subject request (access / correction / deletion / objection)',
-                    domain: 'brand',
-                  })
-                }
-                className="bg-[#18181D] border border-[#33333E] hover:border-[#FF5500] text-white hover:text-[#FF5500] rounded-full px-5 py-2.5 text-xs font-tech-mono uppercase tracking-wider transition-colors cursor-pointer inline-flex items-center gap-2"
-              >
-                <Mail className="w-3.5 h-3.5 text-[#FF5500]" />
-                <span>Submit a data subject request</span>
-              </button>
-            </div>
+            {requestLink ? (
+              <div className="pt-3">
+                <a
+                  href={requestLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-[#18181D] border border-[#33333E] hover:border-[#FF5500] text-white hover:text-[#FF5500] rounded-full px-5 py-2.5 text-xs font-tech-mono uppercase tracking-wider transition-colors cursor-pointer inline-flex items-center gap-2"
+                >
+                  <MessageCircle className="w-3.5 h-3.5 text-[#FF5500]" />
+                  <span>Send a privacy request on WhatsApp</span>
+                </a>
+              </div>
+            ) : null}
           </Section>
 
-          <Section index="10" title="Direct marketing">
+          <Section index="10" title="Contacting you">
             <p>
-              We send marketing by electronic means only where you have opted in (for example by
-              subscribing to allocation alerts), or where you are an existing customer and the message
-              concerns similar products, in which case you were given the chance to opt out when we
-              collected your details. Every marketing message includes a way to unsubscribe, and we act
-              on it promptly. This follows section 69 of POPIA.
+              This website has no newsletter or mailing list. We message or call you only in reply to
+              your own enquiry, or about a sale you have asked about. If you do not want us to contact
+              you, tell us and we will stop. This follows section 69 of POPIA.
             </p>
           </Section>
 
           <Section index="11" title="Children">
             <p>
               This website is intended for adults. We do not knowingly collect personal information
-              from anyone under 18. If you believe a child has provided information to us, contact the
-              Information Officer and we will delete it.
+              from anyone under 18. If you believe a child has sent us information, contact us using
+              the details in section 01 and we will delete it.
             </p>
           </Section>
 
@@ -479,8 +435,7 @@ export const PrivacyPolicyPage: React.FC = () => {
           <Section index="13" title="Changes to this notice">
             <p>
               We will update this notice when our processing changes, and the revision date at the top
-              will change with it. If a change materially affects account holders, we will also notify
-              the email address on the account before it takes effect.
+              will change with it.
             </p>
           </Section>
         </div>
@@ -490,8 +445,8 @@ export const PrivacyPolicyPage: React.FC = () => {
           <div className="flex items-center gap-2">
             <ShieldCheck className="w-4 h-4 text-[#FF5500]" />
             <span>
-              {RESPONSIBLE_PARTY.tradingName} · {RESPONSIBLE_PARTY.country} · Information Officer:{' '}
-              {RESPONSIBLE_PARTY.privacyEmail}
+              {RESPONSIBLE_PARTY.tradingName} · {RESPONSIBLE_PARTY.country}
+              {SITE.phoneDisplay ? ` · ${SITE.phoneDisplay}` : ''}
             </span>
           </div>
           <button

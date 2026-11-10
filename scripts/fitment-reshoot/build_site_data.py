@@ -13,9 +13,13 @@ Each published install gets three images in public/assets/fitments/<slug>/:
                             edge, all metadata (GPS, device) stripped (+ original_800.webp)
 The original is written from --rawdir when the source file is there; otherwise the copy already in
 the site is kept. HEIC originals need `pip install pillow-heif`.
+
+Number plates are pixelated: each job lists `plates`, boxes as [left, top, right, bottom] in
+percent of the EXIF-rotated photo (the renders drop plates entirely, so the published photo
+should not show them either). A job with no visible plate carries an empty list.
 """
 import argparse, json, os, shutil, sys
-from PIL import Image, ImageOps
+from PIL import Image, ImageFilter, ImageOps
 
 try:  # iPhone HEIC originals
     from pillow_heif import register_heif_opener
@@ -43,9 +47,23 @@ if args.approved and os.path.exists(args.approved):
     approved = {l.strip() for l in open(args.approved) if l.strip() and not l.startswith("#")}
 
 
-def write_original(src, dest):
-    """Rotate per EXIF, downscale and re-encode the phone photo without its metadata."""
-    im = ImageOps.exif_transpose(Image.open(src)).convert("RGB")
+def hide_plates(im, plates):
+    """Pixelate and soften each plate box (percent coordinates) so the characters cannot be read."""
+    w, h = im.size
+    for left, top, right, bottom in plates:
+        box = (int(w * left / 100), int(h * top / 100), int(w * right / 100), int(h * bottom / 100))
+        if box[2] <= box[0] or box[3] <= box[1]:
+            raise ValueError(f"empty plate box {[left, top, right, bottom]}")
+        region = im.crop(box)
+        coarse = region.resize((max(1, region.width // 24), max(1, region.height // 24)), Image.BILINEAR)
+        region = coarse.resize(region.size, Image.BILINEAR).filter(ImageFilter.GaussianBlur(max(2, region.width // 40)))
+        im.paste(region, box)
+    return im
+
+
+def write_original(src, dest, plates):
+    """Rotate per EXIF, hide plates, downscale and re-encode the phone photo without its metadata."""
+    im = hide_plates(ImageOps.exif_transpose(Image.open(src)).convert("RGB"), plates)
     for width in ORIGINAL_WIDTHS:
         r = im.copy(); r.thumbnail((width, width), Image.LANCZOS)
         name = "original.webp" if width == ORIGINAL_WIDTHS[0] else f"original_{width}.webp"
@@ -69,11 +87,13 @@ for j in jobs:
                 t = os.path.join(d, f"{slug}_{a}_800.webp")
                 if os.path.exists(t): shutil.copyfile(t, os.path.join(dest, f"{a}_800.webp"))
         raw = os.path.join(args.rawdir, j["sources"][0])
+        if "plates" not in j:
+            sys.exit(f"build_site_data: {slug}: add `plates` to jobs.json (a list of [left, top, right, bottom] percent boxes, or [])")
         if os.path.exists(raw):
-            write_original(raw, dest)
+            write_original(raw, dest, j["plates"])
         elif not os.path.exists(os.path.join(dest, "original.webp")) and not args.all:
             sys.exit(f"build_site_data: {slug}: original photo {j['sources'][0]} is neither in {args.rawdir} nor already in {dest}")
-    except (OSError, ValueError) as e:  # ValueError: Pillow could not decode the photo
+    except (OSError, ValueError, TypeError) as e:  # ValueError: undecodable photo or bad plate box; TypeError: non-numeric box
         sys.exit(f"build_site_data: could not write images for {slug} into {dest}: {e}")
     published.append(j)
 

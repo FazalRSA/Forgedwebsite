@@ -23,8 +23,11 @@ Pipeline (Gemini 3 Pro Image via OpenRouter, ~US$0.14 per image at 2K):
 4. `python3 build_site_data.py --site ../.. --rawdir raw` copies the 1600px WebPs into
    `public/assets/fitments/<slug>/`, writes the phone photo there as `original.webp`
    (EXIF-rotated, 1600 px long edge, GPS and device metadata stripped, plus an 800 px
-   thumbnail) and regenerates `src/data/clientFitments.ts`. Installs whose renders are
-   already in the site are kept, so the data file can be regenerated without re-rendering.
+   thumbnail) and regenerates `src/data/clientFitments.ts`. Number plates are pixelated
+   from the `plates` boxes in `jobs.json` ([left, top, right, bottom] in percent of the
+   rotated photo; `[]` when none is visible), since the renders carry no plate either.
+   Installs whose renders are already in the site are kept, so the data file can be
+   regenerated without re-rendering.
    HEIC phone photos need `pip install pillow-heif`; `raw/`, `out/` and `logs/` are
    git-ignored.
 
