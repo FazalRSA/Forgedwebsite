@@ -24,7 +24,7 @@ export const SITE_NAME = 'FORGED Custom Wheels';
 export const SITE_ORIGIN = `https://${SITE.domain}`;
 
 /** Link-preview image for pages that have no picture of their own (a catalogue wheel photo). */
-export const DEFAULT_SHARE_IMAGE = '/images/wheels/ff-1-liquid-metal/hero.webp';
+export const DEFAULT_SHARE_IMAGE = '/images/share/forged-wheels-share.jpg';
 
 /** Longest title that search results show without cutting it off. */
 const MAX_TITLE_LENGTH = 60;
@@ -221,8 +221,64 @@ export function metaForPath(rawPath: string): PageMeta {
   if (path.startsWith('/admin') || path.startsWith('/studio/')) {
     return hidden(path);
   }
-  // Any other path renders the home page.
-  return HOME;
+  if (isHomePath(path)) return HOME;
+  // Anything else is not a page on this site.
+  return {
+    title: `Page not found | ${SITE_NAME}`,
+    description: `That page does not exist on ${SITE_NAME}. Browse the forged wheel catalogue instead.`,
+    canonicalPath: path,
+    noindex: true,
+  };
+}
+
+/** True for the paths that show the home page. */
+export function isHomePath(path: string): boolean {
+  return path === '' || path === '/' || path === '/index.html';
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+/**
+ * Bake one page's metadata into the built HTML shell, for crawlers and link-preview bots
+ * (WhatsApp, Facebook, Slack) that do not run JavaScript. The app still applies the same
+ * metadata in the browser, so the two always agree.
+ */
+export function renderPageHtml(shell: string, meta: PageMeta, origin: string = SITE_ORIGIN): string {
+  const title = escapeHtml(meta.title);
+  const description = escapeHtml(meta.description);
+  const canonicalUrl = escapeHtml(absoluteUrl(meta.canonicalPath, origin));
+  const shareImage = escapeHtml(absoluteUrl(meta.image ?? DEFAULT_SHARE_IMAGE, origin));
+  const setContent = (html: string, attr: 'name' | 'property', key: string, content: string) =>
+    html.replace(new RegExp(`(<meta ${attr}="${key}" content=")[^"]*(")`), `$1${content}$2`);
+
+  let html = shell.replace(/<title>[^<]*<\/title>/, `<title>${title}</title>`);
+  html = setContent(html, 'name', 'description', description);
+  html = setContent(html, 'property', 'og:title', title);
+  html = setContent(html, 'property', 'og:description', description);
+  html = setContent(html, 'property', 'og:image', shareImage);
+  html = setContent(html, 'name', 'twitter:title', title);
+  html = setContent(html, 'name', 'twitter:description', description);
+  html = setContent(html, 'name', 'twitter:image', shareImage);
+
+  const extra = [
+    `<link rel="canonical" href="${canonicalUrl}" />`,
+    `<meta property="og:url" content="${canonicalUrl}" />`,
+    meta.noindex ? '<meta name="robots" content="noindex, nofollow" />' : '',
+    meta.jsonLd
+      ? `<script id="page-jsonld" type="application/ld+json">${JSON.stringify(
+          absolutiseJsonLd(meta.jsonLd, origin)
+        ).replace(/</g, '\\u003c')}</script>`
+      : '',
+  ]
+    .filter(Boolean)
+    .join('\n    ');
+  return html.replace('</head>', `    ${extra}\n  </head>`);
 }
 
 /** Make a site-relative path absolute; leave full URLs alone. */

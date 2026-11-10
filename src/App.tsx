@@ -1,6 +1,6 @@
 import React, { Suspense, lazy, useEffect } from 'react';
 import { RouterProvider, useRouter } from './utils/router';
-import { applyPageMeta, metaForPath } from './utils/seo';
+import { applyPageMeta, isHomePath, metaForPath } from './utils/seo';
 import { FirebaseProvider } from './context/FirebaseContext';
 import { BrandHeader } from './components/brand/BrandHeader';
 import { HeroSection } from './components/brand/HeroSection';
@@ -11,6 +11,12 @@ import { GlobalOverlays } from './components/shared/GlobalOverlays';
 import { StackedCircularFooter } from '@/components/ui/stacked-circular-footer';
 
 // Lazy-loaded route components for code-splitting and faster initial bundle evaluation
+const NotFoundPage = lazy(() =>
+  import('./components/brand/NotFoundPage').then((m) => ({
+    default: m.NotFoundPage,
+  }))
+);
+
 const DealerApplicationPage = lazy(() =>
   import('./components/brand/DealerApplicationPage').then((m) => ({
     default: m.DealerApplicationPage,
@@ -198,7 +204,12 @@ function AppRoutes() {
   }
 
   // Route 1: / — Brand Editorial Landing Page & Interactive Wheel Catalogue
-  return <BrandHomePage />;
+  if (isHomePath(pathname)) {
+    return <BrandHomePage />;
+  }
+
+  // Anything else is not a page on this site.
+  return <NotFoundPage />;
 }
 
 function MainLayout() {
