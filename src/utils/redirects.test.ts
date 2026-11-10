@@ -3,18 +3,23 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { applyRedirect, normalizePath, redirectFor } from './redirects';
 
-test('old store and Sixnine addresses go to the in-stock wheels on the home page', () => {
+test('old store addresses go to the in-stock wheels on the home page', () => {
   for (const old of [
     '/store',
     '/store/',
     '/store/collections/bmw-m3-2024-onwards-alloy-wheels',
     '/store/products/bmw-m3-type-52-forged',
-    '/sixnine-wheels',
-    '/sixnine-wheels/',
-    '/official-dealer-sixnine-wheels',
-    '/official-dealer-sixnine-wheels/',
   ]) {
     assert.equal(redirectFor(old), '/#catalogue', old);
+  }
+});
+
+test('the Sixnine dealer page is a real page, and its old longer address goes to it', () => {
+  for (const real of ['/sixnine-wheels', '/sixnine-wheels/']) {
+    assert.equal(redirectFor(real), null, real);
+  }
+  for (const old of ['/official-dealer-sixnine-wheels', '/official-dealer-sixnine-wheels/']) {
+    assert.equal(redirectFor(old), '/sixnine-wheels', old);
   }
 });
 
@@ -57,6 +62,7 @@ test('the pages that exist, and look-alike paths, are not redirected', () => {
     '/wheels/fsa002-gold',
     '/installs',
     '/contact',
+    '/sixnine-wheels',
     '/privacy-policy',
     '/studio/stf399',
     '/admin',
@@ -70,7 +76,7 @@ test('the pages that exist, and look-alike paths, are not redirected', () => {
 });
 
 test('no redirect target is itself an old address, so a redirect can never loop', () => {
-  const olds = ['/store', '/client-fitments', '/account', '/garage', '/dealer-application', '/sixnine-wheels', '/wheels'];
+  const olds = ['/store', '/client-fitments', '/account', '/garage', '/dealer-application', '/official-dealer-sixnine-wheels', '/wheels'];
   for (const old of olds) {
     const target = redirectFor(old);
     assert.ok(target, old);

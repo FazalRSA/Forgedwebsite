@@ -21,7 +21,7 @@ const formatSizes = (sizes?: string): string =>
 /** A generated stand-in picture (no real photo yet) is never shown to visitors; a plain tile is used instead. */
 const isGeneratedPlaceholder = (src: string): boolean => src.startsWith('data:');
 
-const WheelCard: React.FC<{ wheel: BrandWheelItem; index: number }> = ({ wheel, index }) => {
+export const WheelCard: React.FC<{ wheel: BrandWheelItem; index: number }> = ({ wheel, index }) => {
   const design = designOf(wheel);
   const finish = wheel.finishName ?? '';
   const sizes = formatSizes(wheel.sizesAvailable);
