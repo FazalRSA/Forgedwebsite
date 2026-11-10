@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { SITE_NAME, metaForPath } from './seo';
+import { SITE_NAME, buildSitemapXml, metaForPath, sitemapPaths } from './seo';
 import { BRAND_WHEELS, STORE_PRODUCTS } from '../data/catalogue';
 
 test('home page metadata names the business and stays indexable', () => {
@@ -49,4 +49,20 @@ test('private and preview pages are noindex; alias routes share one canonical pa
   assert.equal(metaForPath('/store/client-fitments').canonicalPath, '/client-fitments');
   assert.equal(metaForPath('/official-dealer-sixnine-wheels/').canonicalPath, '/sixnine-wheels');
   assert.equal(metaForPath('/client-fitments?x=1#top').canonicalPath, '/client-fitments');
+});
+
+test('the sitemap lists every wheel once, only indexable canonical pages, on the production domain', () => {
+  const paths = sitemapPaths();
+  assert.equal(new Set(paths).size, paths.length);
+  assert.ok(paths.includes('/'));
+  for (const wheel of BRAND_WHEELS) assert.ok(paths.includes(`/wheels/${wheel.slug}`), wheel.slug);
+  for (const p of paths) {
+    const m = metaForPath(p);
+    assert.equal(m.noindex, false, p);
+    assert.equal(m.canonicalPath, p);
+  }
+  assert.ok(!paths.some((p) => p.startsWith('/admin') || p.startsWith('/account') || p.startsWith('/studio')));
+  const xml = buildSitemapXml('https://example.test');
+  assert.equal((xml.match(/<loc>/g) ?? []).length, paths.length);
+  assert.ok(xml.includes('<loc>https://example.test/</loc>'));
 });
