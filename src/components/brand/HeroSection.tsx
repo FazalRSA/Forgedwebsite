@@ -51,13 +51,13 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         <div className="max-w-3xl space-y-4">
           <div className="flex items-center gap-2 text-xs font-tech-mono tracking-[0.2em] uppercase text-[#FF5500]">
             <span className="w-1.5 h-1.5 rounded-full bg-[#FF5500]" />
-            <span>Market Leader · Bespoke Forged Wheels</span>
+            <span>Forged Wheels · BMW M · South Africa</span>
           </div>
           <h1 className="text-4xl sm:text-6xl md:text-7xl font-light tracking-[-0.035em] leading-[1.05] text-white">
-            The pinnacle of custom forged engineering.
+            Forged wheels for BMW M cars.
           </h1>
           <p className="text-base sm:text-lg text-neutral-300 font-light max-w-2xl leading-relaxed pt-1">
-            Engineered from 6061-T6 aerospace aluminum with zero-rub hub-centric precision for the world&apos;s most demanding performance platforms.
+            Forged 6061-T6 aluminium wheel sets in hub-centric BMW M fitments, priced in Rand per set of four.
           </p>
         </div>
 

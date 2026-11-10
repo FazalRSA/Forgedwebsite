@@ -130,7 +130,7 @@ export const GlobalOverlays: React.FC = () => {
                     Reference #{submittedSuccessId}
                   </h3>
                   <p className="text-xs sm:text-sm text-[#C2C2CC] max-w-md mx-auto leading-relaxed">
-                    Your interest and build preferences have been logged. A dedicated FORGED Custom wheels technical specialist will prepare a bespoke fitment specification sheet and reach out to you within 24 hours.
+                    Your interest and build preferences have been logged. We will review your fitment details and contact you using the details you provided.
                   </p>
                 </div>
 

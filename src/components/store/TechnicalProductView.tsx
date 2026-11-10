@@ -285,7 +285,7 @@ export const TechnicalProductView: React.FC<TechnicalProductViewProps> = ({
                     </p>
                   </div>
                   <span className="text-xs font-tech-mono font-semibold uppercase text-emerald-400">
-                    IN STOCK (SA DISPATCH)
+                    IN STOCK
                   </span>
                 </div>
 

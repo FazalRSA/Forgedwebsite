@@ -135,7 +135,8 @@ export function createWheelAndProductEntries(input: NewWheelInput): {
       diameters: `${diameterBadge} Staggered & Square Fitments`,
       finishOptions: 'Satin Black · Liquid Silver · Champagne Bronze · Anthracite Gunmetal',
       testing: 'Load rating and fitment specification supplied with every set',
-      warranty: '3-Year Structural & 2-Year Finish Craftsmanship Guarantee',
+      // Left empty until the owner supplies written warranty terms; the spec table hides empty rows.
+      warranty: '',
     },
     compatibleStoreProductSlug: storeSlug,
   };
@@ -173,7 +174,8 @@ export function createWheelAndProductEntries(input: NewWheelInput): {
       construction: 'FORGED',
       boltPattern: input.boltPattern?.trim().toUpperCase() || '5 X 112',
       partNo,
-      loadRating: '880 KG PER WHEEL',
+      // No default figure: a load rating must come from the manufacturer's documents for the exact wheel.
+      loadRating: 'ON REQUEST',
       centerBore: '66.6 MM (DIRECT HUB-CENTRIC)',
     },
     aboutBullets: [
@@ -184,7 +186,7 @@ export function createWheelAndProductEntries(input: NewWheelInput): {
     ],
     importantInfoBullets: [
       'Price displayed is for a complete set of 4 forged alloy wheels.',
-      'Insured delivery nationwide across South Africa; export shipping on request.',
+      'Delivery and fitting are arranged when you enquire.',
     ],
   };
 

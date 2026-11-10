@@ -78,17 +78,17 @@ export const EditorialFlow: React.FC = () => {
 
   return (
     <div id="heritage" className="scroll-mt-20 max-w-7xl mx-auto px-4 sm:px-6 md:px-10 py-10 space-y-12">
-      {/* Customer Fitments Carousel — Market Leader in South Africa */}
+      {/* Customer Fitments Carousel */}
       <section className="py-6 space-y-6">
-        {/* Section Header: South Africa Market Leadership Positioning */}
+        {/* Section Header */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
           <div className="space-y-3 max-w-3xl">
-            <h3 className="text-3xl sm:text-4xl md:text-5xl font-normal tracking-[-0.03em] leading-tight text-white">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-normal tracking-[-0.03em] leading-tight text-white">
               Customer fitments{' '}
               <span className="font-editorial-serif italic font-normal text-[#FF5500]">
                 across South Africa.
               </span>
-            </h3>
+            </h2>
           </div>
 
           {/* Carousel Navigation Buttons & Gallery Link */}

@@ -264,7 +264,7 @@ export const VehicleFitmentWidget: React.FC = () => {
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
           <div>
             <p className="text-xs font-tech-mono uppercase tracking-[0.15em] text-[#FF5500] mb-1 font-bold">
-              DIRECT DISPATCH · SOUTH AFRICA &amp; EXPORT FREIGHT
+              IN-STOCK SETS · PRICED IN RAND
             </p>
             <h2 className="text-2xl sm:text-3xl font-bold uppercase tracking-tight text-[#F5F5F7]">
               FEATURED FORGED FITMENT PACKAGES
