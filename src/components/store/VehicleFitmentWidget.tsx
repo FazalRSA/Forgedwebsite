@@ -247,7 +247,7 @@ export const VehicleFitmentWidget: React.FC = () => {
                 <button
                   type="button"
                   onClick={() =>
-                    navigate('/store/collections/bmw-m4-2024-onwards-alloy-wheels')
+                    navigate('/store/collections/bmw-m4-alloy-wheels')
                   }
                   className="px-3 py-1 border border-[#26262E] hover:border-[#FF5500] text-[11px] font-tech-mono uppercase tracking-wider text-[#C2C2CC] hover:text-white whitespace-nowrap shrink-0 cursor-pointer bg-[#18181D]"
                 >
@@ -256,7 +256,7 @@ export const VehicleFitmentWidget: React.FC = () => {
                 <button
                   type="button"
                   onClick={() =>
-                    navigate('/store/collections/bmw-m5-2024-onwards-alloy-wheels')
+                    navigate('/store/collections/bmw-m5-alloy-wheels')
                   }
                   className="px-3 py-1 border border-[#26262E] hover:border-[#FF5500] text-[11px] font-tech-mono uppercase tracking-wider text-[#C2C2CC] hover:text-white whitespace-nowrap shrink-0 cursor-pointer bg-[#18181D]"
                 >

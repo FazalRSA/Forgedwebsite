@@ -1,5 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import customWheels from './customWheels.json';
 import {
   BMW_M_MODEL_OPTIONS,
@@ -8,6 +11,7 @@ import {
   VEHICLE_FITMENT_TREE,
   filterWheelsByMarque,
   getAllBrandWheels,
+  getAllStoreProducts,
   getAvailableMakes,
   getModelsForMake,
   getMatchingProductsForFitment,
@@ -34,7 +38,7 @@ test('MARQUE_FILTERS and getAvailableMakes expose only BMW as the car brand opti
   assert.ok(bmwWheels.every((w) => w.marques.includes('BMW')));
 });
 
-test('Vehicle Fitment Engine cascading lookup returns 5 alloy wheels for BMW M3', () => {
+test('Vehicle Fitment Engine lists every in-stock sheet set for the BMW M3 and nothing elsewhere', () => {
   const bmwModels = getModelsForMake('BMW');
   assert.ok(bmwModels.includes('M3'));
   assert.ok(bmwModels.includes('M2'));
@@ -42,33 +46,108 @@ test('Vehicle Fitment Engine cascading lookup returns 5 alloy wheels for BMW M3'
   assert.ok(bmwModels.includes('M5'));
 
   const m3Products = getMatchingProductsForFitment('BMW', 'M3');
-  assert.equal(m3Products.length, 5);
+  assert.equal(m3Products.length, 14);
+  // The sheet lists every row as available for the G80 M3 only.
+  for (const model of bmwModels.filter((m) => m !== 'M3')) {
+    assert.deepEqual(getMatchingProductsForFitment('BMW', model), [], model);
+  }
 });
 
-test('resolveCollectionBySlug handles BMW M3, M2, M4, and M5 collections', () => {
+test('resolveCollectionBySlug handles BMW M3, M2, M4, and M5 collections, including legacy slugs', () => {
   const m3Canonical = resolveCollectionBySlug('bmw-m3-2024-onwards-alloy-wheels');
   assert.equal(m3Canonical.make, 'BMW');
   assert.equal(m3Canonical.node.model, 'M3');
-  assert.equal(m3Canonical.products.length, 5);
+  assert.equal(m3Canonical.products.length, 14);
 
   const m3Shorthand = resolveCollectionBySlug('bmw-m3-2024-alloy-wheels');
   assert.equal(m3Shorthand.node.model, 'M3');
-  assert.equal(m3Shorthand.products.length, 5);
+  assert.equal(m3Shorthand.products.length, 14);
 
+  // The old dated collection slugs still resolve to their model line, now enquiry-only.
   const m2Collection = resolveCollectionBySlug('bmw-m2-2023-onwards-alloy-wheels');
   assert.equal(m2Collection.make, 'BMW');
   assert.equal(m2Collection.node.model, 'M2');
-  assert.equal(m2Collection.products.length, 4);
+  assert.equal(m2Collection.products.length, 0);
 
   const m4Collection = resolveCollectionBySlug('bmw-m4-2024-onwards-alloy-wheels');
-  assert.equal(m4Collection.make, 'BMW');
   assert.equal(m4Collection.node.model, 'M4');
-  assert.equal(m4Collection.products.length, 5);
+  assert.equal(m4Collection.products.length, 0);
 
-  const m5Collection = resolveCollectionBySlug('bmw-m5-2024-onwards-alloy-wheels');
-  assert.equal(m5Collection.make, 'BMW');
+  const m5Collection = resolveCollectionBySlug('bmw-m5-alloy-wheels');
   assert.equal(m5Collection.node.model, 'M5');
-  assert.equal(m5Collection.products.length, 4);
+  assert.equal(m5Collection.products.length, 0);
+});
+
+test('the store sells exactly the stock sheet: one product per sheet wheel, no off-sheet wheels anywhere', () => {
+  const sheetSlugs = BRAND_WHEELS.map((w) => w.slug).sort();
+  assert.equal(sheetSlugs.length, 14);
+
+  // One store product per sheet row, linked both ways.
+  assert.equal(STORE_PRODUCTS.length, 14);
+  assert.deepEqual(STORE_PRODUCTS.map((p) => p.wheelSlug).sort(), sheetSlugs);
+  for (const wheel of BRAND_WHEELS) {
+    const product = STORE_PRODUCTS.find((p) => p.slug === wheel.compatibleStoreProductSlug);
+    assert.ok(product, `${wheel.slug} has no store product`);
+    assert.equal(product.wheelSlug, wheel.slug);
+    assert.equal(product.priceZAR, wheel.priceZAR);
+    assert.equal(product.make, 'BMW');
+    assert.equal(product.model, 'M3');
+    assert.match(product.title, /\(G80\)/);
+    assert.equal(product.isSale, undefined);
+    assert.equal(product.technicalSpecs.boltPattern, '5 X 112');
+    assert.equal(product.technicalSpecs.centerBore, '66.6 MM');
+  }
+  const partNos = STORE_PRODUCTS.map((p) => p.technicalSpecs.partNo);
+  assert.equal(new Set(partNos).size, partNos.length, 'part numbers must be unique');
+
+  // Photography overrides may only touch sheet wheels, and may not add store products.
+  assert.deepEqual(
+    getAllBrandWheels().map((w) => w.slug).sort(),
+    sheetSlugs,
+    'customWheels.json introduced a wheel that is not on the stock sheet'
+  );
+  assert.equal(customWheels.storeProducts.length, 0);
+  assert.equal(getAllStoreProducts().length, 14);
+});
+
+test('generated store products carry the sheet sizes, offsets and construction', () => {
+  const fsa001 = getStoreProductBySlug('bmw-m3-fsa001-black-matte');
+  assert.equal(fsa001.diameterBadge, '19-20"');
+  assert.equal(fsa001.technicalSpecs.frontWheelSize, '19 INCH · ET8');
+  assert.equal(fsa001.technicalSpecs.rearWheelSize, '20 INCH · ET15');
+  assert.equal(fsa001.technicalSpecs.construction, '2 PIECE FORGED WHEEL');
+  assert.equal(fsa001.technicalSpecs.partNo, 'FCW-FSA001-BLACKMATTE-1920');
+  assert.equal(fsa001.setLabel, 'IN STOCK · 1 SET');
+
+  const ff3 = getStoreProductBySlug('bmw-m3-ff-3-liquid-metal');
+  assert.equal(ff3.diameterBadge, '20-21"');
+  assert.equal(ff3.technicalSpecs.frontWheelSize, '20 INCH · ET15');
+  assert.equal(ff3.technicalSpecs.rearWheelSize, '21 INCH · ET17');
+  assert.equal(ff3.technicalSpecs.construction, 'FORGED');
+  assert.equal(ff3.technicalSpecs.partNo, 'FCW-FF3-LIQUIDMETAL-2021');
+  assert.equal(ff3.setLabel, 'IN STOCK · 2 SETS');
+  assert.equal(ff3.priceZAR, 95000);
+});
+
+test('no page copy names a wheel that is not on the stock sheet', () => {
+  const legacyNames = /type\s?52|rs\s?3\.0|\bld\s?rs\b|g06\s?aero|le\s?mans|mondial|defiant|vengeance/i;
+  const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+  const offenders: string[] = [];
+  const walk = (dir: string) => {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        walk(full);
+      } else if (/\.(tsx?|json)$/.test(entry.name) && !entry.name.endsWith('.test.ts')) {
+        const text = fs.readFileSync(full, 'utf8');
+        // The legacy slug alias map in catalogue.ts is the one sanctioned mention.
+        const scrubbed = text.replace(/LEGACY_STORE_PRODUCT_SLUGS[\s\S]*?\n};\n/, '');
+        if (legacyNames.test(scrubbed)) offenders.push(path.relative(root, full));
+      }
+    }
+  };
+  walk(root);
+  assert.deepEqual(offenders, []);
 });
 
 test('every stock-sheet model option belongs to exactly one fitment node, and every seed wheel fits one', () => {
@@ -100,10 +179,6 @@ test('sheet model-line collection slugs resolve to their own node, never the M3/
   assert.equal(resolveCollectionBySlug('bmw-m5-2024-onwards-alloy-wheels').node.model, 'M5');
 });
 
-test('FSA001 store product carries the 19/20 inch badge from the stock sheet', () => {
-  assert.equal(getStoreProductBySlug('bmw-m3-type-52-forged').diameterBadge, '19-20"');
-});
-
 test('customWheels.json overrides of stock-sheet wheels keep the sheet finish names', () => {
   for (const override of customWheels.brandWheels) {
     const seed = BRAND_WHEELS.find((w) => w.slug === override.slug);
@@ -117,12 +192,18 @@ test('filterAndSortStoreProducts filters by diameter, sale flag, and price sorti
   const { products } = resolveCollectionBySlug('bmw-m3-2024-onwards-alloy-wheels');
 
   const staggeredOnly = filterAndSortStoreProducts(products, { diameter: '20-21"' });
-  assert.ok(staggeredOnly.length >= 2);
+  assert.equal(staggeredOnly.length, 13);
   assert.ok(staggeredOnly.every((p) => p.diameterBadge === '20-21"'));
 
+  const nineteenTwenty = filterAndSortStoreProducts(products, { diameter: '19-20"' });
+  assert.deepEqual(
+    nineteenTwenty.map((p) => p.slug),
+    ['bmw-m3-fsa001-black-matte']
+  );
+
+  // The sheet carries no previous prices, so nothing is on sale.
   const saleOnly = filterAndSortStoreProducts(products, { saleOnly: true });
-  assert.equal(saleOnly.length, 1);
-  assert.equal(saleOnly[0].slug, 'bmw-m3-le-mans-gt-forged');
+  assert.equal(saleOnly.length, 0);
 
   const sortedAsc = filterAndSortStoreProducts(products, { sortBy: 'price-asc' });
   assert.ok(sortedAsc[0].priceZAR <= sortedAsc[sortedAsc.length - 1].priceZAR);
@@ -136,14 +217,19 @@ test('formatZAR formats Rand with comma thousands and optional two decimals', ()
   assert.equal(formatZAR(Number.NaN), 'R 0');
 });
 
-test('getStoreProductBySlug resolves technical PDPs and BRAND_WHEELS matches 14 in-stock sheet rows', () => {
+test('getStoreProductBySlug resolves sheet slugs, wheel slugs and the legacy pre-sheet product slugs', () => {
   assert.equal(BRAND_WHEELS.length, 14);
-  const type52 = getStoreProductBySlug('bmw-m3-type-52-forged');
-  assert.equal(type52.technicalSpecs.partNo, 'FCW-FSA001-BLK-1920');
-  assert.equal(type52.priceZAR, 90000);
+  const fsa001 = getStoreProductBySlug('bmw-m3-fsa001-black-matte');
+  assert.equal(fsa001.priceZAR, 90000);
+  assert.equal(fsa001.shortModel, 'FSA001 · BLACK MATTE');
 
-  const rs30 = getStoreProductBySlug('bmw-m3-rs-3-0');
-  assert.equal(rs30.shortModel, 'WHEEL PLACEHOLDER 03');
+  // A wheel slug resolves to its own product.
+  assert.equal(getStoreProductBySlug('fsa003-hyper-black').slug, 'bmw-m3-fsa003-hyper-black');
+
+  // Old links keep working and land on the sheet row they used to stand for.
+  assert.equal(getStoreProductBySlug('bmw-m3-type-52-forged').slug, 'bmw-m3-fsa001-black-matte');
+  assert.equal(getStoreProductBySlug('bmw-m3-rs-3-0').slug, 'bmw-m3-fsa003-silver');
+  assert.equal(getStoreProductBySlug('bmw-m5-vengeance-forged').slug, 'bmw-m3-ff-3-liquid-metal');
 });
 
 test('createWheelAndProductEntries builds custom wheel and store product with images, price, and fitment', async () => {
@@ -181,7 +267,7 @@ test('createWheelAndProductEntries builds custom wheel and store product with im
     'bmw-m3-2024-onwards-alloy-wheels',
     [storeProduct]
   );
-  assert.equal(mergedM3Collection.products.length, 6);
+  assert.equal(mergedM3Collection.products.length, 15);
   assert.equal(mergedM3Collection.products[0].slug, storeProduct.slug);
 });
 
@@ -208,7 +294,7 @@ test('findWheelBySlug has no silent fallback and modelUrl flows through the whee
 });
 
 test('getStoreProductImages resolves every STORE_PRODUCTS wheelSlug to real photography when it exists', () => {
-  assert.equal(STORE_PRODUCTS.length, 8);
+  assert.equal(STORE_PRODUCTS.length, 14);
 
   // Verified by reading src/data/customWheels.json: these wheelSlugs resolve to
   // BrandWheelItem entries (via getAllBrandWheels(), which merges customWheels.json

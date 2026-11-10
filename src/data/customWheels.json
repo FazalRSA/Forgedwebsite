@@ -45,7 +45,7 @@
         "testing": "PCD 5×112 · ET8/15 · CB66.6",
         "warranty": ""
       },
-      "compatibleStoreProductSlug": "bmw-m3-ld-rs-forged",
+      "compatibleStoreProductSlug": "bmw-m3-fsa002-gold",
       "modelUrl": "/models/wheels/fsa002.glb"
     },
     {
@@ -91,7 +91,7 @@
         "testing": "PCD 5×112 · ET15/20 · CB66.6",
         "warranty": ""
       },
-      "compatibleStoreProductSlug": "bmw-m3-le-mans-gt-forged",
+      "compatibleStoreProductSlug": "bmw-m3-ff-1-silver",
       "modelUrl": "/models/wheels/ff-1.glb"
     },
     {
@@ -137,7 +137,7 @@
         "testing": "PCD 5×112 · ET15/17 · CB66.6",
         "warranty": ""
       },
-      "compatibleStoreProductSlug": "bmw-m2-mondial-retro-forged",
+      "compatibleStoreProductSlug": "bmw-m3-ff-1-liquid-metal",
       "modelUrl": "/models/wheels/ff-1.glb"
     },
     {
@@ -184,7 +184,7 @@
         "testing": "PCD 5×112 · ET8/15 · CB66.6",
         "warranty": ""
       },
-      "compatibleStoreProductSlug": "bmw-m3-rs-3-0",
+      "compatibleStoreProductSlug": "bmw-m3-fsa003-hyper-black",
       "modelUrl": "/models/wheels/fsa003.glb"
     },
     {
@@ -232,7 +232,7 @@
         "testing": "PCD 5×112 · ET8/15 · CB66.6",
         "warranty": ""
       },
-      "compatibleStoreProductSlug": "bmw-m3-g06-aero-forged",
+      "compatibleStoreProductSlug": "bmw-m3-fsa004-silver",
       "modelUrl": "/models/wheels/fsa004.glb"
     },
     {
@@ -280,7 +280,7 @@
         "testing": "PCD 5×112 · ET15/17 · CB66.6",
         "warranty": ""
       },
-      "compatibleStoreProductSlug": "bmw-m4-defiant-forged",
+      "compatibleStoreProductSlug": "bmw-m3-ff-3-pure-bronze",
       "modelUrl": "/models/wheels/ff-3.glb"
     },
     {
@@ -328,7 +328,7 @@
         "testing": "PCD 5×112 · ET15/17 · CB66.6",
         "warranty": ""
       },
-      "compatibleStoreProductSlug": "bmw-m4-defiant-forged",
+      "compatibleStoreProductSlug": "bmw-m3-ff-3-glossy-black",
       "modelUrl": "/models/wheels/ff-3.glb"
     },
     {
@@ -376,7 +376,7 @@
         "testing": "PCD 5×112 · ET15/17 · CB66.6",
         "warranty": ""
       },
-      "compatibleStoreProductSlug": "bmw-m5-vengeance-forged",
+      "compatibleStoreProductSlug": "bmw-m3-ff-3-liquid-metal",
       "modelUrl": "/models/wheels/ff-3.glb"
     }
   ],

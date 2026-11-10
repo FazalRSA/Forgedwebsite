@@ -163,7 +163,7 @@ Two record types live in `src/data/catalogue.ts`:
 - **`BrandWheelItem`**: a wheel as shown on the brand site. Key fields: `slug`, `model`, `modelCode`, `finishName`, `priceZAR`, `sizesAvailable`, `compatibleCars`, `technicalSpecSheet`, `stockStatus`, `stockQuantitySets`, `images` (exactly three), `availableFinishes`, `modelUrl`, optional `rearModelUrl`, and `compatibleStoreProductSlug`.
 - **`StoreProductItem`**: a sellable set as shown in the store. Key fields: `slug`, `wheelSlug`, `make`, `model`, `yearRange`, `priceZAR`, optional `originalPriceZAR` (shown as a sale when higher), `technicalSpecs`, optional `modelUrl`.
 
-Fourteen wheels are seeded in `INVENTORY_SEEDS`. `src/data/customWheels.json` is merged on top by slug: an entry with a seed's slug overrides it (this is how real photography is attached), and an entry with a new slug is added.
+The stock sheet is the single source of truth for what the site sells. Its fourteen rows are seeded as `INVENTORY_SEEDS`; `BRAND_WHEELS` (the catalogue) and `STORE_PRODUCTS` (one sellable set per row, slug `bmw-m3-<wheel-slug>`) are both generated from those seeds, so a wheel cannot appear in the store without being on the sheet. `src/data/customWheels.json` is merged on top by slug to attach real photography and 3D models to sheet wheels; the test suite fails if it introduces a wheel that is not on the sheet. Only the M3 (G80) fitment node carries in-stock sets, because that is the only car the sheet lists the wheels as available for; every other model line, including M2, M4 and M5, resolves to an enquiry-only collection.
 
 **Pricing.** Prices are whole Rand in `priceZAR`. `formatZAR()` is the only formatter. There is no currency conversion.
 
@@ -180,7 +180,7 @@ Fourteen wheels are seeded in `INVENTORY_SEEDS`. `src/data/customWheels.json` is
 
 3. **Add the record** to `brandWheels` in `src/data/customWheels.json`. Copy an existing entry and change the slug, names, price, sizes, finishes, spec sheet, stock and image paths. Reference images as `/images/wheels/<slug>/front.webp` (leading slash, no `public/`).
 4. **Add the 3D model** (see below) by setting `modelUrl`.
-5. **Store product**: if the wheel needs its own part number and sizes, add an entry to `storeProducts` in the same file, point the wheel's `compatibleStoreProductSlug` at it, and add its slug to the right model's `productSlugs` in `VEHICLE_FITMENT_TREE`.
+5. **Store product**: nothing to do. Each seed row generates its store product at `/store/products/bmw-m3-<slug>` and lists it in the M3 collection. A wheel must be added to `INVENTORY_SEEDS` (the stock sheet) before anything else; leave `storeProducts` in `customWheels.json` empty.
 6. Run `bun run lint`, `bun run test` and `bun run dev`, check `/wheels/<slug>` and `/#catalogue`, then open a pull request.
 
 The CLI can draft an entry:
