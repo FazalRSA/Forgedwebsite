@@ -93,7 +93,7 @@ for j in jobs:
             write_original(raw, dest, j["plates"])
         elif not os.path.exists(os.path.join(dest, "original.webp")) and not args.all:
             sys.exit(f"build_site_data: {slug}: original photo {j['sources'][0]} is neither in {args.rawdir} nor already in {dest}")
-    except (OSError, ValueError) as e:  # ValueError: Pillow could not decode the photo
+    except (OSError, ValueError, TypeError) as e:  # ValueError: undecodable photo or bad plate box; TypeError: non-numeric box
         sys.exit(f"build_site_data: could not write images for {slug} into {dest}: {e}")
     published.append(j)
 
