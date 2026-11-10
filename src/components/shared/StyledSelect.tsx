@@ -9,6 +9,11 @@ export interface StyledSelectOption {
 interface StyledSelectProps {
   /** Id placed on the trigger button — target this from an existing `<label htmlFor>`. */
   id: string;
+  /**
+   * Id of the visible field label. Names the listbox, so assistive tech hears
+   * "1. MAKE" rather than the trigger's current value. Falls back to `id`.
+   */
+  labelId?: string;
   value: string;
   onChange: (value: string) => void;
   /** Plain strings are used as both value and label. */
@@ -42,6 +47,7 @@ const normalizeOptions = (options: string[] | StyledSelectOption[]): StyledSelec
  */
 export const StyledSelect: React.FC<StyledSelectProps> = ({
   id,
+  labelId,
   value,
   onChange,
   options,
@@ -194,40 +200,41 @@ export const StyledSelect: React.FC<StyledSelectProps> = ({
         />
       </button>
 
-      {isOpen && (
-        <ul
-          id={listboxId}
-          role="listbox"
-          aria-labelledby={id}
-          tabIndex={-1}
-          className="absolute z-20 mt-1 w-full max-h-64 overflow-y-auto bg-[#18181D] border border-[#26262E] shadow-2xl py-1"
-        >
-          {normalized.map((option, index) => {
-            const isSelected = option.value === value;
-            const isActive = index === activeIndex;
-            return (
-              <li
-                key={option.value || `empty-${index}`}
-                id={getOptionId(index)}
-                role="option"
-                aria-selected={isSelected}
-                onMouseEnter={() => setActiveIndex(index)}
-                onMouseDown={(event) => {
-                  // Prevent the trigger's blur/outside-click handling from
-                  // firing before the click is registered.
-                  event.preventDefault();
-                }}
-                onClick={() => commitIndex(index)}
-                className={`px-4 py-2.5 text-xs font-tech-mono uppercase tracking-wider cursor-pointer ${
-                  isActive ? 'bg-[#FF5500] text-white' : 'text-[#F5F5F7]'
-                } ${isSelected && !isActive ? 'text-[#FF5500]' : ''}`}
-              >
-                {option.label}
-              </li>
-            );
-          })}
-        </ul>
-      )}
+      {/* Always mounted (hidden while closed) so the trigger's aria-controls
+          never points at an element that isn't in the DOM. */}
+      <ul
+        id={listboxId}
+        role="listbox"
+        aria-labelledby={labelId ?? id}
+        tabIndex={-1}
+        hidden={!isOpen}
+        className="absolute z-20 mt-1 w-full max-h-64 overflow-y-auto bg-[#18181D] border border-[#26262E] shadow-2xl py-1"
+      >
+        {normalized.map((option, index) => {
+          const isSelected = option.value === value;
+          const isActive = index === activeIndex;
+          return (
+            <li
+              key={option.value || `empty-${index}`}
+              id={getOptionId(index)}
+              role="option"
+              aria-selected={isSelected}
+              onMouseEnter={() => setActiveIndex(index)}
+              onMouseDown={(event) => {
+                // Prevent the trigger's blur/outside-click handling from
+                // firing before the click is registered.
+                event.preventDefault();
+              }}
+              onClick={() => commitIndex(index)}
+              className={`px-4 py-2.5 text-xs font-tech-mono uppercase tracking-wider cursor-pointer ${
+                isActive ? 'bg-[#FF5500] text-white' : 'text-[#F5F5F7]'
+              } ${isSelected && !isActive ? 'text-[#FF5500]' : ''}`}
+            >
+              {option.label}
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
 };
