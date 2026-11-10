@@ -9,6 +9,7 @@ import { HeroSection } from './components/brand/HeroSection';
 import { EditorialFlow } from './components/brand/EditorialFlow';
 import { WheelCatalogue } from './components/brand/WheelCatalogue';
 import { IndustryPartnersSection } from './components/brand/IndustryPartnersSection';
+import { AskAiSection } from './components/brand/AskAiSection';
 import { GlobalOverlays } from './components/shared/GlobalOverlays';
 import { StackedCircularFooter } from '@/components/ui/stacked-circular-footer';
 
@@ -80,6 +81,7 @@ function BrandHomePage() {
         <WheelCatalogue />
         <EditorialFlow />
         <IndustryPartnersSection />
+        <AskAiSection />
       </main>
     </div>
   );
