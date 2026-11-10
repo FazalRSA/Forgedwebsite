@@ -3,16 +3,19 @@ import { CheckCircle2, MessageCircle, X } from 'lucide-react';
 import { SITE, telLink, whatsappLink } from '../../config/site';
 import { useForgedStore } from '../../store/useForgedStore';
 import { Link } from '../../utils/router';
+import { submitLead } from '../../utils/leads';
 
 /**
  * The enquiry form. Short on purpose: a message and a phone number (name is optional).
  *
  * Where the enquiry goes:
- * - WhatsApp number set in src/config/site.ts: the form opens WhatsApp with the message already
- *   typed, and the visitor taps Send there. That is the only way an enquiry reaches the shop.
- * - No number set yet: the form has nowhere to send it. The text is saved in this browser only,
- *   and the dialog says so instead of claiming it was received.
- * There is no backend, e-mail or database behind this form.
+ * - Every submission is posted to the n8n lead workflow (src/utils/leads.ts), which logs it,
+ *   emails the shop and, when the visitor gave an email address, sends them a receipt with a
+ *   reference number.
+ * - WhatsApp number set in src/config/site.ts: the form also opens WhatsApp with the message
+ *   already typed, and the visitor taps Send there.
+ * - If the workflow cannot be reached and there is no WhatsApp number, the text is saved in this
+ *   browser only, and the dialog says so instead of claiming it was received.
  */
 const inputClass =
   'w-full min-h-12 px-4 bg-[#141418] border border-[#26262E] text-[#F5F5F7] text-base rounded-xl focus:outline-none focus:border-[#FF5500] transition-colors placeholder:text-neutral-500';
@@ -27,9 +30,16 @@ const EnquiryDialog: React.FC = () => {
   // the FSA002 in Gold ..."); from anywhere else it is a short topic, which still makes a fair start.
   const [message, setMessage] = useState(enquiryModal.subject);
   const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [name, setName] = useState('');
+  const [honeypot, setHoneypot] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [done, setDone] = useState<null | { whatsappHref: string | null }>(null);
+  const [sending, setSending] = useState(false);
+  const [done, setDone] = useState<null | {
+    whatsappHref: string | null;
+    /** Reference issued by the lead workflow, or null when it could not be reached. */
+    reference: string | null;
+  }>(null);
 
   const dialogRef = useRef<HTMLDivElement | null>(null);
 
@@ -48,15 +58,21 @@ const EnquiryDialog: React.FC = () => {
     };
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (sending) return;
     const text = message.trim();
+    const trimmedEmail = email.trim();
     if (!text) {
       setError('Please type a short message.');
       return;
     }
-    if (phoneRequired && !phone.trim()) {
-      setError('Please add a phone or WhatsApp number so we can reply.');
+    if (phoneRequired && !phone.trim() && !trimmedEmail) {
+      setError('Please add a phone number or an email address so we can reply.');
+      return;
+    }
+    if (trimmedEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      setError('That email address does not look right.');
       return;
     }
     setError(null);
@@ -66,22 +82,40 @@ const EnquiryDialog: React.FC = () => {
     if (phone.trim()) lines.push(`Phone: ${phone.trim()}`);
     const href = whatsappLink(lines.join('\n'));
 
+    setSending(true);
+    const result = await submitLead({
+      type: 'interest',
+      name: name.trim(),
+      email: trimmedEmail,
+      phone: phone.trim(),
+      subject: enquiryModal.subject || 'Website enquiry',
+      partNo: enquiryModal.partNo,
+      finish: enquiryModal.finish,
+      notes: text,
+      details: {
+        priceZAR: enquiryModal.priceZAR ? String(enquiryModal.priceZAR) : '',
+        channel: href ? 'whatsapp' : 'form',
+      },
+      website: honeypot,
+    });
+    setSending(false);
+
     if (href) {
       window.open(href, '_blank', 'noopener,noreferrer');
-    } else {
-      // Nowhere to send it yet: keep it on this device, and say so below.
+    } else if (!result.delivered) {
+      // The workflow could not be reached and there is no WhatsApp: keep it on this device, and say so below.
       submitEnquiryRecord({
         subject: enquiryModal.subject || 'Website enquiry',
         partNo: enquiryModal.partNo,
         finish: enquiryModal.finish,
         customerName: name.trim(),
-        customerEmail: '',
+        customerEmail: trimmedEmail,
         customerPhone: phone.trim(),
         vehicleRegistrationOrVin: '',
         notes: text,
       });
     }
-    setDone({ whatsappHref: href });
+    setDone({ whatsappHref: href, reference: result.delivered ? result.reference : null });
   };
 
   const tel = telLink();
@@ -106,7 +140,13 @@ const EnquiryDialog: React.FC = () => {
       >
         <div className="flex items-start justify-between gap-4">
           <h2 id="enquiry-title" className="text-xl font-semibold tracking-tight text-white">
-            {done ? (done.whatsappHref ? 'Almost there' : 'Saved on this device') : 'Send an enquiry'}
+            {done
+              ? done.whatsappHref
+                ? 'Almost there'
+                : done.reference
+                  ? 'Enquiry sent'
+                  : 'Saved on this device'
+              : 'Send an enquiry'}
           </h2>
           <button
             type="button"
@@ -135,11 +175,24 @@ const EnquiryDialog: React.FC = () => {
                   <MessageCircle className="w-5 h-5" aria-hidden="true" />
                   Open WhatsApp
                 </a>
+                {done.reference && (
+                  <p className="text-xs text-neutral-400" data-testid="enquiry-reference">
+                    We have also logged your enquiry as reference {done.reference}.
+                  </p>
+                )}
               </>
+            ) : done.reference ? (
+              <p className="flex items-start gap-2 text-sm text-[#C2C2CC]" data-testid="enquiry-reference">
+                <CheckCircle2 className="w-5 h-5 text-[#FF5500] shrink-0" aria-hidden="true" />
+                <span>
+                  We have your enquiry under reference {done.reference} and will reply on the
+                  details you gave us.
+                </span>
+              </p>
             ) : (
               <>
-                <p className="text-sm text-[#C2C2CC]">
-                  This form does not reach us yet, so your message has not been sent.
+                <p className="text-sm text-[#C2C2CC]" data-testid="enquiry-undelivered">
+                  We could not send your message right now, so it is saved on this device only.
                   {tel && SITE.phoneDisplay
                     ? ' Please call us instead.'
                     : ' Please use the details on our contact page.'}
@@ -196,6 +249,35 @@ const EnquiryDialog: React.FC = () => {
             </div>
 
             <div>
+              <label htmlFor="enq-email" className={labelClass}>
+                Email (optional, for a written reply)
+              </label>
+              <input
+                id="enq-email"
+                type="email"
+                inputMode="email"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className={inputClass}
+              />
+            </div>
+
+            {/* Honeypot: hidden from people, filled only by bots; the lead client drops it silently. */}
+            <div className="hidden" aria-hidden="true">
+              <label htmlFor="enq-website">Website</label>
+              <input
+                id="enq-website"
+                type="text"
+                name="website"
+                tabIndex={-1}
+                autoComplete="off"
+                value={honeypot}
+                onChange={(e) => setHoneypot(e.target.value)}
+              />
+            </div>
+
+            <div>
               <label htmlFor="enq-name" className={labelClass}>
                 Name (optional)
               </label>
@@ -215,9 +297,13 @@ const EnquiryDialog: React.FC = () => {
               </p>
             )}
 
-            <button type="submit" className={primaryButtonClass}>
-              {waConfigured && <MessageCircle className="w-5 h-5" aria-hidden="true" />}
-              {waConfigured ? 'Send on WhatsApp' : 'Send enquiry'}
+            <button
+              type="submit"
+              disabled={sending}
+              className={`${primaryButtonClass} disabled:opacity-60 disabled:cursor-wait`}
+            >
+              {waConfigured && !sending && <MessageCircle className="w-5 h-5" aria-hidden="true" />}
+              {sending ? 'Sending…' : waConfigured ? 'Send on WhatsApp' : 'Send enquiry'}
             </button>
 
             <p className="text-xs text-neutral-400 text-center">

@@ -115,7 +115,9 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
     requestAnimationFrame(() => view3DButtonRef.current?.focus());
   }, []);
 
-  // No number configured yet: the same button opens the enquiry form, already filled in.
+  // The button opens the enquiry form, already filled in. The form posts the enquiry to the n8n
+  // lead workflow (logged and emailed to the shop) and, with a WhatsApp number configured, then
+  // opens WhatsApp with the same message.
   const openForm = () =>
     openEnquiryModal({
       subject: message,
@@ -124,19 +126,10 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
       domain: 'brand',
     });
 
-  const enquireButton = whatsappHref ? (
-    <a
-      href={whatsappHref}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={PRIMARY_BUTTON}
-    >
-      <MessageCircle className="w-5 h-5" aria-hidden="true" />
-      Enquire on WhatsApp
-    </a>
-  ) : (
+  const enquireButton = (
     <button type="button" onClick={openForm} className={PRIMARY_BUTTON}>
-      Send an enquiry
+      {whatsappHref && <MessageCircle className="w-5 h-5" aria-hidden="true" />}
+      {whatsappHref ? 'Enquire on WhatsApp' : 'Send an enquiry'}
     </button>
   );
 
