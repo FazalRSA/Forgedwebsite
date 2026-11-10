@@ -4,7 +4,7 @@ The website for **FORGED Custom Wheels**, a South African supplier of forged all
 
 It shows the wheels that are in stock, each in photography and an interactive 3D viewer, shows past customer installs, and takes enquiries. There is no online checkout: every call to action is an enquiry.
 
-**Stock rule.** A wheel appears on the site only when its `stockStatus` is `In Stock` and `stockQuantitySets` is above zero. Anything else is hidden, never greyed out or sold as made to order. Each listing is one design in one finish; the other finishes of a design are separate listings.
+**Stock rule.** A wheel appears on the site only when its `stockStatus` is `In Stock` and `stockQuantitySets` is above zero. Each listing is one design in one finish; the other in-stock finishes of a design are separate listings. Colours a design has no stock of are offered on its wheel page as made to order, always with the notice that a lead time of 3 months applies.
 
 | | |
 | --- | --- |

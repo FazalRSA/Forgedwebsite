@@ -3,7 +3,7 @@
  * assistants, which cannot run this single-page app. Everything comes from the catalogue, the
  * installs list and SITE, so it cannot drift from the pages or state anything they do not.
  */
-import { formatZAR, getAllBrandWheels } from '../data/catalogue';
+import { formatZAR, getAllBrandWheels, TO_ORDER_LEAD_TIME } from '../data/catalogue';
 import { CLIENT_FITMENTS } from '../data/clientFitments';
 import { SITE, whatsappLink } from '../config/site';
 import { SITE_ORIGIN } from './seo';
@@ -46,7 +46,8 @@ export function buildLlmsTxt(origin: string = SITE_ORIGIN): string {
       'This file lists every set that is in stock right now, with its price in South African Rand.',
     '',
     `- ${wheels.length} listings, ${sets} sets in stock, ${formatZAR(Math.min(...prices))} to ${formatZAR(Math.max(...prices))} per set of 4.`,
-    '- Each listing is one design in one finish. A wheel that is not listed here is not in stock.',
+    '- Each listing is one design in one colour that is in stock now.',
+    `- Other colours of each design can be ordered. A lead time of ${TO_ORDER_LEAD_TIME} applies to those.`,
     '- There is no online checkout. Customers enquire on WhatsApp or by phone, and the shop confirms fitment for the car.',
     '- Prices and stock change. Confirm both with the shop before relying on them.',
     '',

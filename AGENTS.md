@@ -22,8 +22,11 @@ Run the type check, the tests and the build before you open a pull request. All 
 
 ## Rules that are easy to break
 
-1. **Stock rule.** A wheel is shown only when `stockStatus` is `In Stock` and `stockQuantitySets`
-   is above zero. Use `getAllBrandWheels()`; never list wheels another way.
+1. **Stock rule.** A wheel listing is shown only when `stockStatus` is `In Stock` and
+   `stockQuantitySets` is above zero. Use `getAllBrandWheels()`; never list wheels another way.
+   Colours a design has no stock of are offered as "to order" on its wheel page, always with
+   `TO_ORDER_NOTICE` (3 months lead time). Use `getToOrderFinishes()`; never show a to-order
+   colour as in stock or without the notice.
 2. **No invented facts.** Do not add claims the business has not confirmed: certifications,
    warranties, test standards, compatibility promises, opening hours, service areas, email
    addresses. If a value is unknown, leave it empty; components hide empty values.
