@@ -8,7 +8,7 @@ import {
   Car,
   User as UserIcon,
 } from 'lucide-react';
-import { useRouter } from '../../utils/router';
+import { Link } from '../../utils/router';
 import { displayAddress } from '../../config/site';
 import { useForgedStore } from '../../store/useForgedStore';
 import { useFirebaseAuth } from '../../context/FirebaseContext';
@@ -19,7 +19,6 @@ interface BrandHeaderProps {
 }
 
 export const BrandHeader: React.FC<BrandHeaderProps> = () => {
-  const { navigate } = useRouter();
   const { openEnquiryModal } = useForgedStore();
   const { user, profile } = useFirebaseAuth();
 
@@ -68,69 +67,68 @@ export const BrandHeader: React.FC<BrandHeaderProps> = () => {
     };
   }, [drawerOpen]);
 
-  const handleNav = (target: string) => {
+  const closeMenus = () => {
     setDrawerOpen(false);
     setWheelsDropdownOpen(false);
-    navigate(target);
   };
 
   return (
     <>
       <header className="sticky top-0 z-50 h-16 px-6 md:px-10 flex items-center justify-between gap-6 bg-[#0A0A0A]/95 backdrop-blur-md text-[#F5F5F7] border-b border-[#26262E]">
         {/* Left: Brand Logo Wireframe */}
-        <button
-          type="button"
-          onClick={() => handleNav('/')}
+        <Link
+          to="/"
+          onClick={closeMenus}
           aria-label="FORGED Custom wheels Home"
           className="shrink-0 cursor-pointer text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#FF5500] flex items-center gap-3"
         >
           <LogoPlaceholder label="IMAGE PLACEHOLDER · LOGO" variant="dark" />
-        </button>
+        </Link>
 
         {/* Center / Primary Navigation Controls */}
         <div className="flex items-center gap-4 sm:gap-6">
           {/* Direct Wheel Catalogue Link */}
-          <button
-            type="button"
-            onClick={() => handleNav('/#catalogue')}
+          <Link
+            to="/#catalogue"
+            onClick={closeMenus}
             className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-[#F5F5F7] hover:text-[#FF5500] transition-colors cursor-pointer"
           >
             <Disc3 className="w-3.5 h-3.5 text-[#FF5500] shrink-0" />
             <span>Wheel Catalogue</span>
-          </button>
+          </Link>
 
           {/* Client Fitments Link (Desktop) */}
-          <button
-            type="button"
-            onClick={() => handleNav('/client-fitments')}
+          <Link
+            to="/client-fitments"
+            onClick={closeMenus}
             className="hidden md:inline-flex text-xs sm:text-sm font-medium text-[#C2C2CC] hover:text-[#FF5500] transition-colors cursor-pointer"
           >
             Client Fitments
-          </button>
+          </Link>
 
           {/* Official Dealer of Sixnine Wheels Link (Desktop) */}
-          <button
-            type="button"
-            onClick={() => handleNav('/sixnine-wheels')}
+          <Link
+            to="/sixnine-wheels"
+            onClick={closeMenus}
             className="hidden lg:inline-flex text-xs sm:text-sm font-medium text-[#C2C2CC] hover:text-[#FF5500] transition-colors cursor-pointer whitespace-nowrap shrink-0"
           >
             Sixnine Wheels
-          </button>
+          </Link>
 
           {/* Quick Store Pill */}
-          <button
-            type="button"
-            onClick={() => handleNav('/store')}
+          <Link
+            to="/store"
+            onClick={closeMenus}
             className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-[#FF5500]/40 bg-[#FF5500]/10 text-[#FF5500] hover:bg-[#FF5500] hover:text-white text-xs font-semibold uppercase tracking-wider transition-all duration-200 cursor-pointer shadow-[0_0_12px_rgba(255,85,0,0.15)]"
           >
             <span>Store</span>
             <ArrowUpRight className="w-3.5 h-3.5" />
-          </button>
+          </Link>
 
           {/* My Account & Garage Button */}
-          <button
-            type="button"
-            onClick={() => handleNav('/account')}
+          <Link
+            to="/account"
+            onClick={closeMenus}
             className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#26262E] bg-[#141418] hover:border-[#FF5500] text-[#F5F5F7] text-xs font-mono transition-colors cursor-pointer"
           >
             {user ? (
@@ -146,7 +144,7 @@ export const BrandHeader: React.FC<BrandHeaderProps> = () => {
                 <span>Account</span>
               </>
             )}
-          </button>
+          </Link>
 
           {/* Slide-out Menu Trigger */}
           <button
@@ -203,71 +201,71 @@ export const BrandHeader: React.FC<BrandHeaderProps> = () => {
             {/* Navigation Links Body: Clean, Minimalist Typography */}
             <div className="p-6 sm:p-8 space-y-1 flex-1">
               {/* 1. Wheel Catalogue */}
-              <button
-                type="button"
-                onClick={() => handleNav('/#catalogue')}
+              <Link
+                to="/#catalogue"
+                onClick={closeMenus}
                 className="w-full py-4 border-b border-[#26262E] text-left text-2xl font-light tracking-tight hover:text-[#FF5500] transition-colors cursor-pointer flex items-center justify-between"
               >
                 <span>Wheel Catalogue</span>
                 <Disc3 className="w-5 h-5 text-[#FF5500]" />
-              </button>
+              </Link>
 
               {/* 2. Official Dealer of Sixnine Wheels */}
-              <button
-                type="button"
-                onClick={() => handleNav('/sixnine-wheels')}
+              <Link
+                to="/sixnine-wheels"
+                onClick={closeMenus}
                 className="w-full py-4 border-b border-[#26262E] text-left text-2xl font-light tracking-tight hover:text-[#FF5500] transition-colors cursor-pointer flex items-center justify-between"
               >
                 <span>Official Dealer of Sixnine Wheels</span>
                 <ArrowUpRight className="w-5 h-5 text-[#FF5500]" />
-              </button>
+              </Link>
 
               {/* 3. Wheel Store */}
-              <button
-                type="button"
-                onClick={() => handleNav('/store')}
+              <Link
+                to="/store"
+                onClick={closeMenus}
                 className="w-full py-4 border-b border-[#26262E] text-left text-2xl font-light tracking-tight hover:text-[#FF5500] transition-colors cursor-pointer flex items-center justify-between"
               >
                 <span>Wheel Store</span>
                 <ArrowUpRight className="w-5 h-5 text-[#FF5500]" />
-              </button>
+              </Link>
 
               {/* 4. My Account & Vehicle Garage */}
-              <button
-                type="button"
-                onClick={() => handleNav('/account')}
+              <Link
+                to="/account"
+                onClick={closeMenus}
                 className="w-full py-4 border-b border-[#26262E] text-left text-2xl font-light tracking-tight hover:text-[#FF5500] transition-colors cursor-pointer flex items-center justify-between"
               >
                 <span>My Account &amp; Garage</span>
                 <Car className="w-5 h-5 text-[#FF5500]" />
-              </button>
+              </Link>
 
               {/* 5. Client Fitments */}
-              <button
-                type="button"
-                onClick={() => handleNav('/client-fitments')}
-                className="w-full py-4 border-b border-[#26262E] text-left text-2xl font-light tracking-tight hover:text-[#FF5500] transition-colors cursor-pointer"
+              <Link
+                to="/client-fitments"
+                onClick={closeMenus}
+                className="block w-full py-4 border-b border-[#26262E] text-left text-2xl font-light tracking-tight hover:text-[#FF5500] transition-colors cursor-pointer"
               >
                 Client Fitments
-              </button>
+              </Link>
 
               {/* 6. Dealer Application */}
-              <button
-                type="button"
-                onClick={() => handleNav('/dealer-application')}
-                className="w-full py-4 border-b border-[#26262E] text-left text-2xl font-light tracking-tight hover:text-[#FF5500] transition-colors cursor-pointer"
+              <Link
+                to="/dealer-application"
+                onClick={closeMenus}
+                className="block w-full py-4 border-b border-[#26262E] text-left text-2xl font-light tracking-tight hover:text-[#FF5500] transition-colors cursor-pointer"
               >
                 Dealer Application
-              </button>
+              </Link>
 
               {/* 4. Admin Uploader */}
-              <button
-                type="button"
-                onClick={() => handleNav('/admin/wheels')}
-                className="w-full py-4 border-b border-[#26262E] text-left text-2xl font-light tracking-tight hover:text-[#FF5500] transition-colors cursor-pointer"
+              <Link
+                to="/admin/wheels"
+                onClick={closeMenus}
+                className="block w-full py-4 border-b border-[#26262E] text-left text-2xl font-light tracking-tight hover:text-[#FF5500] transition-colors cursor-pointer"
               >
                 Admin Uploader
-              </button>
+              </Link>
 
               {/* 5. Contact */}
               <button
@@ -279,19 +277,19 @@ export const BrandHeader: React.FC<BrandHeaderProps> = () => {
                     domain: 'brand',
                   });
                 }}
-                className="w-full py-4 border-b border-[#26262E] text-left text-2xl font-light tracking-tight hover:text-[#FF5500] transition-colors cursor-pointer"
+                className="block w-full py-4 border-b border-[#26262E] text-left text-2xl font-light tracking-tight hover:text-[#FF5500] transition-colors cursor-pointer"
               >
                 Contact
               </button>
 
               {/* 6. Privacy Policy */}
-              <button
-                type="button"
-                onClick={() => handleNav('/privacy-policy')}
-                className="w-full py-4 border-b border-[#26262E] text-left text-2xl font-light tracking-tight hover:text-[#FF5500] transition-colors cursor-pointer"
+              <Link
+                to="/privacy-policy"
+                onClick={closeMenus}
+                className="block w-full py-4 border-b border-[#26262E] text-left text-2xl font-light tracking-tight hover:text-[#FF5500] transition-colors cursor-pointer"
               >
                 Privacy Policy
-              </button>
+              </Link>
             </div>
 
             {/* Drawer Bottom Details: Clean, with Two Logo Placeholders */}
