@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import { Link, useRouter } from '../../utils/router';
-import { LogoPlaceholder } from '../shared/LogoPlaceholder';
+import { BrandLogo } from '../shared/BrandLogo';
 import { ContactCta } from './ContactCta';
 
 interface BrandHeaderProps {
@@ -68,7 +68,7 @@ export const BrandHeader: React.FC<BrandHeaderProps> = () => {
           aria-label="FORGED Custom Wheels, home"
           className="shrink-0 inline-flex items-center min-h-11"
         >
-          <LogoPlaceholder variant="dark" />
+          <BrandLogo />
         </Link>
 
         <div className="flex items-center gap-1 sm:gap-2">

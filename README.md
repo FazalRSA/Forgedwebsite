@@ -132,6 +132,8 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
 │  ├─ models/wheels/              .glb models for the 3D viewer
 │  ├─ assets/fitments/<slug>/     front34.webp · side.webp · original.webp per install
 │  ├─ images/partners/            Partner logos (transparent WebP)
+│  ├─ brand/                      FORGED monogram and wordmark (SVG)
+│  ├─ favicon.ico · icon.svg · apple-touch-icon.png   Browser and home-screen icons
 │  ├─ robots.txt
 │  └─ sitemap.xml                 Generated on every build
 ├─ scripts/
@@ -142,7 +144,7 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
 │  ├─ legacy-pages.json           The removed addresses that still get a redirect page
 │  ├─ generate-llms.ts            Writes dist/llms.txt
 │  └─ fitment-reshoot/            Pipeline for the install studio re-shoots
-├─ components/ui/                 Global footer and shared UI primitives
+├─ components/ui/                 Shared UI primitives (button, input, label, icons)
 └─ src/
    ├─ App.tsx                     Providers, route switch, lazy-loaded pages, page metadata
    ├─ config/site.ts              Business identity and contact channels
@@ -162,9 +164,9 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
    ├─ utils/wheelStudioParts.ts   Part classification and camera maths for the viewer
    ├─ utils/wheelBuilder.ts       Builds a stock listing from a short input
    └─ components/
-      ├─ brand/                   Home, catalogue, wheel page, installs, Sixnine dealer page, partners strip, Ask AI, contact, privacy
+      ├─ brand/                   Header, footer, home, catalogue, wheel page, installs, Sixnine dealer page, partners strip, Ask AI, contact, privacy
       ├─ admin/                   Admin uploader
-      ├─ shared/                  Enquiry form, SafeImage
+      ├─ shared/                  BrandLogo, enquiry form, SafeImage
       └─ visuals/                 WheelStudio (3D), WheelStage, its loading skeleton and error boundary
 ```
 
@@ -173,6 +175,8 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
 The look is dark, restrained and technical. Keep new work inside it.
 
 - **Colour tokens** live in `src/index.css`: onyx surfaces (`#0A0A0A`, `#121215`, `#18181D`), borders (`#26262E`), text greys and one accent, electric orange (`#FF5500`). Do not add new colours; WhatsApp green and Instagram pink appear only on those channels' own buttons.
+- **Logo.** `public/brand/forged-monogram.svg` (gold) and `public/brand/forged-wordmark.svg` (red and white FORGED SA) were traced from the logo files on the business's WordPress site. Their red and gold belong to the logo only; do not use them as interface colours. Use `BrandLogo` (`src/components/shared/`) for the monogram and wordmark together. The browser icons in `public/` are the monogram on an onyx tile.
+- **Footer.** `SiteFooter` (`src/components/brand/`) is on every page: the wordmark across the full width, then one column per contact channel set in `src/config/site.ts`, then the page links. An empty channel has no column.
 - **Three typefaces**, each with one job:
   - **Fraunces italic** (`--font-serif`, via `.font-editorial-serif`) for editorial headlines.
   - **Geist Sans** (`--font-sans`) for body text.
