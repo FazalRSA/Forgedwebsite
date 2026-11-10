@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { BrandHeader } from './BrandHeader';
 import { useRouter } from '../../utils/router';
-import { useKahnStore } from '../../store/useKahnStore';
+import { useForgedStore } from '../../store/useForgedStore';
 import {
   CLIENT_FITMENTS,
   FITMENT_FAMILIES,
@@ -31,7 +31,7 @@ const familyLabel = (family: string): string => {
 
 export const ClientFitmentsPage: React.FC = () => {
   const { navigate } = useRouter();
-  const { openEnquiryModal } = useKahnStore();
+  const { openEnquiryModal } = useForgedStore();
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [modalPhotoIndex, setModalPhotoIndex] = useState<0 | 1>(0);
   const [cardPhotoIndices, setCardPhotoIndices] = useState<Record<string, 0 | 1>>({});

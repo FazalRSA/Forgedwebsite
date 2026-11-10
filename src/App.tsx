@@ -192,7 +192,7 @@ function AppRoutes() {
     return <TechnicalProductView productSlug={productSlug} />;
   }
 
-  // Route 3: /store — Project Kahn Storefront & Vehicle Fitment Finder
+  // Route 3: /store — Storefront & Vehicle Fitment Finder
   if (pathname === '/store' || pathname === '/store/') {
     return <VehicleFitmentWidget />;
   }

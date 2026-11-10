@@ -22,9 +22,9 @@ import {
   WHEEL_FINISHES,
   WheelFinishId,
   formatZAR,
-} from '../../data/kahnData';
+} from '../../data/catalogue';
 import { useRouter } from '../../utils/router';
-import { useKahnStore } from '../../store/useKahnStore';
+import { useForgedStore } from '../../store/useForgedStore';
 
 const BRAKE_SYSTEM_OPTIONS: BrakeSystemType[] = [
   'M Compound Steel',
@@ -41,7 +41,7 @@ const FINISH_OPTIONS: WheelFinishId[] = [
 
 export const AccountGaragePage: React.FC = () => {
   const { navigate } = useRouter();
-  const { openEnquiryModal } = useKahnStore();
+  const { openEnquiryModal } = useForgedStore();
   const {
     user,
     authReady,

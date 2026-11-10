@@ -1,5 +1,5 @@
 {
-  "name": "react-example",
+  "name": "forged-custom-wheels",
   "private": true,
   "license": "UNLICENSED",
   "version": "0.0.0",
@@ -11,7 +11,7 @@
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
     "add-wheel": "tsx scripts/add-wheel.ts",
-    "test": "tsx --test src/data/kahnData.test.ts src/data/clientFitments.test.ts src/utils/wheelStudioParts.test.ts src/utils/seo.test.ts firestore.rules.test.ts"
+    "test": "tsx --test src/data/catalogue.test.ts src/data/clientFitments.test.ts src/utils/wheelStudioParts.test.ts src/utils/seo.test.ts firestore.rules.test.ts"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",

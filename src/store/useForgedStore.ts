@@ -1,10 +1,10 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { createJSONStorage, persist, type StateStorage } from 'zustand/middleware';
 import {
   BrandWheelItem,
   StoreProductItem,
   WheelFinishId,
-} from '../data/kahnData';
+} from '../data/catalogue';
 import {
   NewWheelInput,
   createWheelAndProductEntries,
@@ -41,14 +41,7 @@ export interface SubmittedEnquiryRecord {
   createdAt: string;
 }
 
-export interface ChatMessage {
-  id: string;
-  sender: 'concierge' | 'user';
-  text: string;
-  timestamp: string;
-}
-
-interface KahnStoreState {
+interface ForgedStoreState {
   // Admin Protected Route Auth State
   isAdminAuthenticated: boolean;
   loginAdmin: (passcode: string) => boolean;
@@ -112,24 +105,69 @@ interface KahnStoreState {
   submittedEnquiries: SubmittedEnquiryRecord[];
   submitEnquiryRecord: (record: Omit<SubmittedEnquiryRecord, 'id' | 'createdAt'>) => void;
 
-  // Live Concierge Chat
-  isChatOpen: boolean;
-  setChatOpen: (open: boolean) => void;
-  chatMessages: ChatMessage[];
-  sendChatMessage: (text: string) => void;
 }
 
-export const useKahnStore = create<KahnStoreState>()(
+/**
+ * Persisted-state key. The previous key was inherited from the design template;
+ * on first load after the rename, any state saved under it is copied across once
+ * so returning visitors keep their saved vehicle, wishlist and enquiry history.
+ */
+const STORAGE_KEY = 'forged-custom-wheels-store';
+const LEGACY_STORAGE_KEY = 'kahn-automotive-store-bmw-v2';
+
+/**
+ * localStorage can throw (storage disabled, private mode, quota). Treat any
+ * failure as "no persisted state" rather than breaking the store.
+ */
+function safeStorage(): Storage | null {
+  try {
+    return typeof window !== 'undefined' ? window.localStorage : null;
+  } catch {
+    return null;
+  }
+}
+
+const migratingLocalStorage: StateStorage = {
+  getItem: (name) => {
+    const ls = safeStorage();
+    if (!ls) return null;
+    try {
+      const current = ls.getItem(name);
+      if (current !== null) return current;
+      const legacy = ls.getItem(LEGACY_STORAGE_KEY);
+      if (legacy !== null) {
+        ls.setItem(name, legacy);
+        ls.removeItem(LEGACY_STORAGE_KEY);
+      }
+      return legacy;
+    } catch {
+      return null;
+    }
+  },
+  setItem: (name, value) => {
+    try {
+      safeStorage()?.setItem(name, value);
+    } catch {
+      /* quota exceeded or storage blocked: the in-memory store still works */
+    }
+  },
+  removeItem: (name) => {
+    try {
+      safeStorage()?.removeItem(name);
+    } catch {
+      /* ignore */
+    }
+  },
+};
+
+export const useForgedStore = create<ForgedStoreState>()(
   persist(
     (set, get) => ({
       isAdminAuthenticated: false,
       loginAdmin: (passcode: string) => {
         const cleaned = passcode.trim().toUpperCase();
         if (
-          cleaned === 'FORGED-BMW-2026' ||
-          cleaned === 'KAHN-BMW-2026' ||
-          cleaned === 'ADMIN' ||
-          cleaned === 'BMW2026'
+          cleaned === 'FORGED-BMW-2026'
         ) {
           set({ isAdminAuthenticated: true });
           return true;
@@ -295,44 +333,10 @@ export const useKahnStore = create<KahnStoreState>()(
           submittedEnquiries: [newRecord, ...get().submittedEnquiries],
         });
       },
-
-      isChatOpen: false,
-      setChatOpen: (open: boolean) => set({ isChatOpen: open }),
-      chatMessages: [
-        {
-          id: 'welcome-1',
-          sender: 'concierge',
-          text: 'Welcome to FORGED Custom wheels Technical Fitment Concierge. Share your vehicle model or wheel enquiry for immediate hub-centric fitment verification.',
-          timestamp: '11:18',
-        },
-      ],
-      sendChatMessage: (text: string) => {
-        const trimmed = text.trim();
-        if (!trimmed) return;
-        const userMsg: ChatMessage = {
-          id: `u-${Date.now()}`,
-          sender: 'user',
-          text: trimmed,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        };
-        const lower = trimmed.toLowerCase();
-        let replyText =
-          'Our Chelsea & Bradford technical specialists have logged your query. All forged sets ship with TUV certification and direct hub-centric bore machining.';
-        if (lower.includes('m3') || lower.includes('bmw')) {
-          replyText =
-            'For the G80/G81 BMW M3 (2024 Onwards), our Type 52 and RS 3.0 Forged sets use staggered 9.5x20 ET18 front and 10.5x21 ET20 rear specs—100% flush with M Carbon Ceramic clearance.';
-        }
-        const replyMsg: ChatMessage = {
-          id: `c-${Date.now() + 1}`,
-          sender: 'concierge',
-          text: replyText,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        };
-        set({ chatMessages: [...get().chatMessages, userMsg, replyMsg] });
-      },
     }),
     {
-      name: 'kahn-automotive-store-bmw-v2',
+      name: STORAGE_KEY,
+      storage: createJSONStorage(() => migratingLocalStorage),
       // v2: all prices are Rand; the GBP/USD/EUR switcher is gone and GBP-named
       // fields were renamed. Drop the stale currency key and re-key any
       // persisted cart lines from older sessions.
@@ -351,7 +355,7 @@ export const useKahnStore = create<KahnStoreState>()(
             });
           }
         }
-        return state as unknown as KahnStoreState;
+        return state as unknown as ForgedStoreState;
       },
       partialize: (state) => ({
         isAdminAuthenticated: state.isAdminAuthenticated,

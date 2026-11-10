@@ -9,7 +9,8 @@ import {
   User as UserIcon,
 } from 'lucide-react';
 import { useRouter } from '../../utils/router';
-import { useKahnStore } from '../../store/useKahnStore';
+import { displayAddress } from '../../config/site';
+import { useForgedStore } from '../../store/useForgedStore';
 import { useFirebaseAuth } from '../../context/FirebaseContext';
 import { LogoPlaceholder } from '../shared/LogoPlaceholder';
 
@@ -19,7 +20,7 @@ interface BrandHeaderProps {
 
 export const BrandHeader: React.FC<BrandHeaderProps> = () => {
   const { navigate } = useRouter();
-  const { openEnquiryModal } = useKahnStore();
+  const { openEnquiryModal } = useForgedStore();
   const { user, profile } = useFirebaseAuth();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -304,7 +305,7 @@ export const BrandHeader: React.FC<BrandHeaderProps> = () => {
               {/* Quiet Architectural Atelier Address */}
               <div className="text-center">
                 <p className="text-xs font-tech-mono text-neutral-400">
-                  240 CANAL ROAD · BRADFORD · UNITED KINGDOM
+                  {displayAddress()}
                 </p>
               </div>
 

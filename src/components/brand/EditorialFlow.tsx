@@ -8,7 +8,7 @@ import {
   Maximize2,
   CheckCircle2,
 } from 'lucide-react';
-import { useKahnStore } from '../../store/useKahnStore';
+import { useForgedStore } from '../../store/useForgedStore';
 import { useRouter } from '../../utils/router';
 import { WheelRenderSVG } from '../visuals/WheelRenderSVG';
 import { LogoPlaceholder } from '../shared/LogoPlaceholder';
@@ -62,7 +62,7 @@ export const SOUTH_AFRICA_FITMENTS: SouthAfricaCustomerFitment[] = CLIENT_FITMEN
 }));
 
 export const EditorialFlow: React.FC = () => {
-  const { openEnquiryModal } = useKahnStore();
+  const { openEnquiryModal } = useForgedStore();
   const { navigate } = useRouter();
   const carouselRef = useRef<HTMLDivElement | null>(null);
   const [selectedFitment, setSelectedFitment] = useState<SouthAfricaCustomerFitment | null>(null);

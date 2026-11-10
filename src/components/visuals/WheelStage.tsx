@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import type { WheelFinishId } from '../../data/kahnData';
+import type { WheelFinishId } from '../../data/catalogue';
 import { Wheel3DSceneSkeleton } from './Wheel3DSceneSkeleton';
 import { Wheel3DSceneErrorBoundary } from './Wheel3DSceneErrorBoundary';
 import { lazyWithRetry } from '../../utils/lazyWithRetry';

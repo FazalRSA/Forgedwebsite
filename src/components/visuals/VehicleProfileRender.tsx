@@ -1,5 +1,5 @@
 import React from 'react';
-import { SpokeGeometryType, WheelFinishId } from '../../data/kahnData';
+import { SpokeGeometryType, WheelFinishId } from '../../data/catalogue';
 
 interface VehicleProfileRenderProps {
   make: string;

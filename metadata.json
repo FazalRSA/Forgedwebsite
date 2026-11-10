@@ -1,6 +1,8 @@
 {
-  "name": "Kahn Design & Project Kahn — Automotive Fashion House",
-  "description": "Unified dual-domain luxury automotive digital experience featuring the Kahn Design editorial brand showcase, 360-degree forged wheel catalogue, and the Project Kahn technical e-commerce storefront with real-time vehicle fitment engine.",
+  "name": "FORGED Custom Wheels — Forged Alloy Wheels for BMW M",
+  "description": "Brand showcase and technical fitment storefront for FORGED Custom Wheels: in-stock forged wheel sets for BMW M cars priced in Rand, a vehicle fitment finder, 360° 3D wheel studio with per-wheel models, client accounts with a garage, and interest requests in place of a checkout.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }

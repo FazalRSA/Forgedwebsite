@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { BrandHeader } from './BrandHeader';
 import { WheelStudio, type StudioToggles, type StudioViewId } from '../visuals/WheelStudio';
 import { Wheel3DSceneErrorBoundary } from '../visuals/Wheel3DSceneErrorBoundary';
-import { WHEEL_FINISHES, type WheelFinishId } from '../../data/kahnData';
+import { WHEEL_FINISHES, type WheelFinishId } from '../../data/catalogue';
 
 /**
  * Unlisted preview of a wheel that is modelled in 3D but not yet in the catalogue.

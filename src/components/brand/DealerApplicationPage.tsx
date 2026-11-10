@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { BrandHeader } from './BrandHeader';
 import { useRouter } from '../../utils/router';
+import { SITE, displayAddress, tradeContactEmail } from '../../config/site';
 
 interface DealerApplicationSubmission {
   referenceId: string;
@@ -36,7 +37,7 @@ const CAPABILITY_OPTIONS = [
   'BMW M Carbon-Ceramic Brake & Hub Service',
   'Dedicated Client Lounge & Wheel Display Wall',
   'Insured International Customs & Export Handling',
-  'TÜV / JWL Homologation Inspection Desk',
+  'Wheel Load-Rating & Specification Inspection Desk',
 ];
 
 export const DealerApplicationPage: React.FC = () => {
@@ -44,7 +45,7 @@ export const DealerApplicationPage: React.FC = () => {
 
   const [companyName, setCompanyName] = useState('');
   const [tradingName, setTradingName] = useState('');
-  const [country, setCountry] = useState('United Kingdom');
+  const [country, setCountry] = useState('South Africa');
   const [city, setCity] = useState('');
   const [website, setWebsite] = useState('');
   const [contactName, setContactName] = useState('');
@@ -121,7 +122,7 @@ export const DealerApplicationPage: React.FC = () => {
               Dealer <span className="font-editorial-serif italic font-normal text-[#FF5500]">Application</span>.
             </h1>
             <p className="text-base sm:text-lg text-neutral-300 max-w-2xl leading-relaxed pt-2">
-              Join our curated international network of BMW M performance ateliers, coachbuilders, and luxury showrooms. Accredited partners receive priority Bradford &amp; Coventry forged wheel allocations, trade margin tiers, and direct engineering support.
+              Join our curated international network of BMW M performance ateliers, coachbuilders, and luxury showrooms. Accredited partners receive priority forged wheel allocations, trade margin tiers, and direct engineering support.
             </p>
           </div>
 
@@ -130,10 +131,10 @@ export const DealerApplicationPage: React.FC = () => {
               TRADE ACCREDITATION DESK
             </p>
             <p className="text-sm font-tech-mono text-white">
-              240 CANAL ROAD · BRADFORD · BD1 4SX · UK
+              {displayAddress()}
             </p>
             <p className="text-xs font-tech-mono text-[#FF5500] font-semibold">
-              DIRECT B2B DISPATCH · TÜV HOMOLOGATED
+              DIRECT B2B DISPATCH · SOUTH AFRICA &amp; EXPORT
             </p>
           </div>
         </div>
@@ -168,10 +169,10 @@ export const DealerApplicationPage: React.FC = () => {
                 02 / DIRECT BMW HUB-CENTRIC CAD DATA
               </p>
               <h2 className="text-xl font-semibold tracking-tight text-white">
-                Engineering &amp; TÜV Dossiers
+                Engineering &amp; Fitment Dossiers
               </h2>
               <p className="text-sm text-[#C2C2CC] leading-relaxed">
-                Every trade shipment includes German TÜV / JWL load certification documents, exact 5x112 / 66.6mm bore tolerances, and M Carbon Ceramic brake clearance schematics.
+                Every trade shipment includes the set's load-rating and specification documents, exact 5x112 / 66.6mm bore tolerances, and M Carbon Ceramic brake clearance schematics.
               </p>
             </div>
           </div>
@@ -231,8 +232,10 @@ export const DealerApplicationPage: React.FC = () => {
                 <p className="text-[11px] font-tech-mono uppercase tracking-[0.14em] text-neutral-400">
                   B2B TRADE CONCIERGE
                 </p>
-                <p className="text-sm font-tech-mono text-white">trade@forgedcustomwheels.co.uk</p>
-                <p className="text-xs font-tech-mono text-neutral-400">+44 (0) 1274 749 999</p>
+                <p className="text-sm font-tech-mono text-white">{tradeContactEmail()}</p>
+                {SITE.phoneDisplay && (
+                  <p className="text-xs font-tech-mono text-neutral-400">{SITE.phoneDisplay}</p>
+                )}
               </div>
             </div>
 
@@ -280,7 +283,7 @@ export const DealerApplicationPage: React.FC = () => {
 
                 <p className="text-sm sm:text-base text-[#C2C2CC] leading-relaxed">
                   Thank you, <span className="font-semibold text-white">{submission.contactName}</span>. Your trade application for{' '}
-                  <span className="font-semibold text-white">{submission.companyName}</span> ({submission.city}, {submission.country}) has been routed to the FORGED Custom wheels Global Trade Director in Bradford. You will receive your trade account onboarding pack and wholesale price schedule within 24 business hours.
+                  <span className="font-semibold text-white">{submission.companyName}</span> ({submission.city}, {submission.country}) has been recorded. Our trade team reviews every application and will contact you at the details provided to discuss accreditation, allocations and the wholesale price schedule.
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-[#18181D] p-5 rounded-2xl border border-[#26262E] text-xs font-tech-mono">
@@ -356,7 +359,7 @@ export const DealerApplicationPage: React.FC = () => {
                         type="text"
                         value={companyName}
                         onChange={(e) => setCompanyName(e.target.value)}
-                        placeholder="e.g. Apex Munich Motorsport GmbH"
+                        placeholder="e.g. Apex Motorsport (Pty) Ltd"
                         className="w-full h-11 px-4 bg-[#18181D] border border-[#33333E] rounded-xl text-sm text-[#F5F5F7] focus:outline-none focus:border-[#FF5500]"
                         required
                       />
@@ -410,7 +413,7 @@ export const DealerApplicationPage: React.FC = () => {
                         type="text"
                         value={city}
                         onChange={(e) => setCity(e.target.value)}
-                        placeholder="e.g. London / Munich / Dubai"
+                        placeholder="e.g. Johannesburg / Cape Town / Durban"
                         className="w-full h-11 px-4 bg-[#18181D] border border-[#33333E] rounded-xl text-sm text-[#F5F5F7] focus:outline-none focus:border-[#FF5500]"
                         required
                       />
@@ -525,7 +528,7 @@ export const DealerApplicationPage: React.FC = () => {
                         type="tel"
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
-                        placeholder="+44 7700 900412"
+                        placeholder="+27 82 000 0000"
                         className="w-full h-11 px-4 bg-[#18181D] border border-[#33333E] rounded-xl text-sm text-[#F5F5F7] focus:outline-none focus:border-[#FF5500]"
                         required
                       />

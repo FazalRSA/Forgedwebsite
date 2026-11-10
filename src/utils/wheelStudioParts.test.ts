@@ -8,7 +8,7 @@ import {
   explodeOffsets,
 } from './wheelStudioParts';
 import { STUDIO_FINISH_PBR, getStudioFinish } from '../data/studioFinishes';
-import { WHEEL_FINISHES } from '../data/kahnData';
+import { WHEEL_FINISHES } from '../data/catalogue';
 
 test('classifyStudioPart recognises the documented mesh names and the short legacy names', () => {
   assert.equal(classifyStudioPart('Rim_Barrel'), 'barrel');

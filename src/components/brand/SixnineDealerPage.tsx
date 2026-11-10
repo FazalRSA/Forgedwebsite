@@ -2,9 +2,9 @@ import React, { useMemo, useState } from 'react';
 import { ArrowUpRight, ShieldCheck, Layers, Gauge, Check } from 'lucide-react';
 import { motion } from 'motion/react';
 import { BrandHeader } from './BrandHeader';
-import { BRAND_WHEELS, BrandWheelItem, formatZAR } from '../../data/kahnData';
+import { BRAND_WHEELS, BrandWheelItem, formatZAR } from '../../data/catalogue';
 import { WheelLightboxModal } from './WheelLightboxModal';
-import { useKahnStore } from '../../store/useKahnStore';
+import { useForgedStore } from '../../store/useForgedStore';
 import { useRouter } from '../../utils/router';
 
 type SixnineSeriesFilter = 'ALL' | 'FF-1' | 'FF-3';
@@ -61,7 +61,7 @@ const DEALER_ASSURANCES = [
 ];
 
 export const SixnineDealerPage: React.FC = () => {
-  const { openEnquiryModal } = useKahnStore();
+  const { openEnquiryModal } = useForgedStore();
   const { navigate } = useRouter();
 
   const [seriesFilter, setSeriesFilter] = useState<SixnineSeriesFilter>('ALL');

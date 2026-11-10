@@ -8,12 +8,12 @@ import {
   getWheelImages,
   formatZAR,
   WheelFinishId,
-} from '../../data/kahnData';
-import { useKahnStore } from '../../store/useKahnStore';
+} from '../../data/catalogue';
+import { useForgedStore } from '../../store/useForgedStore';
 import { WheelLightboxModal } from './WheelLightboxModal';
 
 export const WheelCatalogue: React.FC = () => {
-  const { customBrandWheels } = useKahnStore();
+  const { customBrandWheels } = useForgedStore();
   const [activeModelFilter, setActiveModelFilter] = useState<WheelModelFilter>('ALL');
 
   const [selectedWheel, setSelectedWheel] = useState<BrandWheelItem | null>(null);
