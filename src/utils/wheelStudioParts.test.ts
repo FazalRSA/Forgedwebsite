@@ -6,7 +6,14 @@ import {
   cameraDistanceScale,
   classifyStudioPart,
   explodeOffsets,
+  isMatteFinishName,
 } from './wheelStudioParts';
+import {
+  describeWheelForEnquiry,
+  parseTechnicalSpecSheet,
+  stockLabel,
+  wheelEnquiryMessage,
+} from './wheelEnquiry';
 import { STUDIO_FINISH_PBR, getStudioFinish } from '../data/studioFinishes';
 import { WHEEL_FINISHES } from '../data/catalogue';
 
@@ -57,4 +64,49 @@ test('every catalogue finish has studio paint settings within physical ranges', 
     }
   }
   assert.equal(getStudioFinish('not-a-finish'), STUDIO_FINISH_PBR.silver);
+});
+
+test('isMatteFinishName flattens matte and satin names only', () => {
+  assert.equal(isMatteFinishName('Black Matte'), true);
+  assert.equal(isMatteFinishName('Satin Bronze'), true);
+  assert.equal(isMatteFinishName('Gloss Black'), false);
+  assert.equal(isMatteFinishName('Glossy Black'), false);
+  assert.equal(isMatteFinishName('Hyper Black'), false);
+  assert.equal(isMatteFinishName(undefined), false);
+});
+
+test('parseTechnicalSpecSheet reads PCD, ET and CB from the stock sheet line', () => {
+  assert.deepEqual(parseTechnicalSpecSheet('PCD 5×112 · ET8/15 · CB66.6'), {
+    pcd: '5×112',
+    et: '8/15',
+    cb: '66.6',
+  });
+  assert.deepEqual(parseTechnicalSpecSheet('PCD 5×112 · ET15/17'), { pcd: '5×112', et: '15/17' });
+  assert.deepEqual(parseTechnicalSpecSheet('Load rating on request'), {});
+  assert.deepEqual(parseTechnicalSpecSheet(undefined), {});
+});
+
+test('stockLabel words the stock count and says nothing without one', () => {
+  assert.equal(stockLabel(1), '1 set in stock');
+  assert.equal(stockLabel(2), '2 sets in stock');
+  assert.equal(stockLabel(0), null);
+  assert.equal(stockLabel(undefined), null);
+});
+
+test('the enquiry wording names design, finish, sizes and price', () => {
+  const descriptor = describeWheelForEnquiry({
+    design: 'FSA002',
+    finish: 'Gold',
+    sizes: '20 inch / 21 inch',
+    price: 'R 75,000',
+  });
+  assert.equal(descriptor, 'FSA002 in Gold (20 inch / 21 inch), R 75,000 per set of 4');
+  assert.equal(
+    wheelEnquiryMessage(descriptor),
+    "Hi, I'd like to ask about the FSA002 in Gold (20 inch / 21 inch), R 75,000 per set of 4. Is it still available?"
+  );
+  assert.equal(
+    describeWheelForEnquiry({ design: 'FF-1', finish: 'Silver', price: 'R 80,000' }),
+    'FF-1 in Silver, R 80,000 per set of 4'
+  );
 });

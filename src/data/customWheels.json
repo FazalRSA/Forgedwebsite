@@ -1,384 +1,121 @@
 {
   "brandWheels": [
     {
-      "id": "wheel-fsa002-gold",
       "slug": "fsa002-gold",
-      "model": "FSA002 — Gold",
-      "modelCode": "FSA002",
-      "series": "20 INCH / 21 INCH · IN STOCK (1 SET)",
-      "headline": "FSA002 (Gold) for BMW M3 Competition Sedan (G80).",
-      "editorialLead": "20 inch / 21 inch staggered fitment engineered specifically for BMW M3 Competition Sedan (G80) (PCD 5×112 · ET8/15 · CB66.6).",
-      "editorialBody": "Direct bolt-on specification (PCD 5×112 · ET8/15 · CB66.6) finished in Gold. Currently in stock: 1 complete set.",
-      "marques": [
-        "BMW"
-      ],
-      "geometry": "multi-spoke-gt",
-      "spokeCount": 10,
-      "defaultFinish": "champagne-bronze",
-      "availableFinishes": [
-        "champagne-bronze",
-        "dark-gunmetal",
-        "silver"
-      ],
-      "priceZAR": 75000,
-      "sizesAvailable": "20 inch / 21 inch",
-      "finishName": "Gold",
-      "compatibleCars": "M3 Competition Sedan (G80)",
-      "stockStatus": "In Stock",
-      "stockQuantitySets": 1,
-      "technicalSpecSheet": "PCD 5×112 · ET8/15 · CB66.6",
       "images": [
         "/images/wheels/fsa002-gold/front.webp",
         "/images/wheels/fsa002-gold/hero.webp",
         "/images/wheels/fsa002-gold/profile.webp"
       ],
       "imageLabels": [
-        "Picture 1 · FSA002 Gold",
-        "Picture 2 · 20 inch / 21 inch Profile",
-        "Picture 3 · PCD 5×112 · ET8/15 · CB66.6"
-      ],
-      "specs": {
-        "product": "FSA002 (Gold) — 1 Set In Stock",
-        "material": "6061-T6 Aerospace Forged Aluminium",
-        "diameters": "20 inch / 21 inch (M3 Competition Sedan (G80))",
-        "finishOptions": "Gold",
-        "testing": "PCD 5×112 · ET8/15 · CB66.6",
-        "warranty": ""
-      },
-      "compatibleStoreProductSlug": "bmw-m3-fsa002-gold",
-      "modelUrl": "/models/wheels/fsa002.glb"
+        "Front face",
+        "Three-quarter view",
+        "Side profile"
+      ]
     },
     {
-      "id": "wheel-ff1-silver",
       "slug": "ff-1-silver",
-      "model": "FF-1 — Silver",
-      "modelCode": "FF-1",
-      "series": "20 INCH / 21 INCH · IN STOCK (1 SET)",
-      "headline": "FF-1 (Silver) for BMW M3 Sedan (G80).",
-      "editorialLead": "20 inch / 21 inch staggered fitment engineered specifically for BMW M3 Sedan (G80) (PCD 5×112 · ET15/20 · CB66.6).",
-      "editorialBody": "Direct bolt-on specification (PCD 5×112 · ET15/20 · CB66.6) finished in Silver. Currently in stock: 1 complete set.",
-      "marques": [
-        "BMW"
-      ],
-      "geometry": "y-spoke-forged",
-      "spokeCount": 10,
-      "defaultFinish": "silver",
-      "availableFinishes": [
-        "silver"
-      ],
-      "priceZAR": 80000,
-      "sizesAvailable": "20 inch / 21 inch",
-      "finishName": "Silver",
-      "compatibleCars": "M3 Sedan (G80)",
-      "stockStatus": "In Stock",
-      "stockQuantitySets": 1,
-      "technicalSpecSheet": "PCD 5×112 · ET15/20 · CB66.6",
       "images": [
         "/images/wheels/ff-1-silver/front.webp",
         "/images/wheels/ff-1-silver/hero.webp",
         "/images/wheels/ff-1-silver/profile.webp"
       ],
       "imageLabels": [
-        "Picture 1 · FF-1 Silver",
-        "Picture 2 · 20 inch / 21 inch Profile",
-        "Picture 3 · PCD 5×112 · ET15/20 · CB66.6"
-      ],
-      "specs": {
-        "product": "FF-1 (Silver) — 1 Set In Stock",
-        "material": "6061-T6 Aerospace Forged Aluminium",
-        "diameters": "20 inch / 21 inch (M3 Sedan (G80))",
-        "finishOptions": "Silver",
-        "testing": "PCD 5×112 · ET15/20 · CB66.6",
-        "warranty": ""
-      },
-      "compatibleStoreProductSlug": "bmw-m3-ff-1-silver",
-      "modelUrl": "/models/wheels/ff-1.glb"
+        "Front face",
+        "Three-quarter view",
+        "Side profile"
+      ]
     },
     {
-      "id": "wheel-ff1-liquid-metal",
       "slug": "ff-1-liquid-metal",
-      "model": "FF-1 — Liquid Metal",
-      "modelCode": "FF-1",
-      "series": "20 INCH / 21 INCH · IN STOCK (2 SETS)",
-      "headline": "FF-1 (Liquid Metal) for BMW M3 Competition Sedan (G80).",
-      "editorialLead": "20 inch / 21 inch staggered fitment engineered specifically for BMW M3 Competition Sedan (G80) (PCD 5×112 · ET15/17 · CB66.6).",
-      "editorialBody": "Direct bolt-on specification (PCD 5×112 · ET15/17 · CB66.6) finished in Liquid Metal. Currently in stock: 2 complete sets.",
-      "marques": [
-        "BMW"
-      ],
-      "geometry": "y-spoke-forged",
-      "spokeCount": 10,
-      "defaultFinish": "silver",
-      "availableFinishes": [
-        "silver"
-      ],
-      "priceZAR": 95000,
-      "sizesAvailable": "20 inch / 21 inch",
-      "finishName": "Liquid Metal",
-      "compatibleCars": "M3 Competition Sedan (G80)",
-      "stockStatus": "In Stock",
-      "stockQuantitySets": 2,
-      "technicalSpecSheet": "PCD 5×112 · ET15/17 · CB66.6",
       "images": [
         "/images/wheels/ff-1-liquid-metal/front.webp",
         "/images/wheels/ff-1-liquid-metal/hero.webp",
         "/images/wheels/ff-1-liquid-metal/profile.webp"
       ],
       "imageLabels": [
-        "Picture 1 · FF-1 Liquid Metal",
-        "Picture 2 · 20 inch / 21 inch Profile",
-        "Picture 3 · PCD 5×112 · ET15/17 · CB66.6"
-      ],
-      "specs": {
-        "product": "FF-1 (Liquid Metal) — 2 Sets In Stock",
-        "material": "6061-T6 Aerospace Forged Aluminium",
-        "diameters": "20 inch / 21 inch (M3 Competition Sedan (G80))",
-        "finishOptions": "Liquid Metal",
-        "testing": "PCD 5×112 · ET15/17 · CB66.6",
-        "warranty": ""
-      },
-      "compatibleStoreProductSlug": "bmw-m3-ff-1-liquid-metal",
-      "modelUrl": "/models/wheels/ff-1.glb"
+        "Front face",
+        "Three-quarter view",
+        "Side profile"
+      ]
     },
     {
-      "id": "wheel-fsa003-hyper-black",
       "slug": "fsa003-hyper-black",
-      "model": "FSA003 — Hyper Black",
-      "modelCode": "FSA003",
-      "series": "20 INCH / 21 INCH · IN STOCK (1 SET)",
-      "headline": "FSA003 (Hyper Black) for BMW M3 Sedan (G80).",
-      "editorialLead": "20 inch / 21 inch staggered fitment engineered specifically for BMW M3 Sedan (G80) (PCD 5×112 · ET8/15 · CB66.6).",
-      "editorialBody": "Direct bolt-on specification (PCD 5×112 · ET8/15 · CB66.6) finished in Hyper Black. Currently in stock: 1 complete set.",
-      "marques": [
-        "BMW"
-      ],
-      "geometry": "multi-spoke-gt",
-      "spokeCount": 10,
-      "defaultFinish": "dark-gunmetal",
-      "availableFinishes": [
-        "dark-gunmetal",
-        "silver"
-      ],
-      "priceZAR": 75000,
-      "sizesAvailable": "20 inch / 21 inch",
-      "finishName": "Hyper Black",
-      "compatibleCars": "M3 Sedan (G80)",
-      "stockStatus": "In Stock",
-      "stockQuantitySets": 1,
-      "technicalSpecSheet": "PCD 5×112 · ET8/15 · CB66.6",
       "images": [
         "/images/wheels/fsa003-hyper-black/front.webp",
         "/images/wheels/fsa003-hyper-black/hero.webp",
         "/images/wheels/fsa003-hyper-black/profile.webp"
       ],
       "imageLabels": [
-        "Picture 1 · FSA003 Hyper Black",
-        "Picture 2 · 20 inch / 21 inch Profile",
-        "Picture 3 · PCD 5×112 · ET8/15 · CB66.6"
-      ],
-      "specs": {
-        "product": "FSA003 (Hyper Black) — 1 Set In Stock",
-        "material": "6061-T6 Aerospace Forged Aluminium",
-        "diameters": "20 inch / 21 inch (M3 Sedan (G80))",
-        "finishOptions": "Hyper Black",
-        "testing": "PCD 5×112 · ET8/15 · CB66.6",
-        "warranty": ""
-      },
-      "compatibleStoreProductSlug": "bmw-m3-fsa003-hyper-black",
-      "modelUrl": "/models/wheels/fsa003.glb"
+        "Front face",
+        "Three-quarter view",
+        "Side profile"
+      ]
     },
     {
-      "id": "wheel-fsa004-silver",
       "slug": "fsa004-silver",
-      "model": "FSA004 — Silver",
-      "modelCode": "FSA004",
-      "series": "20 INCH / 21 INCH · IN STOCK (1 SET)",
-      "headline": "FSA004 (Silver) for BMW M3 Competition Sedan (G80).",
-      "editorialLead": "20 inch / 21 inch staggered fitment engineered specifically for BMW M3 Competition Sedan (G80) (PCD 5×112 · ET8/15 · CB66.6).",
-      "editorialBody": "Direct bolt-on specification (PCD 5×112 · ET8/15 · CB66.6) finished in Silver. Currently in stock: 1 complete set.",
-      "marques": [
-        "BMW"
-      ],
-      "geometry": "multi-spoke-gt",
-      "spokeCount": 12,
-      "defaultFinish": "silver",
-      "availableFinishes": [
-        "silver",
-        "dark-gunmetal",
-        "satin-black"
-      ],
-      "priceZAR": 70000,
-      "sizesAvailable": "20 inch / 21 inch",
-      "finishName": "Silver",
-      "compatibleCars": "M3 Competition Sedan (G80)",
-      "stockStatus": "In Stock",
-      "stockQuantitySets": 1,
-      "technicalSpecSheet": "PCD 5×112 · ET8/15 · CB66.6",
       "images": [
         "/images/wheels/fsa004-silver/front.webp",
         "/images/wheels/fsa004-silver/hero.webp",
         "/images/wheels/fsa004-silver/profile.webp"
       ],
       "imageLabels": [
-        "Picture 1 · FSA004 Silver",
-        "Picture 2 · 20 inch / 21 inch Profile",
-        "Picture 3 · PCD 5×112 · ET8/15 · CB66.6"
-      ],
-      "specs": {
-        "product": "FSA004 (Silver) — 1 Set In Stock",
-        "material": "6061-T6 Aerospace Forged Aluminium",
-        "diameters": "20 inch / 21 inch (M3 Competition Sedan (G80))",
-        "finishOptions": "Silver",
-        "testing": "PCD 5×112 · ET8/15 · CB66.6",
-        "warranty": ""
-      },
-      "compatibleStoreProductSlug": "bmw-m3-fsa004-silver",
-      "modelUrl": "/models/wheels/fsa004.glb"
+        "Front face",
+        "Three-quarter view",
+        "Side profile"
+      ]
     },
     {
-      "id": "wheel-ff3-pure-bronze",
       "slug": "ff-3-pure-bronze",
-      "model": "FF-3 — Pure Bronze",
-      "modelCode": "FF-3",
-      "series": "20 INCH / 21 INCH · IN STOCK (1 SET)",
-      "headline": "FF-3 (Pure Bronze) for BMW M3 Competition Sedan (G80).",
-      "editorialLead": "20 inch / 21 inch staggered fitment engineered specifically for BMW M3 Competition Sedan (G80) (PCD 5×112 · ET15/17 · CB66.6).",
-      "editorialBody": "Direct bolt-on specification (PCD 5×112 · ET15/17 · CB66.6) finished in Pure Bronze. Currently in stock: 1 complete set.",
-      "marques": [
-        "BMW"
-      ],
-      "geometry": "y-spoke-forged",
-      "spokeCount": 10,
-      "defaultFinish": "champagne-bronze",
-      "availableFinishes": [
-        "champagne-bronze",
-        "satin-black",
-        "silver"
-      ],
-      "priceZAR": 80000,
-      "sizesAvailable": "20 inch / 21 inch",
-      "finishName": "Pure Bronze",
-      "compatibleCars": "M3 Competition Sedan (G80)",
-      "stockStatus": "In Stock",
-      "stockQuantitySets": 1,
-      "technicalSpecSheet": "PCD 5×112 · ET15/17 · CB66.6",
       "images": [
         "/images/wheels/ff-3-pure-bronze/front.webp",
         "/images/wheels/ff-3-pure-bronze/hero.webp",
         "/images/wheels/ff-3-pure-bronze/profile.webp"
       ],
       "imageLabels": [
-        "Picture 1 · FF-3 Pure Bronze",
-        "Picture 2 · 20 inch / 21 inch Profile",
-        "Picture 3 · PCD 5×112 · ET15/17 · CB66.6"
-      ],
-      "specs": {
-        "product": "FF-3 (Pure Bronze) — 1 Set In Stock",
-        "material": "6061-T6 Aerospace Forged Aluminium",
-        "diameters": "20 inch / 21 inch (M3 Competition Sedan (G80))",
-        "finishOptions": "Pure Bronze",
-        "testing": "PCD 5×112 · ET15/17 · CB66.6",
-        "warranty": ""
-      },
-      "compatibleStoreProductSlug": "bmw-m3-ff-3-pure-bronze",
-      "modelUrl": "/models/wheels/ff-3.glb"
+        "Front face",
+        "Three-quarter view",
+        "Side profile"
+      ]
     },
     {
-      "id": "wheel-ff3-glossy-black",
       "slug": "ff-3-glossy-black",
-      "model": "FF-3 — Glossy Black",
-      "modelCode": "FF-3",
-      "series": "20 INCH / 21 INCH · IN STOCK (1 SET)",
-      "headline": "FF-3 (Glossy Black) for BMW M3 Competition Sedan (G80).",
-      "editorialLead": "20 inch / 21 inch staggered fitment engineered specifically for BMW M3 Competition Sedan (G80) (PCD 5×112 · ET15/17 · CB66.6).",
-      "editorialBody": "Direct bolt-on specification (PCD 5×112 · ET15/17 · CB66.6) finished in Glossy Black. Currently in stock: 1 complete set.",
-      "marques": [
-        "BMW"
-      ],
-      "geometry": "y-spoke-forged",
-      "spokeCount": 10,
-      "defaultFinish": "satin-black",
-      "availableFinishes": [
-        "satin-black",
-        "champagne-bronze",
-        "silver"
-      ],
-      "priceZAR": 80000,
-      "sizesAvailable": "20 inch / 21 inch",
-      "finishName": "Glossy Black",
-      "compatibleCars": "M3 Competition Sedan (G80)",
-      "stockStatus": "In Stock",
-      "stockQuantitySets": 1,
-      "technicalSpecSheet": "PCD 5×112 · ET15/17 · CB66.6",
       "images": [
         "/images/wheels/ff-3-glossy-black/front.webp",
         "/images/wheels/ff-3-glossy-black/hero.webp",
         "/images/wheels/ff-3-glossy-black/profile.webp"
       ],
       "imageLabels": [
-        "Picture 1 · FF-3 Glossy Black",
-        "Picture 2 · 20 inch / 21 inch Profile",
-        "Picture 3 · PCD 5×112 · ET15/17 · CB66.6"
-      ],
-      "specs": {
-        "product": "FF-3 (Glossy Black) — 1 Set In Stock",
-        "material": "6061-T6 Aerospace Forged Aluminium",
-        "diameters": "20 inch / 21 inch (M3 Competition Sedan (G80))",
-        "finishOptions": "Glossy Black",
-        "testing": "PCD 5×112 · ET15/17 · CB66.6",
-        "warranty": ""
-      },
-      "compatibleStoreProductSlug": "bmw-m3-ff-3-glossy-black",
-      "modelUrl": "/models/wheels/ff-3.glb"
+        "Front face",
+        "Three-quarter view",
+        "Side profile"
+      ]
     },
     {
-      "id": "wheel-ff3-liquid-metal",
       "slug": "ff-3-liquid-metal",
-      "model": "FF-3 — Liquid Metal",
-      "modelCode": "FF-3",
-      "series": "20 INCH / 21 INCH · IN STOCK (2 SETS)",
-      "headline": "FF-3 (Liquid Metal) for BMW M3 Competition Sedan (G80).",
-      "editorialLead": "20 inch / 21 inch staggered fitment engineered specifically for BMW M3 Competition Sedan (G80) (PCD 5×112 · ET15/17 · CB66.6).",
-      "editorialBody": "Direct bolt-on specification (PCD 5×112 · ET15/17 · CB66.6) finished in Liquid Metal. Currently in stock: 2 complete sets.",
-      "marques": [
-        "BMW"
-      ],
-      "geometry": "y-spoke-forged",
-      "spokeCount": 10,
-      "defaultFinish": "silver",
-      "availableFinishes": [
-        "silver",
-        "champagne-bronze",
-        "satin-black"
-      ],
-      "priceZAR": 95000,
-      "sizesAvailable": "20 inch / 21 inch",
-      "finishName": "Liquid Metal",
-      "compatibleCars": "M3 Competition Sedan (G80)",
-      "stockStatus": "In Stock",
-      "stockQuantitySets": 2,
-      "technicalSpecSheet": "PCD 5×112 · ET15/17 · CB66.6",
       "images": [
         "/images/wheels/ff-3-liquid-metal/front.webp",
         "/images/wheels/ff-3-liquid-metal/hero.webp",
         "/images/wheels/ff-3-liquid-metal/profile.webp"
       ],
       "imageLabels": [
-        "Picture 1 · FF-3 Liquid Metal",
-        "Picture 2 · 20 inch / 21 inch Profile",
-        "Picture 3 · PCD 5×112 · ET15/17 · CB66.6"
+        "Front face",
+        "Three-quarter view",
+        "Side profile"
+      ]
+    },
+    {
+      "slug": "fsa001-black-matte",
+      "images": [
+        "/images/wheels/fsa001-black-matte/front.webp",
+        "/images/wheels/fsa001-black-matte/hero.webp",
+        "/images/wheels/fsa001-black-matte/profile.webp"
       ],
-      "specs": {
-        "product": "FF-3 (Liquid Metal) — 2 Sets In Stock",
-        "material": "6061-T6 Aerospace Forged Aluminium",
-        "diameters": "20 inch / 21 inch (M3 Competition Sedan (G80))",
-        "finishOptions": "Liquid Metal",
-        "testing": "PCD 5×112 · ET15/17 · CB66.6",
-        "warranty": ""
-      },
-      "compatibleStoreProductSlug": "bmw-m3-ff-3-liquid-metal",
-      "modelUrl": "/models/wheels/ff-3.glb"
+      "imageLabels": [
+        "Front face",
+        "Three-quarter view",
+        "Side profile"
+      ]
     }
-  ],
-  "storeProducts": []
+  ]
 }

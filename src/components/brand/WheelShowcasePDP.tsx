@@ -1,405 +1,462 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { ArrowLeft, ChevronLeft, ChevronRight, MessageCircle, Play } from 'lucide-react';
 import {
-  ArrowRight,
-  ChevronLeft,
-  ChevronRight,
-  ArrowUpRight,
-  Maximize2,
-  X,
-  Disc3,
-  Camera,
-  Car,
-} from 'lucide-react';
-import {
+  BrandWheelItem,
   WHEEL_FINISHES,
-  WheelFinishId,
+  findWheelBySlug,
+  formatZAR,
   getAllBrandWheels,
-  getWheelBySlug,
+  getSiblingListings,
   getWheelImages,
 } from '../../data/catalogue';
-import { useRouter } from '../../utils/router';
+import { whatsappLink } from '../../config/site';
+import { Link, useRouter } from '../../utils/router';
 import { useForgedStore } from '../../store/useForgedStore';
-import { useFirebaseAuth } from '../../context/FirebaseContext';
+import {
+  describeWheelForEnquiry,
+  parseTechnicalSpecSheet,
+  stockLabel,
+  wheelEnquiryMessage,
+} from '../../utils/wheelEnquiry';
+import { prefersReducedMotion } from '../../utils/wheelStudioParts';
 import { BrandHeader } from './BrandHeader';
-import { WheelLightboxModal } from './WheelLightboxModal';
-import { SafeImage } from '../shared/SafeImage';
 import { WheelStage } from '../visuals/WheelStage';
+
+/**
+ * One wheel in stock: photos first, then name, price, sizes and specs, with a single call to
+ * action (enquire on WhatsApp). The 3D view is opt-in: nothing 3D (no WebGL, no three.js, no GLB)
+ * loads until the visitor taps "View in 3D".
+ */
 
 interface WheelShowcasePDPProps {
   slug: string;
 }
 
+const PRIMARY_BUTTON =
+  'inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[#FF5500] px-6 text-base font-semibold text-[#0A0A0A] hover:bg-[#FF6B1A] active:bg-[#E64D00] transition-colors cursor-pointer';
+
+/** Real photographs only: a generated stand-in picture (data: URL) is not a photo of this wheel. */
+function realPhotos(wheel: BrandWheelItem): string[] {
+  return getWheelImages(wheel).images.filter((src) => src && !src.startsWith('data:'));
+}
+
 export const WheelShowcasePDP: React.FC<WheelShowcasePDPProps> = ({ slug }) => {
   const { navigate } = useRouter();
-  const { openEnquiryModal, customBrandWheels } = useForgedStore();
-  const { user, profile } = useFirebaseAuth();
+  const customBrandWheels = useForgedStore((state) => state.customBrandWheels);
+  const wheel = findWheelBySlug(slug, customBrandWheels);
 
-  const allWheels = getAllBrandWheels(customBrandWheels);
-  const wheel = getWheelBySlug(slug, customBrandWheels);
+  if (!wheel) {
+    return (
+      <div className="min-h-screen bg-[#0A0A0A] text-[#F5F5F7]">
+        <BrandHeader forceLight={false} />
+        <main className="mx-auto max-w-xl px-4 py-20 text-center">
+          <h1 className="text-2xl font-semibold text-white">This wheel is not available</h1>
+          <p className="mt-3 text-neutral-300">It may have sold. Here is what we have in stock now.</p>
+          <button
+            type="button"
+            onClick={() => navigate('/#catalogue')}
+            className={`${PRIMARY_BUTTON} mt-8 !w-auto mx-auto`}
+          >
+            See wheels in stock
+          </button>
+        </main>
+      </div>
+    );
+  }
 
-  const [selectedFinish, setSelectedFinish] = useState<WheelFinishId>(
-    wheel.defaultFinish
-  );
-  // The 3D studio exists only for wheels with a real model; the rest open on photography.
+  // key: a different wheel always starts from a clean page (photos, 3D closed).
+  return <WheelDetail key={wheel.slug} wheel={wheel} />;
+};
+
+const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
+  const customBrandWheels = useForgedStore((state) => state.customBrandWheels);
+  const openEnquiryModal = useForgedStore((state) => state.openEnquiryModal);
+
+  const [studioOpen, setStudioOpen] = useState(false);
+  const stageRef = useRef<HTMLDivElement | null>(null);
+  const view3DButtonRef = useRef<HTMLButtonElement | null>(null);
+
   const has3D = Boolean(wheel.modelUrl);
-  const [viewMode, setViewMode] = useState<'3d' | 'photos'>(has3D ? '3d' : 'photos');
-  const [activePhotoIdx, setActivePhotoIdx] = useState<0 | 1 | 2>(0);
-  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const photos = realPhotos(wheel);
+  const siblings = getSiblingListings(wheel, customBrandWheels);
+  const others = getAllBrandWheels(customBrandWheels)
+    .filter((w) => w.slug !== wheel.slug)
+    .slice(0, 4);
 
-  useEffect(() => {
-    if (
-      profile?.preferredFinish &&
-      wheel.availableFinishes.includes(profile.preferredFinish)
-    ) {
-      setSelectedFinish(profile.preferredFinish);
-    } else {
-      setSelectedFinish(wheel.defaultFinish);
-    }
-    setActivePhotoIdx(0);
-    setLightboxOpen(false);
-    setViewMode(wheel.modelUrl ? '3d' : 'photos');
-  }, [wheel, profile?.preferredFinish]);
+  const design = wheel.modelCode ?? wheel.model;
+  const finishLabel = wheel.finishName ?? WHEEL_FINISHES[wheel.defaultFinish]?.name ?? 'Standard';
+  const priceText = formatZAR(wheel.priceZAR);
+  const stock = stockLabel(wheel.stockQuantitySets);
+  const specs = parseTechnicalSpecSheet(wheel.technicalSpecSheet);
+  const construction = /piece/i.test(wheel.otherFinishes ?? '') ? wheel.otherFinishes : undefined;
 
-  // Keyboard navigation for Left/Right arrow photo cycling when in photo mode
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (viewMode === 'photos' || lightboxOpen) {
-        if (e.key === 'ArrowRight') {
-          setActivePhotoIdx((prev) => ((prev + 1) % 3) as 0 | 1 | 2);
-        } else if (e.key === 'ArrowLeft') {
-          setActivePhotoIdx((prev) => ((prev - 1 + 3) % 3) as 0 | 1 | 2);
-        }
-      }
-      if (e.key === 'Escape' && lightboxOpen) {
-        setLightboxOpen(false);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [viewMode, lightboxOpen]);
+  const descriptor = describeWheelForEnquiry({
+    design,
+    finish: finishLabel,
+    sizes: wheel.sizesAvailable,
+    price: priceText,
+  });
+  const message = wheelEnquiryMessage(descriptor);
+  const whatsappHref = whatsappLink(message);
 
-  const finishObj = WHEEL_FINISHES[selectedFinish] ?? WHEEL_FINISHES.silver;
-  const wheelGallery = getWheelImages(wheel);
+  const openStudio = useCallback(() => {
+    setStudioOpen(true);
+    // Bring the stage into view once it has rendered (the visitor may have tapped lower down).
+    requestAnimationFrame(() =>
+      stageRef.current?.scrollIntoView({
+        behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+        block: 'start',
+      })
+    );
+  }, []);
 
-  const userVehicleLabel = profile
-    ? `${profile.primaryYear} ${profile.primaryMake} ${profile.primaryModel} (${profile.brakeSystem})`
-    : null;
+  const closeStudio = useCallback(() => {
+    setStudioOpen(false);
+    requestAnimationFrame(() => view3DButtonRef.current?.focus());
+  }, []);
 
-  const handleEnquireWheel = () => {
-    const carContext = profile
-      ? ` for ${profile.primaryYear} ${profile.primaryMake} ${profile.primaryModel}`
-      : '';
+  // The button opens the enquiry form, already filled in. The form posts the enquiry to the n8n
+  // lead workflow (logged and emailed to the shop) and, with a WhatsApp number configured, then
+  // opens WhatsApp with the same message.
+  const openForm = () =>
     openEnquiryModal({
-      subject: `FORGED ${wheel.model} (${finishObj.name}) Specification Request${carContext}`,
-      finish: finishObj.name,
+      subject: message,
+      finish: finishLabel,
       priceZAR: wheel.priceZAR,
       domain: 'brand',
     });
-  };
 
-  const handleNextPhoto = (e?: React.MouseEvent) => {
-    e?.stopPropagation();
-    setActivePhotoIdx((prev) => ((prev + 1) % 3) as 0 | 1 | 2);
-  };
+  const enquireButton = (
+    <button type="button" onClick={openForm} className={PRIMARY_BUTTON}>
+      {whatsappHref && <MessageCircle className="w-5 h-5" aria-hidden="true" />}
+      {whatsappHref ? 'Enquire on WhatsApp' : 'Send an enquiry'}
+    </button>
+  );
 
-  const handlePrevPhoto = (e?: React.MouseEvent) => {
-    e?.stopPropagation();
-    setActivePhotoIdx((prev) => ((prev - 1 + 3) % 3) as 0 | 1 | 2);
-  };
-
-  const specRows = [
-    { label: 'PRODUCT', value: wheel.specs.product },
-    { label: 'MATERIAL', value: wheel.specs.material },
-    { label: 'DIAMETERS', value: wheel.specs.diameters },
-    { label: 'FINISH OPTIONS', value: wheel.specs.finishOptions },
-    { label: 'TESTING', value: wheel.specs.testing },
-    { label: 'WARRANTY', value: wheel.specs.warranty },
-  ].filter((row) => Boolean(row.value));
+  const specRows: { label: string; value: string }[] = [
+    wheel.sizesAvailable && { label: 'Sizes', value: wheel.sizesAvailable },
+    specs.pcd && { label: 'PCD (bolt pattern)', value: specs.pcd },
+    specs.et && { label: 'ET (offset)', value: specs.et },
+    specs.cb && {
+      label: 'CB (centre bore)',
+      value: /^\d+(\.\d+)?$/.test(specs.cb) ? `${specs.cb} mm` : specs.cb,
+    },
+    construction && { label: 'Build', value: construction },
+    stock && { label: 'Stock', value: stock },
+  ].filter((row): row is { label: string; value: string } => Boolean(row));
 
   return (
-    <div className="bg-[#0A0A0A] text-[#F5F5F7] pb-28">
+    <div className="min-h-screen bg-[#0A0A0A] text-[#F5F5F7]">
       <BrandHeader forceLight={false} />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 pt-6">
-        {/* Top Bar: Breadcrumbs + 3D Studio / Photography Switcher */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-          <nav
-            aria-label="Breadcrumb"
-            className="flex items-center gap-2 text-xs font-mono uppercase tracking-[0.14em] text-neutral-400"
-          >
-            <button
-              type="button"
-              onClick={() => navigate('/')}
-              className="hover:text-white transition-colors cursor-pointer"
-            >
-              Home
-            </button>
-            <span>/</span>
-            <button
-              type="button"
-              onClick={() => navigate('/#catalogue')}
-              className="hover:text-white transition-colors cursor-pointer"
-            >
-              Wheels
-            </button>
-            <span>/</span>
-            <span className="text-white font-semibold">{wheel.model}</span>
-          </nav>
+      <main className="mx-auto max-w-6xl px-4 sm:px-6 pt-3 pb-40 md:pb-16">
+        <Link
+          to="/#catalogue"
+          className="inline-flex min-h-11 items-center gap-1.5 text-sm text-neutral-300 hover:text-white"
+        >
+          <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+          Wheels in stock
+        </Link>
 
-          {/* Segmented Mode Toggle: 3D Studio vs Photography (only when the wheel has a 3D model) */}
-          {has3D && (
-          <div className="inline-flex items-center gap-1 p-1 rounded-xl bg-[#121216] border border-[#26262E] self-start sm:self-auto">
-            <button
-              type="button"
-              onClick={() => setViewMode('3d')}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-mono flex items-center gap-2 transition-colors cursor-pointer ${
-                viewMode === '3d'
-                  ? 'bg-[#FF5500] text-white font-semibold'
-                  : 'text-neutral-400 hover:text-white'
-              }`}
-            >
-              <Disc3 className="w-3.5 h-3.5" />
-              <span>3D Wheel Studio</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setViewMode('photos')}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-mono flex items-center gap-2 transition-colors cursor-pointer ${
-                viewMode === 'photos'
-                  ? 'bg-[#22222A] text-white font-semibold'
-                  : 'text-neutral-400 hover:text-white'
-              }`}
-            >
-              <Camera className="w-3.5 h-3.5" />
-              <span>Fitment Photography (3)</span>
-            </button>
+        <div className="mt-1 md:grid md:grid-cols-2 md:gap-10 md:items-start">
+          {/* Photos first; the 3D stage takes this slot once the visitor asks for it. */}
+          <div ref={stageRef} className="scroll-mt-20">
+            {studioOpen && has3D ? (
+              <>
+                <WheelStage
+                  wheelModel={wheel.model}
+                  selectedFinish={wheel.defaultFinish}
+                  availableFinishes={[wheel.defaultFinish]}
+                  onSelectFinish={() => {}}
+                  finishName={finishLabel}
+                  modelUrl={wheel.modelUrl}
+                  rearModelUrl={wheel.rearModelUrl}
+                  onClose={closeStudio}
+                />
+                <p className="mt-2 text-xs text-neutral-400">
+                  The 3D view is a guide to shape and finish. The photos show the real wheels.
+                </p>
+              </>
+            ) : photos.length > 0 ? (
+              <PhotoGallery
+                photos={photos}
+                altBase={`${wheel.model} forged wheel`}
+                onView3D={has3D ? openStudio : undefined}
+              />
+            ) : (
+              <NoPhotoPanel
+                label={wheel.model}
+                swatchHex={WHEEL_FINISHES[wheel.defaultFinish]?.swatchHex}
+                onView3D={has3D ? openStudio : undefined}
+                triggerRef={view3DButtonRef}
+              />
+            )}
           </div>
-          )}
-        </div>
 
-        {/* Title & Garage Pairing Banner */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
-          <div>
-            <p className="text-xs font-mono uppercase tracking-[0.18em] text-[#FF5500] mb-1.5">
-              FORGED CUSTOM WHEELS · {wheel.series}
-            </p>
-            <h1 className="text-3xl sm:text-5xl font-semibold tracking-[-0.03em] text-white">
+          <div className="mt-5 md:mt-0 md:sticky md:top-24">
+            <h1 className="text-3xl sm:text-4xl font-semibold tracking-[-0.02em] text-white">
               {wheel.model}
             </h1>
-          </div>
+            <p className="mt-2 text-2xl font-semibold text-white">
+              {priceText}{' '}
+              <span className="text-base font-normal text-neutral-300">per set of 4</span>
+            </p>
+            {stock && <p className="mt-1 text-sm text-[#FF8A4D]">{stock}</p>}
 
-          <button
-            type="button"
-            onClick={() => navigate('/account')}
-            className="self-start md:self-auto px-3.5 py-2 rounded-xl bg-[#121216] border border-[#26262E] hover:border-[#FF5500] text-xs font-mono text-neutral-300 hover:text-white flex items-center gap-2 transition-colors cursor-pointer"
-          >
-            <Car className="w-3.5 h-3.5 text-[#FF5500]" />
-            <span>
-              {user && profile
-                ? `Garage: ${profile.primaryYear} ${profile.primaryMake} ${profile.primaryModel}`
-                : 'Pair with My Car in Account Garage →'}
-            </span>
-          </button>
-        </div>
-
-        {/* Main Interactive Stage: 360° 3D Three.js Scene OR 3-Angle Photography */}
-        <section className="mb-14">
-          {viewMode === '3d' && has3D ? (
-            <WheelStage
-              wheelModel={wheel.model}
-              wheelSeries={wheel.series}
-              selectedFinish={selectedFinish}
-              availableFinishes={wheel.availableFinishes}
-              onSelectFinish={setSelectedFinish}
-              onEnquire={handleEnquireWheel}
-              userVehicleLabel={userVehicleLabel}
-              modelUrl={wheel.modelUrl}
-              rearModelUrl={wheel.rearModelUrl}
-              specFront={wheel.technicalSpecSheet}
-            />
-          ) : (
-            <div className="flex flex-col items-center">
-              <div
-                role="region"
-                aria-label={`${wheel.model} 3-Image Gallery Stage`}
-                className="relative w-full max-w-4xl aspect-[16/10] bg-[#121215] border border-[#26262E] rounded-3xl overflow-hidden select-none shadow-2xl"
-              >
-                <SafeImage
-                  src={wheelGallery.images[activePhotoIdx]}
-                  alt={`${wheel.model} - ${wheelGallery.labels[activePhotoIdx]}`}
-                  fallbackLabel={wheelGallery.labels[activePhotoIdx]}
-                  loading="lazy"
-                  referrerPolicy="no-referrer"
-                  onClick={() => setLightboxOpen(true)}
-                  className="w-full h-full object-cover transition-all duration-500 cursor-zoom-in"
-                />
-
-                <button
-                  type="button"
-                  onClick={handlePrevPhoto}
-                  aria-label="Previous wheel image"
-                  className="absolute left-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-[#0A0A0A]/80 hover:bg-[#FF5500] border border-white/20 text-white flex items-center justify-center transition-colors cursor-pointer z-20"
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleNextPhoto}
-                  aria-label="Next wheel image"
-                  className="absolute right-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-[#0A0A0A]/80 hover:bg-[#FF5500] border border-white/20 text-white flex items-center justify-center transition-colors cursor-pointer z-20"
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setLightboxOpen(true)}
-                  aria-label="Open Fullscreen Lightbox Window"
-                  className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-[#0A0A0A]/85 border border-[#33333E] hover:border-[#FF5500] text-white flex items-center justify-center transition-colors cursor-pointer"
-                >
-                  <Maximize2 className="w-4 h-4" />
-                </button>
-
-                <div className="absolute bottom-4 inset-x-4 flex items-center justify-between gap-2.5 z-20">
-                  <div className="bg-[#0A0A0A]/90 border border-[#26262E] px-3.5 py-1.5 rounded-full text-xs font-mono text-neutral-200">
-                    {wheelGallery.labels[activePhotoIdx]}
-                  </div>
-
-                  <div className="flex items-center gap-1.5 bg-[#0A0A0A]/90 border border-[#26262E] p-1 rounded-full">
-                    {[0, 1, 2].map((idx) => (
-                      <button
-                        key={idx}
-                        type="button"
-                        onClick={() => setActivePhotoIdx(idx as 0 | 1 | 2)}
-                        className={`px-3 py-0.5 rounded-full text-[10px] font-mono uppercase tracking-wider transition-all cursor-pointer ${
-                          activePhotoIdx === idx
-                            ? 'bg-[#FF5500] text-white font-bold'
-                            : 'text-neutral-400 hover:text-white'
-                        }`}
-                      >
-                        Photo {idx + 1}
-                      </button>
-                    ))}
-                  </div>
+            {siblings.length > 0 && (
+              <div className="mt-5">
+                <p className="text-sm text-neutral-400">Finish</p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <span
+                    aria-current="true"
+                    className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white bg-white/10 px-4 text-sm font-medium text-white"
+                  >
+                    <Swatch hex={WHEEL_FINISHES[wheel.defaultFinish]?.swatchHex} />
+                    {finishLabel}
+                  </span>
+                  {siblings.map((s) => (
+                    <Link
+                      key={s.slug}
+                      to={`/wheels/${s.slug}`}
+                      className="inline-flex min-h-11 items-center gap-2 rounded-full border border-[#33333E] px-4 text-sm text-neutral-200 hover:border-[#FF5500] hover:text-white"
+                    >
+                      <Swatch hex={WHEEL_FINISHES[s.defaultFinish]?.swatchHex} />
+                      {s.finishName ?? WHEEL_FINISHES[s.defaultFinish]?.name}
+                    </Link>
+                  ))}
                 </div>
               </div>
-            </div>
-          )}
-        </section>
+            )}
 
-        {/* Editorial Copy & Structured Specifications List */}
-        <section className="grid grid-cols-1 lg:grid-cols-12 gap-12 pt-8 border-t border-[#26262E]">
-          <div className="lg:col-span-5 space-y-4">
-            <p className="text-xs font-mono uppercase tracking-[0.18em] text-[#FF5500]">
-              DESIGN MONOGRAPH
-            </p>
-            <h2 className="text-3xl sm:text-4xl font-semibold tracking-[-0.03em] leading-tight text-white">
-              {wheel.headline}
-            </h2>
-            <p className="text-base text-neutral-300">{wheel.editorialLead}</p>
-            <p className="text-sm text-neutral-400 leading-relaxed">
-              {wheel.editorialBody}
-            </p>
-
-            <div className="pt-4 flex flex-wrap gap-3">
+            {has3D && !studioOpen && photos.length > 0 && (
               <button
+                ref={view3DButtonRef}
                 type="button"
-                onClick={() =>
-                  navigate(`/store/products/${wheel.compatibleStoreProductSlug}`)
-                }
-                className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-[0.12em] font-semibold border border-[#33333E] text-[#F5F5F7] rounded-xl px-5 py-3 hover:border-[#FF5500] hover:text-[#FF5500] transition-colors cursor-pointer"
+                onClick={openStudio}
+                className="mt-5 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full border border-[#33333E] px-6 text-base font-semibold text-white hover:border-[#FF5500] transition-colors cursor-pointer"
               >
-                <span>Technical Fitment Dossier</span>
-                <ArrowUpRight className="w-4 h-4 text-[#FF5500]" />
+                <Play className="w-4 h-4 fill-current" aria-hidden="true" />
+                View in 3D
               </button>
-            </div>
-          </div>
+            )}
 
-          <div className="lg:col-span-7">
-            <p className="text-xs font-mono uppercase tracking-[0.18em] text-[#FF5500] mb-2">
-              TECHNICAL ARCHITECTURE
-            </p>
-            <div className="border-t border-[#26262E]">
+            <dl className="mt-6 border-t border-[#26262E]">
               {specRows.map((row) => (
                 <div
                   key={row.label}
-                  className="border-b border-[#26262E] py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2"
+                  className="flex items-baseline justify-between gap-4 border-b border-[#26262E] py-3"
                 >
-                  <span className="text-xs font-mono uppercase tracking-[0.12em] text-neutral-400 shrink-0">
-                    {row.label}
-                  </span>
-                  <span className="text-sm font-medium text-white sm:text-right">
-                    {row.value}
-                  </span>
+                  <dt className="text-sm text-neutral-400">{row.label}</dt>
+                  <dd className="text-sm font-medium text-white text-right">{row.value}</dd>
                 </div>
               ))}
-            </div>
-          </div>
-        </section>
+            </dl>
 
-        {/* Other Wheels in the Collection */}
-        <section className="mt-16 pt-12 border-t border-[#26262E]">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-semibold tracking-tight text-white">
-              More forged designs
-            </h3>
-            <button
-              type="button"
-              onClick={() => navigate('/#catalogue')}
-              className="text-xs font-mono uppercase tracking-[0.12em] text-[#FF5500] hover:underline underline-offset-4 cursor-pointer"
-            >
-              View All ({allWheels.length})
-            </button>
+            {wheel.compatibleCars && (
+              <p className="mt-4 text-sm text-neutral-300">
+                Listed for BMW {wheel.compatibleCars}. We confirm fitment for your exact car on
+                WhatsApp.
+              </p>
+            )}
+
+            <div className="mt-6 hidden md:block">{enquireButton}</div>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {allWheels
-              .filter((w) => w.slug !== wheel.slug)
-              .slice(0, 4)
-              .map((peer) => {
-                const peerData = getWheelImages(peer);
-                return (
-                  <button
-                    key={peer.id}
-                    type="button"
-                    onClick={() => navigate(`/wheels/${peer.slug}`)}
-                    className="text-left group cursor-pointer"
+        </div>
+
+        {others.length > 0 && (
+          <section aria-labelledby="more-wheels" className="mt-14 border-t border-[#26262E] pt-8">
+            <h2 id="more-wheels" className="text-lg font-semibold text-white">
+              More wheels in stock
+            </h2>
+            <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+              {others.map((w) => (
+                <li key={w.slug}>
+                  <Link
+                    to={`/wheels/${w.slug}`}
+                    className="flex min-h-14 items-center justify-between gap-3 rounded-xl border border-[#26262E] px-4 py-2 hover:border-[#FF5500]"
                   >
-                    <div className="bg-[#121215] border border-[#26262E] group-hover:border-[#FF5500] rounded-2xl aspect-square overflow-hidden relative transition-colors">
-                      <SafeImage
-                        src={peerData.images[0]}
-                        alt={`${peer.model} forged wheel`}
-                        fallbackLabel={peer.model}
-                        loading="lazy"
-                        referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                      {peer.modelUrl && (
-                        <div className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-black/80 text-[9px] font-mono text-neutral-300">
-                          3D
-                        </div>
-                      )}
-                    </div>
-                    <p className="text-xs font-mono uppercase tracking-widest mt-2 font-semibold text-[#F5F5F7] group-hover:text-[#FF5500] transition-colors truncate">
-                      {peer.model}
-                    </p>
-                  </button>
-                );
-              })}
-          </div>
-        </section>
+                    <span className="flex items-center gap-3 min-w-0">
+                      <Swatch hex={WHEEL_FINISHES[w.defaultFinish]?.swatchHex} />
+                      <span className="truncate text-sm font-medium text-white">{w.model}</span>
+                    </span>
+                    <span className="shrink-0 text-sm text-neutral-300">{formatZAR(w.priceZAR)}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
       </main>
 
-      {/* Fullscreen High-Resolution Lightbox Gallery */}
-      {lightboxOpen && (
-        <WheelLightboxModal
-          wheel={wheel}
-          initialAngleIdx={activePhotoIdx}
-          initialFinish={selectedFinish}
-          onClose={() => setLightboxOpen(false)}
-        />
+      {/* Phone: price and the one action stay in reach while scrolling. */}
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[#26262E] bg-[#0A0A0A]/95 px-4 pt-2.5 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur md:hidden">
+        <div className="mb-2 flex items-baseline justify-between gap-3">
+          <p className="text-lg font-semibold text-white">
+            {priceText} <span className="text-xs font-normal text-neutral-300">per set of 4</span>
+          </p>
+          {stock && <p className="text-xs text-neutral-300">{stock}</p>}
+        </div>
+        {enquireButton}
+      </div>
+    </div>
+  );
+};
+
+const Swatch: React.FC<{ hex?: string }> = ({ hex }) => (
+  <span
+    aria-hidden="true"
+    className="inline-block h-3.5 w-3.5 shrink-0 rounded-full border border-white/30"
+    style={{ background: hex ?? '#888' }}
+  />
+);
+
+/** The poster for the 3D view: a play-style button laid over the first photo. */
+const View3DPoster: React.FC<{ onClick: () => void }> = ({ onClick }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className="absolute bottom-3 left-3 inline-flex min-h-11 items-center gap-2 rounded-full bg-black/75 px-4 text-sm font-semibold text-white backdrop-blur cursor-pointer hover:bg-black"
+  >
+    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#FF5500]">
+      <Play className="h-3 w-3 fill-[#0A0A0A] text-[#0A0A0A]" aria-hidden="true" />
+    </span>
+    View in 3D
+  </button>
+);
+
+/**
+ * Swipeable photos (scroll-snap, so vertical page scrolling is never trapped). The first photo is
+ * the page's largest image and loads eagerly at high priority; the rest load lazily.
+ */
+const PhotoGallery: React.FC<{
+  photos: string[];
+  altBase: string;
+  onView3D?: () => void;
+}> = ({ photos, altBase, onView3D }) => {
+  const trackRef = useRef<HTMLDivElement | null>(null);
+  const [active, setActive] = useState(0);
+
+  const goTo = (index: number) => {
+    const track = trackRef.current;
+    if (!track) return;
+    const clamped = (index + photos.length) % photos.length;
+    track.scrollTo({
+      left: clamped * track.clientWidth,
+      behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+    });
+    setActive(clamped);
+  };
+
+  const handleScroll = () => {
+    const track = trackRef.current;
+    if (!track || track.clientWidth === 0) return;
+    setActive(Math.round(track.scrollLeft / track.clientWidth));
+  };
+
+  return (
+    <div
+      role="region"
+      aria-roledescription="carousel"
+      aria-label={`${altBase} photos`}
+      className="relative"
+    >
+      <div
+        ref={trackRef}
+        onScroll={handleScroll}
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'ArrowRight') goTo(active + 1);
+          if (e.key === 'ArrowLeft') goTo(active - 1);
+        }}
+        className="flex snap-x snap-mandatory overflow-x-auto rounded-2xl border border-[#26262E] bg-[#121215] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      >
+        {photos.map((src, i) => (
+          <div key={src} className="relative aspect-square w-full shrink-0 snap-center">
+            <img
+              src={src}
+              alt={`${altBase}, photo ${i + 1} of ${photos.length}`}
+              width={1600}
+              height={1600}
+              // The first photo is the largest thing on the page: never lazy.
+              loading={i === 0 ? 'eager' : 'lazy'}
+              fetchPriority={i === 0 ? 'high' : 'auto'}
+              decoding={i === 0 ? 'sync' : 'async'}
+              className="h-full w-full object-cover"
+            />
+            {i === 0 && onView3D && <View3DPoster onClick={onView3D} />}
+          </div>
+        ))}
+      </div>
+
+      {photos.length > 1 && (
+        <>
+          <button
+            type="button"
+            onClick={() => goTo(active - 1)}
+            aria-label="Previous photo"
+            className="absolute left-2 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black md:flex cursor-pointer"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+          <button
+            type="button"
+            onClick={() => goTo(active + 1)}
+            aria-label="Next photo"
+            className="absolute right-2 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black md:flex cursor-pointer"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </button>
+          <div className="mt-1 flex justify-center">
+            {photos.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => goTo(i)}
+                aria-label={`Show photo ${i + 1} of ${photos.length}`}
+                aria-current={active === i}
+                className="flex h-11 w-9 items-center justify-center cursor-pointer"
+              >
+                <span
+                  className={`block h-2 w-2 rounded-full transition-colors ${
+                    active === i ? 'bg-[#FF5500]' : 'bg-neutral-600'
+                  }`}
+                />
+              </button>
+            ))}
+          </div>
+        </>
       )}
     </div>
   );
 };
+
+/** A listing with no photos yet: say so plainly, and offer the 3D view if there is one. */
+const NoPhotoPanel: React.FC<{
+  label: string;
+  swatchHex?: string;
+  onView3D?: () => void;
+  triggerRef: React.Ref<HTMLButtonElement>;
+}> = ({ label, swatchHex, onView3D, triggerRef }) => (
+  <div className="flex aspect-square w-full flex-col items-center justify-center gap-4 rounded-2xl border border-[#26262E] bg-[#121215] p-6 text-center">
+    <span
+      aria-hidden="true"
+      className="h-16 w-16 rounded-full border border-white/20"
+      style={{ background: swatchHex ?? '#888' }}
+    />
+    <div>
+      <p className="text-lg font-semibold text-white">{label}</p>
+      <p className="mt-1 text-sm text-neutral-300">Photos coming soon.</p>
+    </div>
+    {onView3D && (
+      <button
+        ref={triggerRef}
+        type="button"
+        onClick={onView3D}
+        className="inline-flex min-h-12 items-center gap-2 rounded-full bg-[#FF5500] px-6 text-base font-semibold text-[#0A0A0A] hover:bg-[#FF6B1A] cursor-pointer"
+      >
+        <Play className="h-4 w-4 fill-current" aria-hidden="true" />
+        View in 3D
+      </button>
+    )}
+  </div>
+);

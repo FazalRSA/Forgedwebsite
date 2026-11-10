@@ -1,394 +1,330 @@
-import React, { useState, Suspense, lazy } from 'react';
-import { X, CheckCircle2, ShieldCheck, FileText } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { CheckCircle2, MessageCircle, X } from 'lucide-react';
+import { SITE, telLink, whatsappLink } from '../../config/site';
 import { useForgedStore } from '../../store/useForgedStore';
-import { useRouter } from '../../utils/router';
+import { Link } from '../../utils/router';
 import { submitLead } from '../../utils/leads';
 
-const AddWheelModal = lazy(() =>
-  import('./AddWheelModal').then((m) => ({ default: m.AddWheelModal }))
-);
+/**
+ * The enquiry form. Short on purpose: a message and a phone number (name is optional).
+ *
+ * Where the enquiry goes:
+ * - Every submission is posted to the n8n lead workflow (src/utils/leads.ts), which logs it,
+ *   emails the shop and, when the visitor gave an email address, sends them a receipt with a
+ *   reference number.
+ * - WhatsApp number set in src/config/site.ts: the form also opens WhatsApp with the message
+ *   already typed, and the visitor taps Send there.
+ * - If the workflow cannot be reached and there is no WhatsApp number, the text is saved in this
+ *   browser only, and the dialog says so instead of claiming it was received.
+ */
+const inputClass =
+  'w-full min-h-12 px-4 bg-[#141418] border border-[#26262E] text-[#F5F5F7] text-base rounded-xl focus:outline-none focus:border-[#FF5500] transition-colors placeholder:text-neutral-500';
+const labelClass = 'block text-sm text-[#C2C2CC] mb-1.5';
+const primaryButtonClass =
+  'flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#FF5500] px-6 text-base font-semibold text-[#0A0A0A] hover:bg-[#FF6B1A] transition-colors cursor-pointer';
 
-export const GlobalOverlays: React.FC = () => {
-  const { navigate } = useRouter();
-  const {
-    isAddWheelModalOpen,
-    enquiryModal,
-    closeEnquiryModal,
-    submitEnquiryRecord,
-    submittedEnquiries,
-  } = useForgedStore();
+const EnquiryDialog: React.FC = () => {
+  const { enquiryModal, closeEnquiryModal, submitEnquiryRecord } = useForgedStore();
 
-  const [customerName, setCustomerName] = useState('');
-  const [customerEmail, setCustomerEmail] = useState('');
-  const [customerPhone, setCustomerPhone] = useState('');
-  const [vehicleReg, setVehicleReg] = useState('');
-  const [wheelInterest, setWheelInterest] = useState('');
-  const [preferredFinish, setPreferredFinish] = useState('');
-  const [notes, setNotes] = useState('');
+  // Opened from a wheel page the subject is the message already typed ("Hi, I'd like to ask about
+  // the FSA002 in Gold ..."); from anywhere else it is a short topic, which still makes a fair start.
+  const [message, setMessage] = useState(enquiryModal.subject);
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
   const [honeypot, setHoneypot] = useState('');
-  const [formError, setFormError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [deliveryWarning, setDeliveryWarning] = useState<string | null>(null);
-  const [submittedSuccessId, setSubmittedSuccessId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [sending, setSending] = useState(false);
+  const [done, setDone] = useState<null | {
+    whatsappHref: string | null;
+    /** Reference issued by the lead workflow, or null when it could not be reached. */
+    reference: string | null;
+  }>(null);
 
-  const handleEnquirySubmit = async (e: React.FormEvent) => {
+  const dialogRef = useRef<HTMLDivElement | null>(null);
+
+  const waConfigured = Boolean(whatsappLink());
+  const phoneRequired = !waConfigured;
+
+  // Keep the page behind still, move focus into the dialog, and give focus back when it closes.
+  useEffect(() => {
+    const opener = document.activeElement as HTMLElement | null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    dialogRef.current?.focus();
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      opener?.focus?.();
+    };
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isSubmitting) return;
-    if (!customerName.trim() || !customerEmail.includes('@') || !customerPhone.trim()) {
-      setFormError('Please provide your full name, a valid email address, and contact number.');
+    if (sending) return;
+    const text = message.trim();
+    const trimmedEmail = email.trim();
+    if (!text) {
+      setError('Please type a short message.');
       return;
     }
-    setFormError(null);
-    const combinedNotes = [
-      wheelInterest ? `Wheel Model: ${wheelInterest}` : '',
-      preferredFinish ? `Preferred Finish: ${preferredFinish}` : '',
-      notes ? `Requirements: ${notes}` : '',
-    ]
-      .filter(Boolean)
-      .join(' | ');
+    if (phoneRequired && !phone.trim() && !trimmedEmail) {
+      setError('Please add a phone number or an email address so we can reply.');
+      return;
+    }
+    if (trimmedEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      setError('That email address does not look right.');
+      return;
+    }
+    setError(null);
 
-    const record = {
-      subject: enquiryModal.subject || 'Bespoke Wheel Interest Request',
-      partNo: enquiryModal.partNo,
-      finish: enquiryModal.finish || preferredFinish,
-      customerName: customerName.trim(),
-      customerEmail: customerEmail.trim(),
-      customerPhone: customerPhone.trim(),
-      vehicleRegistrationOrVin: vehicleReg.trim() || 'To be confirmed',
-      notes: combinedNotes || 'General fitment & allocation interest',
-    };
+    const lines = [text];
+    if (name.trim()) lines.push(`Name: ${name.trim()}`);
+    if (phone.trim()) lines.push(`Phone: ${phone.trim()}`);
+    const href = whatsappLink(lines.join('\n'));
 
-    setIsSubmitting(true);
+    setSending(true);
     const result = await submitLead({
       type: 'interest',
-      name: record.customerName,
-      email: record.customerEmail,
-      phone: record.customerPhone,
-      subject: record.subject,
-      partNo: record.partNo,
-      finish: record.finish,
-      vehicle: record.vehicleRegistrationOrVin,
-      notes: record.notes,
+      name: name.trim(),
+      email: trimmedEmail,
+      phone: phone.trim(),
+      subject: enquiryModal.subject || 'Website enquiry',
+      partNo: enquiryModal.partNo,
+      finish: enquiryModal.finish,
+      notes: text,
       details: {
-        wheelInterest: wheelInterest.trim(),
-        preferredFinish: preferredFinish.trim(),
         priceZAR: enquiryModal.priceZAR ? String(enquiryModal.priceZAR) : '',
+        channel: href ? 'whatsapp' : 'form',
       },
       website: honeypot,
     });
-    setIsSubmitting(false);
+    setSending(false);
 
-    submitEnquiryRecord(record);
-    setDeliveryWarning(result.message);
-    setSubmittedSuccessId(result.reference);
-    setHoneypot('');
-    setCustomerName('');
-    setCustomerEmail('');
-    setCustomerPhone('');
-    setVehicleReg('');
-    setWheelInterest('');
-    setPreferredFinish('');
-    setNotes('');
+    if (href) {
+      window.open(href, '_blank', 'noopener,noreferrer');
+    } else if (!result.delivered) {
+      // The workflow could not be reached and there is no WhatsApp: keep it on this device, and say so below.
+      submitEnquiryRecord({
+        subject: enquiryModal.subject || 'Website enquiry',
+        partNo: enquiryModal.partNo,
+        finish: enquiryModal.finish,
+        customerName: name.trim(),
+        customerEmail: trimmedEmail,
+        customerPhone: phone.trim(),
+        vehicleRegistrationOrVin: '',
+        notes: text,
+      });
+    }
+    setDone({ whatsappHref: href, reference: result.delivered ? result.reference : null });
   };
 
-  const handleCloseEnquiry = () => {
-    setSubmittedSuccessId(null);
-    setDeliveryWarning(null);
-    setFormError(null);
-    closeEnquiryModal();
-  };
+  const tel = telLink();
 
   return (
-    <>
-      {isAddWheelModalOpen && (
-        <Suspense fallback={null}>
-          <AddWheelModal />
-        </Suspense>
-      )}
-
-      {/* Bespoke Specification & Interest Request Form (Replaces all E-Commerce Cart & Checkout) */}
-      {enquiryModal.isOpen && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label="FORGED Custom Wheels Interest Request Form"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-200"
-        >
-          <div
-            className={`w-full max-w-xl bg-[#0E0E12] text-[#F5F5F7] p-6 sm:p-8 shadow-2xl border border-[#26262E] my-auto ${
-              enquiryModal.domain === 'brand' ? 'rounded-3xl' : 'rounded-2xl'
-            }`}
+    <div
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm sm:p-4"
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) closeEnquiryModal();
+      }}
+      onKeyDown={(e) => {
+        if (e.key === 'Escape') closeEnquiryModal();
+      }}
+    >
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="enquiry-title"
+        tabIndex={-1}
+        className="w-full max-w-md max-h-[92svh] overflow-y-auto rounded-t-3xl sm:rounded-3xl bg-[#0E0E12] text-[#F5F5F7] border border-[#26262E] p-5 sm:p-6 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-2xl focus:outline-none"
+      >
+        <div className="flex items-start justify-between gap-4">
+          <h2 id="enquiry-title" className="text-xl font-semibold tracking-tight text-white">
+            {done
+              ? done.whatsappHref
+                ? 'Almost there'
+                : done.reference
+                  ? 'Enquiry sent'
+                  : 'Saved on this device'
+              : 'Send an enquiry'}
+          </h2>
+          <button
+            type="button"
+            onClick={closeEnquiryModal}
+            aria-label="Close enquiry form"
+            className="-mr-2 -mt-2 w-11 h-11 rounded-full flex items-center justify-center text-[#C2C2CC] hover:text-white cursor-pointer shrink-0"
           >
-            {/* Header */}
-            <div className="flex items-start justify-between gap-4 pb-4 border-b border-[#26262E]">
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="w-2 h-2 rounded-full bg-[#FF5500] animate-pulse" />
-                  <p className="text-[11px] font-tech-mono uppercase tracking-[0.16em] text-[#FF5500] font-semibold">
-                    BESPOKE ALLOCATION · INTEREST REQUEST
-                  </p>
-                </div>
-                <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white uppercase">
-                  State Your Interest
-                </h2>
-                <p className="text-xs text-[#C2C2CC] mt-1">
-                  No online checkout or payment required. Submit your vehicle details and requirements below; our engineering desk will review 3D hub clearances and contact you directly.
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {done ? (
+          <div className="pt-3 space-y-4">
+            {done.whatsappHref ? (
+              <>
+                <p className="flex items-start gap-2 text-sm text-[#C2C2CC]">
+                  <CheckCircle2 className="w-5 h-5 text-[#FF5500] shrink-0" aria-hidden="true" />
+                  <span>WhatsApp should be opening with your message. Tap Send there to reach us.</span>
                 </p>
-              </div>
-              <button
-                type="button"
-                onClick={handleCloseEnquiry}
-                aria-label="Close Interest Request Form"
-                className="w-9 h-9 rounded-full border border-[#26262E] bg-[#141418] hover:border-[#FF5500] flex items-center justify-center text-[#C2C2CC] hover:text-[#FF5500] transition-colors cursor-pointer shrink-0"
-              >
-                <X className="w-4 h-4" />
-              </button>
+                <a
+                  href={done.whatsappHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={primaryButtonClass}
+                >
+                  <MessageCircle className="w-5 h-5" aria-hidden="true" />
+                  Open WhatsApp
+                </a>
+                {done.reference && (
+                  <p className="text-xs text-neutral-400" data-testid="enquiry-reference">
+                    We have also logged your enquiry as reference {done.reference}.
+                  </p>
+                )}
+              </>
+            ) : done.reference ? (
+              <p className="flex items-start gap-2 text-sm text-[#C2C2CC]" data-testid="enquiry-reference">
+                <CheckCircle2 className="w-5 h-5 text-[#FF5500] shrink-0" aria-hidden="true" />
+                <span>
+                  We have your enquiry under reference {done.reference} and will reply on the
+                  details you gave us.
+                </span>
+              </p>
+            ) : (
+              <>
+                <p className="text-sm text-[#C2C2CC]" data-testid="enquiry-undelivered">
+                  We could not send your message right now, so it is saved on this device only.
+                  {tel && SITE.phoneDisplay
+                    ? ' Please call us instead.'
+                    : ' Please use the details on our contact page.'}
+                </p>
+                {tel && SITE.phoneDisplay ? (
+                  <a href={tel} className={primaryButtonClass}>
+                    Call {SITE.phoneDisplay}
+                  </a>
+                ) : (
+                  <Link to="/contact" onClick={closeEnquiryModal} className={primaryButtonClass}>
+                    Contact details
+                  </Link>
+                )}
+              </>
+            )}
+            <button
+              type="button"
+              onClick={closeEnquiryModal}
+              className="w-full min-h-11 text-sm text-[#C2C2CC] hover:text-white cursor-pointer"
+            >
+              Close
+            </button>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="pt-4 space-y-4" noValidate>
+            <div>
+              <label htmlFor="enq-message" className={labelClass}>
+                Your message
+              </label>
+              <textarea
+                id="enq-message"
+                rows={4}
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                placeholder="Which wheels, and for which car?"
+                className={`${inputClass} py-3 resize-none`}
+              />
             </div>
 
-            {submittedSuccessId ? (
-              <div className="py-10 space-y-5 text-center">
-                <div className="w-16 h-16 rounded-full bg-[#FF5500]/10 border border-[#FF5500]/40 flex items-center justify-center mx-auto text-[#FF5500]">
-                  <CheckCircle2 className="w-8 h-8" />
-                </div>
-                <div className="space-y-2">
-                  <span className="text-[11px] font-tech-mono uppercase tracking-widest text-[#FF5500] font-semibold">
-                    REQUEST SUBMITTED SUCCESSFULLY
-                  </span>
-                  <h3 className="text-xl sm:text-2xl font-bold text-white uppercase">
-                    Reference #{submittedSuccessId}
-                  </h3>
-                  <p className="text-xs sm:text-sm text-[#C2C2CC] max-w-md mx-auto leading-relaxed">
-                    Your interest and build preferences have been logged. We will review your fitment details and contact you using the details you provided.
-                  </p>
-                  {deliveryWarning && (
-                    <p
-                      data-testid="enquiry-delivery-warning"
-                      className="text-xs font-tech-mono text-[#FF5500] bg-[#FF5500]/10 border border-[#FF5500]/30 p-3 rounded-xl max-w-md mx-auto"
-                    >
-                      {deliveryWarning}
-                    </p>
-                  )}
-                </div>
+            <div>
+              <label htmlFor="enq-phone" className={labelClass}>
+                Phone or WhatsApp number{phoneRequired ? '' : ' (optional)'}
+              </label>
+              <input
+                id="enq-phone"
+                type="tel"
+                inputMode="tel"
+                autoComplete="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="082 000 0000"
+                className={inputClass}
+              />
+            </div>
 
-                {submittedEnquiries.length > 0 && (
-                  <p className="text-[11px] font-tech-mono text-neutral-400">
-                    RECORDED IN CLIENT DOSSIER ({submittedEnquiries.length} REGISTERED INQUIRIES)
-                  </p>
-                )}
+            <div>
+              <label htmlFor="enq-email" className={labelClass}>
+                Email (optional, for a written reply)
+              </label>
+              <input
+                id="enq-email"
+                type="email"
+                inputMode="email"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className={inputClass}
+              />
+            </div>
 
-                <div className="pt-2">
-                  <button
-                    type="button"
-                    onClick={handleCloseEnquiry}
-                    className="px-8 py-3.5 bg-[#FF5500] hover:bg-[#FF6B1A] text-white text-xs font-tech-mono font-bold uppercase tracking-[0.16em] rounded-full transition-all shadow-[0_0_20px_rgba(255,85,0,0.3)] cursor-pointer"
-                  >
-                    Return to Atelier
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <form onSubmit={handleEnquirySubmit} className="space-y-4 pt-5">
-                {/* Pre-filled Reference Badge if initiated from a specific wheel/fitment */}
-                {enquiryModal.subject && (
-                  <div className="p-3 bg-[#141418] border border-[#26262E] rounded-xl flex flex-wrap items-center justify-between gap-2 text-xs font-tech-mono text-[#C2C2CC]">
-                    <div className="flex items-center gap-2">
-                      <FileText className="w-3.5 h-3.5 text-[#FF5500] shrink-0" />
-                      <span className="font-semibold text-white truncate max-w-xs sm:max-w-md">
-                        {enquiryModal.subject}
-                      </span>
-                    </div>
-                    {enquiryModal.finish && (
-                      <span className="text-[11px] text-[#FF5500] uppercase font-semibold">
-                        FINISH: {enquiryModal.finish}
-                      </span>
-                    )}
-                  </div>
-                )}
+            {/* Honeypot: hidden from people, filled only by bots; the lead client drops it silently. */}
+            <div className="hidden" aria-hidden="true">
+              <label htmlFor="enq-website">Website</label>
+              <input
+                id="enq-website"
+                type="text"
+                name="website"
+                tabIndex={-1}
+                autoComplete="off"
+                value={honeypot}
+                onChange={(e) => setHoneypot(e.target.value)}
+              />
+            </div>
 
-                {/* Name & Phone */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label
-                      htmlFor="enq-name"
-                      className="block text-[11px] font-tech-mono uppercase tracking-wider text-[#C2C2CC] mb-1.5"
-                    >
-                      Full Name *
-                    </label>
-                    <input
-                      id="enq-name"
-                      type="text"
-                      required
-                      value={customerName}
-                      onChange={(e) => setCustomerName(e.target.value)}
-                      placeholder="e.g. Alexander Vance"
-                      className="w-full h-11 px-3.5 bg-[#141418] border border-[#26262E] text-[#F5F5F7] text-xs sm:text-sm rounded-lg focus:outline-none focus:border-[#FF5500] transition-colors"
-                    />
-                  </div>
+            <div>
+              <label htmlFor="enq-name" className={labelClass}>
+                Name (optional)
+              </label>
+              <input
+                id="enq-name"
+                type="text"
+                autoComplete="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className={inputClass}
+              />
+            </div>
 
-                  <div>
-                    <label
-                      htmlFor="enq-phone"
-                      className="block text-[11px] font-tech-mono uppercase tracking-wider text-[#C2C2CC] mb-1.5"
-                    >
-                      Telephone / WhatsApp *
-                    </label>
-                    <input
-                      id="enq-phone"
-                      type="tel"
-                      required
-                      value={customerPhone}
-                      onChange={(e) => setCustomerPhone(e.target.value)}
-                      placeholder="+27 82 000 0000"
-                      className="w-full h-11 px-3.5 bg-[#141418] border border-[#26262E] text-[#F5F5F7] text-xs sm:text-sm rounded-lg focus:outline-none focus:border-[#FF5500] transition-colors"
-                    />
-                  </div>
-                </div>
-
-                {/* Email & Vehicle Registration / Model */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label
-                      htmlFor="enq-email"
-                      className="block text-[11px] font-tech-mono uppercase tracking-wider text-[#C2C2CC] mb-1.5"
-                    >
-                      Email Address *
-                    </label>
-                    <input
-                      id="enq-email"
-                      type="email"
-                      required
-                      value={customerEmail}
-                      onChange={(e) => setCustomerEmail(e.target.value)}
-                      placeholder="client@prestige.com"
-                      className="w-full h-11 px-3.5 bg-[#141418] border border-[#26262E] text-[#F5F5F7] text-xs sm:text-sm rounded-lg focus:outline-none focus:border-[#FF5500] transition-colors"
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="enq-reg"
-                      className="block text-[11px] font-tech-mono uppercase tracking-wider text-[#C2C2CC] mb-1.5"
-                    >
-                      Vehicle Model &amp; Year
-                    </label>
-                    <input
-                      id="enq-reg"
-                      type="text"
-                      value={vehicleReg}
-                      onChange={(e) => setVehicleReg(e.target.value)}
-                      placeholder="e.g. 2025 BMW G80 M3 Competition"
-                      className="w-full h-11 px-3.5 bg-[#141418] border border-[#26262E] text-[#F5F5F7] text-xs sm:text-sm rounded-lg focus:outline-none focus:border-[#FF5500] transition-colors"
-                    />
-                  </div>
-                </div>
-
-                {/* Preferred Finish or Wheel (optional if not pre-set) */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label
-                      htmlFor="enq-finish"
-                      className="block text-[11px] font-tech-mono uppercase tracking-wider text-[#C2C2CC] mb-1.5"
-                    >
-                      Preferred Finish / Spec
-                    </label>
-                    <input
-                      id="enq-finish"
-                      type="text"
-                      value={preferredFinish}
-                      onChange={(e) => setPreferredFinish(e.target.value)}
-                      placeholder={enquiryModal.finish || "e.g. Liquid Silver, Satin Black, Champagne"}
-                      className="w-full h-11 px-3.5 bg-[#141418] border border-[#26262E] text-[#F5F5F7] text-xs sm:text-sm rounded-lg focus:outline-none focus:border-[#FF5500] transition-colors"
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="enq-timeline"
-                      className="block text-[11px] font-tech-mono uppercase tracking-wider text-[#C2C2CC] mb-1.5"
-                    >
-                      Expected Build Timeline
-                    </label>
-                    <select
-                      id="enq-timeline"
-                      className="w-full h-11 px-3.5 bg-[#141418] border border-[#26262E] text-[#F5F5F7] text-xs sm:text-sm rounded-lg focus:outline-none focus:border-[#FF5500] cursor-pointer"
-                    >
-                      <option value="immediate">Immediate Dispatch / Urgent</option>
-                      <option value="1-2-months">Within 1-2 Months</option>
-                      <option value="planning">Future Build Planning / Consulting</option>
-                    </select>
-                  </div>
-                </div>
-
-                {/* Bespoke Requirements */}
-                <div>
-                  <label
-                    htmlFor="enq-notes"
-                    className="block text-[11px] font-tech-mono uppercase tracking-wider text-[#C2C2CC] mb-1.5"
-                  >
-                    Bespoke Notes / Requirements
-                  </label>
-                  <textarea
-                    id="enq-notes"
-                    rows={3}
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    placeholder="Specify custom tire package (e.g. Michelin Cup 2), TPMS sensors, custom offsets, or international shipping address..."
-                    className="w-full p-3.5 bg-[#141418] border border-[#26262E] text-[#F5F5F7] text-xs sm:text-sm rounded-lg focus:outline-none focus:border-[#FF5500] transition-colors resize-none"
-                  />
-                </div>
-
-                {/* Honeypot: hidden from people, filled only by bots; the lead client drops it silently. */}
-                <div className="hidden" aria-hidden="true">
-                  <label htmlFor="enq-website">Website</label>
-                  <input
-                    id="enq-website"
-                    type="text"
-                    name="website"
-                    tabIndex={-1}
-                    autoComplete="off"
-                    value={honeypot}
-                    onChange={(e) => setHoneypot(e.target.value)}
-                  />
-                </div>
-
-                {formError && (
-                  <p className="text-xs font-tech-mono text-[#FF5500]">{formError}</p>
-                )}
-
-                {/* Submit Button */}
-                <div className="pt-2">
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full py-4 bg-[#FF5500] hover:bg-[#FF6B1A] disabled:opacity-60 disabled:cursor-wait text-white text-xs font-tech-mono font-bold uppercase tracking-[0.18em] rounded-full transition-all shadow-[0_0_25px_rgba(255,85,0,0.35)] cursor-pointer"
-                  >
-                    {isSubmitting ? 'Sending…' : 'Submit Interest Request'}
-                  </button>
-                  <p className="flex items-start justify-center gap-2 mt-3 text-[11px] font-tech-mono text-neutral-400 text-center">
-                    <ShieldCheck className="w-3.5 h-3.5 text-[#FF5500] shrink-0 mt-0.5" />
-                    <span>
-                      By submitting, you consent to FORGED Custom Wheels using these details to respond
-                      to your request, as described in our{' '}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          handleCloseEnquiry();
-                          navigate('/privacy-policy');
-                        }}
-                        className="text-[#FF5500] hover:underline cursor-pointer"
-                      >
-                        Privacy Notice
-                      </button>
-                      .
-                    </span>
-                  </p>
-                </div>
-              </form>
+            {error && (
+              <p role="alert" className="text-sm text-[#FF7A3D]">
+                {error}
+              </p>
             )}
-          </div>
-        </div>
-      )}
 
-    </>
+            <button
+              type="submit"
+              disabled={sending}
+              className={`${primaryButtonClass} disabled:opacity-60 disabled:cursor-wait`}
+            >
+              {waConfigured && !sending && <MessageCircle className="w-5 h-5" aria-hidden="true" />}
+              {sending ? 'Sending…' : waConfigured ? 'Send on WhatsApp' : 'Send enquiry'}
+            </button>
+
+            <p className="text-xs text-neutral-400 text-center">
+              We use your details only to reply. See our{' '}
+              <Link
+                to="/privacy-policy"
+                onClick={closeEnquiryModal}
+                className="underline underline-offset-2 hover:text-white"
+              >
+                privacy policy
+              </Link>
+              .
+            </p>
+          </form>
+        )}
+      </div>
+    </div>
   );
+};
+
+export const GlobalOverlays: React.FC = () => {
+  const isOpen = useForgedStore((state) => state.enquiryModal.isOpen);
+  return isOpen ? <EnquiryDialog /> : null;
 };

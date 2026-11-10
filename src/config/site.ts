@@ -19,7 +19,7 @@ export interface SiteConfig {
   facebookUrl: string;
   addressLine: string;
   serviceAreas: readonly string[];
-  /** n8n webhook that receives every website lead (see README → Lead delivery). */
+  /** n8n webhook that receives every website enquiry (see README → Lead delivery). */
   leadsWebhookUrl: string;
 }
 
@@ -27,12 +27,12 @@ export const SITE: SiteConfig = {
   name: 'FORGED Custom Wheels',
   country: 'South Africa',
   /** Primary web domain, used for fallback email addresses. */
-  domain: 'forgedcustomwheels.com',
+  domain: 'forgedsa.co.za',
 
   /** WhatsApp Business number in E.164 digits only, e.g. '27820000000'. */
-  whatsappNumber: '',
+  whatsappNumber: '27834472654',
   /** Human-readable telephone, e.g. '+27 82 000 0000'. */
-  phoneDisplay: '',
+  phoneDisplay: '+27 83 447 2654',
 
   /** Trade / dealer desk email. Falls back to privacyEmail when empty. */
   tradeEmail: '',
@@ -43,9 +43,9 @@ export const SITE: SiteConfig = {
   facebookUrl: '',
 
   /** One-line street address for the header/footer, e.g. 'UNIT 4 · 12 EXAMPLE ROAD · SANDTON · JOHANNESBURG'. */
-  addressLine: '',
+  addressLine: "11 SAINT MARY'S AVENUE · WINDERMERE · BEREA · DURBAN · 4001",
   /** Cities used in copy and placeholders. */
-  serviceAreas: ['Johannesburg', 'Cape Town', 'Durban'],
+  serviceAreas: [],
 
   /** Production URL of the "FORGED · Website Leads" n8n workflow. Override per deployment with VITE_LEADS_WEBHOOK_URL. */
   leadsWebhookUrl: 'https://novahavensai.app.n8n.cloud/webhook/forged-website-lead',

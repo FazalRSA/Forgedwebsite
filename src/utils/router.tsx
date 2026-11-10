@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { applyRedirect, redirectFor } from './redirects';
 
 interface RouterContextValue {
   pathname: string;
@@ -12,12 +13,38 @@ const RouterContext = createContext<RouterContextValue>({
   navigate: () => {},
 });
 
+/** Scroll to an element id once it is on the page; the target may render a moment after the route. */
+function scrollToHash(id: string, behavior: ScrollBehavior = 'smooth'): void {
+  let attempts = 0;
+  const tryScroll = () => {
+    const el = document.getElementById(id);
+    if (el) {
+      const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+      el.scrollIntoView({ behavior: reduceMotion ? 'auto' : behavior, block: 'start' });
+    } else if (attempts++ < 10) {
+      setTimeout(tryScroll, 100);
+    }
+  };
+  setTimeout(tryScroll, 60);
+}
+
 export function RouterProvider({ children }: { children: React.ReactNode }) {
-  const [pathname, setPathname] = useState<string>(() => window.location.pathname || '/');
+  const [pathname, setPathname] = useState<string>(() => {
+    // An old address (see redirects.ts) is replaced in the history before the first render.
+    applyRedirect(window.location, window.history);
+    return window.location.pathname || '/';
+  });
   const [hash, setHash] = useState<string>(() => window.location.hash || '');
+
+  // A link such as /#catalogue (including one reached through a redirect) opens at its section.
+  useEffect(() => {
+    const initialHash = window.location.hash.replace(/^#/, '');
+    if (initialHash) scrollToHash(initialHash, 'auto');
+  }, []);
 
   useEffect(() => {
     const handlePopState = () => {
+      applyRedirect(window.location, window.history);
       setPathname(window.location.pathname || '/');
       setHash(window.location.hash || '');
     };
@@ -26,7 +53,10 @@ export function RouterProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const navigate = useCallback((to: string) => {
-    const [rawPath, rawHash] = to.split('#');
+    const [requestedPath, requestedHash] = to.split('#');
+    // A link to an old address goes straight to its new address; the old one is never added to the history.
+    const redirected = redirectFor(requestedPath || '/');
+    const [rawPath, rawHash] = redirected ? redirected.split('#') : [requestedPath, requestedHash];
     const targetPath = rawPath || '/';
     const targetHash = rawHash ? `#${rawHash}` : '';
 
@@ -35,12 +65,7 @@ export function RouterProvider({ children }: { children: React.ReactNode }) {
     setHash(targetHash);
 
     if (targetHash) {
-      setTimeout(() => {
-        const el = document.getElementById(rawHash);
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      }, 60);
+      scrollToHash(rawHash);
     } else {
       window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
     }
