@@ -243,6 +243,18 @@ interface RawInventorySeed {
   compatibleStoreProductSlug: string;
 }
 
+/**
+ * One traced 3D model per wheel design; every finish of a design shares it and the
+ * studio repaints it. FSA001 sets its own front/rear pair on the seed instead.
+ */
+export const MODEL_URL_BY_CODE: Partial<Record<RawInventorySeed['modelCode'], string>> = {
+  FSA002: '/models/wheels/fsa002.glb',
+  FSA003: '/models/wheels/fsa003.glb',
+  FSA004: '/models/wheels/fsa004.glb',
+  'FF-1': '/models/wheels/ff-1.glb',
+  'FF-3': '/models/wheels/ff-3.glb',
+};
+
 const INVENTORY_SEEDS: RawInventorySeed[] = [
   {
     slot: 1,
@@ -546,7 +558,7 @@ export const BRAND_WHEELS: BrandWheelItem[] = INVENTORY_SEEDS.map((seed) => {
     stockStatus: seed.stockStatus,
     stockQuantitySets: seed.stockQuantitySets,
     technicalSpecSheet: seed.technicalSpecSheet,
-    modelUrl: seed.modelUrl,
+    modelUrl: seed.modelUrl ?? MODEL_URL_BY_CODE[seed.modelCode],
     rearModelUrl: seed.rearModelUrl,
     images: [
       createWheelPlaceholderDataUrl(
