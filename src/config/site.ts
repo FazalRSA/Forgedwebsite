@@ -19,6 +19,8 @@ export interface SiteConfig {
   facebookUrl: string;
   addressLine: string;
   serviceAreas: readonly string[];
+  /** n8n webhook that receives every website lead (see README → Lead delivery). */
+  leadsWebhookUrl: string;
 }
 
 export const SITE: SiteConfig = {
@@ -44,6 +46,9 @@ export const SITE: SiteConfig = {
   addressLine: '',
   /** Cities used in copy and placeholders. */
   serviceAreas: ['Johannesburg', 'Cape Town', 'Durban'],
+
+  /** Production URL of the "FORGED · Website Leads" n8n workflow. Override per deployment with VITE_LEADS_WEBHOOK_URL. */
+  leadsWebhookUrl: 'https://novahavensai.app.n8n.cloud/webhook/forged-website-lead',
 };
 
 /** wa.me deep link with an optional prefilled message, or null when no number is configured. */

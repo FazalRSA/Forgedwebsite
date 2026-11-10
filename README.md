@@ -237,6 +237,28 @@ A value left empty is never shown: the related button falls back to the enquiry 
 
 **Content rule.** Public copy states only what the business can evidence. Do not add certifications, warranty terms, delivery promises, response times, load ratings or dealer status without a source from the owner.
 
+## Lead delivery (n8n)
+
+Every call to action posts to one n8n webhook; the site itself has no backend.
+
+| Form | Where | Lead `type` |
+| --- | --- | --- |
+| Interest request modal (every "Register interest" / "Enquire" button) | `src/components/shared/GlobalOverlays.tsx` | `interest` |
+| Dealer application | `src/components/brand/DealerApplicationPage.tsx` | `dealer` |
+| Allocation-list sign-up | product page footer in `src/components/store/TechnicalProductView.tsx` | `newsletter` |
+
+`src/utils/leads.ts` builds the payload (fields, the page it came from, a timestamp, consent and a honeypot), POSTs it as JSON and shows the visitor the reference n8n returns. If the webhook cannot be reached the form still completes with a locally generated reference and tells the visitor to email the business, so nothing is silently lost on the visitor's side.
+
+The workflow **FORGED · Website Leads** (production URL `https://novahavensai.app.n8n.cloud/webhook/forged-website-lead`) does the rest:
+
+1. **Normalize & Validate** (Code node): rejects unknown types, bad emails and filled honeypots with HTTP 400, otherwise issues a `FORGED-INT-`, `FORGED-DLR-` or `FORGED-NEWS-` reference and builds the emails. The inbox that receives leads and the reply-to address live in the `CONFIG` block at the top of this node; change them there.
+2. **Log lead**: inserts the raw submission into the n8n data table **FORGED Website Leads** (one row per lead, with `status` for triage).
+3. **Respond: accepted**: answers the browser with `{ ok: true, reference }`.
+4. **Email the team**: a dark-themed summary of the lead, reply-to set to the visitor.
+5. **Confirm to visitor**: a receipt for interest requests and dealer applications, a welcome note for allocation-list sign-ups.
+
+Emails go out through the Gmail credential attached to the workflow. To point a deployment at a different workflow (for example the test URL while developing), set `VITE_LEADS_WEBHOOK_URL`; otherwise `SITE.leadsWebhookUrl` in `src/config/site.ts` is used.
+
 ## Accounts and Firebase
 
 Client accounts use Firebase Authentication (Google provider) and Firestore:
@@ -293,7 +315,7 @@ Build chunks are split per vendor (`react`, `motion`, `three`, `firebase`, `luci
 
 | Area | Today | Planned |
 | --- | --- | --- |
-| **Lead delivery** | Interest requests, dealer applications and newsletter sign-ups are stored only in the visitor's browser. Nothing reaches the business. | Write to Firestore and fan out to email, Google Sheets, WhatsApp and the CRM |
+| **Lead delivery** | Leads reach the team by email through n8n (see [Lead delivery](#lead-delivery-n8n)). The inbox is set inside the n8n workflow, and there is no CRM or WhatsApp hand-off yet. | Route leads into the CRM and WhatsApp from the same workflow |
 | **Contact channels** | Address, WhatsApp, phone and social links are empty in `src/config/site.ts`, so those elements are hidden | Fill in once confirmed |
 | **3D accuracy** | Five designs are traced from photos with simplified surfaces | Replace with scans of the physical wheels |
 | **Photography** | Six listings have no product photos (FSA001, FSA002 Hyper Black and Polished Face, FSA003 Silver, FSA004 Hyper Black and Gloss Black) | Shoot and add |

@@ -2,6 +2,7 @@ import React, { useState, Suspense, lazy } from 'react';
 import { X, CheckCircle2, ShieldCheck, FileText } from 'lucide-react';
 import { useForgedStore } from '../../store/useForgedStore';
 import { useRouter } from '../../utils/router';
+import { submitLead } from '../../utils/leads';
 
 const AddWheelModal = lazy(() =>
   import('./AddWheelModal').then((m) => ({ default: m.AddWheelModal }))
@@ -24,11 +25,15 @@ export const GlobalOverlays: React.FC = () => {
   const [wheelInterest, setWheelInterest] = useState('');
   const [preferredFinish, setPreferredFinish] = useState('');
   const [notes, setNotes] = useState('');
+  const [honeypot, setHoneypot] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [deliveryWarning, setDeliveryWarning] = useState<string | null>(null);
   const [submittedSuccessId, setSubmittedSuccessId] = useState<string | null>(null);
 
-  const handleEnquirySubmit = (e: React.FormEvent) => {
+  const handleEnquirySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
     if (!customerName.trim() || !customerEmail.includes('@') || !customerPhone.trim()) {
       setFormError('Please provide your full name, a valid email address, and contact number.');
       return;
@@ -42,7 +47,7 @@ export const GlobalOverlays: React.FC = () => {
       .filter(Boolean)
       .join(' | ');
 
-    submitEnquiryRecord({
+    const record = {
       subject: enquiryModal.subject || 'Bespoke Wheel Interest Request',
       partNo: enquiryModal.partNo,
       finish: enquiryModal.finish || preferredFinish,
@@ -51,10 +56,32 @@ export const GlobalOverlays: React.FC = () => {
       customerPhone: customerPhone.trim(),
       vehicleRegistrationOrVin: vehicleReg.trim() || 'To be confirmed',
       notes: combinedNotes || 'General fitment & allocation interest',
-    });
+    };
 
-    const refCode = `FORGED-${Math.floor(100000 + Math.random() * 900000)}`;
-    setSubmittedSuccessId(refCode);
+    setIsSubmitting(true);
+    const result = await submitLead({
+      type: 'interest',
+      name: record.customerName,
+      email: record.customerEmail,
+      phone: record.customerPhone,
+      subject: record.subject,
+      partNo: record.partNo,
+      finish: record.finish,
+      vehicle: record.vehicleRegistrationOrVin,
+      notes: record.notes,
+      details: {
+        wheelInterest: wheelInterest.trim(),
+        preferredFinish: preferredFinish.trim(),
+        priceZAR: enquiryModal.priceZAR ? String(enquiryModal.priceZAR) : '',
+      },
+      website: honeypot,
+    });
+    setIsSubmitting(false);
+
+    submitEnquiryRecord(record);
+    setDeliveryWarning(result.message);
+    setSubmittedSuccessId(result.reference);
+    setHoneypot('');
     setCustomerName('');
     setCustomerEmail('');
     setCustomerPhone('');
@@ -66,6 +93,7 @@ export const GlobalOverlays: React.FC = () => {
 
   const handleCloseEnquiry = () => {
     setSubmittedSuccessId(null);
+    setDeliveryWarning(null);
     setFormError(null);
     closeEnquiryModal();
   };
@@ -132,6 +160,14 @@ export const GlobalOverlays: React.FC = () => {
                   <p className="text-xs sm:text-sm text-[#C2C2CC] max-w-md mx-auto leading-relaxed">
                     Your interest and build preferences have been logged. We will review your fitment details and contact you using the details you provided.
                   </p>
+                  {deliveryWarning && (
+                    <p
+                      data-testid="enquiry-delivery-warning"
+                      className="text-xs font-tech-mono text-[#FF5500] bg-[#FF5500]/10 border border-[#FF5500]/30 p-3 rounded-xl max-w-md mx-auto"
+                    >
+                      {deliveryWarning}
+                    </p>
+                  )}
                 </div>
 
                 {submittedEnquiries.length > 0 && (
@@ -301,6 +337,20 @@ export const GlobalOverlays: React.FC = () => {
                   />
                 </div>
 
+                {/* Honeypot: hidden from people, filled only by bots; the lead client drops it silently. */}
+                <div className="hidden" aria-hidden="true">
+                  <label htmlFor="enq-website">Website</label>
+                  <input
+                    id="enq-website"
+                    type="text"
+                    name="website"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={honeypot}
+                    onChange={(e) => setHoneypot(e.target.value)}
+                  />
+                </div>
+
                 {formError && (
                   <p className="text-xs font-tech-mono text-[#FF5500]">{formError}</p>
                 )}
@@ -309,9 +359,10 @@ export const GlobalOverlays: React.FC = () => {
                 <div className="pt-2">
                   <button
                     type="submit"
-                    className="w-full py-4 bg-[#FF5500] hover:bg-[#FF6B1A] text-white text-xs font-tech-mono font-bold uppercase tracking-[0.18em] rounded-full transition-all shadow-[0_0_25px_rgba(255,85,0,0.35)] cursor-pointer"
+                    disabled={isSubmitting}
+                    className="w-full py-4 bg-[#FF5500] hover:bg-[#FF6B1A] disabled:opacity-60 disabled:cursor-wait text-white text-xs font-tech-mono font-bold uppercase tracking-[0.18em] rounded-full transition-all shadow-[0_0_25px_rgba(255,85,0,0.35)] cursor-pointer"
                   >
-                    Submit Interest Request
+                    {isSubmitting ? 'Sending…' : 'Submit Interest Request'}
                   </button>
                   <p className="flex items-start justify-center gap-2 mt-3 text-[11px] font-tech-mono text-neutral-400 text-center">
                     <ShieldCheck className="w-3.5 h-3.5 text-[#FF5500] shrink-0 mt-0.5" />

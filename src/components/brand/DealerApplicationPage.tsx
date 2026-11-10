@@ -11,9 +11,13 @@ import {
 import { BrandHeader } from './BrandHeader';
 import { useRouter } from '../../utils/router';
 import { SITE, displayAddress, tradeContactEmail } from '../../config/site';
+import { submitLead } from '../../utils/leads';
 
 interface DealerApplicationSubmission {
   referenceId: string;
+  /** False when the n8n webhook could not be reached; the page then shows deliveryNotice. */
+  delivered: boolean;
+  deliveryNotice: string | null;
   companyName: string;
   tradingName: string;
   country: string;
@@ -60,7 +64,9 @@ export const DealerApplicationPage: React.FC = () => {
     'In-House 4-Wheel Laser Geometry & Corner Weighting',
   ]);
   const [notes, setNotes] = useState('');
+  const [honeypot, setHoneypot] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [submission, setSubmission] = useState<DealerApplicationSubmission | null>(null);
 
   const toggleCapability = (cap: string) => {
@@ -69,8 +75,9 @@ export const DealerApplicationPage: React.FC = () => {
     );
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
     if (!companyName.trim() || !contactName.trim() || !email.includes('@') || !phone.trim() || !city.trim()) {
       setFormError(
         'Please complete all required trade fields: Company Name, City, Primary Contact Name, valid Email, and Direct Telephone.'
@@ -79,9 +86,34 @@ export const DealerApplicationPage: React.FC = () => {
     }
 
     setFormError(null);
-    const referenceId = `FORGED-DLR-${Math.floor(100000 + Math.random() * 900000)}`;
+    setIsSubmitting(true);
+    const result = await submitLead({
+      type: 'dealer',
+      name: contactName.trim(),
+      email: email.trim(),
+      phone: phone.trim(),
+      company: companyName.trim(),
+      subject: `Dealer application · ${companyName.trim()} (${city.trim()}, ${country.trim()})`,
+      notes: notes.trim(),
+      details: {
+        tradingName: tradingName.trim(),
+        country: country.trim(),
+        city: city.trim(),
+        website: website.trim(),
+        contactRole: contactRole.trim(),
+        vatNumber: vatNumber.trim(),
+        facilityType,
+        monthlyVolume,
+        capabilities,
+      },
+      website: honeypot,
+    });
+    setIsSubmitting(false);
+    setHoneypot('');
     setSubmission({
-      referenceId,
+      referenceId: result.reference,
+      delivered: result.delivered,
+      deliveryNotice: result.message,
       companyName: companyName.trim(),
       tradingName: tradingName.trim() || companyName.trim(),
       country: country.trim(),
@@ -285,6 +317,14 @@ export const DealerApplicationPage: React.FC = () => {
                   Thank you, <span className="font-semibold text-white">{submission.contactName}</span>. Your trade application for{' '}
                   <span className="font-semibold text-white">{submission.companyName}</span> ({submission.city}, {submission.country}) has been recorded. Our trade team reviews every application and will contact you at the details provided to discuss accreditation, allocations and the wholesale price schedule.
                 </p>
+                {submission.deliveryNotice && (
+                  <p
+                    data-testid="dealer-delivery-warning"
+                    className="text-xs font-tech-mono text-[#FF5500] bg-[#FF5500]/10 border border-[#FF5500]/30 p-3 rounded-xl"
+                  >
+                    {submission.deliveryNotice}
+                  </p>
+                )}
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-[#18181D] p-5 rounded-2xl border border-[#26262E] text-xs font-tech-mono">
                   <div>
@@ -647,6 +687,20 @@ export const DealerApplicationPage: React.FC = () => {
                   </div>
                 </div>
 
+                {/* Honeypot: hidden from people, filled only by bots; the lead client drops it silently. */}
+                <div className="hidden" aria-hidden="true">
+                  <label htmlFor="dealer-website-hp">Website</label>
+                  <input
+                    id="dealer-website-hp"
+                    type="text"
+                    name="website"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={honeypot}
+                    onChange={(e) => setHoneypot(e.target.value)}
+                  />
+                </div>
+
                 {formError && (
                   <p className="text-xs font-tech-mono text-[#FF5500] bg-[#FF5500]/10 border border-[#FF5500]/30 p-3 rounded-xl">
                     {formError}
@@ -667,9 +721,10 @@ export const DealerApplicationPage: React.FC = () => {
                   </p>
                   <button
                     type="submit"
-                    className="bg-[#FF5500] text-white rounded-full px-8 py-4 text-xs font-tech-mono font-bold uppercase tracking-[0.18em] hover:bg-[#FF6B1A] transition-all shadow-[0_0_20px_rgba(255,85,0,0.35)] inline-flex items-center justify-center gap-3 cursor-pointer whitespace-nowrap shrink-0"
+                    disabled={isSubmitting}
+                    className="bg-[#FF5500] text-white rounded-full px-8 py-4 text-xs font-tech-mono font-bold uppercase tracking-[0.18em] hover:bg-[#FF6B1A] disabled:opacity-60 disabled:cursor-wait transition-all shadow-[0_0_20px_rgba(255,85,0,0.35)] inline-flex items-center justify-center gap-3 cursor-pointer whitespace-nowrap shrink-0"
                   >
-                    <span>SUBMIT DEALER APPLICATION</span>
+                    <span>{isSubmitting ? 'SENDING…' : 'SUBMIT DEALER APPLICATION'}</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>

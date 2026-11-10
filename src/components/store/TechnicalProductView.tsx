@@ -20,6 +20,7 @@ import {
 import { useForgedStore } from '../../store/useForgedStore';
 import { useRouter } from '../../utils/router';
 import { SITE, whatsappLink, telLink } from '../../config/site';
+import { submitLead } from '../../utils/leads';
 import { StoreHeader } from './StoreHeader';
 import { WheelRenderSVG } from '../visuals/WheelRenderSVG';
 import { WheelStage } from '../visuals/WheelStage';
@@ -63,7 +64,9 @@ export const TechnicalProductView: React.FC<TechnicalProductViewProps> = ({
   >('front');
   const [isLoadingProduct, setIsLoadingProduct] = useState(true);
   const [newsletterEmail, setNewsletterEmail] = useState('');
-  const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'error' | 'subscribed'>('idle');
+  const [newsletterStatus, setNewsletterStatus] = useState<
+    'idle' | 'error' | 'sending' | 'subscribed' | 'failed'
+  >('idle');
 
   useEffect(() => {
     setSelectedFinish(product.defaultFinish);
@@ -118,14 +121,26 @@ export const TechnicalProductView: React.FC<TechnicalProductViewProps> = ({
     'barrel-profile': productImages.images[2],
   };
 
-  const handleNewsletterSubmit = (e: React.FormEvent) => {
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (newsletterStatus === 'sending') return;
     if (!newsletterEmail.includes('@') || !newsletterEmail.includes('.')) {
       setNewsletterStatus('error');
       return;
     }
-    setNewsletterStatus('subscribed');
-    setNewsletterEmail('');
+    setNewsletterStatus('sending');
+    const result = await submitLead({
+      type: 'newsletter',
+      email: newsletterEmail.trim(),
+      subject: `Allocation list sign-up from ${product.title}`,
+      details: { productSlug: product.slug },
+    });
+    if (result.delivered) {
+      setNewsletterStatus('subscribed');
+      setNewsletterEmail('');
+    } else {
+      setNewsletterStatus('failed');
+    }
   };
 
   return (
@@ -560,14 +575,21 @@ export const TechnicalProductView: React.FC<TechnicalProductViewProps> = ({
               />
               <button
                 type="submit"
-                className="h-12 px-8 bg-[#FF5500] text-white font-tech-mono text-xs font-bold uppercase tracking-[0.16em] hover:bg-[#FF6B1A] transition-colors cursor-pointer whitespace-nowrap shadow-md"
+                disabled={newsletterStatus === 'sending'}
+                className="h-12 px-8 bg-[#FF5500] text-white font-tech-mono text-xs font-bold uppercase tracking-[0.16em] hover:bg-[#FF6B1A] disabled:opacity-60 disabled:cursor-wait transition-colors cursor-pointer whitespace-nowrap shadow-md"
               >
-                SUBSCRIBE
+                {newsletterStatus === 'sending' ? 'SENDING…' : 'SUBSCRIBE'}
               </button>
             </form>
             {newsletterStatus === 'error' && (
               <p className="text-xs font-tech-mono text-[#FF5500] mt-2">
                 Please enter a valid email address.
+              </p>
+            )}
+            {newsletterStatus === 'failed' && (
+              <p className="text-xs font-tech-mono text-[#FF5500] mt-2">
+                We could not reach our mailing list right now. Please try again in a moment or email{' '}
+                {SITE.tradeEmail || SITE.privacyEmail}.
               </p>
             )}
             {newsletterStatus === 'subscribed' && (
