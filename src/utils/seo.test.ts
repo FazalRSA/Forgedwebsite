@@ -25,14 +25,13 @@ const PUBLIC_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), '..',
 
 const WHEELS = getAllBrandWheels();
 
-/** Addresses that were pages before the site was cut down to home, wheel, installs and contact. */
+/** Addresses that were pages before the site was cut down to home, wheel, installs, the Sixnine dealer page and contact. */
 const REMOVED_ROUTES = [
   '/store',
   '/store/collections/bmw-m3-2024-onwards-alloy-wheels',
   '/store/products/bmw-m3-type-52-forged',
   '/store/client-fitments',
   '/client-fitments',
-  '/sixnine-wheels',
   '/official-dealer-sixnine-wheels',
   '/dealer-application',
   '/store/dealer-application',
@@ -55,8 +54,8 @@ test('home page metadata matches what people search for and stays indexable', ()
   assert.ok(shell.includes(`content="${m.description}"`), 'index.html description matches the home page');
 });
 
-test('installs and contact are indexable pages with their own title and canonical URL', () => {
-  for (const p of ['/installs', '/contact', '/privacy-policy']) {
+test('installs, contact and the Sixnine dealer page are indexable pages with their own title and canonical URL', () => {
+  for (const p of ['/installs', '/contact', '/sixnine-wheels', '/privacy-policy']) {
     for (const variant of [p, `${p}/`, `${p}?x=1#top`]) {
       const m = metaForPath(variant);
       assert.equal(m.canonicalPath, p, variant);
@@ -65,6 +64,7 @@ test('installs and contact are indexable pages with their own title and canonica
     }
   }
   assert.notEqual(metaForPath('/installs').title, metaForPath('/contact').title);
+  assert.notEqual(metaForPath('/sixnine-wheels').title, metaForPath('/contact').title);
 });
 
 test('every catalogue wheel gets a unique title, a Rand price and Product structured data', () => {
@@ -180,14 +180,14 @@ test('link-preview images are real files in public/', () => {
   }
 });
 
-test('the sitemap lists the home page, every in-stock wheel once, installs, contact and the privacy policy, and nothing else', () => {
+test('the sitemap lists the home page, every in-stock wheel once, installs, the Sixnine dealer page, contact and the privacy policy, and nothing else', () => {
   const paths = sitemapPaths();
   assert.equal(new Set(paths).size, paths.length);
   assert.deepEqual(
     [...paths].sort(),
-    ['/', '/contact', '/installs', '/privacy-policy', ...WHEELS.map((w) => `/wheels/${w.slug}`)].sort()
+    ['/', '/contact', '/installs', '/privacy-policy', '/sixnine-wheels', ...WHEELS.map((w) => `/wheels/${w.slug}`)].sort()
   );
-  assert.equal(paths.length, 4 + 14);
+  assert.equal(paths.length, 5 + 14);
   for (const p of paths.filter((x) => x.startsWith('/wheels/'))) {
     const wheel = findWheelBySlug(p.slice('/wheels/'.length));
     assert.ok(wheel && isInStock(wheel), `${p} must be an in-stock wheel`);
@@ -199,13 +199,14 @@ test('the sitemap lists the home page, every in-stock wheel once, installs, cont
   }
 
   // No removed route, store page, dealer page, account page or unlisted page is listed.
-  const banned = /^\/(store|sixnine-wheels|official-dealer|dealer-application|account|garage|client-fitments|admin|studio)/;
+  const banned = /^\/(store|official-dealer|dealer-application|account|garage|client-fitments|admin|studio)/;
   assert.ok(!paths.some((p) => banned.test(p)));
   const xml = buildSitemapXml('https://example.test');
   assert.equal((xml.match(/<loc>/g) ?? []).length, paths.length);
   assert.ok(xml.includes('<loc>https://example.test/</loc>'));
   assert.ok(xml.includes('<loc>https://example.test/installs</loc>'));
   assert.ok(xml.includes('<loc>https://example.test/contact</loc>'));
+  assert.ok(xml.includes('<loc>https://example.test/sixnine-wheels</loc>'));
   for (const removed of REMOVED_ROUTES) assert.ok(!xml.includes(`example.test${removed}<`), removed);
   const onDisk = readFileSync(path.join(PUBLIC_DIR, 'sitemap.xml'), 'utf8');
   assert.equal(onDisk, buildSitemapXml(), 'run `npm run build` to regenerate public/sitemap.xml');

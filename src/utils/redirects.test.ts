@@ -1,19 +1,25 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { applyRedirect, normalizePath, redirectFor } from './redirects';
 
-test('old store and Sixnine addresses go to the in-stock wheels on the home page', () => {
+test('old store addresses go to the in-stock wheels on the home page', () => {
   for (const old of [
     '/store',
     '/store/',
     '/store/collections/bmw-m3-2024-onwards-alloy-wheels',
     '/store/products/bmw-m3-type-52-forged',
-    '/sixnine-wheels',
-    '/sixnine-wheels/',
-    '/official-dealer-sixnine-wheels',
-    '/official-dealer-sixnine-wheels/',
   ]) {
     assert.equal(redirectFor(old), '/#catalogue', old);
+  }
+});
+
+test('the Sixnine dealer page is a real page, and its old longer address goes to it', () => {
+  for (const real of ['/sixnine-wheels', '/sixnine-wheels/']) {
+    assert.equal(redirectFor(real), null, real);
+  }
+  for (const old of ['/official-dealer-sixnine-wheels', '/official-dealer-sixnine-wheels/']) {
+    assert.equal(redirectFor(old), '/sixnine-wheels', old);
   }
 });
 
@@ -56,6 +62,7 @@ test('the pages that exist, and look-alike paths, are not redirected', () => {
     '/wheels/fsa002-gold',
     '/installs',
     '/contact',
+    '/sixnine-wheels',
     '/privacy-policy',
     '/studio/stf399',
     '/admin',
@@ -69,7 +76,7 @@ test('the pages that exist, and look-alike paths, are not redirected', () => {
 });
 
 test('no redirect target is itself an old address, so a redirect can never loop', () => {
-  const olds = ['/store', '/client-fitments', '/account', '/garage', '/dealer-application', '/sixnine-wheels', '/wheels'];
+  const olds = ['/store', '/client-fitments', '/account', '/garage', '/dealer-application', '/official-dealer-sixnine-wheels', '/wheels'];
   for (const old of olds) {
     const target = redirectFor(old);
     assert.ok(target, old);
@@ -100,4 +107,15 @@ test('normalizePath drops query, hash and trailing slashes', () => {
   assert.equal(normalizePath('/'), '/');
   assert.equal(normalizePath(''), '/');
   assert.equal(normalizePath('/#catalogue'), '/');
+});
+
+test('every address in scripts/legacy-pages.json has a redirect and is not a current page', () => {
+  const listUrl = new URL('../../scripts/legacy-pages.json', import.meta.url);
+  const legacyPaths: string[] = JSON.parse(readFileSync(listUrl, 'utf8'));
+  assert.ok(legacyPaths.length > 0, 'the list of old addresses must not be empty');
+  for (const old of legacyPaths) {
+    const target = redirectFor(old);
+    assert.ok(target, `${old} has no redirect in redirects.ts`);
+    assert.notEqual(target, old, `${old} must not redirect to itself`);
+  }
 });
