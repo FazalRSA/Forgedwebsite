@@ -1,19 +1,40 @@
 #!/usr/bin/env python3
 """
-Copy approved renders into the site and (re)generate src/data/clientFitments.ts.
+Copy approved renders and each customer's original photo into the site and (re)generate
+src/data/clientFitments.ts.
 
-  python3 tools/build_site_data.py --site /home/claude/forgedwebsite [--approved approved.txt]
+  python3 build_site_data.py --site ../.. --rawdir raw [--approved approved.txt]
 
-Only jobs with both renders present (and listed in --approved, if given) are published.
-Images land in public/assets/fitments/<slug>/{front34,side}.webp (1600x1200) plus
-thumb variants at 800x600. The original phone photo is NOT copied into the repo.
+A job is published when its two studio renders exist in --outdir, or are already in the site
+under public/assets/fitments/<slug>/ (so the data file can be regenerated without re-rendering).
+Each published install gets three images in public/assets/fitments/<slug>/:
+  front34.webp, side.webp   studio renders, 1600x1200 (+ *_800.webp thumbnails)
+  original.webp             the customer's own photo from Drive: EXIF-rotated, 1600 px on the long
+                            edge, all metadata (GPS, device) stripped (+ original_800.webp)
+The original is written from --rawdir when the source file is there; otherwise the copy already in
+the site is kept. HEIC originals need `pip install pillow-heif`.
+
+Number plates are pixelated: each job lists `plates`, boxes as [left, top, right, bottom] in
+percent of the EXIF-rotated photo (the renders drop plates entirely, so the published photo
+should not show them either). A job with no visible plate carries an empty list.
 """
 import argparse, json, os, shutil, sys
+from PIL import Image, ImageFilter, ImageOps
+
+try:  # iPhone HEIC originals
+    from pillow_heif import register_heif_opener
+    register_heif_opener()
+except ImportError:
+    pass
+
+ORIGINAL_WIDTHS = [1600, 800]
+IMAGE_LABELS = "['Front 3/4 studio re-shoot', 'Side profile studio re-shoot', \"Owner's original photo\"]"
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--site", required=True); ap.add_argument("--jobs", default="jobs.json")
-ap.add_argument("--outdir", default="out"); ap.add_argument("--approved", default=None)
-ap.add_argument("--all", action="store_true", help="include jobs whose renders do not exist yet (dev only)")
+ap.add_argument("--outdir", default="out"); ap.add_argument("--rawdir", default="raw")
+ap.add_argument("--approved", default=None)
+ap.add_argument("--all", action="store_true", help="include jobs whose images do not exist yet (dev only)")
 args = ap.parse_args()
 
 try:
@@ -25,28 +46,60 @@ approved = None
 if args.approved and os.path.exists(args.approved):
     approved = {l.strip() for l in open(args.approved) if l.strip() and not l.startswith("#")}
 
+
+def hide_plates(im, plates):
+    """Pixelate and soften each plate box (percent coordinates) so the characters cannot be read."""
+    w, h = im.size
+    for left, top, right, bottom in plates:
+        box = (int(w * left / 100), int(h * top / 100), int(w * right / 100), int(h * bottom / 100))
+        if box[2] <= box[0] or box[3] <= box[1]:
+            raise ValueError(f"empty plate box {[left, top, right, bottom]}")
+        region = im.crop(box)
+        coarse = region.resize((max(1, region.width // 24), max(1, region.height // 24)), Image.BILINEAR)
+        region = coarse.resize(region.size, Image.BILINEAR).filter(ImageFilter.GaussianBlur(max(2, region.width // 40)))
+        im.paste(region, box)
+    return im
+
+
+def write_original(src, dest, plates):
+    """Rotate per EXIF, hide plates, downscale and re-encode the phone photo without its metadata."""
+    im = hide_plates(ImageOps.exif_transpose(Image.open(src)).convert("RGB"), plates)
+    for width in ORIGINAL_WIDTHS:
+        r = im.copy(); r.thumbnail((width, width), Image.LANCZOS)
+        name = "original.webp" if width == ORIGINAL_WIDTHS[0] else f"original_{width}.webp"
+        r.save(os.path.join(dest, name), "WEBP", quality=86, method=6)
+
+
 published = []
 for j in jobs:
     slug = j["slug"]; d = os.path.join(args.outdir, slug)
+    dest = os.path.join(args.site, "public", "assets", "fitments", slug)
     f34 = os.path.join(d, f"{slug}_front34_1600.webp"); side = os.path.join(d, f"{slug}_side_1600.webp")
-    have = os.path.exists(f34) and os.path.exists(side)
-    if not have and not args.all: continue
+    rendered = os.path.exists(f34) and os.path.exists(side)
+    in_site = all(os.path.exists(os.path.join(dest, n)) for n in ("front34.webp", "side.webp"))
+    if not (rendered or in_site) and not args.all: continue
     if approved is not None and slug not in approved: continue
-    if have:
-        dest = os.path.join(args.site, "public", "assets", "fitments", slug)
-        try:
-            os.makedirs(dest, exist_ok=True)
+    try:
+        os.makedirs(dest, exist_ok=True)
+        if rendered:
             shutil.copyfile(f34, os.path.join(dest, "front34.webp")); shutil.copyfile(side, os.path.join(dest, "side.webp"))
             for a in ("front34", "side"):
                 t = os.path.join(d, f"{slug}_{a}_800.webp")
                 if os.path.exists(t): shutil.copyfile(t, os.path.join(dest, f"{a}_800.webp"))
-        except OSError as e:
-            sys.exit(f"build_site_data: could not copy renders for {slug} into {dest}: {e}")
+        raw = os.path.join(args.rawdir, j["sources"][0])
+        if "plates" not in j:
+            sys.exit(f"build_site_data: {slug}: add `plates` to jobs.json (a list of [left, top, right, bottom] percent boxes, or [])")
+        if os.path.exists(raw):
+            write_original(raw, dest, j["plates"])
+        elif not os.path.exists(os.path.join(dest, "original.webp")) and not args.all:
+            sys.exit(f"build_site_data: {slug}: original photo {j['sources'][0]} is neither in {args.rawdir} nor already in {dest}")
+    except (OSError, ValueError, TypeError) as e:  # ValueError: undecodable photo or bad plate box; TypeError: non-numeric box
+        sys.exit(f"build_site_data: could not write images for {slug} into {dest}: {e}")
     published.append(j)
 
 def ts_string_literal(value): return json.dumps(value, ensure_ascii=False)
 
-lines = ["// GENERATED by installs/tools/build_site_data.py from the Drive folder",
+lines = ["// GENERATED by scripts/fitment-reshoot/build_site_data.py from the Drive folder",
          "// 'Gallery - Past installations'. Edit jobs.json and re-run rather than editing by hand.",
          "// Car make/model/paint were read off each phone photo and should be confirmed by the shop;",
          "// wheel model, sizes, finish name and city are optional and shown only when filled in.",
@@ -58,8 +111,9 @@ lines = ["// GENERATED by installs/tools/build_site_data.py from the Drive folde
          "  wheelModel?: string;", "  wheelSlug?: string;", "  storeProductSlug?: string;",
          "  staggeredSpec?: string;", "  finishName?: string;", "  clientCity?: string;",
          "  bentoClass: string;", "  accentHex: string;",
-         "  images: [string, string];", "  imageLabels: [string, string];",
-         "  /** File name of the customer's original photo in Drive (not served). */",
+         "  /** Front 3/4 studio render, side profile studio render, then the customer's own photo. */",
+         "  images: [string, string, string];", "  imageLabels: [string, string, string];",
+         "  /** File name of the customer's original photo in Drive; served as images[2]. */",
          "  sourcePhoto: string;",
          "}", "", "export const CLIENT_FITMENTS: ClientFitment[] = ["]
 n = len(published)
@@ -71,6 +125,8 @@ for i, j in enumerate(published):
     title = f"{make_prefix}{j['chassis']} {j['family']} — {j['paint'].upper()}"
     chassis = f"{j['chassis']} · {j['paint'].upper()}"
     bento = "min-h-[300px] sm:min-h-[340px]" if i % 2 == 0 else "min-h-[320px] sm:min-h-[360px]"
+    base = f"/assets/fitments/{slug}"
+    images = ", ".join(ts_string_literal(f"{base}/{n}") for n in ("front34.webp", "side.webp", "original.webp"))
     lines += ["  {",
               f"    id: {ts_string_literal(slug)},", f"    slotLabel: {ts_string_literal(f'{i+1:02d} / {n:02d}')},",
               f"    vehicleTitle: {ts_string_literal(title)},", f"    chassisCode: {ts_string_literal(chassis)},",
@@ -80,8 +136,8 @@ for i, j in enumerate(published):
     for k in ("wheelModel", "wheelSlug", "storeProductSlug", "staggeredSpec", "finishName", "clientCity"):
         if j.get(k): lines.append(f"    {k}: {ts_string_literal(j[k])},")
     lines += [f"    bentoClass: {ts_string_literal(bento)},", f"    accentHex: {ts_string_literal(j['accentHex'])},",
-              f"    images: [{ts_string_literal(f'/assets/fitments/{slug}/front34.webp')}, {ts_string_literal(f'/assets/fitments/{slug}/side.webp')}],",
-              "    imageLabels: ['Front 3/4 studio re-shoot', 'Side profile studio re-shoot'],",
+              f"    images: [{images}],",
+              f"    imageLabels: {IMAGE_LABELS},",
               f"    sourcePhoto: {ts_string_literal(j['sources'][0])},",
               "  },"]
 lines += ["];", "",

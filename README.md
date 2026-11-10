@@ -46,7 +46,7 @@ Four pages, plus the privacy policy:
 
 - **Home (`/`).** What is in stock, as a grid you can filter by design, then customer installs.
 - **Wheel page (`/wheels/:slug`).** One in-stock listing: photos, price per set of four, sizes, specification and the other in-stock finishes of the same design. The 3D viewer loads only when the visitor taps "View in 3D". The enquiry button opens WhatsApp with the design, finish and sizes filled in.
-- **Installs (`/installs`).** Customer BMW M cars on FORGED wheels, shown as studio re-shoots of each customer's own photo.
+- **Installs (`/installs`).** Customer BMW M cars on FORGED wheels. Each install opens to three photos: two studio re-shoots made from the customer's own photo, then that photo itself.
 - **Contact (`/contact`).** WhatsApp, phone, address and areas served; any channel not set in `src/config/site.ts` is hidden.
 - **Search-ready pages.** Per-route titles, descriptions, canonical URLs, link-preview tags, structured data and a generated sitemap.
 
@@ -123,7 +123,7 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
 ├─ public/
 │  ├─ images/wheels/<slug>/       front.webp · hero.webp · profile.webp per wheel
 │  ├─ models/wheels/              .glb models for the 3D viewer
-│  ├─ assets/fitments/            Customer install photography
+│  ├─ assets/fitments/<slug>/     front34.webp · side.webp · original.webp per install
 │  ├─ robots.txt
 │  └─ sitemap.xml                 Generated on every build
 ├─ scripts/

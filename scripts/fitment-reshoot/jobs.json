@@ -1,20 +1,28 @@
 {
- "_notes": "One job per past install photo in Drive > 'Gallery - Past installations'. The car fields were read off the phone photo by Claude on 2026-11-09 and are a best reading, not a confirmed spec: correct make/model/paint before publishing. `car` is the description given to the image model. `extra` adds job-specific prompt instructions. Wheel model, finish name, sizes and city are unknown from the photos and left for the shop to fill in (`wheelModel`, `wheelSlug`, `staggeredSpec`, `finishName`, `clientCity`).",
+ "_notes": "One job per past install photo in Drive > 'Gallery - Past installations'. The car fields were read off the phone photo by Claude on 2026-11-09 and are a best reading, not a confirmed spec: correct make/model/paint before publishing. `car` is the description given to the image model. `extra` adds job-specific prompt instructions. Wheel model, finish name, sizes and city are unknown from the photos and left for the shop to fill in (`wheelModel`, `wheelSlug`, `staggeredSpec`, `finishName`, `clientCity`). `plates` lists number plates to pixelate in the published original photo as [left, top, right, bottom] in percent of the EXIF-rotated photo; [] when none is visible.",
  "jobs": [
   {
-   "slug": "g80-m3-brooklyn-grey-bronze",
+   "slug": "g80-m3-brooklyn-grey-silver",
    "make": "BMW",
    "family": "M3",
    "chassis": "G80",
    "body": "Sedan",
    "paint": "Brooklyn Grey",
-   "wheelLook": "Bronze multi-spoke, red calipers",
+   "wheelLook": "Brushed silver multi-spoke, red calipers",
    "accentHex": "#8E959E",
-   "car": "BMW G80 M3 Competition sedan in Brooklyn Grey with bronze multi-spoke forged wheels and red brake calipers",
+   "car": "BMW G80 M3 Competition sedan in Brooklyn Grey with brushed silver multi-spoke forged wheels (many thin spokes, polished lip) and red brake calipers",
    "sources": [
     "20250425_151440.jpg"
    ],
-   "extra": "The source photo was taken indoors in a showroom; ignore the showroom entirely."
+   "extra": "The source photo was taken indoors in a showroom; ignore the showroom entirely. The wheels are brushed silver / light titanium with a polished lip, NOT bronze, gold or black: copy the thin many-spoke design (about twenty spokes) exactly as photographed.",
+   "plates": [
+    [
+     24,
+     44,
+     42,
+     52
+    ]
+   ]
   },
   {
    "slug": "f80-m3-yas-marina-blue",
@@ -29,7 +37,8 @@
    "sources": [
     "20250708_121617.jpg"
    ],
-   "extra": "The source photo is tilted and shot from above; the output must be level, from normal standing height."
+   "extra": "The source photo is tilted and shot from above; the output must be level, from normal standing height.",
+   "plates": []
   },
   {
    "slug": "g82-m4-black-gunmetal",
@@ -44,7 +53,15 @@
    "sources": [
     "20251112_150121.jpg"
    ],
-   "extra": ""
+   "extra": "",
+   "plates": [
+    [
+     78,
+     44,
+     90,
+     51
+    ]
+   ]
   },
   {
    "slug": "g82-m4-alpine-white-silver",
@@ -59,7 +76,15 @@
    "sources": [
     "20251223_140953.jpg"
    ],
-   "extra": "The source photo is tilted and shot from above; the output must be level, from normal standing height."
+   "extra": "The source photo is tilted and shot from above; the output must be level, from normal standing height.",
+   "plates": [
+    [
+     88,
+     60,
+     100,
+     80
+    ]
+   ]
   },
   {
    "slug": "g80-m3-black-silver",
@@ -74,7 +99,15 @@
    "sources": [
     "20260421_163944.jpg"
    ],
-   "extra": "The source photo is a low rear view; reconstruct the front of the car faithfully as a standard BMW G80 M3 Competition front end."
+   "extra": "The source photo is a low rear view; reconstruct the front of the car faithfully as a standard BMW G80 M3 Competition front end.",
+   "plates": [
+    [
+     0,
+     25,
+     22,
+     35
+    ]
+   ]
   },
   {
    "slug": "g87-m2-toronto-red-black",
@@ -89,7 +122,15 @@
    "sources": [
     "20260505_165503.jpg"
    ],
-   "extra": "There is NO rear wing on this car: the boot carries only a small black lip spoiler and there is a small black roof spoiler, exactly as in the reference photo. Keep the black rear-quarter strakes (fins) in front of the rear wheels and the M Performance side skirts. Remove the sticker text on the door."
+   "extra": "There is NO rear wing on this car: the boot carries only a small black lip spoiler and there is a small black roof spoiler, exactly as in the reference photo. Keep the black rear-quarter strakes (fins) in front of the rear wheels and the M Performance side skirts. Remove the sticker text on the door.",
+   "plates": [
+    [
+     0,
+     38,
+     8,
+     50
+    ]
+   ]
   },
   {
    "slug": "g81-m3-touring-alpine-white",
@@ -104,7 +145,15 @@
    "sources": [
     "20260512_153807.jpg"
    ],
-   "extra": "This is the Touring (estate / wagon) body: keep the long roof and tailgate."
+   "extra": "This is the Touring (estate / wagon) body: keep the long roof and tailgate.",
+   "plates": [
+    [
+     10,
+     39,
+     31,
+     46
+    ]
+   ]
   },
   {
    "slug": "g80-m3-black-bronze",
@@ -113,13 +162,14 @@
    "chassis": "G80",
    "body": "Sedan",
    "paint": "Black Sapphire",
-   "wheelLook": "Bronze multi-spoke",
+   "wheelLook": "Bronze two-piece split-spoke, polished lip",
    "accentHex": "#C5B095",
-   "car": "BMW G80 M3 Competition sedan in Black Sapphire with bronze multi-spoke forged wheels",
+   "car": "BMW G80 M3 Competition sedan in Black Sapphire with two-piece forged wheels: bronze-gold concave five-split-spoke centres and a polished silver step lip, red brake calipers",
    "sources": [
     "20260523_155120.jpg"
    ],
-   "extra": "The source photo was taken at an outdoor event with people, gazebos and other cars; remove every person and every other object."
+   "extra": "The source photo was taken at an outdoor event with people, gazebos and other cars; remove every person and every other object. There is NO large rear wing on this car: the boot is standard with at most the small factory lip spoiler. The wheels are two-piece with a polished silver outer lip around bronze-gold centres; keep that lip visible.",
+   "plates": []
   },
   {
    "slug": "g80-m3-brooklyn-grey-black",
@@ -134,7 +184,8 @@
    "sources": [
     "20260530_192952.jpg"
    ],
-   "extra": "The source photo was taken in a dim parking garage; render the paint in neutral studio light as Brooklyn Grey metallic."
+   "extra": "The source photo was taken in a dim parking garage; render the paint in neutral studio light as Brooklyn Grey metallic.",
+   "plates": []
   },
   {
    "slug": "g81-m3-touring-black",
@@ -149,7 +200,15 @@
    "sources": [
     "20260611_164253.jpg"
    ],
-   "extra": "This is the Touring (estate / wagon) body: keep the long roof and tailgate."
+   "extra": "This is the Touring (estate / wagon) body: keep the long roof and tailgate.",
+   "plates": [
+    [
+     8,
+     63,
+     22,
+     71
+    ]
+   ]
   },
   {
    "slug": "f80-m3-alpine-white-silver",
@@ -164,7 +223,15 @@
    "sources": [
     "IMG-20250513-WA0112.jpg"
    ],
-   "extra": ""
+   "extra": "",
+   "plates": [
+    [
+     9,
+     76,
+     18,
+     83
+    ]
+   ]
   },
   {
    "slug": "g82-m4-fire-red-carbon",
@@ -179,7 +246,15 @@
    "sources": [
     "IMG-20250921-WA0026.jpg"
    ],
-   "extra": "Keep the exposed carbon-fibre bonnet."
+   "extra": "Keep the exposed carbon-fibre bonnet.",
+   "plates": [
+    [
+     87,
+     12,
+     97,
+     20
+    ]
+   ]
   },
   {
    "slug": "g80-m3-mint-green-silver",
@@ -194,7 +269,8 @@
    "sources": [
     "IMG-20251023-WA0013.jpg"
    ],
-   "extra": ""
+   "extra": "",
+   "plates": []
   },
   {
    "slug": "g80-m3-isle-of-man-green-gold",
@@ -209,7 +285,8 @@
    "sources": [
     "IMG-20251221-WA0026_2.jpg"
    ],
-   "extra": ""
+   "extra": "",
+   "plates": []
   },
   {
    "slug": "f80-m3-british-racing-green-white",
@@ -224,7 +301,15 @@
    "sources": [
     "IMG-20260518-WA0250.jpg"
    ],
-   "extra": ""
+   "extra": "",
+   "plates": [
+    [
+     22,
+     54,
+     34,
+     62
+    ]
+   ]
   },
   {
    "slug": "f82-m4-frozen-grey-black",
@@ -239,7 +324,8 @@
    "sources": [
     "IMG-20260603-WA0051.jpg"
    ],
-   "extra": "Keep the matte paint finish matte in studio light (no gloss)."
+   "extra": "Keep the matte paint finish matte in studio light (no gloss).",
+   "plates": []
   },
   {
    "slug": "g82-m4-isle-of-man-green-silver",
@@ -254,7 +340,8 @@
    "sources": [
     "IMG-20260603-WA0222.jpg"
    ],
-   "extra": ""
+   "extra": "",
+   "plates": []
   },
   {
    "slug": "audi-rs3-kyalami-green-white",
@@ -269,7 +356,8 @@
    "sources": [
     "IMG-20260603-WA0251.jpg"
    ],
-   "extra": "This is an Audi, not a BMW; keep the Audi RS3 front end, grille and badges."
+   "extra": "This is an Audi, not a BMW; keep the Audi RS3 front end, grille and badges.",
+   "plates": []
   },
   {
    "slug": "f82-m4-frozen-black-gunmetal",
@@ -284,7 +372,15 @@
    "sources": [
     "IMG_8452.jpg"
    ],
-   "extra": "Keep the matte paint finish matte in studio light (no gloss). This is the two-door F82 M4 coupe body."
+   "extra": "Keep the matte paint finish matte in studio light (no gloss). This is the two-door F82 M4 coupe body.",
+   "plates": [
+    [
+     2,
+     53,
+     10,
+     60
+    ]
+   ]
   },
   {
    "slug": "g90-m5-black-bronze",
@@ -299,7 +395,15 @@
    "sources": [
     "M5_2025.jpg"
    ],
-   "extra": "This is the 2025 G90 M5 body, wider and longer than an M3; keep its proportions."
+   "extra": "This is the 2025 G90 M5 body, wider and longer than an M3; keep its proportions.",
+   "plates": [
+    [
+     0,
+     45,
+     10,
+     58
+    ]
+   ]
   },
   {
    "slug": "g81-m3-touring-dravit-grey-silver",
@@ -314,7 +418,15 @@
    "sources": [
     "Screenshot_20250919_181054_Instagram.jpg"
    ],
-   "extra": "This is the Touring (estate / wagon) body: keep the long roof and tailgate. The source is a workshop photo with the car on a ramp; the output must show the car on a flat studio floor."
+   "extra": "This is the Touring (estate / wagon) body: keep the long roof and tailgate. The source is a workshop photo with the car on a ramp; the output must show the car on a flat studio floor.",
+   "plates": [
+    [
+     6,
+     37,
+     24,
+     45
+    ]
+   ]
   },
   {
    "slug": "g80-m3-pink-silver",
@@ -329,7 +441,15 @@
    "sources": [
     "Screenshot_20250921_210534_Instagram.jpg"
    ],
-   "extra": "The source photo was taken indoors in a shopping mall; ignore the mall entirely."
+   "extra": "The source photo was taken indoors in a shopping mall; ignore the mall entirely.",
+   "plates": [
+    [
+     8,
+     55,
+     26,
+     65
+    ]
+   ]
   }
  ],
  "_not_downloaded": [
