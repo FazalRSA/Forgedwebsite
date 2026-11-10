@@ -2,9 +2,9 @@ import React, { useMemo, useState } from 'react';
 import { ArrowUpRight, ShieldCheck, Layers, Gauge, Check } from 'lucide-react';
 import { motion } from 'motion/react';
 import { BrandHeader } from './BrandHeader';
-import { BRAND_WHEELS, BrandWheelItem, formatZAR } from '../../data/kahnData';
+import { BRAND_WHEELS, BrandWheelItem, formatZAR } from '../../data/catalogue';
 import { WheelLightboxModal } from './WheelLightboxModal';
-import { useKahnStore } from '../../store/useKahnStore';
+import { useForgedStore } from '../../store/useForgedStore';
 import { useRouter } from '../../utils/router';
 
 type SixnineSeriesFilter = 'ALL' | 'FF-1' | 'FF-3';
@@ -12,15 +12,15 @@ type SixnineSeriesFilter = 'ALL' | 'FF-1' | 'FF-3';
 const SIXNINE_PILLARS = [
   {
     index: '01',
-    title: 'German Engineering & TÜV Certification',
+    title: 'Designed in Germany',
     description:
-      'Designed and developed in Germany, every Sixnine wheel undergoes stringent Finite Element Analysis (FEA) and impact testing. Each model carries official German TÜV verification for high-load performance saloons and coupes.',
+      'Sixnine Wheels are designed and developed in Germany for European performance cars. The FF-ONE and FF-THREE sets we stock are in staggered BMW M3 (G80) fitments.',
   },
   {
     index: '02',
     title: 'Modular Interchangeable Architecture',
     description:
-      'Sixnine pioneered a modular wheel concept across the FF-ONE (FF-1) and FF-THREE (FF-3) lineups. Interchangeable aerodynamic inlays and hardware components are cross-compatible, allowing owners to evolve their wheel aesthetic without replacing the barrel.',
+      'The FF-ONE (FF-1) and FF-THREE (FF-3) lineups share a modular wheel concept. Interchangeable aerodynamic inlays and hardware components are cross-compatible, allowing owners to evolve their wheel aesthetic without replacing the barrel.',
   },
   {
     index: '03',
@@ -54,14 +54,14 @@ const SIXNINE_SERIES_SPECS = [
 ];
 
 const DEALER_ASSURANCES = [
-  '100% Genuine German-developed Sixnine Wheels with serialized barrel authentication',
-  'Physical in-stock sets ready for immediate inspection and dispatch',
+  'Genuine Sixnine Wheels supplied by an official dealer',
+  'In-stock FF-1 and FF-3 sets, listed above with set counts',
   'Direct 66.6mm BMW M hub-centric bore — zero spigot rings or adapters required',
   'Full OEM BMW TPMS sensor and floating center-cap compatibility',
 ];
 
 export const SixnineDealerPage: React.FC = () => {
-  const { openEnquiryModal } = useKahnStore();
+  const { openEnquiryModal } = useForgedStore();
   const { navigate } = useRouter();
 
   const [seriesFilter, setSeriesFilter] = useState<SixnineSeriesFilter>('ALL');
@@ -85,6 +85,11 @@ export const SixnineDealerPage: React.FC = () => {
     );
   }, [sixnineWheels]);
 
+  const finishCount = useMemo(
+    () => new Set(sixnineWheels.map((wheel) => wheel.finishName).filter(Boolean)).size,
+    [sixnineWheels]
+  );
+
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-[#F5F5F7]">
       <BrandHeader forceLight={false} />
@@ -94,7 +99,7 @@ export const SixnineDealerPage: React.FC = () => {
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-end">
           <div className="lg:col-span-8 space-y-5">
             <div className="flex flex-wrap items-center gap-2 text-xs font-tech-mono uppercase tracking-[0.18em] text-[#FF5500]">
-              <span>AUTHORIZED RETAIL &amp; DISTRIBUTION PARTNER</span>
+              <span>OFFICIAL DEALER</span>
               <span aria-hidden="true">·</span>
               <span>GERMAN WHEEL ARCHITECTURE</span>
             </div>
@@ -109,9 +114,8 @@ export const SixnineDealerPage: React.FC = () => {
 
             <p className="text-base sm:text-lg text-[#C2C2CC] max-w-2xl leading-relaxed pt-1">
               Developed in Germany for high-output European performance marques,{' '}
-              <span className="text-white font-medium">SIXNINE WHEELS</span> combines
-              TÜV-certified structural engineering with a patented modular spoke and inlay
-              ecosystem. As an official dealer, we maintain physical stock of the flagship{' '}
+              <span className="text-white font-medium">SIXNINE WHEELS</span> is built around
+              a modular spoke and inlay ecosystem. As an official dealer, we maintain physical stock of the flagship{' '}
               <span className="text-white font-medium">FF-1 (FF-ONE)</span> and{' '}
               <span className="text-white font-medium">FF-3 (FF-THREE)</span> series in
               dedicated 20&quot;/21&quot; staggered BMW M3 (G80) fitments.
@@ -144,10 +148,10 @@ export const SixnineDealerPage: React.FC = () => {
           <div className="lg:col-span-4 border-t lg:border-t-0 lg:border-l border-[#26262E] pt-8 lg:pt-0 lg:pl-10 space-y-6">
             <div>
               <p className="text-xs font-tech-mono uppercase tracking-[0.14em] text-neutral-400">
-                ORIGIN &amp; CERTIFICATION
+                ORIGIN
               </p>
               <p className="text-xl font-light text-white mt-1 tabular-nums">
-                Designed in Germany · TÜV Approved
+                Designed in Germany
               </p>
             </div>
 
@@ -156,7 +160,7 @@ export const SixnineDealerPage: React.FC = () => {
                 IN-STOCK BMW M3 (G80) ALLOCATION
               </p>
               <p className="text-xl font-light text-white mt-1 tabular-nums">
-                {totalSetsInStock} Complete Sets · 5 Finishes
+                {totalSetsInStock} Complete Sets · {finishCount} Finishes
               </p>
             </div>
 
@@ -216,7 +220,7 @@ export const SixnineDealerPage: React.FC = () => {
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div className="space-y-2">
               <p className="text-xs font-tech-mono uppercase tracking-[0.18em] text-[#FF5500]">
-                VERIFIED DEALER STOCK · IMMEDIATE DISPATCH
+                IN-STOCK SETS
               </p>
               <h2 className="text-2xl sm:text-4xl font-light tracking-tight text-white">
                 Sixnine FF-1 &amp; FF-3 Collection.
@@ -267,7 +271,7 @@ export const SixnineDealerPage: React.FC = () => {
                     {primaryImage && (
                       <motion.img
                         src={primaryImage}
-                        alt={`Sixnine ${wheel.model}`}
+                        alt={`Sixnine ${wheel.model} forged wheel`}
                         referrerPolicy="no-referrer"
                         whileHover={{ scale: 1.05 }}
                         transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
@@ -303,7 +307,7 @@ export const SixnineDealerPage: React.FC = () => {
                       </span>
 
                       <span className="inline-flex items-center gap-1.5 text-xs font-tech-mono uppercase tracking-wider text-neutral-300 group-hover:text-[#FF5500] transition-colors">
-                        <span>Inspect 3D &amp; Specs</span>
+                        <span>View Specs</span>
                         <ArrowUpRight className="w-3.5 h-3.5" />
                       </span>
                     </div>
@@ -386,11 +390,11 @@ export const SixnineDealerPage: React.FC = () => {
           <div className="lg:col-span-7 space-y-5">
             <div className="flex items-center gap-2 text-xs font-tech-mono uppercase tracking-[0.18em] text-[#FF5500]">
               <ShieldCheck className="w-4 h-4" />
-              <span>OFFICIAL DEALER AUTHENTICITY GUARANTEE</span>
+              <span>BUYING FROM AN OFFICIAL DEALER</span>
             </div>
 
             <h2 className="text-2xl sm:text-4xl font-light tracking-tight text-white text-balance">
-              Commission Your Sixnine Set Through an Authorized Specialist.
+              Order Your Sixnine Set Through an Official Dealer.
             </h2>
 
             <ul className="space-y-3 pt-2">
@@ -406,11 +410,11 @@ export const SixnineDealerPage: React.FC = () => {
           <div className="lg:col-span-5 lg:border-l border-[#26262E] lg:pl-10 space-y-5">
             <div className="space-y-2">
               <p className="text-xs font-tech-mono uppercase tracking-[0.15em] text-neutral-400">
-                READY FOR FITMENT OR NATIONWIDE DELIVERY
+                RESERVE OR ENQUIRE
               </p>
               <p className="text-sm text-[#C2C2CC] leading-relaxed">
-                Reserve any in-stock FF-1 or FF-3 set directly or speak with our fitment
-                engineers regarding modular aero inlays and tyre packages for your BMW M.
+                Reserve any in-stock FF-1 or FF-3 set directly or speak with us
+                regarding modular aero inlays and tyre packages for your BMW M.
               </p>
             </div>
 

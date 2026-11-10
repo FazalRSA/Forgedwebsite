@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Suspense } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ArrowRight,
   ChevronLeft,
@@ -16,22 +16,14 @@ import {
   getAllBrandWheels,
   getWheelBySlug,
   getWheelImages,
-} from '../../data/kahnData';
+} from '../../data/catalogue';
 import { useRouter } from '../../utils/router';
-import { useKahnStore } from '../../store/useKahnStore';
+import { useForgedStore } from '../../store/useForgedStore';
 import { useFirebaseAuth } from '../../context/FirebaseContext';
 import { BrandHeader } from './BrandHeader';
 import { WheelLightboxModal } from './WheelLightboxModal';
 import { SafeImage } from '../shared/SafeImage';
-import { Wheel3DSceneSkeleton } from '../visuals/Wheel3DSceneSkeleton';
-import { Wheel3DSceneErrorBoundary } from '../visuals/Wheel3DSceneErrorBoundary';
-import { lazyWithRetry } from '../../utils/lazyWithRetry';
-
-// Defers the three.js bundle (core + OrbitControls + RoomEnvironment + GLTFLoader) until
-// a visitor actually opens the 3D tab, instead of shipping it in every PDP's main chunk.
-const Wheel3DScene = lazyWithRetry(() =>
-  import('../visuals/Wheel3DScene').then((m) => ({ default: m.Wheel3DScene }))
-);
+import { WheelStage } from '../visuals/WheelStage';
 
 interface WheelShowcasePDPProps {
   slug: string;
@@ -39,7 +31,7 @@ interface WheelShowcasePDPProps {
 
 export const WheelShowcasePDP: React.FC<WheelShowcasePDPProps> = ({ slug }) => {
   const { navigate } = useRouter();
-  const { openEnquiryModal, customBrandWheels } = useKahnStore();
+  const { openEnquiryModal, customBrandWheels } = useForgedStore();
   const { user, profile } = useFirebaseAuth();
 
   const allWheels = getAllBrandWheels(customBrandWheels);
@@ -48,7 +40,9 @@ export const WheelShowcasePDP: React.FC<WheelShowcasePDPProps> = ({ slug }) => {
   const [selectedFinish, setSelectedFinish] = useState<WheelFinishId>(
     wheel.defaultFinish
   );
-  const [viewMode, setViewMode] = useState<'3d' | 'photos'>('3d');
+  // The 3D studio exists only for wheels with a real model; the rest open on photography.
+  const has3D = Boolean(wheel.modelUrl);
+  const [viewMode, setViewMode] = useState<'3d' | 'photos'>(has3D ? '3d' : 'photos');
   const [activePhotoIdx, setActivePhotoIdx] = useState<0 | 1 | 2>(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
 
@@ -63,7 +57,7 @@ export const WheelShowcasePDP: React.FC<WheelShowcasePDPProps> = ({ slug }) => {
     }
     setActivePhotoIdx(0);
     setLightboxOpen(false);
-    setViewMode('3d');
+    setViewMode(wheel.modelUrl ? '3d' : 'photos');
   }, [wheel, profile?.preferredFinish]);
 
   // Keyboard navigation for Left/Right arrow photo cycling when in photo mode
@@ -120,7 +114,7 @@ export const WheelShowcasePDP: React.FC<WheelShowcasePDPProps> = ({ slug }) => {
     { label: 'FINISH OPTIONS', value: wheel.specs.finishOptions },
     { label: 'TESTING', value: wheel.specs.testing },
     { label: 'WARRANTY', value: wheel.specs.warranty },
-  ];
+  ].filter((row) => Boolean(row.value));
 
   return (
     <div className="bg-[#0A0A0A] text-[#F5F5F7] pb-28">
@@ -152,7 +146,8 @@ export const WheelShowcasePDP: React.FC<WheelShowcasePDPProps> = ({ slug }) => {
             <span className="text-white font-semibold">{wheel.model}</span>
           </nav>
 
-          {/* Segmented Mode Toggle: 360° 3D Studio vs Photography */}
+          {/* Segmented Mode Toggle: 3D Studio vs Photography (only when the wheel has a 3D model) */}
+          {has3D && (
           <div className="inline-flex items-center gap-1 p-1 rounded-xl bg-[#121216] border border-[#26262E] self-start sm:self-auto">
             <button
               type="button"
@@ -164,7 +159,7 @@ export const WheelShowcasePDP: React.FC<WheelShowcasePDPProps> = ({ slug }) => {
               }`}
             >
               <Disc3 className="w-3.5 h-3.5" />
-              <span>360° 3D Wheel Studio</span>
+              <span>3D Wheel Studio</span>
             </button>
 
             <button
@@ -180,6 +175,7 @@ export const WheelShowcasePDP: React.FC<WheelShowcasePDPProps> = ({ slug }) => {
               <span>Fitment Photography (3)</span>
             </button>
           </div>
+          )}
         </div>
 
         {/* Title & Garage Pairing Banner */}
@@ -209,22 +205,19 @@ export const WheelShowcasePDP: React.FC<WheelShowcasePDPProps> = ({ slug }) => {
 
         {/* Main Interactive Stage: 360° 3D Three.js Scene OR 3-Angle Photography */}
         <section className="mb-14">
-          {viewMode === '3d' ? (
-            <Wheel3DSceneErrorBoundary>
-              <Suspense fallback={<Wheel3DSceneSkeleton />}>
-                <Wheel3DScene
-                  wheelModel={wheel.model}
-                  wheelSeries={wheel.series}
-                  spokeStyle={wheel.geometry}
-                  selectedFinish={selectedFinish}
-                  availableFinishes={wheel.availableFinishes}
-                  onSelectFinish={setSelectedFinish}
-                  onEnquire={handleEnquireWheel}
-                  userVehicleLabel={userVehicleLabel}
-                  modelUrl={wheel.modelUrl}
-                />
-              </Suspense>
-            </Wheel3DSceneErrorBoundary>
+          {viewMode === '3d' && has3D ? (
+            <WheelStage
+              wheelModel={wheel.model}
+              wheelSeries={wheel.series}
+              selectedFinish={selectedFinish}
+              availableFinishes={wheel.availableFinishes}
+              onSelectFinish={setSelectedFinish}
+              onEnquire={handleEnquireWheel}
+              userVehicleLabel={userVehicleLabel}
+              modelUrl={wheel.modelUrl}
+              rearModelUrl={wheel.rearModelUrl}
+              specFront={wheel.technicalSpecSheet}
+            />
           ) : (
             <div className="flex flex-col items-center">
               <div
@@ -350,7 +343,7 @@ export const WheelShowcasePDP: React.FC<WheelShowcasePDPProps> = ({ slug }) => {
         <section className="mt-16 pt-12 border-t border-[#26262E]">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-xl font-semibold tracking-tight text-white">
-              Explore Peer Forged Designs in 360° 3D
+              More forged designs
             </h3>
             <button
               type="button"
@@ -376,15 +369,17 @@ export const WheelShowcasePDP: React.FC<WheelShowcasePDPProps> = ({ slug }) => {
                     <div className="bg-[#121215] border border-[#26262E] group-hover:border-[#FF5500] rounded-2xl aspect-square overflow-hidden relative transition-colors">
                       <SafeImage
                         src={peerData.images[0]}
-                        alt={peer.model}
+                        alt={`${peer.model} forged wheel`}
                         fallbackLabel={peer.model}
                         loading="lazy"
                         referrerPolicy="no-referrer"
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
-                      <div className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-black/80 text-[9px] font-mono text-neutral-300">
-                        360° 3D
-                      </div>
+                      {peer.modelUrl && (
+                        <div className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-black/80 text-[9px] font-mono text-neutral-300">
+                          3D
+                        </div>
+                      )}
                     </div>
                     <p className="text-xs font-mono uppercase tracking-widest mt-2 font-semibold text-[#F5F5F7] group-hover:text-[#FF5500] transition-colors truncate">
                       {peer.model}

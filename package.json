@@ -1,17 +1,17 @@
 {
-  "name": "react-example",
+  "name": "forged-custom-wheels",
   "private": true,
   "license": "UNLICENSED",
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
-    "build": "vite build",
+    "build": "tsx scripts/generate-sitemap.ts && vite build && tsx scripts/prerender-meta.ts",
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
     "add-wheel": "tsx scripts/add-wheel.ts",
-    "test": "tsx --test src/data/kahnData.test.ts firestore.rules.test.ts"
+    "test": "tsx --test src/data/catalogue.test.ts src/data/clientFitments.test.ts src/utils/wheelStudioParts.test.ts src/utils/seo.test.ts firestore.rules.test.ts"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",

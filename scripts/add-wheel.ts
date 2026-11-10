@@ -16,7 +16,7 @@
  *     --diameter '20-21"' \
  *     --finish "satin-black" \
  *     --geometry "aero-disc-f1" \
- *     --part-no "WAKB9600B0F-2-KIT"
+ *     --part-no "FCW-TYPE60-BLK-2021"
  *
  * Usage (Interactive prompt):
  *   npm run add-wheel
@@ -36,7 +36,7 @@ import {
   StoreProductItem,
   WheelFinishId,
   formatZAR,
-} from '../src/data/kahnData';
+} from '../src/data/catalogue';
 import { createWheelAndProductEntries } from '../src/utils/wheelBuilder';
 
 interface CustomWheelsFile {

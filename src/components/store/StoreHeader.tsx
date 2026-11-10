@@ -11,11 +11,11 @@ import {
   Plus,
 } from 'lucide-react';
 import { useRouter } from '../../utils/router';
-import { useKahnStore } from '../../store/useKahnStore';
+import { useForgedStore } from '../../store/useForgedStore';
 import {
   formatZAR,
   getAllStoreProducts,
-} from '../../data/kahnData';
+} from '../../data/catalogue';
 import { LogoPlaceholder } from '../shared/LogoPlaceholder';
 
 export const StoreHeader: React.FC = () => {
@@ -25,7 +25,7 @@ export const StoreHeader: React.FC = () => {
     openEnquiryModal,
     customStoreProducts,
     setAddWheelModalOpen,
-  } = useKahnStore();
+  } = useForgedStore();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [openAccordion, setOpenAccordion] = useState<string | null>(null);
@@ -94,7 +94,7 @@ export const StoreHeader: React.FC = () => {
               type="button"
               onClick={() =>
                 openEnquiryModal({
-                  subject: 'FORGED Custom wheels Direct Telephone Callback (+44 1274 749 999)',
+                  subject: 'FORGED Custom Wheels telephone callback request',
                   domain: 'store',
                 })
               }
@@ -304,10 +304,10 @@ export const StoreHeader: React.FC = () => {
                       </button>
                       <button
                         type="button"
-                        onClick={() => handleNavigate('/wheels/fsa001-black-matte')}
+                        onClick={() => handleNavigate('/#catalogue')}
                         className="block w-full text-left py-1 text-neutral-400 hover:text-white cursor-pointer"
                       >
-                        360° Wheel Showcase: FSA001
+                        Wheel Catalogue
                       </button>
                     </div>
                   )}

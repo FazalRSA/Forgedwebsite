@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Facebook, Instagram, Linkedin, Twitter, ArrowUpRight, CheckCircle2 } from "lucide-react"
+import { SITE } from "@/src/config/site"
+import { Link } from "@/src/utils/router"
 import { LogoPlaceholder } from "@/src/components/shared/LogoPlaceholder"
 
 export interface StackedCircularFooterProps {
@@ -46,49 +48,43 @@ function StackedCircularFooter({ onNavigate, useBrandLinks = false }: StackedCir
           <nav className="mb-8 flex flex-wrap justify-center items-center gap-6 text-xs text-neutral-400">
             {useBrandLinks && onNavigate ? (
               <>
-                <button
-                  type="button"
-                  onClick={() => onNavigate('/#catalogue')}
+                <Link
+                  to="/#catalogue"
                   className="hover:text-white transition-colors cursor-pointer"
                 >
                   Catalogue
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onNavigate('/sixnine-wheels')}
+                </Link>
+                <Link
+                  to="/sixnine-wheels"
                   className="hover:text-white transition-colors cursor-pointer"
                 >
                   Official Dealer of Sixnine Wheels
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onNavigate('/client-fitments')}
+                </Link>
+                <Link
+                  to="/client-fitments"
                   className="hover:text-white transition-colors cursor-pointer"
                 >
                   Installations
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onNavigate('/dealer-application')}
+                </Link>
+                <Link
+                  to="/dealer-application"
                   className="hover:text-white transition-colors cursor-pointer"
                 >
                   Dealer Application
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onNavigate('/store')}
+                </Link>
+                <Link
+                  to="/store"
                   className="hover:text-white transition-colors cursor-pointer flex items-center gap-1.5"
                 >
                   <span>Vehicle Configurator</span>
                   <ArrowUpRight className="w-3 h-3 text-neutral-500" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onNavigate('/privacy-policy')}
+                </Link>
+                <Link
+                  to="/privacy-policy"
                   className="hover:text-white transition-colors cursor-pointer"
                 >
                   Privacy
-                </button>
+                </Link>
               </>
             ) : (
               <>
@@ -100,25 +96,33 @@ function StackedCircularFooter({ onNavigate, useBrandLinks = false }: StackedCir
             )}
           </nav>
 
-          {/* Social Icons */}
-          <div className="mb-8 flex space-x-3">
-            <Button
-              variant="outline"
-              size="icon"
-              className="w-8 h-8 rounded-md bg-neutral-900/60 border-neutral-800 text-neutral-400 hover:text-white hover:border-neutral-700 hover:bg-neutral-800 cursor-pointer transition-colors"
-            >
-              <Facebook className="h-3.5 w-3.5" />
-              <span className="sr-only">Facebook</span>
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="w-8 h-8 rounded-md bg-neutral-900/60 border-neutral-800 text-neutral-400 hover:text-white hover:border-neutral-700 hover:bg-neutral-800 cursor-pointer transition-colors"
-            >
-              <Instagram className="h-3.5 w-3.5" />
-              <span className="sr-only">Instagram</span>
-            </Button>
-          </div>
+          {/* Social Icons: rendered only for channels configured in src/config/site.ts */}
+          {(SITE.facebookUrl || SITE.instagramUrl) && (
+            <div className="mb-8 flex space-x-3">
+              {SITE.facebookUrl && (
+                <a
+                  href={SITE.facebookUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="FORGED Custom Wheels on Facebook"
+                  className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-neutral-900/60 border border-neutral-800 text-neutral-400 hover:text-white hover:border-neutral-700 hover:bg-neutral-800 transition-colors"
+                >
+                  <Facebook className="h-3.5 w-3.5" />
+                </a>
+              )}
+              {SITE.instagramUrl && (
+                <a
+                  href={SITE.instagramUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="FORGED Custom Wheels on Instagram"
+                  className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-neutral-900/60 border border-neutral-800 text-neutral-400 hover:text-white hover:border-neutral-700 hover:bg-neutral-800 transition-colors"
+                >
+                  <Instagram className="h-3.5 w-3.5" />
+                </a>
+              )}
+            </div>
+          )}
 
           {/* Email Subscription Form */}
           <div className="mb-8 w-full max-w-sm">

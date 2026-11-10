@@ -22,9 +22,9 @@ import {
   WHEEL_FINISHES,
   WheelFinishId,
   formatZAR,
-} from '../../data/kahnData';
+} from '../../data/catalogue';
 import { useRouter } from '../../utils/router';
-import { useKahnStore } from '../../store/useKahnStore';
+import { useForgedStore } from '../../store/useForgedStore';
 
 const BRAKE_SYSTEM_OPTIONS: BrakeSystemType[] = [
   'M Compound Steel',
@@ -41,7 +41,7 @@ const FINISH_OPTIONS: WheelFinishId[] = [
 
 export const AccountGaragePage: React.FC = () => {
   const { navigate } = useRouter();
-  const { openEnquiryModal } = useKahnStore();
+  const { openEnquiryModal } = useForgedStore();
   const {
     user,
     authReady,
@@ -161,7 +161,7 @@ export const AccountGaragePage: React.FC = () => {
               My Garage
             </h1>
             <p className="text-xs sm:text-sm text-neutral-400 mt-1">
-              Pair your BMW M chassis with in-stock forged wheel sets and 360° 3D studio previews.
+              Pair your BMW M chassis with in-stock forged wheel sets.
             </p>
           </div>
 
@@ -193,7 +193,7 @@ export const AccountGaragePage: React.FC = () => {
                 Sign in to your Garage
               </h2>
               <p className="text-xs text-neutral-400 leading-relaxed">
-                Save your vehicle specifications and pair them directly with our in-stock wheel inventory and 3D viewer.
+                Save your vehicle specifications and pair them directly with our in-stock wheel inventory.
               </p>
             </div>
 
@@ -631,7 +631,7 @@ export const AccountGaragePage: React.FC = () => {
                             className="flex-1 py-2 px-3 rounded-lg bg-[#18181F] hover:bg-neutral-800 text-white text-xs font-mono flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                           >
                             <Disc3 className="w-3.5 h-3.5 text-[#FF5500]" />
-                            <span>360° Studio</span>
+                            <span>View Wheel</span>
                           </button>
 
                           <button

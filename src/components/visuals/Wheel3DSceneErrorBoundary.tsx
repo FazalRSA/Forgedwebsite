@@ -10,7 +10,7 @@ interface State {
 }
 
 /**
- * Catches a failed dynamic import() of the lazy-loaded Wheel3DScene chunk
+ * Catches a failed dynamic import() of the lazy-loaded WheelStudio chunk
  * (after lazyWithRetry's own retries are exhausted) so the PDP degrades to a
  * message instead of crashing. React.lazy caches a rejected import for the
  * lifetime of that lazy() instance, so "retry" is a full reload rather than
@@ -25,7 +25,7 @@ export class Wheel3DSceneErrorBoundary extends React.Component<Props, State> {
   }
 
   componentDidCatch(error: unknown) {
-    console.error('Wheel3DScene failed to load:', error);
+    console.error('WheelStudio failed to load:', error);
   }
 
   render() {

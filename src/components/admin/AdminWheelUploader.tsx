@@ -13,7 +13,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { BrandHeader } from '../brand/BrandHeader';
-import { useKahnStore } from '../../store/useKahnStore';
+import { useForgedStore } from '../../store/useForgedStore';
 import { useRouter } from '../../utils/router';
 import {
   SpokeGeometryType,
@@ -21,7 +21,7 @@ import {
   WheelFinishId,
   getModelsForMake,
   formatZAR,
-} from '../../data/kahnData';
+} from '../../data/catalogue';
 import { WheelRenderSVG } from '../visuals/WheelRenderSVG';
 
 const GEOMETRY_OPTIONS: Array<{ id: SpokeGeometryType; label: string }> = [
@@ -44,7 +44,7 @@ export const AdminWheelUploader: React.FC = () => {
     addCustomWheelAndProduct,
     customBrandWheels,
     removeCustomWheel,
-  } = useKahnStore();
+  } = useForgedStore();
 
   // Auth gate state
   const [passcode, setPasscode] = useState('');
@@ -86,14 +86,8 @@ export const AdminWheelUploader: React.FC = () => {
     setAuthError(null);
     const ok = loginAdmin(passcode);
     if (!ok) {
-      setAuthError('Invalid studio passcode. Use FORGED-BMW-2026 to unlock the protected route.');
+      setAuthError('Invalid studio passcode.');
     }
-  };
-
-  const handleDemoUnlock = () => {
-    setPasscode('FORGED-BMW-2026');
-    setAuthError(null);
-    loginAdmin('FORGED-BMW-2026');
   };
 
   const processImageFile = (file: File) => {
@@ -216,7 +210,7 @@ export const AdminWheelUploader: React.FC = () => {
                     type="password"
                     value={passcode}
                     onChange={(e) => setPasscode(e.target.value)}
-                    placeholder="Enter passcode (FORGED-BMW-2026)"
+                    placeholder="Enter studio passcode"
                     className="w-full h-12 pl-10 pr-4 bg-[#18181D] border border-[#26262E] rounded-xl text-xs font-tech-mono text-[#F5F5F7] focus:outline-none focus:border-[#FF5500]"
                     required
                   />
@@ -235,19 +229,6 @@ export const AdminWheelUploader: React.FC = () => {
                 <span>UNLOCK ADMIN WHEEL UPLOADER</span>
               </button>
             </form>
-
-            <div className="pt-4 border-t border-[#26262E] flex flex-col gap-2">
-              <div className="flex items-center justify-between text-[11px] font-tech-mono text-[#C2C2CC]">
-                <span>DEMO KEY: <span className="text-[#F5F5F7]">FORGED-BMW-2026</span></span>
-                <button
-                  type="button"
-                  onClick={handleDemoUnlock}
-                  className="text-[#FF5500] hover:underline uppercase cursor-pointer font-bold"
-                >
-                  One-Click Demo Unlock →
-                </button>
-              </div>
-            </div>
           </div>
         </main>
       </div>

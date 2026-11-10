@@ -7,8 +7,8 @@ import {
   getFitmentNode,
   getMatchingProductsForFitment,
   getModelsForMake,
-} from '../../data/kahnData';
-import { useKahnStore } from '../../store/useKahnStore';
+} from '../../data/catalogue';
+import { useForgedStore } from '../../store/useForgedStore';
 import { useRouter } from '../../utils/router';
 import { StyledSelect } from '../shared/StyledSelect';
 import { StoreHeader } from './StoreHeader';
@@ -29,7 +29,7 @@ export const VehicleFitmentWidget: React.FC = () => {
     savedVehicle,
     saveVehicleSession,
     customStoreProducts,
-  } = useKahnStore();
+  } = useForgedStore();
 
   const allStoreProducts = getAllStoreProducts(customStoreProducts);
   const makes = getAvailableMakes();
@@ -264,7 +264,7 @@ export const VehicleFitmentWidget: React.FC = () => {
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
           <div>
             <p className="text-xs font-tech-mono uppercase tracking-[0.15em] text-[#FF5500] mb-1 font-bold">
-              DIRECT DISPATCH · UK &amp; GLOBAL FREIGHT
+              IN-STOCK SETS · PRICED IN RAND
             </p>
             <h2 className="text-2xl sm:text-3xl font-bold uppercase tracking-tight text-[#F5F5F7]">
               FEATURED FORGED FITMENT PACKAGES
@@ -358,10 +358,10 @@ export const VehicleFitmentWidget: React.FC = () => {
             <ShieldCheck className="w-5 h-5 shrink-0 mt-0.5 text-[#FF5500]" />
             <div>
               <h4 className="text-xs font-bold uppercase tracking-wider text-[#F5F5F7]">
-                GERMAN TÜV &amp; JWL HOMOLOGATED
+                LOAD-RATED FORGED CONSTRUCTION
               </h4>
               <p className="text-xs text-[#C2C2CC] mt-1 leading-relaxed">
-                Every forged wheel set undergoes finite element radial fatigue and kerb impact testing.
+                Every set is supplied with its load rating and fitment specification for your chassis.
               </p>
             </div>
           </div>
@@ -380,10 +380,10 @@ export const VehicleFitmentWidget: React.FC = () => {
             <ArrowRight className="w-5 h-5 shrink-0 mt-0.5 text-[#FF5500]" />
             <div>
               <h4 className="text-xs font-bold uppercase tracking-wider text-[#F5F5F7]">
-                BRADFORD &amp; CHELSEA SHOWROOM FITTING
+                PARTNER WORKSHOP FITTING
               </h4>
               <p className="text-xs text-[#C2C2CC] mt-1 leading-relaxed">
-                Book turnkey wheel, Michelin Pilot Sport 4S tyre, and laser alignment installation.
+                Book wheel, tyre and alignment installation through our fitment partners.
               </p>
             </div>
           </div>

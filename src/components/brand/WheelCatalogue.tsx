@@ -7,18 +7,15 @@ import {
   getAllBrandWheels,
   getWheelImages,
   formatZAR,
-  WheelFinishId,
-} from '../../data/kahnData';
-import { useKahnStore } from '../../store/useKahnStore';
-import { WheelLightboxModal } from './WheelLightboxModal';
+} from '../../data/catalogue';
+import { useForgedStore } from '../../store/useForgedStore';
+import { useRouter } from '../../utils/router';
 
 export const WheelCatalogue: React.FC = () => {
-  const { customBrandWheels } = useKahnStore();
+  const { customBrandWheels } = useForgedStore();
   const [activeModelFilter, setActiveModelFilter] = useState<WheelModelFilter>('ALL');
 
-  const [selectedWheel, setSelectedWheel] = useState<BrandWheelItem | null>(null);
-  const [activePhotoIdx, setActivePhotoIdx] = useState<0 | 1 | 2>(0);
-  const [selectedFinish, setSelectedFinish] = useState<WheelFinishId>('silver');
+  const { navigate } = useRouter();
 
   const allWheels = useMemo(
     () => getAllBrandWheels(customBrandWheels),
@@ -34,10 +31,9 @@ export const WheelCatalogue: React.FC = () => {
     );
   }, [activeModelFilter, allWheels]);
 
-  const handleOpenWheelModal = (wheel: BrandWheelItem) => {
-    setSelectedWheel(wheel);
-    setActivePhotoIdx(0);
-    setSelectedFinish(wheel.defaultFinish);
+  /** A card opens the wheel's own page, which leads with the 3D studio when the wheel has a model. */
+  const openWheelPage = (wheel: BrandWheelItem) => {
+    navigate(`/wheels/${wheel.slug}`);
   };
 
   return (
@@ -101,11 +97,11 @@ export const WheelCatalogue: React.FC = () => {
                 key={wheel.id}
                 role="button"
                 tabIndex={0}
-                onClick={() => handleOpenWheelModal(wheel)}
+                onClick={() => openWheelPage(wheel)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
-                    handleOpenWheelModal(wheel);
+                    openWheelPage(wheel);
                   }
                 }}
                 className="group text-left flex flex-col focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white cursor-pointer select-none"
@@ -114,7 +110,7 @@ export const WheelCatalogue: React.FC = () => {
                 <div className="w-full bg-[#121215] border border-[#222228] group-hover:border-neutral-600 rounded-2xl aspect-square relative overflow-hidden transition-colors duration-300">
                   <motion.img
                     src={cardImage}
-                    alt={wheel.model}
+                    alt={`${wheel.model} forged wheel`}
                     loading="lazy"
                     referrerPolicy="no-referrer"
                     initial={{ scale: 1 }}
@@ -122,13 +118,32 @@ export const WheelCatalogue: React.FC = () => {
                     transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
                     className="w-full h-full object-cover will-change-transform"
                   />
+                  {wheel.modelUrl && (
+                    <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/70 border border-white/15 text-[10px] font-mono font-semibold tracking-[0.18em] text-white">
+                      VIEW IN 3D
+                    </span>
+                  )}
                 </div>
 
                 {/* Minimalist 2-Line Typography Below Card */}
                 <div className="mt-3.5 px-0.5 space-y-1">
                   <div className="flex items-baseline justify-between gap-4">
                     <h3 className="text-base font-medium tracking-tight text-white truncate">
-                      {wheel.model}
+                      {/* A real link to the wheel's page for search engines and "open in new tab";
+                          a normal click is handled by the card, which navigates without a reload. */}
+                      <a
+                        href={`/wheels/${wheel.slug}`}
+                        tabIndex={-1}
+                        onClick={(e) => {
+                          if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
+                            e.stopPropagation();
+                            return;
+                          }
+                          e.preventDefault();
+                        }}
+                      >
+                        {wheel.model}
+                      </a>
                     </h3>
                     <span className="text-sm font-mono text-neutral-200 tabular-nums shrink-0">
                       {displayPrice}
@@ -151,15 +166,6 @@ export const WheelCatalogue: React.FC = () => {
         </AnimatePresence>
       </div>
 
-      {/* Minimalist Lightbox Gallery */}
-      {selectedWheel && (
-        <WheelLightboxModal
-          wheel={selectedWheel}
-          initialAngleIdx={activePhotoIdx}
-          initialFinish={selectedFinish}
-          onClose={() => setSelectedWheel(null)}
-        />
-      )}
     </section>
   );
 };

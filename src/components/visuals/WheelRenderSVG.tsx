@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Image as ImageIcon } from 'lucide-react';
-import { SpokeGeometryType, WHEEL_FINISHES, WheelFinishId } from '../../data/kahnData';
+import { SpokeGeometryType, WHEEL_FINISHES, WheelFinishId } from '../../data/catalogue';
 
 interface WheelRenderSVGProps {
   geometry: SpokeGeometryType;

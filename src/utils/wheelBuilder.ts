@@ -6,7 +6,7 @@ import {
   StoreProductItem,
   WHEEL_FINISHES,
   WheelFinishId,
-} from '../data/kahnData';
+} from '../data/catalogue';
 
 export interface NewWheelInput {
   name: string;
@@ -59,6 +59,29 @@ export function normalizeMarques(rawMarques?: string[]): MarqueFilter[] {
   return matched.length > 0 ? matched : ['BMW'];
 }
 
+/** Finish code used in FORGED part numbers. */
+const FINISH_PART_CODES: Record<WheelFinishId, string> = {
+  silver: 'SLV',
+  'satin-black': 'BLK',
+  'champagne-bronze': 'BRZ',
+  'dark-gunmetal': 'GUN',
+};
+
+/**
+ * Deterministic FORGED part number: FCW-<MODEL>-<FINISH>-<DIAMETERS>,
+ * e.g. FCW-FSA002-GLD-2021 for a 20"/21" set. MODEL is the wheel name
+ * reduced to letters and digits (max 8), DIAMETERS the badge digits.
+ */
+export function buildPartNumber(
+  wheelName: string,
+  finish: WheelFinishId,
+  diameterBadge: string
+): string {
+  const model = wheelName.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8) || 'WHEEL';
+  const diameters = diameterBadge.replace(/[^0-9]/g, '') || '00';
+  return `FCW-${model}-${FINISH_PART_CODES[finish] ?? 'STD'}-${diameters}`;
+}
+
 export function createWheelAndProductEntries(input: NewWheelInput): {
   brandWheel: BrandWheelItem;
   storeProduct: StoreProductItem;
@@ -84,9 +107,7 @@ export function createWheelAndProductEntries(input: NewWheelInput): {
 
   const storeSlug = slugifyWheelText(`${make}-${vehicleModel}-${cleanName}-forged`);
   const marques = normalizeMarques(input.marques?.length ? input.marques : [make]);
-  const partNo =
-    input.partNo?.trim().toUpperCase() ||
-    `WAK-${wheelSlug.slice(0, 4).toUpperCase()}-${Math.floor(100 + Math.random() * 899)}-KIT`;
+  const partNo = input.partNo?.trim().toUpperCase() || buildPartNumber(cleanName, defaultFinish, diameterBadge);
 
   const brandWheel: BrandWheelItem = {
     id: `wheel-${wheelSlug}`,
@@ -98,7 +119,7 @@ export function createWheelAndProductEntries(input: NewWheelInput): {
       'Precision CNC-machined from aerospace-grade 6061-T6 forged aluminium billet.',
     editorialBody:
       input.description?.trim() ||
-      `Engineered in our UK design studio, the ${cleanName} combines high-load structural rigidity with reduced unsprung rotational mass and direct OEM hub-centric fitment.`,
+      `Engineered for South African roads and circuits, the ${cleanName} combines high-load structural rigidity with reduced unsprung rotational mass and direct OEM hub-centric fitment.`,
     marques,
     geometry,
     spokeCount: 10,
@@ -113,8 +134,9 @@ export function createWheelAndProductEntries(input: NewWheelInput): {
       material: '6061-T6 Aerospace Forged Aluminium',
       diameters: `${diameterBadge} Staggered & Square Fitments`,
       finishOptions: 'Satin Black · Liquid Silver · Champagne Bronze · Anthracite Gunmetal',
-      testing: 'JWL / VIA & German TÜV Impact + Radial Fatigue Certified',
-      warranty: '3-Year Structural & 2-Year Finish Craftsmanship Guarantee',
+      testing: 'Load rating and fitment specification supplied with every set',
+      // Left empty until the owner supplies written warranty terms; the spec table hides empty rows.
+      warranty: '',
     },
     compatibleStoreProductSlug: storeSlug,
   };
@@ -152,7 +174,8 @@ export function createWheelAndProductEntries(input: NewWheelInput): {
       construction: 'FORGED',
       boltPattern: input.boltPattern?.trim().toUpperCase() || '5 X 112',
       partNo,
-      loadRating: '880 KG PER WHEEL',
+      // No default figure: a load rating must come from the manufacturer's documents for the exact wheel.
+      loadRating: 'ON REQUEST',
       centerBore: '66.6 MM (DIRECT HUB-CENTRIC)',
     },
     aboutBullets: [
@@ -163,7 +186,7 @@ export function createWheelAndProductEntries(input: NewWheelInput): {
     ],
     importantInfoBullets: [
       'Price displayed is for a complete set of 4 forged alloy wheels.',
-      'Worldwide insured shipping available from FORGED Custom wheels UK headquarters.',
+      'Delivery and fitting are arranged when you enquire.',
     ],
   };
 

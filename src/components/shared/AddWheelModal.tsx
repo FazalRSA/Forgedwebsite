@@ -10,7 +10,7 @@ import {
   ArrowUpRight,
   Image as ImageIcon,
 } from 'lucide-react';
-import { useKahnStore } from '../../store/useKahnStore';
+import { useForgedStore } from '../../store/useForgedStore';
 import {
   MARQUE_FILTERS,
   MarqueFilter,
@@ -20,7 +20,7 @@ import {
   getAvailableMakes,
   getModelsForMake,
   formatZAR,
-} from '../../data/kahnData';
+} from '../../data/catalogue';
 import { WheelRenderSVG } from '../visuals/WheelRenderSVG';
 import { useRouter } from '../../utils/router';
 
@@ -43,7 +43,7 @@ export const AddWheelModal: React.FC = () => {
     addCustomWheelAndProduct,
     customBrandWheels,
     removeCustomWheel,
-  } = useKahnStore();
+  } = useForgedStore();
 
   const [name, setName] = useState('');
   const [series, setSeries] = useState('FORGED SERIES');
@@ -60,7 +60,7 @@ export const AddWheelModal: React.FC = () => {
   const [diameterBadge, setDiameterBadge] = useState<'20"' | '20-21"' | '22"' | '23"'>('20-21"');
   const [defaultFinish, setDefaultFinish] = useState<WheelFinishId>('satin-black');
   const [geometry, setGeometry] = useState<SpokeGeometryType>('aero-disc-f1');
-  const [partNo, setPartNo] = useState('WAKB6000CF-KIT');
+  const [partNo, setPartNo] = useState('');
   const [frontWheelSize, setFrontWheelSize] = useState('9.5 X 20 ET18');
   const [rearWheelSize, setRearWheelSize] = useState('10.5 X 21 ET20');
   const [boltPattern, setBoltPattern] = useState('5 X 112');

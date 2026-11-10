@@ -1,0 +1,339 @@
+{
+ "_notes": "One job per past install photo in Drive > 'Gallery - Past installations'. The car fields were read off the phone photo by Claude on 2026-11-09 and are a best reading, not a confirmed spec: correct make/model/paint before publishing. `car` is the description given to the image model. `extra` adds job-specific prompt instructions. Wheel model, finish name, sizes and city are unknown from the photos and left for the shop to fill in (`wheelModel`, `wheelSlug`, `staggeredSpec`, `finishName`, `clientCity`).",
+ "jobs": [
+  {
+   "slug": "g80-m3-brooklyn-grey-bronze",
+   "make": "BMW",
+   "family": "M3",
+   "chassis": "G80",
+   "body": "Sedan",
+   "paint": "Brooklyn Grey",
+   "wheelLook": "Bronze multi-spoke, red calipers",
+   "accentHex": "#8E959E",
+   "car": "BMW G80 M3 Competition sedan in Brooklyn Grey with bronze multi-spoke forged wheels and red brake calipers",
+   "sources": [
+    "20250425_151440.jpg"
+   ],
+   "extra": "The source photo was taken indoors in a showroom; ignore the showroom entirely."
+  },
+  {
+   "slug": "f80-m3-yas-marina-blue",
+   "make": "BMW",
+   "family": "M3",
+   "chassis": "F80",
+   "body": "Sedan",
+   "paint": "Yas Marina Blue",
+   "wheelLook": "Silver mesh multi-spoke",
+   "accentHex": "#2F7FD1",
+   "car": "BMW F80 M3 sedan in Yas Marina Blue with silver mesh multi-spoke forged wheels",
+   "sources": [
+    "20250708_121617.jpg"
+   ],
+   "extra": "The source photo is tilted and shot from above; the output must be level, from normal standing height."
+  },
+  {
+   "slug": "g82-m4-black-gunmetal",
+   "make": "BMW",
+   "family": "M4",
+   "chassis": "G82",
+   "body": "Coupe",
+   "paint": "Black Sapphire",
+   "wheelLook": "Gunmetal multi-spoke",
+   "accentHex": "#2B2D42",
+   "car": "BMW G82 M4 Competition coupe in Black Sapphire with gunmetal grey multi-spoke forged wheels and a ducktail spoiler",
+   "sources": [
+    "20251112_150121.jpg"
+   ],
+   "extra": ""
+  },
+  {
+   "slug": "g82-m4-alpine-white-silver",
+   "make": "BMW",
+   "family": "M4",
+   "chassis": "G82",
+   "body": "Coupe",
+   "paint": "Alpine White",
+   "wheelLook": "Silver multi-spoke, red calipers",
+   "accentHex": "#D9D9D9",
+   "car": "BMW G82 M4 Competition coupe in Alpine White with silver multi-spoke forged wheels and red brake calipers",
+   "sources": [
+    "20251223_140953.jpg"
+   ],
+   "extra": "The source photo is tilted and shot from above; the output must be level, from normal standing height."
+  },
+  {
+   "slug": "g80-m3-black-silver",
+   "make": "BMW",
+   "family": "M3",
+   "chassis": "G80",
+   "body": "Sedan",
+   "paint": "Black Sapphire",
+   "wheelLook": "Silver multi-spoke",
+   "accentHex": "#2B2D42",
+   "car": "BMW G80 M3 Competition sedan in Black Sapphire with silver multi-spoke forged wheels",
+   "sources": [
+    "20260421_163944.jpg"
+   ],
+   "extra": "The source photo is a low rear view; reconstruct the front of the car faithfully as a standard BMW G80 M3 Competition front end."
+  },
+  {
+   "slug": "g87-m2-toronto-red-black",
+   "make": "BMW",
+   "family": "M2",
+   "chassis": "G87",
+   "body": "Coupe",
+   "paint": "Toronto Red",
+   "wheelLook": "Gloss black 2-piece multi-spoke, red calipers",
+   "accentHex": "#C8102E",
+   "car": "BMW G87 M2 coupe in Toronto Red with gloss black multi-spoke forged wheels",
+   "sources": [
+    "20260505_165503.jpg"
+   ],
+   "extra": "There is NO rear wing on this car: the boot carries only a small black lip spoiler and there is a small black roof spoiler, exactly as in the reference photo. Keep the black rear-quarter strakes (fins) in front of the rear wheels and the M Performance side skirts. Remove the sticker text on the door."
+  },
+  {
+   "slug": "g81-m3-touring-alpine-white",
+   "make": "BMW",
+   "family": "M3",
+   "chassis": "G81",
+   "body": "Touring",
+   "paint": "Alpine White",
+   "wheelLook": "Silver multi-spoke",
+   "accentHex": "#D9D9D9",
+   "car": "BMW G81 M3 Touring Competition estate in Alpine White with silver multi-spoke forged wheels",
+   "sources": [
+    "20260512_153807.jpg"
+   ],
+   "extra": "This is the Touring (estate / wagon) body: keep the long roof and tailgate."
+  },
+  {
+   "slug": "g80-m3-black-bronze",
+   "make": "BMW",
+   "family": "M3",
+   "chassis": "G80",
+   "body": "Sedan",
+   "paint": "Black Sapphire",
+   "wheelLook": "Bronze multi-spoke",
+   "accentHex": "#C5B095",
+   "car": "BMW G80 M3 Competition sedan in Black Sapphire with bronze multi-spoke forged wheels",
+   "sources": [
+    "20260523_155120.jpg"
+   ],
+   "extra": "The source photo was taken at an outdoor event with people, gazebos and other cars; remove every person and every other object."
+  },
+  {
+   "slug": "g80-m3-brooklyn-grey-black",
+   "make": "BMW",
+   "family": "M3",
+   "chassis": "G80",
+   "body": "Sedan",
+   "paint": "Brooklyn Grey",
+   "wheelLook": "Gloss black multi-spoke, red calipers",
+   "accentHex": "#8E959E",
+   "car": "BMW G80 M3 Competition sedan in Brooklyn Grey with gloss black multi-spoke forged wheels and red brake calipers",
+   "sources": [
+    "20260530_192952.jpg"
+   ],
+   "extra": "The source photo was taken in a dim parking garage; render the paint in neutral studio light as Brooklyn Grey metallic."
+  },
+  {
+   "slug": "g81-m3-touring-black",
+   "make": "BMW",
+   "family": "M3",
+   "chassis": "G81",
+   "body": "Touring",
+   "paint": "Black Sapphire",
+   "wheelLook": "Bronze multi-spoke, red calipers",
+   "accentHex": "#2B2D42",
+   "car": "BMW G81 M3 Touring Competition estate in Black Sapphire with bronze multi-spoke forged wheels and red brake calipers",
+   "sources": [
+    "20260611_164253.jpg"
+   ],
+   "extra": "This is the Touring (estate / wagon) body: keep the long roof and tailgate."
+  },
+  {
+   "slug": "f80-m3-alpine-white-silver",
+   "make": "BMW",
+   "family": "M3",
+   "chassis": "F80",
+   "body": "Sedan",
+   "paint": "Alpine White",
+   "wheelLook": "Silver multi-spoke",
+   "accentHex": "#D9D9D9",
+   "car": "BMW F80 M3 sedan in Alpine White with silver multi-spoke forged wheels, lowered",
+   "sources": [
+    "IMG-20250513-WA0112.jpg"
+   ],
+   "extra": ""
+  },
+  {
+   "slug": "g82-m4-fire-red-carbon",
+   "make": "BMW",
+   "family": "M4",
+   "chassis": "G82",
+   "body": "Coupe",
+   "paint": "Fire Red",
+   "wheelLook": "Gunmetal multi-spoke, carbon bonnet",
+   "accentHex": "#C8102E",
+   "car": "BMW G82 M4 Competition coupe in Fire Red with a carbon-fibre bonnet and gunmetal grey multi-spoke forged wheels",
+   "sources": [
+    "IMG-20250921-WA0026.jpg"
+   ],
+   "extra": "Keep the exposed carbon-fibre bonnet."
+  },
+  {
+   "slug": "g80-m3-mint-green-silver",
+   "make": "BMW",
+   "family": "M3",
+   "chassis": "G80",
+   "body": "Sedan",
+   "paint": "Mint Green Individual",
+   "wheelLook": "Brushed silver multi-spoke",
+   "accentHex": "#43C59E",
+   "car": "BMW G80 M3 Competition sedan in Mint Green (BMW Individual) with brushed silver multi-spoke forged wheels",
+   "sources": [
+    "IMG-20251023-WA0013.jpg"
+   ],
+   "extra": ""
+  },
+  {
+   "slug": "g80-m3-isle-of-man-green-gold",
+   "make": "BMW",
+   "family": "M3",
+   "chassis": "G80",
+   "body": "Sedan",
+   "paint": "Isle of Man Green",
+   "wheelLook": "Gold multi-spoke",
+   "accentHex": "#1E7A5A",
+   "car": "BMW G80 M3 Competition sedan in Isle of Man Green with gold multi-spoke forged wheels",
+   "sources": [
+    "IMG-20251221-WA0026_2.jpg"
+   ],
+   "extra": ""
+  },
+  {
+   "slug": "f80-m3-british-racing-green-white",
+   "make": "BMW",
+   "family": "M3",
+   "chassis": "F80",
+   "body": "Sedan",
+   "paint": "British Racing Green",
+   "wheelLook": "White multi-spoke",
+   "accentHex": "#1F4D3A",
+   "car": "BMW F80 M3 sedan in dark British Racing Green with white multi-spoke forged wheels",
+   "sources": [
+    "IMG-20260518-WA0250.jpg"
+   ],
+   "extra": ""
+  },
+  {
+   "slug": "f82-m4-frozen-grey-black",
+   "make": "BMW",
+   "family": "M4",
+   "chassis": "F82",
+   "body": "Coupe",
+   "paint": "Frozen Dark Grey",
+   "wheelLook": "Gloss black multi-spoke",
+   "accentHex": "#4A4E54",
+   "car": "BMW F82 M4 coupe in Frozen (matte) dark grey with gloss black multi-spoke forged wheels",
+   "sources": [
+    "IMG-20260603-WA0051.jpg"
+   ],
+   "extra": "Keep the matte paint finish matte in studio light (no gloss)."
+  },
+  {
+   "slug": "g82-m4-isle-of-man-green-silver",
+   "make": "BMW",
+   "family": "M4",
+   "chassis": "G82",
+   "body": "Coupe",
+   "paint": "Isle of Man Green",
+   "wheelLook": "Silver multi-spoke",
+   "accentHex": "#1E7A5A",
+   "car": "BMW G82 M4 Competition coupe in Isle of Man Green with silver multi-spoke forged wheels",
+   "sources": [
+    "IMG-20260603-WA0222.jpg"
+   ],
+   "extra": ""
+  },
+  {
+   "slug": "audi-rs3-kyalami-green-white",
+   "make": "Audi",
+   "family": "RS3",
+   "chassis": "8Y",
+   "body": "Sedan",
+   "paint": "Kyalami Green",
+   "wheelLook": "White multi-spoke, red calipers",
+   "accentHex": "#7FBF3F",
+   "car": "Audi RS3 (8Y) sedan in Kyalami Green with white multi-spoke forged wheels and red brake calipers",
+   "sources": [
+    "IMG-20260603-WA0251.jpg"
+   ],
+   "extra": "This is an Audi, not a BMW; keep the Audi RS3 front end, grille and badges."
+  },
+  {
+   "slug": "f82-m4-frozen-black-gunmetal",
+   "make": "BMW",
+   "family": "M4",
+   "chassis": "F82",
+   "body": "Coupe",
+   "paint": "Frozen Black",
+   "wheelLook": "Gunmetal 5-spoke, blue calipers",
+   "accentHex": "#2B2D42",
+   "car": "BMW F82 M4 coupe in Frozen (matte) Black with a ducktail spoiler, red leather interior, gunmetal grey five-spoke forged wheels and blue brake calipers",
+   "sources": [
+    "IMG_8452.jpg"
+   ],
+   "extra": "Keep the matte paint finish matte in studio light (no gloss). This is the two-door F82 M4 coupe body."
+  },
+  {
+   "slug": "g90-m5-black-bronze",
+   "make": "BMW",
+   "family": "M5",
+   "chassis": "G90",
+   "body": "Saloon",
+   "paint": "Black Sapphire",
+   "wheelLook": "Bronze multi-spoke",
+   "accentHex": "#C5B095",
+   "car": "BMW G90 M5 (2025) saloon in Black Sapphire with bronze multi-spoke forged wheels",
+   "sources": [
+    "M5_2025.jpg"
+   ],
+   "extra": "This is the 2025 G90 M5 body, wider and longer than an M3; keep its proportions."
+  },
+  {
+   "slug": "g81-m3-touring-dravit-grey-silver",
+   "make": "BMW",
+   "family": "M3",
+   "chassis": "G81",
+   "body": "Touring",
+   "paint": "Dravit Grey",
+   "wheelLook": "Silver multi-spoke, red calipers",
+   "accentHex": "#5C5F66",
+   "car": "BMW G81 M3 Touring Competition estate in Dravit Grey with silver multi-spoke forged wheels and red brake calipers",
+   "sources": [
+    "Screenshot_20250919_181054_Instagram.jpg"
+   ],
+   "extra": "This is the Touring (estate / wagon) body: keep the long roof and tailgate. The source is a workshop photo with the car on a ramp; the output must show the car on a flat studio floor."
+  },
+  {
+   "slug": "g80-m3-pink-silver",
+   "make": "BMW",
+   "family": "M3",
+   "chassis": "G80",
+   "body": "Sedan",
+   "paint": "Magenta Pink wrap",
+   "wheelLook": "Silver multi-spoke",
+   "accentHex": "#D41C8C",
+   "car": "BMW G80 M3 Competition sedan in a glossy magenta-pink wrap with silver multi-spoke forged wheels",
+   "sources": [
+    "Screenshot_20250921_210534_Instagram.jpg"
+   ],
+   "extra": "The source photo was taken indoors in a shopping mall; ignore the mall entirely."
+  }
+ ],
+ "_not_downloaded": [
+  "DSC07501.jpg (11 MB, over the Drive tool's 10 MB limit)",
+  "20260613_163326.jpg (44.7 MB, over the limit)"
+ ]
+}

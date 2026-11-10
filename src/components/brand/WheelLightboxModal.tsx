@@ -6,8 +6,8 @@ import {
   WHEEL_FINISHES,
   WheelFinishId,
   formatZAR,
-} from '../../data/kahnData';
-import { useKahnStore } from '../../store/useKahnStore';
+} from '../../data/catalogue';
+import { useForgedStore } from '../../store/useForgedStore';
 import { SafeImage } from '../shared/SafeImage';
 
 interface WheelLightboxModalProps {
@@ -23,7 +23,7 @@ export const WheelLightboxModal: React.FC<WheelLightboxModalProps> = ({
   initialFinish,
   onClose,
 }) => {
-  const { openEnquiryModal } = useKahnStore();
+  const { openEnquiryModal } = useForgedStore();
 
   const [activeAngleIdx, setActiveAngleIdx] = useState<0 | 1 | 2>(initialAngleIdx);
   const [selectedFinish, setSelectedFinish] = useState<WheelFinishId>(

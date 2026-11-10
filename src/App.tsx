@@ -1,5 +1,6 @@
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useEffect } from 'react';
 import { RouterProvider, useRouter } from './utils/router';
+import { applyPageMeta, isHomePath, metaForPath } from './utils/seo';
 import { FirebaseProvider } from './context/FirebaseContext';
 import { BrandHeader } from './components/brand/BrandHeader';
 import { HeroSection } from './components/brand/HeroSection';
@@ -10,6 +11,12 @@ import { GlobalOverlays } from './components/shared/GlobalOverlays';
 import { StackedCircularFooter } from '@/components/ui/stacked-circular-footer';
 
 // Lazy-loaded route components for code-splitting and faster initial bundle evaluation
+const NotFoundPage = lazy(() =>
+  import('./components/brand/NotFoundPage').then((m) => ({
+    default: m.NotFoundPage,
+  }))
+);
+
 const DealerApplicationPage = lazy(() =>
   import('./components/brand/DealerApplicationPage').then((m) => ({
     default: m.DealerApplicationPage,
@@ -55,6 +62,12 @@ const PrivacyPolicyPage = lazy(() =>
     default: m.PrivacyPolicyPage,
   }))
 );
+const StudioPreviewPage = lazy(() =>
+  import('./components/brand/StudioPreviewPage').then((m) => ({
+    default: m.StudioPreviewPage,
+  }))
+);
+
 const SixnineDealerPage = lazy(() =>
   import('./components/brand/SixnineDealerPage').then((m) => ({
     default: m.SixnineDealerPage,
@@ -94,6 +107,16 @@ function BrandHomePage() {
 
 function AppRoutes() {
   const { pathname } = useRouter();
+
+  // Give every route its own title, description, canonical URL and structured data.
+  useEffect(() => {
+    try {
+      applyPageMeta(metaForPath(pathname));
+    } catch (err) {
+      // Metadata is an enhancement: a failure here must never stop the page rendering.
+      console.error('Could not set page metadata for', pathname, err);
+    }
+  }, [pathname]);
 
   // Route: /sixnine-wheels — Official Dealer of Sixnine Wheels
   if (
@@ -147,6 +170,12 @@ function AppRoutes() {
     return <ClientFitmentsPage />;
   }
 
+  // Route: /studio/[slug] — unlisted 3D studio preview for a wheel not yet in the catalogue
+  if (pathname.startsWith('/studio/')) {
+    const slug = pathname.replace('/studio/', '').split('/')[0];
+    return <StudioPreviewPage slug={slug} />;
+  }
+
   // Route 2: /wheels/[slug] — Editorial Wheel Showcase PDP with 360° 3D Studio
   if (pathname.startsWith('/wheels/')) {
     const slug = pathname.replace('/wheels/', '').split('/')[0] || 'fsa001-black-matte';
@@ -169,13 +198,18 @@ function AppRoutes() {
     return <TechnicalProductView productSlug={productSlug} />;
   }
 
-  // Route 3: /store — Project Kahn Storefront & Vehicle Fitment Finder
+  // Route 3: /store — Storefront & Vehicle Fitment Finder
   if (pathname === '/store' || pathname === '/store/') {
     return <VehicleFitmentWidget />;
   }
 
   // Route 1: / — Brand Editorial Landing Page & Interactive Wheel Catalogue
-  return <BrandHomePage />;
+  if (isHomePath(pathname)) {
+    return <BrandHomePage />;
+  }
+
+  // Anything else is not a page on this site.
+  return <NotFoundPage />;
 }
 
 function MainLayout() {

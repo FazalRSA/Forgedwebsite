@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Suspense } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Bookmark,
   MessageCircle,
@@ -16,22 +16,17 @@ import {
   getStoreProductBySlug,
   findWheelBySlug,
   getStoreProductImages,
-} from '../../data/kahnData';
-import { useKahnStore } from '../../store/useKahnStore';
+} from '../../data/catalogue';
+import { useForgedStore } from '../../store/useForgedStore';
 import { useRouter } from '../../utils/router';
+import { SITE, whatsappLink, telLink } from '../../config/site';
 import { StoreHeader } from './StoreHeader';
 import { WheelRenderSVG } from '../visuals/WheelRenderSVG';
-import { Wheel3DSceneSkeleton } from '../visuals/Wheel3DSceneSkeleton';
-import { Wheel3DSceneErrorBoundary } from '../visuals/Wheel3DSceneErrorBoundary';
+import { WheelStage } from '../visuals/WheelStage';
+import { SafeImage } from '../shared/SafeImage';
 import { TechnicalProductViewSkeleton } from '../shared/SkeletonLoaders';
 import { LogoPlaceholder } from '../shared/LogoPlaceholder';
-import { lazyWithRetry } from '../../utils/lazyWithRetry';
 
-// Defers the three.js bundle (core + OrbitControls + RoomEnvironment + GLTFLoader) until
-// the PDP actually renders the 3D stage, instead of shipping it in every PDP's main chunk.
-const Wheel3DScene = lazyWithRetry(() =>
-  import('../visuals/Wheel3DScene').then((m) => ({ default: m.Wheel3DScene }))
-);
 
 interface TechnicalProductViewProps {
   productSlug: string;
@@ -45,17 +40,21 @@ export const TechnicalProductView: React.FC<TechnicalProductViewProps> = ({
     wishlistSlugs,
     toggleWishlist,
     openEnquiryModal,
-    setChatOpen,
-    sendChatMessage,
     customStoreProducts,
     customBrandWheels,
-  } = useKahnStore();
+  } = useForgedStore();
 
   const product = getStoreProductBySlug(productSlug, customStoreProducts);
   // Photoreal 3D model: product-level override, else the linked brand wheel's model.
   const modelUrl =
     product.modelUrl ?? findWheelBySlug(product.wheelSlug, customBrandWheels)?.modelUrl;
+  const rearModelUrl = product.modelUrl
+    ? undefined
+    : findWheelBySlug(product.wheelSlug, customBrandWheels)?.rearModelUrl;
   const productImages = getStoreProductImages(product, customBrandWheels);
+  // Stock wording comes from the linked wheel's record; with no record there is no stock claim.
+  const stockStatus = findWheelBySlug(product.wheelSlug, customBrandWheels)?.stockStatus?.trim() ?? '';
+  const isInStock = /in stock/i.test(stockStatus);
   const [selectedFinish, setSelectedFinish] = useState<WheelFinishId>(
     product.defaultFinish
   );
@@ -65,7 +64,6 @@ export const TechnicalProductView: React.FC<TechnicalProductViewProps> = ({
   const [isLoadingProduct, setIsLoadingProduct] = useState(true);
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'error' | 'subscribed'>('idle');
-  const [contactActionFeedback, setContactActionFeedback] = useState<string | null>(null);
 
   useEffect(() => {
     setSelectedFinish(product.defaultFinish);
@@ -177,7 +175,7 @@ export const TechnicalProductView: React.FC<TechnicalProductViewProps> = ({
                   onClick={() => navigate(`/wheels/${product.wheelSlug}`)}
                   className="text-[#FF5500] underline underline-offset-4 hover:text-[#FF6B1A] cursor-pointer font-bold"
                 >
-                  View in FORGED Custom wheels 360° Gallery →
+                  View the wheel page →
                 </button>
               </div>
             </div>
@@ -188,19 +186,28 @@ export const TechnicalProductView: React.FC<TechnicalProductViewProps> = ({
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
               {/* Left Column: Interactive 360° 3D Wheel Studio */}
               <div className="lg:col-span-7 space-y-4">
-                <Wheel3DSceneErrorBoundary>
-                  <Suspense fallback={<Wheel3DSceneSkeleton />}>
-                    <Wheel3DScene
-                      wheelModel={product.shortModel}
-                      wheelSeries={product.technicalSpecs.construction}
-                      spokeStyle={product.geometry}
-                      selectedFinish={selectedFinish}
-                      availableFinishes={product.availableFinishes}
-                      onSelectFinish={setSelectedFinish}
-                      modelUrl={modelUrl}
+                {modelUrl ? (
+                  <WheelStage
+                    wheelModel={product.shortModel}
+                    wheelSeries={product.technicalSpecs.construction}
+                    selectedFinish={selectedFinish}
+                    availableFinishes={product.availableFinishes}
+                    onSelectFinish={setSelectedFinish}
+                    modelUrl={modelUrl}
+                    rearModelUrl={rearModelUrl}
+                  />
+                ) : (
+                  // No 3D model for this wheel yet: lead with its photography.
+                  <div className="relative w-full aspect-square max-h-[860px] bg-[#121215] border border-[#26262E] rounded-3xl overflow-hidden">
+                    <SafeImage
+                      src={productImages.images[0]}
+                      alt={`${product.title} — ${productImages.labels[0]}`}
+                      fallbackLabel={productImages.labels[0]}
+                      referrerPolicy="no-referrer"
+                      className="w-full h-full object-cover"
                     />
-                  </Suspense>
-                </Wheel3DSceneErrorBoundary>
+                  </div>
+                )}
 
                 {/* Finish Swatch Selector Bar */}
                 <div className="p-4 border border-[#26262E] bg-[#121215] flex flex-wrap items-center justify-between gap-4">
@@ -280,9 +287,15 @@ export const TechnicalProductView: React.FC<TechnicalProductViewProps> = ({
                       PER SET OF 4 · PRICED IN SOUTH AFRICAN RAND (ZAR)
                     </p>
                   </div>
-                  <span className="text-xs font-tech-mono font-semibold uppercase text-emerald-400">
-                    IN STOCK (SA DISPATCH)
-                  </span>
+                  {stockStatus && (
+                    <span
+                      className={`text-xs font-tech-mono font-semibold uppercase ${
+                        isInStock ? 'text-emerald-400' : 'text-neutral-400'
+                      }`}
+                    >
+                      {stockStatus}
+                    </span>
+                  )}
                 </div>
 
                 {/* Primary CTA: Bespoke Interest Request Form (No e-commerce checkout) */}
@@ -427,70 +440,90 @@ export const TechnicalProductView: React.FC<TechnicalProductViewProps> = ({
             </section>
           </main>
 
-          {/* Persistent Quiet Contact Dock (WhatsApp / Instagram / Phone) — a secondary,
-              always-available affordance deliberately kept out of the primary CTA stack.
-              Anchored bottom-left (opposite corner) so it never overlaps the store-wide
-              live-chat widget in GlobalOverlays.tsx, which is fixed bottom-5 right-5 and
-              can expand into a 320–384px-wide panel on that same right-hand side. */}
+          {/* Persistent contact dock (WhatsApp / Instagram / Phone). Channels come from
+              src/config/site.ts: a configured WhatsApp number or phone opens that channel
+              directly; when not configured the button falls back to the interest request
+              form so nothing pretends to connect. Instagram is shown only when configured. */}
           <div className="fixed bottom-6 left-6 z-30 flex flex-col items-start gap-2">
-            {contactActionFeedback && (
-              <p className="max-w-[240px] text-left text-[11px] font-tech-mono text-emerald-400 bg-[#0A0A0A]/95 border border-emerald-800 px-3 py-2 shadow-lg">
-                {contactActionFeedback}
-              </p>
-            )}
             <div className="flex flex-col items-center gap-1.5 bg-[#121215]/90 backdrop-blur-sm border border-[#26262E] rounded-full p-1.5 shadow-lg">
-              <button
-                type="button"
-                onClick={() => {
-                  // No contactActionFeedback toast here: on narrow viewports the live-chat
-                  // panel this opens (GlobalOverlays.tsx, fixed bottom-5 right-5, up to
-                  // 320px wide below the sm breakpoint) can cover this dock's bottom-left
-                  // footprint and hide the toast right as it appears. Opening the chat
-                  // panel is itself an obvious, immediate confirmation for this action.
-                  setChatOpen(true);
-                  sendChatMessage(
-                    `WhatsApp Fitment Check: ${product.title} (${product.technicalSpecs.partNo})`
-                  );
-                }}
-                aria-label="Enquire via WhatsApp"
-                title="WhatsApp"
-                className="w-10 h-10 rounded-full flex items-center justify-center bg-[#25D366] text-white hover:opacity-90 transition-opacity cursor-pointer"
-              >
-                <MessageCircle className="w-4 h-4" />
-              </button>
+              {(() => {
+                const waMessage = `Hi FORGED, I'm interested in ${product.title} (part ${product.technicalSpecs.partNo}, ${finishObj.name}). Please confirm fitment and availability.`;
+                const wa = whatsappLink(waMessage);
+                const dockBtn =
+                  'w-10 h-10 rounded-full flex items-center justify-center transition-opacity cursor-pointer';
+                return wa ? (
+                  <a
+                    href={wa}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Chat on WhatsApp about this wheel set"
+                    title="WhatsApp"
+                    className={`${dockBtn} bg-[#25D366] text-white hover:opacity-90`}
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                  </a>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      openEnquiryModal({
+                        subject: `WhatsApp callback request: ${product.shortModel}`,
+                        partNo: product.technicalSpecs.partNo,
+                        finish: finishObj.name,
+                        priceZAR: product.priceZAR,
+                        domain: 'store',
+                      })
+                    }
+                    aria-label="Request a WhatsApp callback about this wheel set"
+                    title="Request WhatsApp callback"
+                    className={`${dockBtn} bg-[#25D366] text-white hover:opacity-90`}
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                  </button>
+                );
+              })()}
 
-              <button
-                type="button"
-                onClick={() =>
-                  setContactActionFeedback(
-                    'FORGED Custom wheels Official Build Portfolio tagged for ' +
-                      product.shortModel
-                  )
-                }
-                aria-label="Connect via Instagram"
-                title="Instagram"
-                className="w-10 h-10 rounded-full flex items-center justify-center bg-[#E1306C] text-white hover:opacity-90 transition-opacity cursor-pointer"
-              >
-                <Instagram className="w-4 h-4" />
-              </button>
+              {SITE.instagramUrl && (
+                <a
+                  href={SITE.instagramUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="FORGED Custom Wheels on Instagram"
+                  title="Instagram"
+                  className="w-10 h-10 rounded-full flex items-center justify-center bg-[#E1306C] text-white hover:opacity-90 transition-opacity cursor-pointer"
+                >
+                  <Instagram className="w-4 h-4" />
+                </a>
+              )}
 
-              <button
-                type="button"
-                onClick={() =>
-                  openEnquiryModal({
-                    subject: `Priority Telephone Fitment Order: ${product.shortModel}`,
-                    partNo: product.technicalSpecs.partNo,
-                    finish: finishObj.name,
-                    priceZAR: product.priceZAR,
-                    domain: 'store',
-                  })
-                }
-                aria-label="Call FORGED Custom wheels Specialist"
-                title="Phone"
-                className="w-10 h-10 rounded-full flex items-center justify-center bg-[#18181D] border border-[#26262E] text-white hover:border-[#FF5500] hover:text-[#FF5500] transition-colors cursor-pointer"
-              >
-                <Phone className="w-4 h-4" />
-              </button>
+              {telLink() ? (
+                <a
+                  href={telLink() ?? undefined}
+                  aria-label={`Call FORGED Custom Wheels on ${SITE.phoneDisplay}`}
+                  title={SITE.phoneDisplay}
+                  className="w-10 h-10 rounded-full flex items-center justify-center bg-[#18181D] border border-[#26262E] text-white hover:border-[#FF5500] hover:text-[#FF5500] transition-colors cursor-pointer"
+                >
+                  <Phone className="w-4 h-4" />
+                </a>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() =>
+                    openEnquiryModal({
+                      subject: `Telephone callback request: ${product.shortModel}`,
+                      partNo: product.technicalSpecs.partNo,
+                      finish: finishObj.name,
+                      priceZAR: product.priceZAR,
+                      domain: 'store',
+                    })
+                  }
+                  aria-label="Request a telephone callback about this wheel set"
+                  title="Request callback"
+                  className="w-10 h-10 rounded-full flex items-center justify-center bg-[#18181D] border border-[#26262E] text-white hover:border-[#FF5500] hover:text-[#FF5500] transition-colors cursor-pointer"
+                >
+                  <Phone className="w-4 h-4" />
+                </button>
+              )}
             </div>
           </div>
         </>
