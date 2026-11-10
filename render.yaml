@@ -73,41 +73,50 @@ services:
         source: /wheels/ff-1-liquid-metal
         destination: /wheels/ff-1-liquid-metal.html
       - type: rewrite
-        source: /store/products/bmw-m3-type-52-forged
-        destination: /store/products/bmw-m3-type-52-forged.html
+        source: /store/products/bmw-m3-fsa001-black-matte
+        destination: /store/products/bmw-m3-fsa001-black-matte.html
       - type: rewrite
-        source: /store/products/bmw-m3-rs-3-0
-        destination: /store/products/bmw-m3-rs-3-0.html
+        source: /store/products/bmw-m3-fsa002-gold
+        destination: /store/products/bmw-m3-fsa002-gold.html
       - type: rewrite
-        source: /store/products/bmw-m3-ld-rs-forged
-        destination: /store/products/bmw-m3-ld-rs-forged.html
+        source: /store/products/bmw-m3-fsa002-hyper-black
+        destination: /store/products/bmw-m3-fsa002-hyper-black.html
       - type: rewrite
-        source: /store/products/bmw-m3-g06-aero-forged
-        destination: /store/products/bmw-m3-g06-aero-forged.html
+        source: /store/products/bmw-m3-fsa002-polished-face
+        destination: /store/products/bmw-m3-fsa002-polished-face.html
       - type: rewrite
-        source: /store/products/bmw-m3-le-mans-gt-forged
-        destination: /store/products/bmw-m3-le-mans-gt-forged.html
+        source: /store/products/bmw-m3-fsa003-silver
+        destination: /store/products/bmw-m3-fsa003-silver.html
       - type: rewrite
-        source: /store/products/bmw-m2-mondial-retro-forged
-        destination: /store/products/bmw-m2-mondial-retro-forged.html
+        source: /store/products/bmw-m3-fsa003-hyper-black
+        destination: /store/products/bmw-m3-fsa003-hyper-black.html
       - type: rewrite
-        source: /store/products/bmw-m4-defiant-forged
-        destination: /store/products/bmw-m4-defiant-forged.html
+        source: /store/products/bmw-m3-fsa004-silver
+        destination: /store/products/bmw-m3-fsa004-silver.html
       - type: rewrite
-        source: /store/products/bmw-m5-vengeance-forged
-        destination: /store/products/bmw-m5-vengeance-forged.html
+        source: /store/products/bmw-m3-fsa004-hyper-black
+        destination: /store/products/bmw-m3-fsa004-hyper-black.html
+      - type: rewrite
+        source: /store/products/bmw-m3-fsa004-gloss-black
+        destination: /store/products/bmw-m3-fsa004-gloss-black.html
+      - type: rewrite
+        source: /store/products/bmw-m3-ff-1-silver
+        destination: /store/products/bmw-m3-ff-1-silver.html
+      - type: rewrite
+        source: /store/products/bmw-m3-ff-3-pure-bronze
+        destination: /store/products/bmw-m3-ff-3-pure-bronze.html
+      - type: rewrite
+        source: /store/products/bmw-m3-ff-3-glossy-black
+        destination: /store/products/bmw-m3-ff-3-glossy-black.html
+      - type: rewrite
+        source: /store/products/bmw-m3-ff-3-liquid-metal
+        destination: /store/products/bmw-m3-ff-3-liquid-metal.html
+      - type: rewrite
+        source: /store/products/bmw-m3-ff-1-liquid-metal
+        destination: /store/products/bmw-m3-ff-1-liquid-metal.html
       - type: rewrite
         source: /store/collections/bmw-m3-2024-onwards-alloy-wheels
         destination: /store/collections/bmw-m3-2024-onwards-alloy-wheels.html
-      - type: rewrite
-        source: /store/collections/bmw-m2-2023-onwards-alloy-wheels
-        destination: /store/collections/bmw-m2-2023-onwards-alloy-wheels.html
-      - type: rewrite
-        source: /store/collections/bmw-m4-2024-onwards-alloy-wheels
-        destination: /store/collections/bmw-m4-2024-onwards-alloy-wheels.html
-      - type: rewrite
-        source: /store/collections/bmw-m5-2024-onwards-alloy-wheels
-        destination: /store/collections/bmw-m5-2024-onwards-alloy-wheels.html
       - type: rewrite
         source: /store/collections/bmw-m135-alloy-wheels
         destination: /store/collections/bmw-m135-alloy-wheels.html
@@ -118,14 +127,23 @@ services:
         source: /store/collections/bmw-m240-alloy-wheels
         destination: /store/collections/bmw-m240-alloy-wheels.html
       - type: rewrite
+        source: /store/collections/bmw-m2-alloy-wheels
+        destination: /store/collections/bmw-m2-alloy-wheels.html
+      - type: rewrite
         source: /store/collections/bmw-m340-alloy-wheels
         destination: /store/collections/bmw-m340-alloy-wheels.html
       - type: rewrite
         source: /store/collections/bmw-m440-alloy-wheels
         destination: /store/collections/bmw-m440-alloy-wheels.html
       - type: rewrite
+        source: /store/collections/bmw-m4-alloy-wheels
+        destination: /store/collections/bmw-m4-alloy-wheels.html
+      - type: rewrite
         source: /store/collections/bmw-m550-alloy-wheels
         destination: /store/collections/bmw-m550-alloy-wheels.html
+      - type: rewrite
+        source: /store/collections/bmw-m5-alloy-wheels
+        destination: /store/collections/bmw-m5-alloy-wheels.html
       - type: rewrite
         source: /store/collections/bmw-m760-alloy-wheels
         destination: /store/collections/bmw-m760-alloy-wheels.html

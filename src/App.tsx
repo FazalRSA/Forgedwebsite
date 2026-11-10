@@ -178,7 +178,7 @@ function AppRoutes() {
 
   // Route 2: /wheels/[slug] — Editorial Wheel Showcase PDP with 360° 3D Studio
   if (pathname.startsWith('/wheels/')) {
-    const slug = pathname.replace('/wheels/', '').split('/')[0] || 'ld-rs';
+    const slug = pathname.replace('/wheels/', '').split('/')[0] || 'fsa001-black-matte';
     return <WheelShowcasePDP slug={slug} />;
   }
 
@@ -194,7 +194,7 @@ function AppRoutes() {
   if (pathname.startsWith('/store/products/')) {
     const productSlug =
       pathname.replace('/store/products/', '').split('/')[0] ||
-      'bmw-m3-type-52-forged';
+      'bmw-m3-fsa001-black-matte';
     return <TechnicalProductView productSlug={productSlug} />;
   }
 

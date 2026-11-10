@@ -257,7 +257,7 @@ export const useForgedStore = create<ForgedStoreState>()(
 
       saveVehicleSession: (session: SavedVehicleSession) => set({ savedVehicle: session }),
 
-      wishlistSlugs: ['bmw-m3-type-52-forged'],
+      wishlistSlugs: ['bmw-m3-fsa001-black-matte'],
       toggleWishlist: (slug: string) => {
         const current = get().wishlistSlugs;
         if (current.includes(slug)) {
