@@ -55,6 +55,15 @@ Run the type check, the tests and the build before you open a pull request. All 
 - `src/components/brand/`: pages and sections. `scripts/`: build steps, in the order in the
   `build` script.
 
+## Things that must stay in step
+
+- The privacy notice (`PrivacyPolicyPage.tsx`) describes what the site does. If a change collects,
+  stores or sends visitor data, update the notice in the same pull request.
+- `README.md` describes the routes, the build steps, the tests and the stock rule. Update it when
+  you change any of them.
+- The lead time for to-order colours is `TO_ORDER_LEAD_TIME` in `src/data/catalogue.ts`. Pages and
+  `llms.txt` read it from there.
+
 ## Adding a page
 
 Add the route in `src/App.tsx`, its title and description in `metaForPath` and its path in
