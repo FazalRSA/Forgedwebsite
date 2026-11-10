@@ -52,6 +52,9 @@ export const TechnicalProductView: React.FC<TechnicalProductViewProps> = ({
     ? undefined
     : findWheelBySlug(product.wheelSlug, customBrandWheels)?.rearModelUrl;
   const productImages = getStoreProductImages(product, customBrandWheels);
+  // Stock wording comes from the linked wheel's record; with no record there is no stock claim.
+  const stockStatus = findWheelBySlug(product.wheelSlug, customBrandWheels)?.stockStatus?.trim() ?? '';
+  const isInStock = /in stock/i.test(stockStatus);
   const [selectedFinish, setSelectedFinish] = useState<WheelFinishId>(
     product.defaultFinish
   );
@@ -284,9 +287,15 @@ export const TechnicalProductView: React.FC<TechnicalProductViewProps> = ({
                       PER SET OF 4 · PRICED IN SOUTH AFRICAN RAND (ZAR)
                     </p>
                   </div>
-                  <span className="text-xs font-tech-mono font-semibold uppercase text-emerald-400">
-                    IN STOCK
-                  </span>
+                  {stockStatus && (
+                    <span
+                      className={`text-xs font-tech-mono font-semibold uppercase ${
+                        isInStock ? 'text-emerald-400' : 'text-neutral-400'
+                      }`}
+                    >
+                      {stockStatus}
+                    </span>
+                  )}
                 </div>
 
                 {/* Primary CTA: Bespoke Interest Request Form (No e-commerce checkout) */}

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import {
@@ -9,6 +9,8 @@ import {
   SITE_ORIGIN,
   absoluteUrl,
   absolutiseJsonLd,
+  isHomePath,
+  renderPageHtml,
   buildSitemapXml,
   homeJsonLd,
   metaForPath,
@@ -176,4 +178,40 @@ test('the sitemap lists every wheel once, only indexable canonical pages, on the
   const xml = buildSitemapXml('https://example.test');
   assert.equal((xml.match(/<loc>/g) ?? []).length, paths.length);
   assert.ok(xml.includes('<loc>https://example.test/</loc>'));
+});
+
+test('an address that is not a page is a noindex "not found", while home paths stay the home page', () => {
+  for (const home of ['', '/', '/index.html']) {
+    assert.equal(isHomePath(home), true);
+    assert.equal(metaForPath(home).noindex, false);
+  }
+  const missing = metaForPath('/no-such-page');
+  assert.equal(isHomePath('/no-such-page'), false);
+  assert.equal(missing.noindex, true);
+  assert.ok(missing.title.startsWith('Page not found'));
+  assert.ok(!sitemapPaths().includes('/no-such-page'));
+});
+
+test('renderPageHtml bakes a page\'s own title, description, canonical, image and structured data into the shell', () => {
+  const shell = readFileSync(path.join(PUBLIC_DIR, '..', 'index.html'), 'utf8');
+  const wheel = BRAND_WHEELS.find((w) => w.slug === 'fsa002-gold')!;
+  const meta = metaForPath(`/wheels/${wheel.slug}`);
+  const html = renderPageHtml(shell, meta, 'https://example.test');
+
+  assert.ok(html.includes(`<title>${meta.title.replace(/&/g, '&amp;')}</title>`));
+  assert.equal((html.match(/<title>/g) ?? []).length, 1);
+  assert.ok(html.includes('<link rel="canonical" href="https://example.test/wheels/fsa002-gold" />'));
+  assert.ok(html.includes('<meta property="og:url" content="https://example.test/wheels/fsa002-gold" />'));
+  assert.ok(html.includes(`<meta property="og:image" content="https://example.test${meta.image}" />`));
+  assert.ok(html.includes('"@type":"Product"'));
+  assert.ok(!html.includes('noindex'));
+  assert.ok(html.includes('<div id="root"></div>'), 'the app shell body is untouched');
+
+  // Hostile text in a title cannot break out of the tag.
+  const hostile = renderPageHtml(shell, { ...meta, title: 'A "quoted" <b>title</b> & more', jsonLd: { name: '</script><script>x' } });
+  assert.ok(hostile.includes('<title>A &quot;quoted&quot; &lt;b&gt;title&lt;/b&gt; &amp; more</title>'));
+  assert.ok(!hostile.includes('</script><script>x'));
+
+  const hiddenPage = renderPageHtml(shell, metaForPath('/no-such-page'));
+  assert.ok(hiddenPage.includes('<meta name="robots" content="noindex, nofollow" />'));
 });
