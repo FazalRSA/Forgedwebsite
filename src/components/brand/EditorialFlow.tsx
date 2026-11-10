@@ -18,8 +18,6 @@ export interface SouthAfricaCustomerFitment {
   vehicleTitle: string;
   chassisCode: string;
   wheelModel: string;
-  wheelSlug: string;
-  storeProductSlug: string;
   staggeredSpec: string;
   frontSpec: string;
   rearSpec: string;
@@ -39,9 +37,7 @@ export const SOUTH_AFRICA_FITMENTS: SouthAfricaCustomerFitment[] = [
     id: 'sa-01',
     vehicleTitle: 'BMW G80 M3 COMPETITION xDRIVE',
     chassisCode: 'G80 LCI · MINT GREEN INDIVIDUAL',
-    wheelModel: 'TYPE 52 FORGED MONOBLOCK',
-    wheelSlug: 'type-52',
-    storeProductSlug: 'bmw-m3-type-52-forged',
+    wheelModel: 'BESPOKE FORGED COMMISSION',
     staggeredSpec: '20×9.5" ET18 (F) · 21×10.5" ET20 (R)',
     frontSpec: '20×9.5J ET18 · 275/30 R20 Michelin Pilot Sport 4S',
     rearSpec: '21×10.5J ET20 · 295/25 R21 Michelin Pilot Sport 4S',
@@ -67,9 +63,7 @@ export const SOUTH_AFRICA_FITMENTS: SouthAfricaCustomerFitment[] = [
     id: 'sa-02',
     vehicleTitle: 'BMW G80 M3 COMPETITION SALOON',
     chassisCode: 'G80 M3 · DRAVIT GREY INDIVIDUAL',
-    wheelModel: 'RS 3.0 HERITAGE FORGED',
-    wheelSlug: 'rs-3-0',
-    storeProductSlug: 'bmw-m3-rs-3-0',
+    wheelModel: 'BESPOKE FORGED COMMISSION',
     staggeredSpec: '20×9.5" ET18 (F) · 21×10.5" ET20 (R)',
     frontSpec: '20×9.5J ET18 · 275/35 R20 Michelin Cup 2',
     rearSpec: '21×10.5J ET20 · 285/30 R21 Michelin Cup 2',
@@ -95,9 +89,7 @@ export const SOUTH_AFRICA_FITMENTS: SouthAfricaCustomerFitment[] = [
     id: 'sa-03',
     vehicleTitle: 'BMW G81 M3 TOURING COMPETITION',
     chassisCode: 'G81 TOURING · MINERAL GREY METALLIC',
-    wheelModel: 'LD RS MONOBLOCK FORGED',
-    wheelSlug: 'ld-rs',
-    storeProductSlug: 'bmw-m3-ld-rs-forged',
+    wheelModel: 'BESPOKE FORGED COMMISSION',
     staggeredSpec: '20×9.5" ET18 (F) · 20×10.5" ET20 (R)',
     frontSpec: '20×9.5J ET18 · 275/35 R20 Michelin PS4S',
     rearSpec: '20×10.5J ET20 · 285/30 R20 Michelin PS4S',
@@ -123,9 +115,7 @@ export const SOUTH_AFRICA_FITMENTS: SouthAfricaCustomerFitment[] = [
     id: 'sa-04',
     vehicleTitle: 'BMW G82 M4 COMPETITION COUPE',
     chassisCode: 'G82 M4 · FROZEN BROOKLYN GREY',
-    wheelModel: 'TYPE 52 COMPETITION FORGED',
-    wheelSlug: 'type-52',
-    storeProductSlug: 'bmw-m3-type-52-forged',
+    wheelModel: 'BESPOKE FORGED COMMISSION',
     staggeredSpec: '20×9.5" ET16 (F) · 21×10.5" ET18 (R)',
     frontSpec: '20×9.5J ET16 · 275/35 R20 Pirelli Trofeo R',
     rearSpec: '21×10.5J ET18 · 295/30 R21 Pirelli Trofeo R',
@@ -151,9 +141,7 @@ export const SOUTH_AFRICA_FITMENTS: SouthAfricaCustomerFitment[] = [
     id: 'sa-05',
     vehicleTitle: 'BMW G87 M2 COUPE TRACK-SPEC',
     chassisCode: 'G87 M2 · ALPINE WHITE',
-    wheelModel: 'MONDIAL RETRO MONOBLOCK',
-    wheelSlug: 'mondial-retro',
-    storeProductSlug: 'bmw-m2-mondial-retro-forged',
+    wheelModel: 'BESPOKE FORGED COMMISSION',
     staggeredSpec: '20×9.5" ET18 (F) · 20×10.5" ET20 (R)',
     frontSpec: '20×9.5J ET18 · 275/35 R20 Michelin Cup 2',
     rearSpec: '20×10.5J ET20 · 295/30 R20 Michelin Cup 2',
@@ -179,9 +167,7 @@ export const SOUTH_AFRICA_FITMENTS: SouthAfricaCustomerFitment[] = [
     id: 'sa-06',
     vehicleTitle: 'BMW G90 M5 HYBRID SALOON',
     chassisCode: 'G90 M5 · MARINA BAY BLUE METALLIC',
-    wheelModel: 'VENGEANCE DIRECTIONAL TURBINE',
-    wheelSlug: 'vengeance-wb',
-    storeProductSlug: 'bmw-m5-vengeance-forged',
+    wheelModel: 'BESPOKE FORGED COMMISSION',
     staggeredSpec: '22×10" ET20 (F) · 22×11.5" ET22 (R)',
     frontSpec: '22×10J ET20 · 285/35 R22 Continental SC7',
     rearSpec: '22×11.5J ET22 · 315/30 R22 Continental SC7',
@@ -201,7 +187,7 @@ export const SOUTH_AFRICA_FITMENTS: SouthAfricaCustomerFitment[] = [
       '/assets/aistudio/m5_saloon_front.jpg',
       '/assets/aistudio/m5_saloon_side.jpg',
     ],
-    imageLabels: ['Front 3/4 Studio Stance & 22" Monoblock Fit', 'Full Side 90° Profile & Directional Turbine Blades'],
+    imageLabels: ['Front 3/4 Studio Stance & Flush Fit', 'Full Side 90° Profile & Spoke Detail'],
   },
 ];
 
@@ -516,7 +502,7 @@ export const EditorialFlow: React.FC = () => {
                     const fit = selectedFitment;
                     setSelectedFitment(null);
                     openEnquiryModal({
-                      subject: `Commission ${fit.wheelModel} for ${fit.vehicleTitle} (${fit.city})`,
+                      subject: `Commission a bespoke forged set for ${fit.vehicleTitle} (${fit.city})`,
                       domain: 'brand',
                     });
                   }}
@@ -529,13 +515,12 @@ export const EditorialFlow: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => {
-                    const slug = selectedFitment.wheelSlug;
                     setSelectedFitment(null);
-                    navigate(`/wheels/${slug}`);
+                    navigate('/store/collections/bmw-m3-2024-onwards-alloy-wheels');
                   }}
                   className="w-full sm:w-auto border border-[#33333E] text-neutral-300 hover:text-white hover:border-[#FF5500] rounded-full px-5 py-3 text-xs font-tech-mono uppercase tracking-wider transition-colors cursor-pointer"
                 >
-                  View Wheel in 360° Studio
+                  Browse In-Stock Wheel Sets
                 </button>
 
                 <button

@@ -110,9 +110,11 @@ Two record types live in `src/data/kahnData.ts`:
 - **`BrandWheelItem`**: a wheel as shown on the brand site. Key fields: `slug`, `model`, `modelCode`, `finishName`, `priceZAR`, `sizesAvailable`, `compatibleCars`, `technicalSpecSheet`, `stockStatus`, `stockQuantitySets`, `images` (exactly three), `imageLabels`, `availableFinishes`, optional `modelUrl`, and `compatibleStoreProductSlug` linking to a store product.
 - **`StoreProductItem`**: a sellable set as shown in the store. Key fields: `slug`, `wheelSlug`, `make`, `model`, `yearRange`, `priceZAR`, optional `originalPriceZAR` (shown as a sale when higher), `technicalSpecs` (sizes, bolt pattern, part number, load rating, centre bore), optional `modelUrl`.
 
-Fourteen in-stock wheels are seeded in `kahnData.ts`. `src/data/customWheels.json` is merged on top by slug: an entry with a seed's slug overrides it (this is how real photography is attached), and an entry with a new slug is added. `VEHICLE_FITMENT_TREE` has a node for every BMW M model line on the stock sheet; `BMW_M_MODEL_OPTIONS` holds the sheet's "Cars that this is available for" names verbatim and each belongs to exactly one node's `variants`. A node's `productSlugs` are the store products the fitment finder lists for it. The M3, M2, M4 and M5 nodes carry the in-stock sets; every other model line resolves to an enquiry-only collection until sets are allocated to it.
+The stock sheet is the single source of truth for what the site sells. Its fourteen rows are seeded as `INVENTORY_SEEDS` in `kahnData.ts`; `BRAND_WHEELS` (the catalogue) and `STORE_PRODUCTS` (one sellable set per row, slug `bmw-m3-<wheel-slug>`) are both generated from those seeds, so a wheel cannot appear in the store without being on the sheet. `src/data/customWheels.json` is merged on top by slug and is used to attach real photography and 3D models to sheet wheels; the test suite fails if it introduces a wheel that is not on the sheet. `VEHICLE_FITMENT_TREE` has a node for every BMW M model line on the stock sheet; `BMW_M_MODEL_OPTIONS` holds the sheet's "Cars that this is available for" names verbatim and each belongs to exactly one node's `variants`. A node's `productSlugs` are the store products the fitment finder lists for it. Only the M3 (G80) node carries in-stock sets, because that is the only car the sheet lists the wheels as available for; every other model line, including M2, M4 and M5, resolves to an enquiry-only collection until the sheet allocates sets to it.
 
 ## Adding a wheel
+
+A wheel must be on the stock sheet before it goes on the site. Add its row to `INVENTORY_SEEDS` in `src/data/kahnData.ts` first (model code, sizes, finish, compatible car, price, stock, spec string); the catalogue entry and store product are generated from it. Then attach media:
 
 1. **Choose a slug**: lowercase model code plus finish, e.g. `fsa003-pure-bronze`. It becomes the URL, the image folder and the model file name.
 2. **Add photos** as three square WebP files (2000×2000 recommended, under 400 KB each, consistent background and framing):
@@ -124,7 +126,7 @@ Fourteen in-stock wheels are seeded in `kahnData.ts`. `src/data/customWheels.jso
    ```
 
 3. **Add the record** to `brandWheels` in `src/data/customWheels.json`. Copy an existing entry and change the slug, names, price, sizes, finishes, spec sheet, stock, image paths and labels. Reference images as `/images/wheels/<slug>/front.webp` (leading slash, no `public/`).
-4. **Store product**: if the wheel needs its own part number and sizes, add an entry to `storeProducts` in the same file (use a `STORE_PRODUCTS` entry in `kahnData.ts` as a template), point the wheel's `compatibleStoreProductSlug` at it, and add its slug to the right model's `productSlugs` in `VEHICLE_FITMENT_TREE`.
+4. **Store product**: nothing to do. Each seed row already generates its store product at `/store/products/bmw-m3-<slug>` and lists it in the M3 collection. Leave `storeProducts` in `customWheels.json` empty.
 5. Run `bun run lint` and `bun run dev`, check `/wheels/<slug>` and `/#catalogue`, then commit and deploy.
 
 The CLI can draft an entry for you:

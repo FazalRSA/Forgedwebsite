@@ -18,8 +18,6 @@ export interface ClientFitmentItem {
   vehicleTitle: string;
   chassisCode: string;
   wheelModel: string;
-  wheelSlug: string;
-  storeProductSlug: string;
   staggeredSpec: string;
   finishName: string;
   clientCity: string;
@@ -36,9 +34,7 @@ export const CLIENT_FITMENT_ITEMS: ClientFitmentItem[] = [
     slotLabel: '01 / 08',
     vehicleTitle: 'BMW G80 M3 COMPETITION — MINT INDIVIDUAL',
     chassisCode: 'G80 · MINT GREEN / CYAN INDIVIDUAL',
-    wheelModel: 'TYPE 52 FORGED',
-    wheelSlug: 'type-52',
-    storeProductSlug: 'bmw-m3-type-52-forged',
+    wheelModel: 'BESPOKE FORGED COMMISSION',
     staggeredSpec: '20x9.5" ET18 / 21x10.5" ET20',
     finishName: 'Brushed Liquid Silver',
     clientCity: 'SANDTON, JOHANNESBURG',
@@ -56,9 +52,7 @@ export const CLIENT_FITMENT_ITEMS: ClientFitmentItem[] = [
     slotLabel: '02 / 08',
     vehicleTitle: 'BMW G80 M3 COMPETITION — DRAVIT GREY',
     chassisCode: 'G80 · DRAVIT GREY METALLIC',
-    wheelModel: 'RS 3.0 HERITAGE FORGED',
-    wheelSlug: 'rs-3-0',
-    storeProductSlug: 'bmw-m3-rs-3-0',
+    wheelModel: 'BESPOKE FORGED COMMISSION',
     staggeredSpec: '20x9.5" ET18 / 21x10.5" ET20',
     finishName: 'Champagne Bronze Brushed',
     clientCity: 'CAMPS BAY, CAPE TOWN',
@@ -76,9 +70,7 @@ export const CLIENT_FITMENT_ITEMS: ClientFitmentItem[] = [
     slotLabel: '03 / 08',
     vehicleTitle: 'BMW G81 M3 TOURING COMPETITION',
     chassisCode: 'G81 · MINERAL GREY METALLIC',
-    wheelModel: 'LD RS MONOBLOCK FORGED',
-    wheelSlug: 'ld-rs',
-    storeProductSlug: 'bmw-m3-ld-rs-forged',
+    wheelModel: 'BESPOKE FORGED COMMISSION',
     staggeredSpec: '20x9.5" ET18 / 20x10.5" ET20',
     finishName: 'Liquid Silver Diamond Cut',
     clientCity: 'STELLENBOSCH, WINELANDS',
@@ -96,9 +88,7 @@ export const CLIENT_FITMENT_ITEMS: ClientFitmentItem[] = [
     slotLabel: '04 / 08',
     vehicleTitle: 'BMW G82 M4 COMPETITION COUPE',
     chassisCode: 'G82 · FROZEN BROOKLYN GREY',
-    wheelModel: 'TYPE 52 COMPETITION FORGED',
-    wheelSlug: 'type-52',
-    storeProductSlug: 'bmw-m3-type-52-forged',
+    wheelModel: 'BESPOKE FORGED COMMISSION',
     staggeredSpec: '20x9.5" ET16 / 21x10.5" ET18',
     finishName: 'Satin Black',
     clientCity: 'MUNICH, GERMANY',
@@ -116,9 +106,7 @@ export const CLIENT_FITMENT_ITEMS: ClientFitmentItem[] = [
     slotLabel: '05 / 08',
     vehicleTitle: 'BMW G87 M2 COUPE TRACK-SPEC',
     chassisCode: 'G87 · ALPINE WHITE',
-    wheelModel: 'MONDIAL RETRO MONOBLOCK',
-    wheelSlug: 'mondial-retro',
-    storeProductSlug: 'bmw-m2-mondial-retro-forged',
+    wheelModel: 'BESPOKE FORGED COMMISSION',
     staggeredSpec: '20x9.5" ET18 / 20x10.5" ET20',
     finishName: 'Anthracite Gunmetal Matte',
     clientCity: 'KYALAMI GP CIRCUIT, MIDRAND',
@@ -136,9 +124,7 @@ export const CLIENT_FITMENT_ITEMS: ClientFitmentItem[] = [
     slotLabel: '06 / 08',
     vehicleTitle: 'BMW G90 M5 HYBRID SALOON',
     chassisCode: 'G90 · MARINA BAY BLUE METALLIC',
-    wheelModel: 'VENGEANCE DIRECTIONAL TURBINE',
-    wheelSlug: 'vengeance-wb',
-    storeProductSlug: 'bmw-m5-vengeance-forged',
+    wheelModel: 'BESPOKE FORGED COMMISSION',
     staggeredSpec: '22x10.0" ET20 / 22x11.5" ET22',
     finishName: 'Liquid Silver Mirror Lustre',
     clientCity: 'UMHLANGA ARCH, DURBAN',
@@ -148,7 +134,7 @@ export const CLIENT_FITMENT_ITEMS: ClientFitmentItem[] = [
       '/assets/aistudio/m5_saloon_front.jpg',
       '/assets/aistudio/m5_saloon_side.jpg',
     ],
-    imageLabels: ['Front 3/4 Studio Stance & 22" Monoblock Fit', 'Full Side 90° Profile & Directional Turbine Blades'],
+    imageLabels: ['Front 3/4 Studio Stance & Flush Fit', 'Full Side 90° Profile & Spoke Detail'],
   },
   // 7. BMW G80 M3 Competition — Champagne Bronze Staggered
   {
@@ -156,9 +142,7 @@ export const CLIENT_FITMENT_ITEMS: ClientFitmentItem[] = [
     slotLabel: '07 / 08',
     vehicleTitle: 'BMW G80 M3 CS COMPETITION',
     chassisCode: 'G80 · DRAVIT GREY CARBON ARCH',
-    wheelModel: 'RS 3.0 HERITAGE FORGED',
-    wheelSlug: 'rs-3-0',
-    storeProductSlug: 'bmw-m3-rs-3-0',
+    wheelModel: 'BESPOKE FORGED COMMISSION',
     staggeredSpec: '20x9.5" ET18 / 21x10.5" ET20',
     finishName: 'Champagne Bronze Brushed',
     clientCity: 'SILVERSTONE, UK',
@@ -176,9 +160,7 @@ export const CLIENT_FITMENT_ITEMS: ClientFitmentItem[] = [
     slotLabel: '08 / 08',
     vehicleTitle: 'BMW G81 M3 TOURING ATELIER SPEC',
     chassisCode: 'G81 · MINERAL GREY INDIVIDUAL',
-    wheelModel: 'LD RS MONOBLOCK FORGED',
-    wheelSlug: 'ld-rs',
-    storeProductSlug: 'bmw-m3-ld-rs-forged',
+    wheelModel: 'BESPOKE FORGED COMMISSION',
     staggeredSpec: '20x9.5" ET18 / 20x10.5" ET20',
     finishName: 'Liquid Silver Diamond Cut',
     clientCity: 'ZURICH, SWITZERLAND',
@@ -564,7 +546,7 @@ export const ClientFitmentsPage: React.FC = () => {
                     onClick={() => {
                       setSelectedIndex(null);
                       openEnquiryModal({
-                        subject: `Fitment Specification: ${activeItem.vehicleTitle} (${activeItem.wheelModel})`,
+                        subject: `Fitment Specification: ${activeItem.vehicleTitle}`,
                         finish: activeItem.finishName,
                         domain: 'brand',
                       });
@@ -578,13 +560,12 @@ export const ClientFitmentsPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => {
-                      const target = activeItem.wheelSlug;
                       setSelectedIndex(null);
-                      navigate(`/wheels/${target}`);
+                      navigate('/store/collections/bmw-m3-2024-onwards-alloy-wheels');
                     }}
                     className="w-full py-3 px-5 rounded-full border border-[#33333E] text-[#F5F5F7] text-xs font-tech-mono font-bold uppercase tracking-[0.14em] hover:border-[#FF5500] hover:text-[#FF5500] inline-flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap transition-colors"
                   >
-                    <span>Open 360° Wheel Showcase</span>
+                    <span>Browse In-Stock Wheel Sets</span>
                     <ArrowUpRight className="w-4 h-4 shrink-0" />
                   </button>
                 </div>

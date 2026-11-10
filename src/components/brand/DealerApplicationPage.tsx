@@ -154,7 +154,7 @@ export const DealerApplicationPage: React.FC = () => {
                 Structured Trade Tiers
               </h2>
               <p className="text-sm text-[#C2C2CC] leading-relaxed">
-                Access tiered B2B trade pricing on all 20&quot;–23&quot; forged BMW M wheel packages (Type 52, LD RS, RS 3.0, G06 Aero, and Vengeance) with regional stockist protection.
+                Access tiered B2B trade pricing on all in-stock 19&quot;–21&quot; forged BMW M wheel sets (FSA001, FSA002, FSA003, FSA004, FF-1 and FF-3) with regional stockist protection.
               </p>
             </div>
           </div>

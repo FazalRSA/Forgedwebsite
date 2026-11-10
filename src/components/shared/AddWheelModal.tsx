@@ -25,14 +25,14 @@ import { WheelRenderSVG } from '../visuals/WheelRenderSVG';
 import { useRouter } from '../../utils/router';
 
 const GEOMETRY_OPTIONS: Array<{ id: SpokeGeometryType; label: string }> = [
-  { id: 'y-spoke-forged', label: 'Y-Spoke Motorsport Forged (Type 52)' },
-  { id: 'ten-spoke-ring', label: '10-Spoke Tension Ring (LD RS)' },
-  { id: 'split-five-rs', label: '5-Twin Concave Split (RS 3.0)' },
+  { id: 'y-spoke-forged', label: 'Y-Spoke Motorsport Forged' },
+  { id: 'ten-spoke-ring', label: '10-Spoke Tension Ring' },
+  { id: 'split-five-rs', label: '5-Twin Concave Split' },
   { id: 'aero-disc-f1', label: 'F1 Aero Louvered Disc (F1-X)' },
-  { id: 'multi-spoke-gt', label: 'Multi-Spoke Motorsport (Le Mans GT)' },
+  { id: 'multi-spoke-gt', label: 'Multi-Spoke Motorsport' },
   { id: 'dish-beadlock', label: 'Heavy-Duty Beadlock Ring (Defend 1983)' },
-  { id: 'directional-turbine', label: '20-Fin Directional Turbine (Vengeance)' },
-  { id: 'classic-horseshoe', label: 'Heritage Horseshoe Monoblock (Mondial)' },
+  { id: 'directional-turbine', label: '20-Fin Directional Turbine' },
+  { id: 'classic-horseshoe', label: 'Heritage Horseshoe Monoblock' },
 ];
 
 export const AddWheelModal: React.FC = () => {
@@ -45,7 +45,7 @@ export const AddWheelModal: React.FC = () => {
     removeCustomWheel,
   } = useKahnStore();
 
-  const [name, setName] = useState('TYPE 60 CARBON');
+  const [name, setName] = useState('');
   const [series, setSeries] = useState('FORGED SERIES');
   const [priceZAR, setPriceZAR] = useState('75000');
   const [originalPriceZAR, setOriginalPriceZAR] = useState('');
@@ -102,7 +102,7 @@ export const AddWheelModal: React.FC = () => {
 
   const cliCommand = [
     'npm run add-wheel --',
-    `--name "${name || 'TYPE 60'}"`,
+    `--name "${name || 'NEW WHEEL'}"`,
     `--series "${series || 'FORGED SERIES'}"`,
     `--price ${Number(priceZAR) || 75000}`,
     originalPriceZAR ? `--original-price ${Number(originalPriceZAR)}` : '',
@@ -353,7 +353,7 @@ export const AddWheelModal: React.FC = () => {
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="e.g. TYPE 60"
+                    placeholder="e.g. FSA005"
                     className="w-full h-10 px-3 bg-[#18181D] border border-[#26262E] text-[#F5F5F7] text-xs font-tech-mono uppercase focus:outline-none focus:border-[#FF5500]"
                     required
                   />

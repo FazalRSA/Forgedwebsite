@@ -234,7 +234,6 @@ interface RawInventorySeed {
   geometry: SpokeGeometryType;
   spokeCount: number;
   swatchHex: string;
-  compatibleStoreProductSlug: string;
 }
 
 const INVENTORY_SEEDS: RawInventorySeed[] = [
@@ -256,7 +255,6 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     geometry: 'y-spoke-forged',
     spokeCount: 10,
     swatchHex: '#484B52',
-    compatibleStoreProductSlug: 'bmw-m3-type-52-forged',
   },
   {
     slot: 2,
@@ -275,7 +273,6 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     geometry: 'ten-spoke-ring',
     spokeCount: 10,
     swatchHex: '#D4AF37',
-    compatibleStoreProductSlug: 'bmw-m3-ld-rs-forged',
   },
   {
     slot: 3,
@@ -294,7 +291,6 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     geometry: 'ten-spoke-ring',
     spokeCount: 10,
     swatchHex: '#6E737B',
-    compatibleStoreProductSlug: 'bmw-m3-ld-rs-forged',
   },
   {
     slot: 4,
@@ -313,7 +309,6 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     geometry: 'ten-spoke-ring',
     spokeCount: 10,
     swatchHex: '#E8ECEF',
-    compatibleStoreProductSlug: 'bmw-m3-ld-rs-forged',
   },
   {
     slot: 5,
@@ -332,7 +327,6 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     geometry: 'split-five-rs',
     spokeCount: 10,
     swatchHex: '#D8DCE3',
-    compatibleStoreProductSlug: 'bmw-m3-rs-3-0',
   },
   {
     slot: 6,
@@ -351,7 +345,6 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     geometry: 'split-five-rs',
     spokeCount: 10,
     swatchHex: '#6E737B',
-    compatibleStoreProductSlug: 'bmw-m3-rs-3-0',
   },
   {
     slot: 7,
@@ -370,7 +363,6 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     geometry: 'multi-spoke-gt',
     spokeCount: 12,
     swatchHex: '#D8DCE3',
-    compatibleStoreProductSlug: 'bmw-m3-g06-aero-forged',
   },
   {
     slot: 8,
@@ -389,7 +381,6 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     geometry: 'multi-spoke-gt',
     spokeCount: 12,
     swatchHex: '#6E737B',
-    compatibleStoreProductSlug: 'bmw-m3-g06-aero-forged',
   },
   {
     slot: 9,
@@ -408,7 +399,6 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     geometry: 'multi-spoke-gt',
     spokeCount: 12,
     swatchHex: '#3A3D45',
-    compatibleStoreProductSlug: 'bmw-m3-g06-aero-forged',
   },
   {
     slot: 10,
@@ -427,7 +417,6 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     geometry: 'directional-turbine',
     spokeCount: 10,
     swatchHex: '#D8DCE3',
-    compatibleStoreProductSlug: 'bmw-m3-le-mans-gt-forged',
   },
   {
     slot: 11,
@@ -446,7 +435,6 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     geometry: 'y-spoke-forged',
     spokeCount: 10,
     swatchHex: '#B8864D',
-    compatibleStoreProductSlug: 'bmw-m4-defiant-forged',
   },
   {
     slot: 12,
@@ -465,7 +453,6 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     geometry: 'y-spoke-forged',
     spokeCount: 10,
     swatchHex: '#3A3D45',
-    compatibleStoreProductSlug: 'bmw-m4-defiant-forged',
   },
   {
     slot: 13,
@@ -484,7 +471,6 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     geometry: 'y-spoke-forged',
     spokeCount: 10,
     swatchHex: '#E2E6EC',
-    compatibleStoreProductSlug: 'bmw-m5-vengeance-forged',
   },
   {
     slot: 14,
@@ -503,7 +489,6 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     geometry: 'directional-turbine',
     spokeCount: 10,
     swatchHex: '#E2E6EC',
-    compatibleStoreProductSlug: 'bmw-m2-mondial-retro-forged',
   },
 ];
 
@@ -581,324 +566,129 @@ export const BRAND_WHEELS: BrandWheelItem[] = INVENTORY_SEEDS.map((seed) => {
       testing: seed.technicalSpecSheet,
       warranty: '3-Year Structural & Finish Guarantee',
     },
-    compatibleStoreProductSlug: seed.compatibleStoreProductSlug,
+    compatibleStoreProductSlug: storeProductSlugForWheel(seed.slug),
   };
 });
 
-export const STORE_PRODUCTS: StoreProductItem[] = [
-  {
-    id: 'prod-bmw-m3-type-52',
-    slug: 'bmw-m3-type-52-forged',
-    wheelSlug: 'fsa001-black-matte',
-    title: 'BMW M3 SEDAN (G80) — FSA001 BLACK MATTE (2 PIECE WHEEL)',
-    shortModel: 'FSA001 · BLACK MATTE',
+/** Store product slug for a stock-sheet wheel: exactly one sellable set per sheet row. */
+export function storeProductSlugForWheel(wheelSlug: string): string {
+  return `bmw-m3-${wheelSlug}`;
+}
+
+/**
+ * Hand-written store product slugs that shipped before the store was tied 1:1 to the stock
+ * sheet. Old links and saved wishlists resolve to the sheet row they used to represent.
+ */
+const LEGACY_STORE_PRODUCT_SLUGS: Record<string, string> = {
+  'bmw-m3-type-52-forged': storeProductSlugForWheel('fsa001-black-matte'),
+  'bmw-m3-rs-3-0': storeProductSlugForWheel('fsa003-silver'),
+  'bmw-m3-ld-rs-forged': storeProductSlugForWheel('fsa002-gold'),
+  'bmw-m3-g06-aero-forged': storeProductSlugForWheel('fsa004-silver'),
+  'bmw-m3-le-mans-gt-forged': storeProductSlugForWheel('ff-1-silver'),
+  'bmw-m2-mondial-retro-forged': storeProductSlugForWheel('ff-1-liquid-metal'),
+  'bmw-m4-defiant-forged': storeProductSlugForWheel('ff-3-pure-bronze'),
+  'bmw-m5-vengeance-forged': storeProductSlugForWheel('ff-3-liquid-metal'),
+};
+
+function slugifyLabel(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+/** "PCD 5×112 · ET8/15 · CB66.6" → bolt pattern, front/rear offsets and centre bore. */
+function parseTechnicalSpecSheet(spec: string): {
+  boltPattern: string;
+  etFront: string;
+  etRear: string;
+  centerBore: string;
+} {
+  const pcd = /PCD\s*(\d)\s*[×x]\s*(\d+)/i.exec(spec);
+  const et = /ET\s*(\d+)\s*\/\s*(\d+)/i.exec(spec);
+  const cb = /CB\s*([\d.]+)/i.exec(spec);
+  return {
+    boltPattern: pcd ? `${pcd[1]} X ${pcd[2]}` : '5 X 112',
+    etFront: et?.[1] ?? '',
+    etRear: et?.[2] ?? '',
+    centerBore: cb?.[1] ?? '66.6',
+  };
+}
+
+/** "19 inch / 20 inch" → front and rear diameters plus the collection filter badge. */
+function parseSizesAvailable(sizes: string): {
+  front: string;
+  rear: string;
+  badge: StoreProductItem['diameterBadge'];
+} {
+  const m = /(\d+)\s*inch\s*\/\s*(\d+)\s*inch/i.exec(sizes);
+  const front = m?.[1] ?? '20';
+  const rear = m?.[2] ?? '21';
+  return { front, rear, badge: `${front}-${rear}"` as StoreProductItem['diameterBadge'] };
+}
+
+/**
+ * Builds the sellable store product for one stock-sheet row. Every value comes from the sheet
+ * (model code, finish, sizes, spec string, price, stock, compatible car); nothing the sheet does
+ * not state is invented, so load rating is "on request" and construction is only "2 piece" where
+ * the sheet says so.
+ */
+function buildStoreProductFromSeed(seed: RawInventorySeed): StoreProductItem {
+  const slug = storeProductSlugForWheel(seed.slug);
+  const finishUpper = seed.finishName.toUpperCase();
+  const { front, rear, badge } = parseSizesAvailable(seed.sizesAvailable);
+  const { boltPattern, etFront, etRear, centerBore } = parseTechnicalSpecSheet(
+    seed.technicalSpecSheet
+  );
+  const sets = seed.stockQuantitySets;
+  const setsWord = sets === 1 ? 'SET' : 'SETS';
+  const isTwoPiece = /2\s*piece/i.test(seed.otherFinishes ?? '');
+  const otherSuffix = seed.otherFinishes ? ` (${seed.otherFinishes.toUpperCase()})` : '';
+
+  return {
+    id: `prod-${slug}`,
+    slug,
+    wheelSlug: seed.slug,
+    title: `BMW ${seed.compatibleCars.toUpperCase()} — ${seed.modelCode} ${finishUpper}${otherSuffix}`,
+    shortModel: `${seed.modelCode} · ${finishUpper}`,
     make: 'BMW',
     model: 'M3',
     yearRange: '2024 ONWARDS',
     partCategory: 'ALLOY WHEELS',
-    priceZAR: 90000,
-    isLatest: true,
-    isReserve: true,
-    setLabel: 'IN STOCK · 1 SET',
-    diameterBadge: '19-20"',
-    geometry: 'y-spoke-forged',
-    spokeCount: 10,
-    defaultFinish: 'satin-black',
-    availableFinishes: ['satin-black', 'silver', 'champagne-bronze', 'dark-gunmetal'],
-    technicalSpecs: {
-      productName: 'FSA001 — BLACK MATTE (2 PIECE WHEEL)',
-      frontWheelSize: '19 INCH · ET8',
-      rearWheelSize: '20 INCH · ET15',
-      colour: 'BLACK MATTE',
-      material: 'ALUMINIUM (6061-T6)',
-      construction: '2 PIECE FORGED WHEEL',
-      boltPattern: '5 X 112',
-      partNo: 'WAKB9250B0F-2-KIT',
-      loadRating: '850 KG PER WHEEL',
-      centerBore: '66.6 MM (DIRECT HUB-CENTRIC)',
-    },
-    aboutBullets: [
-      'Direct fitment for BMW M3 Sedan (G80) — 19 inch front / 20 inch rear 2-piece wheel.',
-      'Technical specification: PCD 5x112 · ET8/15 · CB66.6.',
-    ],
-    importantInfoBullets: [
-      'In Stock (1 Set available for immediate dispatch).',
-    ],
-  },
-  {
-    id: 'prod-bmw-m3-rs-3-0',
-    slug: 'bmw-m3-rs-3-0',
-    wheelSlug: 'fsa003-silver',
-    title: 'BMW M3 SEDAN (G80) — FSA003 SILVER / HYPER BLACK',
-    shortModel: 'WHEEL PLACEHOLDER 03',
-    make: 'BMW',
-    model: 'M3',
-    yearRange: '2024 ONWARDS',
-    partCategory: 'ALLOY WHEELS',
-    priceZAR: 75000,
-    isLatest: true,
-    isReserve: true,
-    setLabel: 'IN STOCK · 1 SET',
-    diameterBadge: '20-21"',
-    geometry: 'split-five-rs',
-    spokeCount: 10,
-    defaultFinish: 'silver',
-    availableFinishes: ['silver', 'dark-gunmetal'],
-    technicalSpecs: {
-      productName: 'FSA003 — 20" / 21" FORGED',
-      frontWheelSize: '20 INCH · ET8',
-      rearWheelSize: '21 INCH · ET15',
-      colour: 'SILVER / HYPER BLACK',
-      material: 'ALUMINIUM',
-      construction: 'FORGED',
-      boltPattern: '5 X 112',
-      partNo: 'WAKB9300S0F-2-KIT',
-      loadRating: '850 KG PER WHEEL',
-      centerBore: '66.6 MM',
-    },
-    aboutBullets: [
-      'Engineered for BMW M3 Sedan (G80) in 20 inch / 21 inch staggered diameters.',
-      'Technical specification: PCD 5x112 · ET8/15 · CB66.6.',
-    ],
-    importantInfoBullets: [
-      'In Stock: 1 set in Silver and 1 set in Hyper Black.',
-    ],
-  },
-  {
-    id: 'prod-bmw-m3-ld-rs',
-    slug: 'bmw-m3-ld-rs-forged',
-    wheelSlug: 'fsa002-gold',
-    title: 'BMW M3 COMPETITION SEDAN (G80) — FSA002 FORGED',
-    shortModel: 'FSA002 · GOLD / HYPER BLACK / POLISHED',
-    make: 'BMW',
-    model: 'M3',
-    yearRange: '2024 ONWARDS',
-    partCategory: 'ALLOY WHEELS',
-    priceZAR: 75000,
-    isLatest: true,
-    isReserve: false,
-    setLabel: 'IN STOCK · 3 SETS',
-    diameterBadge: '20"',
-    geometry: 'ten-spoke-ring',
-    spokeCount: 10,
-    defaultFinish: 'champagne-bronze',
-    availableFinishes: ['champagne-bronze', 'dark-gunmetal', 'silver'],
-    technicalSpecs: {
-      productName: 'FSA002 — M3 COMPETITION SEDAN (G80)',
-      frontWheelSize: '20 INCH · ET8',
-      rearWheelSize: '21 INCH · ET15',
-      colour: 'GOLD / HYPER BLACK / POLISHED FACE',
-      material: 'ALUMINIUM',
-      construction: 'FORGED',
-      boltPattern: '5 X 112',
-      partNo: 'WAKB9100S0F-4-KIT',
-      loadRating: '840 KG PER WHEEL',
-      centerBore: '66.6 MM',
-    },
-    aboutBullets: [
-      'Available in Gold (R 75,000), Hyper Black (R 75,000), and Polished Face (R 85,000).',
-    ],
-    importantInfoBullets: [
-      'PCD 5x112 · ET8/15 · CB66.6 — In Stock.',
-    ],
-  },
-  {
-    id: 'prod-bmw-m3-g06-aero',
-    slug: 'bmw-m3-g06-aero-forged',
-    wheelSlug: 'fsa004-silver',
-    title: 'BMW M3 SEDAN (G80) — FSA004 FORGED (20" / 21")',
-    shortModel: 'FSA004 · SILVER / HYPER / GLOSS BLACK',
-    make: 'BMW',
-    model: 'M3',
-    yearRange: '2024 ONWARDS',
-    partCategory: 'ALLOY WHEELS',
-    priceZAR: 70000,
-    isLatest: true,
-    isReserve: true,
-    setLabel: 'IN STOCK · 3 SETS',
-    diameterBadge: '20-21"',
-    geometry: 'multi-spoke-gt',
-    spokeCount: 12,
-    defaultFinish: 'silver',
-    availableFinishes: ['silver', 'dark-gunmetal', 'satin-black'],
-    technicalSpecs: {
-      productName: 'FSA004 — M3 (G80)',
-      frontWheelSize: '20 INCH · ET8',
-      rearWheelSize: '21 INCH · ET15',
-      colour: 'SILVER / HYPER BLACK / GLOSS BLACK',
-      material: 'ALUMINIUM',
-      construction: 'FORGED',
-      boltPattern: '5 X 112',
-      partNo: 'WAKB9606G0F-2-KIT',
-      loadRating: '860 KG PER WHEEL',
-      centerBore: '66.6 MM',
-    },
-    aboutBullets: [
-      'In stock in Silver, Hyper Black, and Gloss Black for BMW M3 (G80).',
-    ],
-    importantInfoBullets: [
-      'PCD 5x112 · ET8/15 · CB66.6 — 1 set per finish in stock.',
-    ],
-  },
-  {
-    id: 'prod-bmw-m3-le-mans-gt',
-    slug: 'bmw-m3-le-mans-gt-forged',
-    wheelSlug: 'ff-1-silver',
-    title: 'BMW M3 SEDAN (G80) — FF-1 SILVER / LIQUID METAL',
-    shortModel: 'FF-1 · 20" / 21"',
-    make: 'BMW',
-    model: 'M3',
-    yearRange: '2024 ONWARDS',
-    partCategory: 'ALLOY WHEELS',
-    priceZAR: 80000,
-    originalPriceZAR: 95000,
-    isSale: true,
+    priceZAR: seed.priceZAR,
     isLatest: false,
-    isReserve: true,
-    setLabel: 'IN STOCK · 3 SETS',
-    diameterBadge: '20"',
-    geometry: 'directional-turbine',
-    spokeCount: 10,
-    defaultFinish: 'silver',
-    availableFinishes: ['silver'],
+    isReserve: seed.stockStatus.toLowerCase() === 'in stock',
+    setLabel: `${seed.stockStatus.toUpperCase()} · ${sets} ${setsWord}`,
+    diameterBadge: badge,
+    geometry: seed.geometry,
+    spokeCount: seed.spokeCount,
+    defaultFinish: seed.defaultFinish,
+    availableFinishes: seed.availableFinishes,
     technicalSpecs: {
-      productName: 'FF-1 — M3 (G80)',
-      frontWheelSize: '20 INCH · ET15',
-      rearWheelSize: '21 INCH · ET20 / ET17',
-      colour: 'SILVER / LIQUID METAL',
-      material: 'ALUMINIUM',
-      construction: 'FORGED',
-      boltPattern: '5 X 112',
-      partNo: 'WAKB9416C0F-2-KIT',
-      loadRating: '850 KG PER WHEEL',
-      centerBore: '66.6 MM',
+      productName: `${seed.modelCode} — ${finishUpper}${otherSuffix}`,
+      frontWheelSize: `${front} INCH · ET${etFront}`,
+      rearWheelSize: `${rear} INCH · ET${etRear}`,
+      colour: finishUpper,
+      material: 'FORGED ALUMINIUM',
+      construction: isTwoPiece ? '2 PIECE FORGED WHEEL' : 'FORGED',
+      boltPattern,
+      partNo: `${seed.modelCode}-${slugifyLabel(seed.finishName).toUpperCase()}`,
+      loadRating: 'ON REQUEST',
+      centerBore: `${centerBore} MM`,
     },
     aboutBullets: [
-      'Available in Silver (ET15/20, 1 set) and Liquid Metal (ET15/17, 2 sets).',
+      `${seed.modelCode} in ${seed.finishName} for the BMW ${seed.compatibleCars}: ${seed.sizesAvailable} staggered set of four.`,
+      `Technical specification: ${seed.technicalSpecSheet}.`,
     ],
     importantInfoBullets: [
-      'Direct 5x112 CB66.6 fitment for BMW M3 Sedan & Competition (G80).',
+      `${seed.stockStatus}: ${sets} complete ${sets === 1 ? 'set' : 'sets'} available for immediate dispatch.`,
+      'Price shown is for a complete set of four wheels in South African Rand.',
     ],
-  },
-  {
-    id: 'prod-bmw-m2-mondial',
-    slug: 'bmw-m2-mondial-retro-forged',
-    wheelSlug: 'ff-1-liquid-metal',
-    title: 'BMW M3 COMPETITION (G80) — FF-1 LIQUID METAL',
-    shortModel: 'FF-1 · LIQUID METAL',
-    make: 'BMW',
-    model: 'M2',
-    yearRange: '2023 ONWARDS',
-    partCategory: 'ALLOY WHEELS',
-    priceZAR: 95000,
-    originalPriceZAR: 98000,
-    isSale: true,
-    isLatest: true,
-    isReserve: false,
-    setLabel: 'IN STOCK · 2 SETS',
-    diameterBadge: '20"',
-    geometry: 'directional-turbine',
-    spokeCount: 10,
-    defaultFinish: 'silver',
-    availableFinishes: ['silver'],
-    technicalSpecs: {
-      productName: 'FF-1 LIQUID METAL — 20" / 21"',
-      frontWheelSize: '20 INCH · ET15',
-      rearWheelSize: '21 INCH · ET17',
-      colour: 'LIQUID METAL',
-      material: 'ALUMINIUM',
-      construction: 'FORGED',
-      boltPattern: '5 X 112',
-      partNo: 'WAKB8710G0F-4-KIT',
-      loadRating: '850 KG PER WHEEL',
-      centerBore: '66.6 MM',
-    },
-    aboutBullets: [
-      '2 sets in stock in Liquid Metal finish (PCD 5x112 · ET15/17 · CB66.6).',
-    ],
-    importantInfoBullets: [
-      'Staggered 20 inch / 21 inch set of 4 wheels.',
-    ],
-  },
-  {
-    id: 'prod-bmw-m4-defiant',
-    slug: 'bmw-m4-defiant-forged',
-    wheelSlug: 'ff-3-pure-bronze',
-    title: 'BMW M3 COMPETITION (G80) — FF-3 PURE BRONZE / GLOSSY BLACK',
-    shortModel: 'FF-3 · PURE BRONZE / GLOSSY BLACK',
-    make: 'BMW',
-    model: 'M4',
-    yearRange: '2024 ONWARDS',
-    partCategory: 'ALLOY WHEELS',
-    priceZAR: 80000,
-    originalPriceZAR: 85000,
-    isSale: true,
-    isLatest: true,
-    isReserve: false,
-    setLabel: 'IN STOCK · 2 SETS',
-    diameterBadge: '20"',
-    geometry: 'y-spoke-forged',
-    spokeCount: 10,
-    defaultFinish: 'champagne-bronze',
-    availableFinishes: ['champagne-bronze', 'satin-black', 'silver'],
-    technicalSpecs: {
-      productName: 'FF-3 — 20" / 21" FORGED',
-      frontWheelSize: '20 INCH · ET15',
-      rearWheelSize: '21 INCH · ET17',
-      colour: 'PURE BRONZE / GLOSSY BLACK',
-      material: 'ALUMINIUM',
-      construction: 'FORGED',
-      boltPattern: '5 X 112',
-      partNo: 'WAKB8200B0F-4-KIT',
-      loadRating: '900 KG PER WHEEL',
-      centerBore: '66.6 MM',
-    },
-    aboutBullets: [
-      'In stock in Pure Bronze (1 set) and Glossy Black (1 set) for M3 Competition (G80).',
-    ],
-    importantInfoBullets: [
-      'PCD 5x112 · ET15/17 · CB66.6.',
-    ],
-  },
-  {
-    id: 'prod-bmw-m5-vengeance',
-    slug: 'bmw-m5-vengeance-forged',
-    wheelSlug: 'ff-3-liquid-metal',
-    title: 'BMW M3 COMPETITION (G80) — FF-3 LIQUID METAL',
-    shortModel: 'FF-3 · LIQUID METAL',
-    make: 'BMW',
-    model: 'M5',
-    yearRange: '2024 ONWARDS',
-    partCategory: 'ALLOY WHEELS',
-    priceZAR: 95000,
-    isLatest: true,
-    isReserve: true,
-    setLabel: 'IN STOCK · 2 SETS',
-    diameterBadge: '22"',
-    geometry: 'y-spoke-forged',
-    spokeCount: 10,
-    defaultFinish: 'silver',
-    availableFinishes: ['silver', 'champagne-bronze', 'satin-black'],
-    technicalSpecs: {
-      productName: 'FF-3 LIQUID METAL — 20" / 21"',
-      frontWheelSize: '20 INCH · ET15',
-      rearWheelSize: '21 INCH · ET17',
-      colour: 'LIQUID METAL',
-      material: 'ALUMINIUM',
-      construction: 'FORGED',
-      boltPattern: '5 X 112',
-      partNo: 'WAKB9000S0F-4-KIT',
-      loadRating: '980 KG PER WHEEL',
-      centerBore: '66.6 MM',
-    },
-    aboutBullets: [
-      '2 sets in stock in Liquid Metal finish (PCD 5x112 · ET15/17 · CB66.6).',
-    ],
-    importantInfoBullets: [
-      'Immediate allocation available.',
-    ],
-  },
-];
+  };
+}
+
+/** One store product per stock-sheet row, in sheet order. */
+export const STORE_PRODUCTS: StoreProductItem[] = INVENTORY_SEEDS.map(buildStoreProductFromSeed);
 
 export interface FitmentModelNode {
   model: string;
@@ -1029,6 +819,12 @@ const SHEET_ENQUIRY_FAMILIES: SheetModelFamily[] = [
     variants: ['M240i Coupe (G42)', 'M240i xDrive Coupe (G42)'],
   },
   {
+    model: 'M2',
+    years: ['2023 ONWARDS'],
+    vehicleLabel: 'M2 (G87)',
+    variants: ['M2 Coupe (G87)', 'M2 CS (G87)'],
+  },
+  {
     model: 'M340',
     years: ['2019 ONWARDS'],
     vehicleLabel: 'M340i / M340d (G20 / G21)',
@@ -1054,10 +850,30 @@ const SHEET_ENQUIRY_FAMILIES: SheetModelFamily[] = [
     ],
   },
   {
+    model: 'M4',
+    years: ['2024 ONWARDS'],
+    vehicleLabel: 'M4 (G82 / G83)',
+    variants: [
+      'M4 Coupe (G82)',
+      'M4 Competition Coupe (G82)',
+      'M4 Competition M xDrive Coupe (G82)',
+      'M4 Competition Convertible (G83)',
+      'M4 Competition M xDrive Convertible (G83)',
+      'M4 CS (G82)',
+      'M4 CSL (G82)',
+    ],
+  },
+  {
     model: 'M550',
     years: ['2017 - 2023'],
     vehicleLabel: 'M550i xDRIVE (G30)',
     variants: ['M550i xDrive Sedan (G30)'],
+  },
+  {
+    model: 'M5',
+    years: ['2024 ONWARDS'],
+    vehicleLabel: 'M5 (G90 / G99)',
+    variants: ['M5 Sedan (G90)', 'M5 Touring (G99)'],
   },
   {
     model: 'M760',
@@ -1239,82 +1055,7 @@ export const VEHICLE_FITMENT_TREE: Record<string, FitmentModelNode[]> = {
         'In-stock forged alloy wheel sets (FSA001, FSA002, FSA003, FSA004, FF-1, FF-3) engineered for the BMW M3 Sedan & M3 Competition Sedan (G80).',
       seoDescriptionFull:
         'Explore our in-stock inventory of forged alloy wheels for the BMW G80 M3 Sedan and M3 Competition Sedan. Every set features direct 5x112 PCD and 66.6mm hub-centric bore fitment.',
-      productSlugs: [
-        'bmw-m3-type-52-forged',
-        'bmw-m3-rs-3-0',
-        'bmw-m3-ld-rs-forged',
-        'bmw-m3-g06-aero-forged',
-        'bmw-m3-le-mans-gt-forged',
-      ],
-    },
-    {
-      model: 'M2',
-      years: ['2023 ONWARDS'],
-      variants: ['M2 Coupe (G87)', 'M2 CS (G87)'],
-      parts: ['ALLOY WHEELS'],
-      collectionSlug: 'bmw-m2-2023-onwards-alloy-wheels',
-      bannerColorHex: '#1D3557',
-      bannerAccentHex: '#457B9D',
-      vehicleLabel: 'BMW M2 G87 (2023 ONWARDS) - ALLOY WHEELS',
-      seoDescriptionShort:
-        'Staggered 20"/21" 5x112 CB66.6 wheel sets compatible with G8x BMW M platforms.',
-      seoDescriptionFull:
-        'Shared G80 platform hub geometry (PCD 5x112, CB 66.6mm) ensures direct bolt-on fitment with factory BMW TPMS and floating center caps.',
-      productSlugs: [
-        'bmw-m2-mondial-retro-forged',
-        'bmw-m3-type-52-forged',
-        'bmw-m3-ld-rs-forged',
-        'bmw-m3-g06-aero-forged',
-      ],
-    },
-    {
-      model: 'M4',
-      years: ['2024 ONWARDS'],
-      variants: [
-        'M4 Coupe (G82)',
-        'M4 Competition Coupe (G82)',
-        'M4 Competition M xDrive Coupe (G82)',
-        'M4 Competition Convertible (G83)',
-        'M4 Competition M xDrive Convertible (G83)',
-        'M4 CS (G82)',
-        'M4 CSL (G82)',
-      ],
-      parts: ['ALLOY WHEELS'],
-      collectionSlug: 'bmw-m4-2024-onwards-alloy-wheels',
-      bannerColorHex: '#2B2D42',
-      bannerAccentHex: '#5C6080',
-      vehicleLabel: 'BMW M4 G82 (2024 ONWARDS) - ALLOY WHEELS',
-      seoDescriptionShort:
-        'Forged 5x112 CB66.6 wheel sets engineered for BMW M3/M4 Competition platforms.',
-      seoDescriptionFull:
-        'Forged wheel sets engineered for BMW G80/G82 M platforms with ET8/15 and ET15/17 staggered offsets.',
-      productSlugs: [
-        'bmw-m3-type-52-forged',
-        'bmw-m3-rs-3-0',
-        'bmw-m4-defiant-forged',
-        'bmw-m3-le-mans-gt-forged',
-        'bmw-m3-g06-aero-forged',
-      ],
-    },
-    {
-      model: 'M5',
-      years: ['2024 ONWARDS'],
-      variants: ['M5 Sedan (G90)', 'M5 Touring (G99)'],
-      parts: ['ALLOY WHEELS'],
-      collectionSlug: 'bmw-m5-2024-onwards-alloy-wheels',
-      bannerColorHex: '#1A1B1E',
-      bannerAccentHex: '#3E4149',
-      vehicleLabel: 'BMW M5 G90 (2024 ONWARDS) - ALLOY WHEELS',
-      seoDescriptionShort:
-        'Forged 5x112 CB66.6 wheel allocations for flagship BMW M saloons.',
-      seoDescriptionFull:
-        'High-load forged 5x112 CB66.6 wheel sets ready for immediate dispatch.',
-      productSlugs: [
-        'bmw-m5-vengeance-forged',
-        'bmw-m3-rs-3-0',
-        'bmw-m3-ld-rs-forged',
-        'bmw-m3-type-52-forged',
-      ],
+      productSlugs: STORE_PRODUCTS.map((product) => product.slug),
     },
     ...SHEET_ENQUIRY_NODES,
   ],
@@ -1464,7 +1205,8 @@ export function getStoreProductBySlug(
   slug: string,
   runtimeCustomProducts: StoreProductItem[] = []
 ): StoreProductItem {
-  const normalized = slug.toLowerCase();
+  const requested = slug.toLowerCase();
+  const normalized = LEGACY_STORE_PRODUCT_SLUGS[requested] ?? requested;
   const allProducts = getAllStoreProducts(runtimeCustomProducts);
   const found = allProducts.find(
     (p) => p.slug.toLowerCase() === normalized || p.wheelSlug.toLowerCase() === normalized

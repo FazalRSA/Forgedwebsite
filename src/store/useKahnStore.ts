@@ -219,7 +219,7 @@ export const useKahnStore = create<KahnStoreState>()(
 
       saveVehicleSession: (session: SavedVehicleSession) => set({ savedVehicle: session }),
 
-      wishlistSlugs: ['bmw-m3-type-52-forged'],
+      wishlistSlugs: ['bmw-m3-fsa001-black-matte'],
       toggleWishlist: (slug: string) => {
         const current = get().wishlistSlugs;
         if (current.includes(slug)) {
@@ -320,7 +320,7 @@ export const useKahnStore = create<KahnStoreState>()(
           'Our Chelsea & Bradford technical specialists have logged your query. All forged sets ship with TUV certification and direct hub-centric bore machining.';
         if (lower.includes('m3') || lower.includes('bmw')) {
           replyText =
-            'For the G80/G81 BMW M3 (2024 Onwards), our Type 52 and RS 3.0 Forged sets use staggered 9.5x20 ET18 front and 10.5x21 ET20 rear specs—100% flush with M Carbon Ceramic clearance.';
+            'For the BMW M3 Sedan and M3 Competition Sedan (G80) we hold FSA001, FSA002, FSA003, FSA004, FF-1 and FF-3 sets in stock: staggered 20 inch / 21 inch (FSA001 is 19 / 20 inch), PCD 5×112, centre bore 66.6 mm, offsets ET8/15 or ET15/17.';
         }
         const replyMsg: ChatMessage = {
           id: `c-${Date.now() + 1}`,

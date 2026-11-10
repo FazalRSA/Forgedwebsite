@@ -153,7 +153,7 @@ export const StoreHeader: React.FC = () => {
                   type="search"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search by BMW model (M3, M4, M2, M5), wheel (Type 52, RS 3.0) or Part No..."
+                  placeholder="Search by wheel (FSA001, FSA002, FF-1, FF-3), finish or Part No..."
                   aria-label="Search vehicle parts and forged wheels"
                   className="w-full bg-transparent text-sm text-[#F5F5F7] placeholder-neutral-500 focus:outline-none"
                   autoFocus
@@ -254,9 +254,13 @@ export const StoreHeader: React.FC = () => {
                   </button>
                   {openAccordion === 'PREVIOUS CAR BUILDS' && (
                     <div className="bg-[#121215] px-5 py-3 space-y-2 text-xs text-neutral-400">
-                      <p>BMW G80 M3 Carbon Widebody Type 52 Edition</p>
-                      <p>BMW G82 M4 Competition RS 3.0 Heritage Build</p>
-                      <p>BMW G90 M5 Vengeance Coachbuilt Touring</p>
+                      <button
+                        type="button"
+                        onClick={() => handleNavigate('/client-fitments')}
+                        className="block w-full text-left py-1 font-tech-mono uppercase text-neutral-300 hover:text-[#FF5500] cursor-pointer"
+                      >
+                        → View Client Fitments Gallery
+                      </button>
                     </div>
                   )}
                 </div>
@@ -300,17 +304,10 @@ export const StoreHeader: React.FC = () => {
                       </button>
                       <button
                         type="button"
-                        onClick={() => handleNavigate('/admin/wheels')}
-                        className="block w-full text-left py-1 text-neutral-300 hover:text-[#FF5500] cursor-pointer"
-                      >
-                        → Admin Wheel Uploader (Protected)
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleNavigate('/wheels/ld-rs')}
+                        onClick={() => handleNavigate('/wheels/fsa001-black-matte')}
                         className="block w-full text-left py-1 text-neutral-400 hover:text-white cursor-pointer"
                       >
-                        360° Wheel Showcase: LD RS
+                        360° Wheel Showcase: FSA001
                       </button>
                     </div>
                   )}
@@ -320,7 +317,7 @@ export const StoreHeader: React.FC = () => {
                 <button
                   type="button"
                   onClick={() =>
-                    handleNavigate('/store/products/bmw-m3-type-52-forged')
+                    handleNavigate('/store/collections/bmw-m3-2024-onwards-alloy-wheels')
                   }
                   className="w-full px-5 py-4 flex items-center justify-between text-xs font-bold tracking-[0.16em] uppercase hover:bg-[#121215] cursor-pointer"
                 >
