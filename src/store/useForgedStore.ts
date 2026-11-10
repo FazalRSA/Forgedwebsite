@@ -115,23 +115,48 @@ interface ForgedStoreState {
 const STORAGE_KEY = 'forged-custom-wheels-store';
 const LEGACY_STORAGE_KEY = 'kahn-automotive-store-bmw-v2';
 
+/**
+ * localStorage can throw (storage disabled, private mode, quota). Treat any
+ * failure as "no persisted state" rather than breaking the store.
+ */
+function safeStorage(): Storage | null {
+  try {
+    return typeof window !== 'undefined' ? window.localStorage : null;
+  } catch {
+    return null;
+  }
+}
+
 const migratingLocalStorage: StateStorage = {
   getItem: (name) => {
-    if (typeof window === 'undefined') return null;
-    const current = window.localStorage.getItem(name);
-    if (current !== null) return current;
-    const legacy = window.localStorage.getItem(LEGACY_STORAGE_KEY);
-    if (legacy !== null) {
-      window.localStorage.setItem(name, legacy);
-      window.localStorage.removeItem(LEGACY_STORAGE_KEY);
+    const ls = safeStorage();
+    if (!ls) return null;
+    try {
+      const current = ls.getItem(name);
+      if (current !== null) return current;
+      const legacy = ls.getItem(LEGACY_STORAGE_KEY);
+      if (legacy !== null) {
+        ls.setItem(name, legacy);
+        ls.removeItem(LEGACY_STORAGE_KEY);
+      }
+      return legacy;
+    } catch {
+      return null;
     }
-    return legacy;
   },
   setItem: (name, value) => {
-    if (typeof window !== 'undefined') window.localStorage.setItem(name, value);
+    try {
+      safeStorage()?.setItem(name, value);
+    } catch {
+      /* quota exceeded or storage blocked: the in-memory store still works */
+    }
   },
   removeItem: (name) => {
-    if (typeof window !== 'undefined') window.localStorage.removeItem(name);
+    try {
+      safeStorage()?.removeItem(name);
+    } catch {
+      /* ignore */
+    }
   },
 };
 
