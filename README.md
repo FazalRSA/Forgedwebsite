@@ -268,7 +268,20 @@ There are no browser-level tests. Check 3D and layout changes by hand on a phone
 
 ## Deployment
 
-`bun run build` produces a static single-page app in `dist/`. Any static host works, provided every path is rewritten to `index.html`. For Firebase Hosting:
+`npm run build` (or `bun run build`) produces a static single-page app in `dist/`. Any static host works, provided every path that is not a real file is rewritten to `index.html`. The repository ships ready-made configuration for two hosts:
+
+| Host | Config file | How to deploy |
+| --- | --- | --- |
+| **Render** (static site) | `render.yaml` | Render dashboard → New → Blueprint → select this repository |
+| **Vercel** | `vercel.json` | Vercel dashboard → Add New → Project → import this repository |
+
+Both configurations install with `npm install --legacy-peer-deps`, run `npm run build`, publish `dist/`, apply the single-page rewrite, and cache fingerprinted assets for a year and models and images for a day. Every push to `main` redeploys.
+
+After the first deploy, add `forgedcustomwheels.com` as a custom domain in the host's dashboard and point the DNS records it gives you at the domain registrar. Canonical URLs and the sitemap already use that domain.
+
+Vercel's free Hobby plan is for non-commercial use only, so a business site needs Vercel Pro. Render's static sites are free to deploy; check the bandwidth included with the workspace plan against traffic, since each 3D model is 3–4 MB.
+
+For Firebase Hosting instead:
 
 ```json
 { "hosting": { "public": "dist", "rewrites": [{ "source": "**", "destination": "/index.html" }] } }
