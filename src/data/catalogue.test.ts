@@ -17,7 +17,7 @@ import {
   getStoreProductBySlug,
   getStoreProductImages,
   STORE_PRODUCTS,
-} from './kahnData';
+} from './catalogue';
 
 test('MARQUE_FILTERS and getAvailableMakes expose only BMW as the car brand option', () => {
   assert.deepEqual(MARQUE_FILTERS, ['ALL', 'BMW']);
@@ -139,7 +139,7 @@ test('formatZAR formats Rand with comma thousands and optional two decimals', ()
 test('getStoreProductBySlug resolves technical PDPs and BRAND_WHEELS matches 14 in-stock sheet rows', () => {
   assert.equal(BRAND_WHEELS.length, 14);
   const type52 = getStoreProductBySlug('bmw-m3-type-52-forged');
-  assert.equal(type52.technicalSpecs.partNo, 'WAKB9250B0F-2-KIT');
+  assert.equal(type52.technicalSpecs.partNo, 'FCW-FSA001-BLK-1920');
   assert.equal(type52.priceZAR, 90000);
 
   const rs30 = getStoreProductBySlug('bmw-m3-rs-3-0');
@@ -160,7 +160,7 @@ test('createWheelAndProductEntries builds custom wheel and store product with im
     diameterBadge: '20-21"',
     defaultFinish: 'satin-black',
     geometry: 'aero-disc-f1',
-    partNo: 'WAKB6000-KIT',
+    partNo: 'FCW-TYPE60-BLK-2021',
   });
 
   assert.equal(brandWheel.slug, 'type-60-carbon');
@@ -172,7 +172,7 @@ test('createWheelAndProductEntries builds custom wheel and store product with im
 
   assert.equal(storeProduct.priceZAR, 5400);
   assert.equal(storeProduct.isSale, true);
-  assert.equal(storeProduct.technicalSpecs.partNo, 'WAKB6000-KIT');
+  assert.equal(storeProduct.technicalSpecs.partNo, 'FCW-TYPE60-BLK-2021');
 
   const mergedBmwWheels = filterWheelsByMarque('BMW', [brandWheel]);
   assert.ok(mergedBmwWheels.some((w) => w.slug === 'type-60-carbon'));
@@ -186,7 +186,7 @@ test('createWheelAndProductEntries builds custom wheel and store product with im
 });
 
 test('findWheelBySlug has no silent fallback and modelUrl flows through the wheel builder to both entries', async () => {
-  const { findWheelBySlug, getWheelBySlug } = await import('./kahnData');
+  const { findWheelBySlug, getWheelBySlug } = await import('./catalogue');
   const { createWheelAndProductEntries } = await import('../utils/wheelBuilder');
 
   assert.equal(findWheelBySlug('does-not-exist'), undefined);
@@ -274,4 +274,15 @@ test('getStoreProductImages degrades to a placeholder rather than throwing when 
   assert.equal(images.length, 3);
   assert.ok(images.every((image) => image.startsWith('data:image/svg+xml')));
   assert.equal(labels.length, 3);
+});
+
+test('buildPartNumber is deterministic and encodes model, finish and diameters', async () => {
+  const { buildPartNumber, createWheelAndProductEntries } = await import('../utils/wheelBuilder');
+  assert.equal(buildPartNumber('FSA002 — Gold', 'champagne-bronze', '20-21"'), 'FCW-FSA002GO-BRZ-2021');
+  assert.equal(buildPartNumber('TYPE 60', 'satin-black', '22"'), 'FCW-TYPE60-BLK-22');
+  const a = createWheelAndProductEntries({ name: 'TYPE 60', priceZAR: 1000, defaultFinish: 'silver', diameterBadge: '20"' });
+  const b = createWheelAndProductEntries({ name: 'TYPE 60', priceZAR: 1000, defaultFinish: 'silver', diameterBadge: '20"' });
+  assert.equal(a.storeProduct.technicalSpecs.partNo, 'FCW-TYPE60-SLV-20');
+  assert.equal(a.storeProduct.technicalSpecs.partNo, b.storeProduct.technicalSpecs.partNo);
+  assert.ok(!a.storeProduct.technicalSpecs.partNo.startsWith('WAK'));
 });

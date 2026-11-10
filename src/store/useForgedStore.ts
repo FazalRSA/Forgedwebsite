@@ -1,10 +1,10 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { createJSONStorage, persist, type StateStorage } from 'zustand/middleware';
 import {
   BrandWheelItem,
   StoreProductItem,
   WheelFinishId,
-} from '../data/kahnData';
+} from '../data/catalogue';
 import {
   NewWheelInput,
   createWheelAndProductEntries,
@@ -41,7 +41,7 @@ export interface SubmittedEnquiryRecord {
   createdAt: string;
 }
 
-interface KahnStoreState {
+interface ForgedStoreState {
   // Admin Protected Route Auth State
   isAdminAuthenticated: boolean;
   loginAdmin: (passcode: string) => boolean;
@@ -107,17 +107,42 @@ interface KahnStoreState {
 
 }
 
-export const useKahnStore = create<KahnStoreState>()(
+/**
+ * Persisted-state key. The previous key was inherited from the design template;
+ * on first load after the rename, any state saved under it is copied across once
+ * so returning visitors keep their saved vehicle, wishlist and enquiry history.
+ */
+const STORAGE_KEY = 'forged-custom-wheels-store';
+const LEGACY_STORAGE_KEY = 'kahn-automotive-store-bmw-v2';
+
+const migratingLocalStorage: StateStorage = {
+  getItem: (name) => {
+    if (typeof window === 'undefined') return null;
+    const current = window.localStorage.getItem(name);
+    if (current !== null) return current;
+    const legacy = window.localStorage.getItem(LEGACY_STORAGE_KEY);
+    if (legacy !== null) {
+      window.localStorage.setItem(name, legacy);
+      window.localStorage.removeItem(LEGACY_STORAGE_KEY);
+    }
+    return legacy;
+  },
+  setItem: (name, value) => {
+    if (typeof window !== 'undefined') window.localStorage.setItem(name, value);
+  },
+  removeItem: (name) => {
+    if (typeof window !== 'undefined') window.localStorage.removeItem(name);
+  },
+};
+
+export const useForgedStore = create<ForgedStoreState>()(
   persist(
     (set, get) => ({
       isAdminAuthenticated: false,
       loginAdmin: (passcode: string) => {
         const cleaned = passcode.trim().toUpperCase();
         if (
-          cleaned === 'FORGED-BMW-2026' ||
-          cleaned === 'KAHN-BMW-2026' ||
-          cleaned === 'ADMIN' ||
-          cleaned === 'BMW2026'
+          cleaned === 'FORGED-BMW-2026'
         ) {
           set({ isAdminAuthenticated: true });
           return true;
@@ -285,7 +310,8 @@ export const useKahnStore = create<KahnStoreState>()(
       },
     }),
     {
-      name: 'kahn-automotive-store-bmw-v2',
+      name: STORAGE_KEY,
+      storage: createJSONStorage(() => migratingLocalStorage),
       // v2: all prices are Rand; the GBP/USD/EUR switcher is gone and GBP-named
       // fields were renamed. Drop the stale currency key and re-key any
       // persisted cart lines from older sessions.
@@ -304,7 +330,7 @@ export const useKahnStore = create<KahnStoreState>()(
             });
           }
         }
-        return state as unknown as KahnStoreState;
+        return state as unknown as ForgedStoreState;
       },
       partialize: (state) => ({
         isAdminAuthenticated: state.isAdminAuthenticated,

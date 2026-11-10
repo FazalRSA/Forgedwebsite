@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { ChevronDown, ChevronUp, AlertTriangle, Loader2 } from 'lucide-react';
-import { WHEEL_FINISHES, type WheelFinishId } from '../../data/kahnData';
+import { WHEEL_FINISHES, type WheelFinishId } from '../../data/catalogue';
 import { getStudioFinish } from '../../data/studioFinishes';
 import {
   BRAKE_PARTS,

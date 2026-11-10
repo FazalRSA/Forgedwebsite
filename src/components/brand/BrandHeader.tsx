@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { useRouter } from '../../utils/router';
 import { displayAddress } from '../../config/site';
-import { useKahnStore } from '../../store/useKahnStore';
+import { useForgedStore } from '../../store/useForgedStore';
 import { useFirebaseAuth } from '../../context/FirebaseContext';
 import { LogoPlaceholder } from '../shared/LogoPlaceholder';
 
@@ -20,7 +20,7 @@ interface BrandHeaderProps {
 
 export const BrandHeader: React.FC<BrandHeaderProps> = () => {
   const { navigate } = useRouter();
-  const { openEnquiryModal } = useKahnStore();
+  const { openEnquiryModal } = useForgedStore();
   const { user, profile } = useFirebaseAuth();
 
   const [drawerOpen, setDrawerOpen] = useState(false);

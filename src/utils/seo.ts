@@ -5,7 +5,7 @@ import {
   getWheelImages,
   resolveCollectionBySlug,
   type BrandWheelItem,
-} from '../data/kahnData';
+} from '../data/catalogue';
 
 /**
  * Per-page metadata for search engines and link previews.

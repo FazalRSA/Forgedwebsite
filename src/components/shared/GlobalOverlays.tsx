@@ -1,6 +1,6 @@
 import React, { useState, Suspense, lazy } from 'react';
 import { X, CheckCircle2, ShieldCheck, FileText } from 'lucide-react';
-import { useKahnStore } from '../../store/useKahnStore';
+import { useForgedStore } from '../../store/useForgedStore';
 import { useRouter } from '../../utils/router';
 
 const AddWheelModal = lazy(() =>
@@ -15,7 +15,7 @@ export const GlobalOverlays: React.FC = () => {
     closeEnquiryModal,
     submitEnquiryRecord,
     submittedEnquiries,
-  } = useKahnStore();
+  } = useForgedStore();
 
   const [customerName, setCustomerName] = useState('');
   const [customerEmail, setCustomerEmail] = useState('');

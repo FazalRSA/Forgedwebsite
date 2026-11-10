@@ -11,11 +11,11 @@ import {
   Plus,
 } from 'lucide-react';
 import { useRouter } from '../../utils/router';
-import { useKahnStore } from '../../store/useKahnStore';
+import { useForgedStore } from '../../store/useForgedStore';
 import {
   formatZAR,
   getAllStoreProducts,
-} from '../../data/kahnData';
+} from '../../data/catalogue';
 import { LogoPlaceholder } from '../shared/LogoPlaceholder';
 
 export const StoreHeader: React.FC = () => {
@@ -25,7 +25,7 @@ export const StoreHeader: React.FC = () => {
     openEnquiryModal,
     customStoreProducts,
     setAddWheelModalOpen,
-  } = useKahnStore();
+  } = useForgedStore();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [openAccordion, setOpenAccordion] = useState<string | null>(null);

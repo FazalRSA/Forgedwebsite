@@ -24,7 +24,7 @@ import {
   handleFirestoreError,
   OperationType,
 } from '../lib/firebase';
-import { WheelFinishId } from '../data/kahnData';
+import { WheelFinishId } from '../data/catalogue';
 import { SITE } from '../config/site';
 
 export type BrakeSystemType =

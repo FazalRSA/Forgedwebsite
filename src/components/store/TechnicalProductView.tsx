@@ -16,8 +16,8 @@ import {
   getStoreProductBySlug,
   findWheelBySlug,
   getStoreProductImages,
-} from '../../data/kahnData';
-import { useKahnStore } from '../../store/useKahnStore';
+} from '../../data/catalogue';
+import { useForgedStore } from '../../store/useForgedStore';
 import { useRouter } from '../../utils/router';
 import { SITE, whatsappLink, telLink } from '../../config/site';
 import { StoreHeader } from './StoreHeader';
@@ -42,7 +42,7 @@ export const TechnicalProductView: React.FC<TechnicalProductViewProps> = ({
     openEnquiryModal,
     customStoreProducts,
     customBrandWheels,
-  } = useKahnStore();
+  } = useForgedStore();
 
   const product = getStoreProductBySlug(productSlug, customStoreProducts);
   // Photoreal 3D model: product-level override, else the linked brand wheel's model.

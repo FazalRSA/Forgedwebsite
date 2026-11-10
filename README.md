@@ -91,10 +91,11 @@ No environment variables are required for local development. Firebase configurat
 ├─ components/ui/                 Button, input, label, icons, global footer
 └─ src/
    ├─ App.tsx                     Providers, route switch, lazy-loaded pages
-   ├─ data/kahnData.ts            Types, 14 seed wheels, 8 store products, fitment tree, helpers
+   ├─ data/catalogue.ts            Types, 14 seed wheels, 8 store products, fitment tree, helpers
    ├─ data/customWheels.json      Inventory overrides and additions (edit this to add wheels)
-   ├─ store/useKahnStore.ts       Zustand store persisted to localStorage
+   ├─ store/useForgedStore.ts       Zustand store persisted to localStorage
    ├─ context/FirebaseContext.tsx Auth, profile and garage data
+   ├─ config/site.ts              Business identity and contact channels (single source of truth)
    ├─ utils/router.tsx            pushState router
    ├─ utils/wheelBuilder.ts       Builds a wheel + store product from a short input
    └─ components/
@@ -107,12 +108,12 @@ No environment variables are required for local development. Firebase configurat
 
 ## Catalogue data model
 
-Two record types live in `src/data/kahnData.ts`:
+Two record types live in `src/data/catalogue.ts`:
 
 - **`BrandWheelItem`**: a wheel as shown on the brand site. Key fields: `slug`, `model`, `modelCode`, `finishName`, `priceZAR`, `sizesAvailable`, `compatibleCars`, `technicalSpecSheet`, `stockStatus`, `stockQuantitySets`, `images` (exactly three), `imageLabels`, `availableFinishes`, optional `modelUrl`, and `compatibleStoreProductSlug` linking to a store product.
 - **`StoreProductItem`**: a sellable set as shown in the store. Key fields: `slug`, `wheelSlug`, `make`, `model`, `yearRange`, `priceZAR`, optional `originalPriceZAR` (shown as a sale when higher), `technicalSpecs` (sizes, bolt pattern, part number, load rating, centre bore), optional `modelUrl`.
 
-Fourteen in-stock wheels are seeded in `kahnData.ts`. `src/data/customWheels.json` is merged on top by slug: an entry with a seed's slug overrides it (this is how real photography is attached), and an entry with a new slug is added. `VEHICLE_FITMENT_TREE` has a node for every BMW M model line on the stock sheet; `BMW_M_MODEL_OPTIONS` holds the sheet's "Cars that this is available for" names verbatim and each belongs to exactly one node's `variants`. A node's `productSlugs` are the store products the fitment finder lists for it. The M3, M2, M4 and M5 nodes carry the in-stock sets; every other model line resolves to an enquiry-only collection until sets are allocated to it.
+Fourteen in-stock wheels are seeded in `catalogue.ts`. `src/data/customWheels.json` is merged on top by slug: an entry with a seed's slug overrides it (this is how real photography is attached), and an entry with a new slug is added. `VEHICLE_FITMENT_TREE` has a node for every BMW M model line on the stock sheet; `BMW_M_MODEL_OPTIONS` holds the sheet's "Cars that this is available for" names verbatim and each belongs to exactly one node's `variants`. A node's `productSlugs` are the store products the fitment finder lists for it. The M3, M2, M4 and M5 nodes carry the in-stock sets; every other model line resolves to an enquiry-only collection until sets are allocated to it.
 
 ## Adding a wheel
 
@@ -126,7 +127,7 @@ Fourteen in-stock wheels are seeded in `kahnData.ts`. `src/data/customWheels.jso
    ```
 
 3. **Add the record** to `brandWheels` in `src/data/customWheels.json`. Copy an existing entry and change the slug, names, price, sizes, finishes, spec sheet, stock, image paths and labels. Reference images as `/images/wheels/<slug>/front.webp` (leading slash, no `public/`).
-4. **Store product**: if the wheel needs its own part number and sizes, add an entry to `storeProducts` in the same file (use a `STORE_PRODUCTS` entry in `kahnData.ts` as a template), point the wheel's `compatibleStoreProductSlug` at it, and add its slug to the right model's `productSlugs` in `VEHICLE_FITMENT_TREE`.
+4. **Store product**: if the wheel needs its own part number and sizes, add an entry to `storeProducts` in the same file (use a `STORE_PRODUCTS` entry in `catalogue.ts` as a template), point the wheel's `compatibleStoreProductSlug` at it, and add its slug to the right model's `productSlugs` in `VEHICLE_FITMENT_TREE`.
 5. Run `bun run lint` and `bun run dev`, check `/wheels/<slug>` and `/#catalogue`, then commit and deploy.
 
 The CLI can draft an entry for you:
@@ -162,7 +163,7 @@ Model requirements (full detail in `public/models/wheels/README.md`):
 
 ## Pricing
 
-All prices are South African Rand for a complete set of four wheels and are stored as whole Rand in `priceZAR`. `formatZAR()` in `src/data/kahnData.ts` is the only formatter and renders `R 75,000` or `R 75,000.00`. There is no currency conversion.
+All prices are South African Rand for a complete set of four wheels and are stored as whole Rand in `priceZAR`. `formatZAR()` in `src/data/catalogue.ts` is the only formatter and renders `R 75,000` or `R 75,000.00`. There is no currency conversion.
 
 ## Accounts and Firebase
 
@@ -187,7 +188,7 @@ firebase deploy --only firestore:rules
 | `bun run build` | Production build to `dist/` |
 | `bun run preview` | Serve `dist/` locally |
 | `bun run lint` | `tsc --noEmit` |
-| `bun run test` | `src/data/kahnData.test.ts` and `firestore.rules.test.ts` with `node:test` |
+| `bun run test` | `src/data/catalogue.test.ts` and `firestore.rules.test.ts` with `node:test` |
 | `bun run add-wheel` | Catalogue CLI (`--help` for options) |
 | `bun run clean` | Remove `dist/` |
 
@@ -209,7 +210,6 @@ The catalogue, fitment finder, product pages, 3D studio and client accounts are 
 - **Contact buttons**: the WhatsApp, Instagram and phone buttons on product pages do not yet open external channels.
 - **Admin publishing**: the admin uploader stores wheels locally; publishing goes through `customWheels.json` and a rebuild. Planned: Firebase-backed catalogue with authenticated admin writes.
 - **Industry partners**: the partner section renders placeholders pending logo assets.
-- **Legacy naming**: some internal identifiers (`useKahnStore`, `kahnData.ts`, the persisted store key) and the AI Studio metadata still carry template-era names.
 
 ## License
 

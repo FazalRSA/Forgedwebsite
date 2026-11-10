@@ -16,9 +16,9 @@ import {
   getAllBrandWheels,
   getWheelBySlug,
   getWheelImages,
-} from '../../data/kahnData';
+} from '../../data/catalogue';
 import { useRouter } from '../../utils/router';
-import { useKahnStore } from '../../store/useKahnStore';
+import { useForgedStore } from '../../store/useForgedStore';
 import { useFirebaseAuth } from '../../context/FirebaseContext';
 import { BrandHeader } from './BrandHeader';
 import { WheelLightboxModal } from './WheelLightboxModal';
@@ -31,7 +31,7 @@ interface WheelShowcasePDPProps {
 
 export const WheelShowcasePDP: React.FC<WheelShowcasePDPProps> = ({ slug }) => {
   const { navigate } = useRouter();
-  const { openEnquiryModal, customBrandWheels } = useKahnStore();
+  const { openEnquiryModal, customBrandWheels } = useForgedStore();
   const { user, profile } = useFirebaseAuth();
 
   const allWheels = getAllBrandWheels(customBrandWheels);

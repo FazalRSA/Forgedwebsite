@@ -7,8 +7,8 @@ import {
   getFitmentNode,
   getMatchingProductsForFitment,
   getModelsForMake,
-} from '../../data/kahnData';
-import { useKahnStore } from '../../store/useKahnStore';
+} from '../../data/catalogue';
+import { useForgedStore } from '../../store/useForgedStore';
 import { useRouter } from '../../utils/router';
 import { StyledSelect } from '../shared/StyledSelect';
 import { StoreHeader } from './StoreHeader';
@@ -29,7 +29,7 @@ export const VehicleFitmentWidget: React.FC = () => {
     savedVehicle,
     saveVehicleSession,
     customStoreProducts,
-  } = useKahnStore();
+  } = useForgedStore();
 
   const allStoreProducts = getAllStoreProducts(customStoreProducts);
   const makes = getAvailableMakes();

@@ -2,7 +2,7 @@ import React from 'react';
 import { ArrowLeft, Lock, Mail, MapPin, Phone, ShieldCheck } from 'lucide-react';
 import { BrandHeader } from './BrandHeader';
 import { useRouter } from '../../utils/router';
-import { useKahnStore } from '../../store/useKahnStore';
+import { useForgedStore } from '../../store/useForgedStore';
 import { SITE } from '../../config/site';
 
 /**
@@ -63,7 +63,7 @@ const Strong: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 
 export const PrivacyPolicyPage: React.FC = () => {
   const { navigate } = useRouter();
-  const { openEnquiryModal } = useKahnStore();
+  const { openEnquiryModal } = useForgedStore();
 
   const toc: Array<[string, string]> = [
     ['01', 'Who we are'],

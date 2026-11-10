@@ -6,8 +6,8 @@ import {
   filterAndSortStoreProducts,
   formatZAR,
   resolveCollectionBySlug,
-} from '../../data/kahnData';
-import { useKahnStore } from '../../store/useKahnStore';
+} from '../../data/catalogue';
+import { useForgedStore } from '../../store/useForgedStore';
 import { useRouter } from '../../utils/router';
 import { StoreHeader } from './StoreHeader';
 import { VehicleProfileRender } from '../visuals/VehicleProfileRender';
@@ -21,7 +21,7 @@ export const FitmentCollectionView: React.FC<FitmentCollectionViewProps> = ({
   fitmentSlug,
 }) => {
   const { navigate } = useRouter();
-  const { saveVehicleSession, customStoreProducts, openEnquiryModal } = useKahnStore();
+  const { saveVehicleSession, customStoreProducts, openEnquiryModal } = useForgedStore();
 
   const { node, make, products } = useMemo(
     () => resolveCollectionBySlug(fitmentSlug, customStoreProducts),

@@ -1,4 +1,4 @@
-import type { WheelFinishId } from './kahnData';
+import type { WheelFinishId } from './catalogue';
 
 /**
  * Physically based paint settings for the 3D wheel studio, one per catalogue finish.

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { SITE_NAME, metaForPath } from './seo';
-import { BRAND_WHEELS, STORE_PRODUCTS } from '../data/kahnData';
+import { BRAND_WHEELS, STORE_PRODUCTS } from '../data/catalogue';
 
 test('home page metadata names the business and stays indexable', () => {
   const m = metaForPath('/');
