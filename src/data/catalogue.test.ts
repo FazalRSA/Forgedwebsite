@@ -299,5 +299,21 @@ test('FSA001 carries front and rear 3D models that exist in /public; wheels with
   for (const wheel of BRAND_WHEELS) {
     if (wheel.modelUrl) assert.ok(existsSync(`public${wheel.modelUrl}`), `${wheel.slug}: ${wheel.modelUrl} missing`);
   }
-  assert.equal(BRAND_WHEELS.find((w) => w.slug === 'fsa002-gold')?.modelUrl, undefined);
+});
+
+test('every listed wheel opens in the 3D studio with a model file that exists, one model per design', async () => {
+  const { existsSync } = await import('node:fs');
+  const all = getAllBrandWheels();
+  assert.equal(all.length, 14);
+  for (const wheel of all) {
+    assert.ok(wheel.modelUrl, `${wheel.slug} has no 3D model`);
+    assert.ok(existsSync(`public${wheel.modelUrl}`), `${wheel.slug}: ${wheel.modelUrl} missing`);
+  }
+  const byCode = new Map<string, Set<string>>();
+  for (const wheel of all) {
+    const code = wheel.modelCode ?? wheel.slug;
+    byCode.set(code, (byCode.get(code) ?? new Set()).add(wheel.modelUrl!));
+  }
+  for (const [code, urls] of byCode) assert.equal(urls.size, 1, `${code} finishes disagree on the model`);
+  assert.equal(all.find((w) => w.slug === 'fsa002-gold')?.modelUrl, '/models/wheels/fsa002.glb');
 });
