@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="280" viewBox="0 0 900 280" role="img" aria-labelledby="t d">
+  <title id="t">Pipeline phases and files per install</title>
+  <desc id="d">Six phases from collecting the phone photo to committing, with a bar chart of how many files one install has on disk at each phase: 1 photo, 10 working files after rendering, 6 published WebPs in the site.</desc>
+  <style>
+    text { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    @keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 0.75; transform: translateY(0); } }
+    .bar { opacity: 0; animation: rise 0.7s ease-out both; }
+    .b0 { animation-delay: 0.2s; } .b1 { animation-delay: 0.9s; } .b2 { animation-delay: 1.6s; }
+    .b3 { animation-delay: 2.3s; } .b4 { animation-delay: 3.0s; } .b5 { animation-delay: 3.7s; }
+    @keyframes blink { 0%,100% { opacity: 0.6; } 50% { opacity: 1; } }
+    .m { animation: blink 2s ease-in-out infinite; }
+  </style>
+  <rect width="900" height="280" fill="#0d1117"/>
+  <rect x="50" y="50" width="800" height="8" rx="4" fill="#21262d"/>
+
+  <!-- phase markers at 50 + 133.3*i + 60 -->
+  <circle class="m" cx="110" cy="54" r="5" fill="#4a9eff"/><text x="110" y="38" text-anchor="middle" fill="#8b949e" font-size="11">Collect photo</text>
+  <circle class="m" cx="243" cy="54" r="5" fill="#4a9eff"/><text x="243" y="38" text-anchor="middle" fill="#8b949e" font-size="11">Describe job</text>
+  <circle class="m" cx="377" cy="54" r="5" fill="#4a9eff"/><text x="377" y="38" text-anchor="middle" fill="#8b949e" font-size="11">Render</text>
+  <circle class="m" cx="510" cy="54" r="5" fill="#ff9900"/><text x="510" y="38" text-anchor="middle" fill="#8b949e" font-size="11">Review</text>
+  <circle class="m" cx="643" cy="54" r="5" fill="#3fb950"/><text x="643" y="38" text-anchor="middle" fill="#8b949e" font-size="11">Build</text>
+  <circle class="m" cx="777" cy="54" r="5" fill="#3fb950"/><text x="777" y="38" text-anchor="middle" fill="#8b949e" font-size="11">Commit</text>
+
+  <!-- gridlines: chart 100..220, max 10 files -->
+  <line x1="50" y1="220" x2="850" y2="220" stroke="#30363d" stroke-width="1"/><text x="40" y="224" text-anchor="end" fill="#8b949e" font-size="10">0</text>
+  <line x1="50" y1="160" x2="850" y2="160" stroke="#21262d" stroke-width="1"/><text x="40" y="164" text-anchor="end" fill="#8b949e" font-size="10">5</text>
+  <line x1="50" y1="100" x2="850" y2="100" stroke="#21262d" stroke-width="1"/><text x="40" y="104" text-anchor="end" fill="#8b949e" font-size="10">10</text>
+  <text x="50" y="88" fill="#8b949e" font-size="10">files on disk for one install</text>
+
+  <!-- bars: bar_y = 220 - N/10*120, x = marker-50, width 100 -->
+  <rect class="bar b0" x="60"  y="208" width="100" height="12"  rx="2" fill="#4a9eff"/>
+  <rect class="bar b1" x="193" y="208" width="100" height="12"  rx="2" fill="#4a9eff"/>
+  <rect class="bar b2" x="327" y="100" width="100" height="120" rx="2" fill="#4a9eff"/>
+  <rect class="bar b3" x="460" y="100" width="100" height="120" rx="2" fill="#ff9900"/>
+  <rect class="bar b4" x="593" y="148" width="100" height="72"  rx="2" fill="#3fb950"/>
+  <rect class="bar b5" x="727" y="148" width="100" height="72"  rx="2" fill="#3fb950"/>
+
+  <!-- bar labels -->
+  <text x="110" y="200" text-anchor="middle" fill="#e6edf3" font-size="10">1 photo in raw/</text>
+  <text x="243" y="200" text-anchor="middle" fill="#e6edf3" font-size="10">+ entry in jobs.json</text>
+  <text x="377" y="92" text-anchor="middle" fill="#e6edf3" font-size="10">10 in out/&lt;slug&gt;/</text>
+  <text x="510" y="92" text-anchor="middle" fill="#e6edf3" font-size="10">+ QA sheet</text>
+  <text x="643" y="140" text-anchor="middle" fill="#e6edf3" font-size="10">6 WebPs in public/</text>
+  <text x="777" y="140" text-anchor="middle" fill="#e6edf3" font-size="10">+ 1 row in data</text>
+
+  <!-- footnotes -->
+  <text x="50" y="248" fill="#8b949e" font-size="10">Render: about US$0.14 per image at 2K, two images per car, plus one per re-roll. Review: compare each render with its photo before building.</text>
+  <text x="50" y="264" fill="#8b949e" font-size="10">Build: front34, side, original and their 800 px thumbnails; raw/, out/ and logs/ stay out of git.</text>
+</svg>
