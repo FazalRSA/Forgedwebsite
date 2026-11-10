@@ -542,9 +542,9 @@ export const BRAND_WHEELS: BrandWheelItem[] = INVENTORY_SEEDS.map((seed) => {
     })`,
     headline: `${seed.modelCode} (${fullFinishLabel}) for BMW ${seed.compatibleCars}.`,
     editorialLead: `${seed.sizesAvailable} staggered fitment engineered specifically for BMW ${seed.compatibleCars} (${seed.technicalSpecSheet}).`,
-    editorialBody: `Direct bolt-on specification (${seed.technicalSpecSheet}) finished in ${fullFinishLabel}. Currently ${seed.stockStatus.toLowerCase()} with ${seed.stockQuantitySets} complete ${
+    editorialBody: `Direct bolt-on specification (${seed.technicalSpecSheet}) finished in ${fullFinishLabel}. Currently ${seed.stockStatus.toLowerCase()}: ${seed.stockQuantitySets} complete ${
       seed.stockQuantitySets === 1 ? 'set' : 'sets'
-    } ready for immediate dispatch.`,
+    }.`,
     marques: ['BMW'],
     geometry: seed.geometry,
     spokeCount: seed.spokeCount,
@@ -601,7 +601,8 @@ export const BRAND_WHEELS: BrandWheelItem[] = INVENTORY_SEEDS.map((seed) => {
       diameters: `${seed.sizesAvailable} (${seed.compatibleCars})`,
       finishOptions: fullFinishLabel,
       testing: seed.technicalSpecSheet,
-      warranty: '3-Year Structural & Finish Guarantee',
+      // Left empty until the owner supplies written warranty terms; the spec table hides empty rows.
+      warranty: '',
     },
     compatibleStoreProductSlug: seed.compatibleStoreProductSlug,
   };
@@ -644,7 +645,7 @@ export const STORE_PRODUCTS: StoreProductItem[] = [
       'Technical specification: PCD 5x112 · ET8/15 · CB66.6.',
     ],
     importantInfoBullets: [
-      'In Stock (1 Set available for immediate dispatch).',
+      'In Stock (1 Set).',
     ],
   },
   {
@@ -1330,7 +1331,7 @@ export const VEHICLE_FITMENT_TREE: Record<string, FitmentModelNode[]> = {
       seoDescriptionShort:
         'Forged 5x112 CB66.6 wheel allocations for flagship BMW M saloons.',
       seoDescriptionFull:
-        'High-load forged 5x112 CB66.6 wheel sets ready for immediate dispatch.',
+        'Forged 5x112 CB66.6 wheel sets.',
       productSlugs: [
         'bmw-m5-vengeance-forged',
         'bmw-m3-rs-3-0',

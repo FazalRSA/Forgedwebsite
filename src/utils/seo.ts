@@ -20,6 +20,52 @@ import { SITE } from '../config/site';
 
 export const SITE_NAME = 'FORGED Custom Wheels';
 
+/** Production origin from config/site.ts. Canonical URLs always point here, whichever host served the page. */
+export const SITE_ORIGIN = `https://${SITE.domain}`;
+
+/** Link-preview image for pages that have no picture of their own (a catalogue wheel photo). */
+export const DEFAULT_SHARE_IMAGE = '/images/wheels/ff-1-liquid-metal/hero.webp';
+
+/** Longest title that search results show without cutting it off. */
+const MAX_TITLE_LENGTH = 60;
+
+/** Catalogue model codes made by Sixnine Wheels (the same ones the Sixnine dealer page lists). */
+const SIXNINE_MODEL_CODES = new Set(['FF-1', 'FF-3']);
+
+/**
+ * The manufacturer of a wheel, when the catalogue says who it is. Only the Sixnine FF-1 and FF-3
+ * are attributed to a maker in this repo; other wheels return undefined rather than a guess.
+ */
+export function wheelBrand(wheel: BrandWheelItem): string | undefined {
+  return wheel.modelCode && SIXNINE_MODEL_CODES.has(wheel.modelCode) ? 'Sixnine' : undefined;
+}
+
+/** Organization and WebSite structured data for the home page, built only from config/site.ts. */
+export function homeJsonLd(): Record<string, unknown> {
+  const sameAs = [SITE.instagramUrl, SITE.facebookUrl].filter(Boolean);
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Organization',
+        '@id': '/#organization',
+        name: SITE.name,
+        url: '/',
+        areaServed: { '@type': 'Country', name: SITE.country },
+        ...(sameAs.length ? { sameAs } : {}),
+      },
+      {
+        '@type': 'WebSite',
+        '@id': '/#website',
+        name: SITE.name,
+        url: '/',
+        inLanguage: 'en-ZA',
+        publisher: { '@id': '/#organization' },
+      },
+    ],
+  };
+}
+
 export interface PageMeta {
   title: string;
   description: string;
@@ -34,15 +80,23 @@ export interface PageMeta {
 }
 
 const HOME: PageMeta = {
-  title: `${SITE_NAME} | Forged wheels for BMW M cars in South Africa`,
+  title: `${SITE_NAME} | Forged BMW M wheels in South Africa`,
   description:
     'Forged alloy wheel sets for BMW M cars, supplied in South Africa. Browse in-stock designs, see client fitments and request a fitment quote.',
   canonicalPath: '/',
   noindex: false,
+  jsonLd: homeJsonLd(),
 };
 
+/** The home page's title and description for a path that must stay out of search results. */
+function hidden(canonicalPath: string): PageMeta {
+  return { title: HOME.title, description: HOME.description, canonicalPath, noindex: true };
+}
+
 function page(title: string, description: string, canonicalPath: string, noindex = false): PageMeta {
-  return { title: `${title} | ${SITE_NAME}`, description, canonicalPath, noindex };
+  // Drop the site name when it would push the title past what search results display.
+  const withSite = `${title} | ${SITE_NAME}`;
+  return { title: withSite.length <= MAX_TITLE_LENGTH ? withSite : title, description, canonicalPath, noindex };
 }
 
 function isInStock(wheel: BrandWheelItem): boolean {
@@ -64,6 +118,7 @@ function wheelMeta(wheel: BrandWheelItem): PageMeta {
     .filter(Boolean)
     .join(' ');
   const image = getWheelImages(wheel).images[0];
+  const brand = wheelBrand(wheel);
   return {
     title: `${wheel.model} forged wheels | ${SITE_NAME}`,
     description,
@@ -76,6 +131,7 @@ function wheelMeta(wheel: BrandWheelItem): PageMeta {
       name: `${wheel.model} forged wheel set`,
       description,
       ...(image.startsWith('/') ? { image } : {}),
+      ...(brand ? { brand: { '@type': 'Brand', name: brand } } : {}),
       ...(wheel.modelCode ? { sku: wheel.modelCode } : {}),
       url: path,
       offers: {
@@ -99,13 +155,13 @@ export function metaForPath(rawPath: string): PageMeta {
     const slug = path.slice('/wheels/'.length).split('/')[0];
     const wheel = findWheelBySlug(slug);
     // An unknown slug still renders a wheel page; do not let it be indexed as a duplicate.
-    return wheel ? wheelMeta(wheel) : { ...HOME, canonicalPath: path, noindex: true };
+    return wheel ? wheelMeta(wheel) : hidden(path);
   }
 
   if (path.startsWith('/store/products/')) {
     const slug = path.slice('/store/products/'.length).split('/')[0].toLowerCase();
     const product = getAllStoreProducts().find((p) => p.slug.toLowerCase() === slug);
-    if (!product) return { ...HOME, canonicalPath: path, noindex: true };
+    if (!product) return hidden(path);
     return page(
       product.title,
       `${product.title}. ${product.technicalSpecs.frontWheelSize} front, ${product.technicalSpecs.rearWheelSize} rear, ${product.technicalSpecs.boltPattern}. ${formatZAR(product.priceZAR)} per set of four.`,
@@ -116,6 +172,8 @@ export function metaForPath(rawPath: string): PageMeta {
   if (path.startsWith('/store/collections/')) {
     const slug = path.slice('/store/collections/'.length).split('/')[0];
     const { node, make } = resolveCollectionBySlug(slug);
+    // An unknown slug falls back to another model's collection; do not let it be indexed as a duplicate.
+    if (node.collectionSlug.toLowerCase() !== slug.toLowerCase()) return hidden(path);
     return page(
       `Forged wheels for ${make} ${node.model}`,
       `Forged wheel sets that fit the ${make} ${node.model}, with sizes, offsets and Rand prices per set of four.`,
@@ -134,7 +192,7 @@ export function metaForPath(rawPath: string): PageMeta {
     case '/store/client-fitments':
       return page(
         'Client fitments',
-        'Photos of forged wheel sets fitted to South African clients’ BMW M cars.',
+        'Client BMW M cars on forged wheel sets, shown as studio re-shoots of each customer’s own photo.',
         '/client-fitments'
       );
     case '/sixnine-wheels':
@@ -161,10 +219,29 @@ export function metaForPath(rawPath: string): PageMeta {
   }
 
   if (path.startsWith('/admin') || path.startsWith('/studio/')) {
-    return { ...HOME, canonicalPath: path, noindex: true };
+    return hidden(path);
   }
   // Any other path renders the home page.
   return HOME;
+}
+
+/** Make a site-relative path absolute; leave full URLs alone. */
+export function absoluteUrl(value: string, origin: string = SITE_ORIGIN): string {
+  return value.startsWith('/') ? `${origin}${value}` : value;
+}
+
+/** Copy of structured data with every site-relative `url`, `image` and `@id` made absolute. */
+export function absolutiseJsonLd(
+  jsonLd: Record<string, unknown>,
+  origin: string = SITE_ORIGIN
+): Record<string, unknown> {
+  return JSON.parse(
+    JSON.stringify(jsonLd, (key, value) =>
+      (key === 'url' || key === 'image' || key === '@id') && typeof value === 'string'
+        ? absoluteUrl(value, origin)
+        : value
+    )
+  );
 }
 
 function setMeta(attr: 'name' | 'property', key: string, content: string | null): void {
@@ -182,9 +259,10 @@ function setMeta(attr: 'name' | 'property', key: string, content: string | null)
 }
 
 /** Write a page's metadata into <head>. Safe to call on every route change. */
-export function applyPageMeta(meta: PageMeta, origin: string = window.location.origin): void {
-  const absolute = (value: string) => (value.startsWith('/') ? `${origin}${value}` : value);
+export function applyPageMeta(meta: PageMeta, origin: string = SITE_ORIGIN): void {
+  const absolute = (value: string) => absoluteUrl(value, origin);
   const canonicalUrl = absolute(meta.canonicalPath);
+  const shareImage = absolute(meta.image ?? DEFAULT_SHARE_IMAGE);
 
   document.title = meta.title;
   setMeta('name', 'description', meta.description);
@@ -193,7 +271,11 @@ export function applyPageMeta(meta: PageMeta, origin: string = window.location.o
   setMeta('property', 'og:description', meta.description);
   setMeta('property', 'og:url', canonicalUrl);
   setMeta('property', 'og:site_name', SITE_NAME);
-  setMeta('property', 'og:image', meta.image ? absolute(meta.image) : null);
+  setMeta('property', 'og:image', shareImage);
+  setMeta('name', 'twitter:card', 'summary_large_image');
+  setMeta('name', 'twitter:title', meta.title);
+  setMeta('name', 'twitter:description', meta.description);
+  setMeta('name', 'twitter:image', shareImage);
 
   let canonical = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
   if (!canonical) {
@@ -208,11 +290,7 @@ export function applyPageMeta(meta: PageMeta, origin: string = window.location.o
     existing?.remove();
     return;
   }
-  const absolutised = JSON.parse(
-    JSON.stringify(meta.jsonLd, (key, value) =>
-      (key === 'url' || key === 'image') && typeof value === 'string' ? absolute(value) : value
-    )
-  );
+  const absolutised = absolutiseJsonLd(meta.jsonLd, origin);
   const script = existing ?? document.createElement('script');
   script.id = 'page-jsonld';
   script.setAttribute('type', 'application/ld+json');

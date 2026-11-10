@@ -114,7 +114,7 @@ export const WheelCatalogue: React.FC = () => {
                 <div className="w-full bg-[#121215] border border-[#222228] group-hover:border-neutral-600 rounded-2xl aspect-square relative overflow-hidden transition-colors duration-300">
                   <motion.img
                     src={cardImage}
-                    alt={wheel.model}
+                    alt={`${wheel.model} forged wheel`}
                     loading="lazy"
                     referrerPolicy="no-referrer"
                     initial={{ scale: 1 }}
@@ -128,7 +128,21 @@ export const WheelCatalogue: React.FC = () => {
                 <div className="mt-3.5 px-0.5 space-y-1">
                   <div className="flex items-baseline justify-between gap-4">
                     <h3 className="text-base font-medium tracking-tight text-white truncate">
-                      {wheel.model}
+                      {/* A real link to the wheel's page for search engines and "open in new tab";
+                          a normal click still opens the quick-view through the card's handler. */}
+                      <a
+                        href={`/wheels/${wheel.slug}`}
+                        tabIndex={-1}
+                        onClick={(e) => {
+                          if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
+                            e.stopPropagation();
+                            return;
+                          }
+                          e.preventDefault();
+                        }}
+                      >
+                        {wheel.model}
+                      </a>
                     </h3>
                     <span className="text-sm font-mono text-neutral-200 tabular-nums shrink-0">
                       {displayPrice}

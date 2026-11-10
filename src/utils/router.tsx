@@ -56,3 +56,30 @@ export function RouterProvider({ children }: { children: React.ReactNode }) {
 export function useRouter() {
   return useContext(RouterContext);
 }
+
+interface LinkProps extends Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> {
+  to: string;
+}
+
+/**
+ * An in-app link that is still a real <a href>, so search engines can follow it and visitors can
+ * open it in a new tab. A plain left click is routed in-app without a page reload.
+ */
+export function Link({ to, onClick, children, ...rest }: LinkProps) {
+  const { navigate } = useRouter();
+  return (
+    <a
+      {...rest}
+      href={to}
+      onClick={(event) => {
+        onClick?.(event);
+        if (event.defaultPrevented || event.button !== 0) return;
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        event.preventDefault();
+        navigate(to);
+      }}
+    >
+      {children}
+    </a>
+  );
+}

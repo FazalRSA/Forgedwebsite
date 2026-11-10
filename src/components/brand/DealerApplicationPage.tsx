@@ -116,13 +116,13 @@ export const DealerApplicationPage: React.FC = () => {
             <div className="flex items-center gap-2 text-xs font-tech-mono uppercase tracking-[0.18em] text-[#FF5500]">
               <span>FORGED CUSTOM WHEELS</span>
               <span>·</span>
-              <span>GLOBAL TRADE NETWORK · ONYX ATELIER</span>
+              <span>TRADE &amp; DEALER APPLICATIONS</span>
             </div>
             <h1 className="text-4xl sm:text-6xl md:text-7xl font-light tracking-[-0.03em] leading-[0.98] text-white">
               Dealer <span className="font-editorial-serif italic font-normal text-[#FF5500]">Application</span>.
             </h1>
             <p className="text-base sm:text-lg text-neutral-300 max-w-2xl leading-relaxed pt-2">
-              Join our curated international network of BMW M performance ateliers, coachbuilders, and luxury showrooms. Accredited partners receive priority forged wheel allocations, trade margin tiers, and direct engineering support.
+              Apply to stock or fit FORGED Custom Wheels sets at your BMW M workshop or showroom. Tell us about your business using the form below.
             </p>
           </div>
 
@@ -134,7 +134,7 @@ export const DealerApplicationPage: React.FC = () => {
               {displayAddress()}
             </p>
             <p className="text-xs font-tech-mono text-[#FF5500] font-semibold">
-              DIRECT B2B DISPATCH · SOUTH AFRICA &amp; EXPORT
+              TRADE ENQUIRIES · SOUTH AFRICA
             </p>
           </div>
         </div>
@@ -155,7 +155,7 @@ export const DealerApplicationPage: React.FC = () => {
                 Structured Trade Tiers
               </h2>
               <p className="text-sm text-[#C2C2CC] leading-relaxed">
-                Access tiered B2B trade pricing on all 20&quot;–23&quot; forged BMW M wheel packages (Type 52, LD RS, RS 3.0, G06 Aero, and Vengeance) with regional stockist protection.
+                Ask about trade pricing on the forged BMW M wheel sets in our catalogue.
               </p>
             </div>
           </div>
@@ -183,13 +183,13 @@ export const DealerApplicationPage: React.FC = () => {
             </div>
             <div className="space-y-2">
               <p className="text-[11px] font-tech-mono uppercase tracking-[0.15em] text-[#FF5500]">
-                03 / SHOWROOM DISPLAY MONOLITH
+                03 / SHOWROOM DISPLAY
               </p>
               <h2 className="text-xl font-semibold tracking-tight text-white">
-                Point-of-Sale &amp; Priority Air Freight
+                Point-of-Sale Support
               </h2>
               <p className="text-sm text-[#C2C2CC] leading-relaxed">
-                Qualifying showrooms receive the bespoke FORGED Custom wheels brushed-aluminium 4-wheel display monolith, finish swatch cases, and 48-hour DHL Express global dispatch.
+                Showroom display and finish sample options can be discussed with approved trade partners.
               </p>
             </div>
           </div>
@@ -244,7 +244,7 @@ export const DealerApplicationPage: React.FC = () => {
                 CLIENT GALLERY &amp; FITMENTS
               </p>
               <p className="text-sm text-[#C2C2CC] leading-relaxed">
-                Explore how our authorized partners present FORGED Custom wheels BMW commissions in our 4x4 Client Fitments archive.
+                See FORGED Custom Wheels sets on client BMW M cars in our Client Fitments gallery.
               </p>
               <button
                 type="button"

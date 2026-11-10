@@ -114,7 +114,7 @@ export const WheelShowcasePDP: React.FC<WheelShowcasePDPProps> = ({ slug }) => {
     { label: 'FINISH OPTIONS', value: wheel.specs.finishOptions },
     { label: 'TESTING', value: wheel.specs.testing },
     { label: 'WARRANTY', value: wheel.specs.warranty },
-  ];
+  ].filter((row) => Boolean(row.value));
 
   return (
     <div className="bg-[#0A0A0A] text-[#F5F5F7] pb-28">
@@ -369,7 +369,7 @@ export const WheelShowcasePDP: React.FC<WheelShowcasePDPProps> = ({ slug }) => {
                     <div className="bg-[#121215] border border-[#26262E] group-hover:border-[#FF5500] rounded-2xl aspect-square overflow-hidden relative transition-colors">
                       <SafeImage
                         src={peerData.images[0]}
-                        alt={peer.model}
+                        alt={`${peer.model} forged wheel`}
                         fallbackLabel={peer.model}
                         loading="lazy"
                         referrerPolicy="no-referrer"
