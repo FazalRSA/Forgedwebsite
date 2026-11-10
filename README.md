@@ -8,7 +8,8 @@ It shows the wheels that are in stock, each in photography and an interactive 3D
 
 | | |
 | --- | --- |
-| **Production domain** | `forgedsa.co.za` (set in `src/config/site.ts`) |
+| **Live site** | [forged-custom-wheels-gu3l.onrender.com](https://forged-custom-wheels-gu3l.onrender.com) (Render, redeploys on every push to `main`) |
+| **Production domain** | `forgedsa.co.za` (set in `src/config/site.ts`). The domain still serves the business's existing WordPress site; its DNS has not been moved to this app yet |
 | **Stack** | React 19 · TypeScript · Vite 8 · Tailwind CSS v4 · Three.js · Zustand · Firebase |
 | **Type** | Static single-page app with client-side routing |
 | **Inventory** | 14 in-stock wheel listings across 6 designs, priced in South African Rand per set of four |
@@ -23,18 +24,19 @@ It shows the wheels that are in stock, each in photography and an interactive 3D
 3. [Scripts](#scripts)
 4. [Routes](#routes)
 5. [Project structure](#project-structure)
-6. [Inventory](#inventory)
-7. [Catalogue data model](#catalogue-data-model)
-8. [Adding or changing a wheel](#adding-or-changing-a-wheel)
-9. [3D wheel studio](#3d-wheel-studio)
-10. [Search and sharing](#search-and-sharing)
-11. [Business details and contact channels](#business-details-and-contact-channels)
-12. [Firebase](#firebase)
-13. [Testing](#testing)
-14. [Deployment](#deployment)
-15. [Known limitations and roadmap](#known-limitations-and-roadmap)
-16. [Contributing](#contributing)
-17. [Licence](#licence)
+6. [Design system](#design-system)
+7. [Inventory](#inventory)
+8. [Catalogue data model](#catalogue-data-model)
+9. [Adding or changing a wheel](#adding-or-changing-a-wheel)
+10. [3D wheel studio](#3d-wheel-studio)
+11. [Search and sharing](#search-and-sharing)
+12. [Business details and contact channels](#business-details-and-contact-channels)
+13. [Firebase](#firebase)
+14. [Testing](#testing)
+15. [Deployment](#deployment)
+16. [Known limitations and roadmap](#known-limitations-and-roadmap)
+17. [Contributing](#contributing)
+18. [Licence](#licence)
 
 ---
 
@@ -76,7 +78,7 @@ No environment variables are needed for local development. Firebase configuratio
 | Script | What it does |
 | --- | --- |
 | `bun run dev` | Vite dev server on port 3000 |
-| `bun run build` | Regenerates `public/sitemap.xml` from the catalogue, then builds to `dist/` |
+| `bun run build` | Regenerates `public/sitemap.xml` and the page rules in `render.yaml` from the catalogue, builds to `dist/`, then writes each page's own HTML file with its title and share image (`scripts/prerender-meta.ts`) |
 | `bun run preview` | Serves the production build locally |
 | `bun run lint` | Type-check with `tsc --noEmit` |
 | `bun run test` | Data, SEO, 3D-studio and security-rules tests (`node:test` via `tsx`) |
@@ -87,7 +89,7 @@ Run `lint`, `test` and `build` before every pull request. The repository has no 
 
 ## Routes
 
-Routing is client-side (`src/utils/router.tsx`). The host must rewrite every path to `index.html`.
+Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also gets its own HTML file at build time, so link previews show that page. The host serves those files for their paths and rewrites every other path to `index.html`.
 
 | Route | Component | Purpose |
 | --- | --- | --- |
@@ -140,6 +142,7 @@ Routing is client-side (`src/utils/router.tsx`). The host must rewrite every pat
    ├─ store/                      Zustand store (enquiry form, admin preview) in localStorage
    ├─ context/FirebaseContext.tsx Firebase provider
    ├─ utils/router.tsx            pushState router and crawlable <Link>
+   ├─ utils/lazyWithRetry.ts      React.lazy with retries, for the 3D viewer's code
    ├─ utils/redirects.ts          Old address to new address
    ├─ utils/seo.ts                Per-route metadata, structured data, sitemap paths
    ├─ utils/wheelStudioParts.ts   Part classification and camera maths for the viewer
@@ -147,9 +150,22 @@ Routing is client-side (`src/utils/router.tsx`). The host must rewrite every pat
    └─ components/
       ├─ brand/                   Home, catalogue, wheel page, installs, contact, privacy
       ├─ admin/                   Admin uploader
-      ├─ shared/                  Enquiry form
-      └─ visuals/                 WheelStudio (3D), WheelStage
+      ├─ shared/                  Enquiry form, SafeImage
+      └─ visuals/                 WheelStudio (3D), WheelStage, its loading skeleton and error boundary
 ```
+
+## Design system
+
+The look is dark, restrained and technical. Keep new work inside it.
+
+- **Colour tokens** live in `src/index.css`: onyx surfaces (`#0A0A0A`, `#121215`, `#18181D`), borders (`#26262E`), text greys and one accent, electric orange (`#FF5500`). Do not add new colours; WhatsApp green and Instagram pink appear only on those channels' own buttons.
+- **Three typefaces**, each with one job:
+  - **Fraunces italic** (`--font-serif`, via `.font-editorial-serif`) for editorial headlines.
+  - **Geist Sans** (`--font-sans`) for body text.
+  - **Geist Mono** (`--font-mono`, via `.font-tech-mono`) for specifications and uppercase labels.
+- **Reuse these components** rather than the plain HTML element:
+  - `SafeImage` (`src/components/shared/`) instead of `<img>` for wheel photography. A broken image URL shows the site's placeholder card instead of the browser's broken-image icon.
+  - `WheelStage` for any 3D view. It downloads Three.js only when it's needed.
 
 ## Inventory
 
@@ -211,7 +227,7 @@ The admin page at `/admin` is a local preview tool: wheels created there are sto
 
 ## 3D wheel studio
 
-A wheel with a `modelUrl` opens in the studio (`src/components/visuals/WheelStudio.tsx`, mounted through `WheelStage.tsx`). Three.js is downloaded only after the visitor taps "View in 3D". If a model fails to load, the studio shows a message with a retry button.
+A wheel with a `modelUrl` opens in the studio (`src/components/visuals/WheelStudio.tsx`, mounted through `WheelStage.tsx`). Three.js is downloaded only after the visitor taps "View in 3D". If a model fails to load, the studio shows a message with a retry button. If the studio's own code fails to download, `lazyWithRetry` tries twice more, then `Wheel3DSceneErrorBoundary` shows a reload card instead of breaking the page.
 
 **How models are assigned**
 
@@ -238,7 +254,7 @@ All search metadata is produced by `src/utils/seo.ts` and applied on every route
 
 - **Titles and descriptions** per route, with titles capped at 60 characters. The home title is "Forged wheels for BMW M cars in stock | FORGED Custom Wheels".
 - **Canonical URLs** always on the production domain in `src/config/site.ts`.
-- **Link previews**: Open Graph and Twitter tags on every route, plus static tags in `index.html` for crawlers that do not run JavaScript.
+- **Link previews**: Open Graph and Twitter tags on every route. Link-preview bots and crawlers that do not run JavaScript read the same tags from each page's own HTML file, written by `scripts/prerender-meta.ts`. `index.html` keeps generic tags because it is also the fallback for unknown paths.
 - **Structured data**: `Organization` and `WebSite` on the home page; `Product` with the Rand price, in stock, on wheel pages.
 - **Sitemap**: `public/sitemap.xml` is regenerated from the catalogue on every build. It lists `/`, one page per in-stock wheel, `/installs`, `/contact` and `/privacy-policy`, and nothing else.
 - **Noindex**: admin, preview, sold or unknown wheels, and unknown addresses. `public/robots.txt` keeps crawlers out of `/admin` and `/studio/`.
@@ -283,12 +299,16 @@ There are no browser-level tests. Check 3D and layout changes by hand on a phone
 
 | Host | Config file | How to deploy |
 | --- | --- | --- |
-| **Render** (static site) | `render.yaml` | Render dashboard → New → Blueprint → select this repository |
+| **Render** (static site, in use) | `render.yaml` | Already deployed as `forged-custom-wheels-gu3l`. To recreate it: Render dashboard → New → Blueprint → select this repository |
 | **Vercel** | `vercel.json` | Vercel dashboard → Add New → Project → import this repository |
 
 Both configurations install with `npm install --legacy-peer-deps`, run `npm run build`, publish `dist/`, apply the single-page rewrite, and cache fingerprinted assets for a year and models and images for a day. Every push to `main` redeploys.
 
-After the first deploy, add `forgedsa.co.za` as a custom domain in the host's dashboard and point the DNS records it gives you at the domain registrar. Canonical URLs and the sitemap already use that domain.
+The page rules in `render.yaml` are written by the build. Do not edit the block between `BEGIN generated page routes` and `END generated page routes` by hand; run `bun run build` and commit the result.
+
+**Checking a deploy.** Render's CDN caches each page's HTML for up to five minutes, so a visitor can see the previous version briefly after a deploy goes live. To check a new deploy straight away, add any query string to the URL, for example `/installs?check=1`.
+
+**Moving the domain.** To go live on `forgedsa.co.za`, add it as a custom domain in the host's dashboard and point the DNS records it gives you at the domain registrar. Canonical URLs and the sitemap already use that domain. The domain currently serves the business's existing WordPress site, which the DNS change replaces, so keep anything still needed from it first.
 
 Vercel's free Hobby plan is for non-commercial use only, so a business site needs Vercel Pro. Render's static sites are free to deploy; check the bandwidth included with the workspace plan against traffic, since each 3D model is 3–4 MB.
 
@@ -310,6 +330,8 @@ Build chunks are split per vendor (`react`, `motion`, `three`, `firebase`, `luci
 | **Photography** | Six listings have no product photos and show a plain drawn stand-in (FSA001, FSA002 Hyper Black and Polished Face, FSA003 Silver, FSA004 Hyper Black and Gloss Black) | Shoot and add |
 | **Link previews** | The app is client-rendered; `npm run build` bakes each page's title and share image into its own HTML file so chat apps show the right preview for the pages in the sitemap | Server-render if more pages are added |
 | **Old links** | Redirected in the browser, not with an HTTP 301 | Add 301 rules on the host |
+| **Unknown addresses** | Show the noindex not-found page, but the host still answers HTTP 200 | Return HTTP 404 from the host for unknown paths |
+| **Domain** | The new site is live only at its Render address; `forgedsa.co.za` still serves the old WordPress site | Move the domain's DNS to the host (see [Deployment](#deployment)) |
 | **Admin publishing** | The uploader stores wheels locally; publishing is a data-file change and rebuild | Firebase-backed catalogue with authenticated admin writes |
 | **Stock** | Counts are edited in `INVENTORY_SEEDS` and need a rebuild | Read from the stock sheet |
 
