@@ -1,14 +1,12 @@
 import {
   findWheelBySlug,
   formatZAR,
-  getAllStoreProducts,
+  getAllBrandWheels,
   getWheelImages,
-  resolveCollectionBySlug,
-  BRAND_WHEELS,
-  VEHICLE_FITMENT_TREE,
   type BrandWheelItem,
 } from '../data/catalogue';
 import { SITE } from '../config/site';
+import { normalizePath } from './redirects';
 
 /**
  * Per-page metadata for search engines and link previews.
@@ -29,12 +27,12 @@ export const DEFAULT_SHARE_IMAGE = '/images/share/forged-wheels-share.jpg';
 /** Longest title that search results show without cutting it off. */
 const MAX_TITLE_LENGTH = 60;
 
-/** Catalogue model codes made by Sixnine Wheels (the same ones the Sixnine dealer page lists). */
+/** Catalogue model codes that the stock sheet lists as Sixnine designs (FF-ONE and FF-THREE). */
 const SIXNINE_MODEL_CODES = new Set(['FF-1', 'FF-3']);
 
 /**
- * The manufacturer of a wheel, when the catalogue says who it is. Only the Sixnine FF-1 and FF-3
- * are attributed to a maker in this repo; other wheels return undefined rather than a guess.
+ * The manufacturer of a wheel, when the stock sheet says who it is. Only the Sixnine FF-1 and FF-3
+ * are attributed to a maker; other wheels return undefined rather than a guess.
  */
 export function wheelBrand(wheel: BrandWheelItem): string | undefined {
   return wheel.modelCode && SIXNINE_MODEL_CODES.has(wheel.modelCode) ? 'Sixnine' : undefined;
@@ -80,9 +78,8 @@ export interface PageMeta {
 }
 
 const HOME: PageMeta = {
-  title: `${SITE_NAME} | Forged BMW M wheels in South Africa`,
-  description:
-    'Forged alloy wheel sets for BMW M cars, supplied in South Africa. Browse in-stock designs, see client fitments and request a fitment quote.',
+  title: `Forged wheels for BMW M cars in stock | ${SITE_NAME}`,
+  description: `Forged wheel sets for BMW M cars, in stock in ${SITE.country}. Prices in Rand per set of four, each wheel in 3D, and wheels fitted on customer cars.`,
   canonicalPath: '/',
   noindex: false,
   jsonLd: homeJsonLd(),
@@ -99,10 +96,6 @@ function page(title: string, description: string, canonicalPath: string, noindex
   return { title: withSite.length <= MAX_TITLE_LENGTH ? withSite : title, description, canonicalPath, noindex };
 }
 
-function isInStock(wheel: BrandWheelItem): boolean {
-  return /in stock/i.test(wheel.stockStatus ?? '') && (wheel.stockQuantitySets ?? 1) > 0;
-}
-
 function wheelMeta(wheel: BrandWheelItem): PageMeta {
   const path = `/wheels/${wheel.slug}`;
   const facts = [
@@ -110,10 +103,11 @@ function wheelMeta(wheel: BrandWheelItem): PageMeta {
     wheel.sizesAvailable ?? '',
     wheel.technicalSpecSheet ?? '',
   ].filter(Boolean);
+  const sets = wheel.stockQuantitySets ?? 0;
   const description = [
     `${wheel.model} forged wheels${facts.length ? ` ${facts.join(', ')}` : ''}.`,
     `${formatZAR(wheel.priceZAR)} per set of four.`,
-    wheel.stockStatus ? `${wheel.stockStatus}.` : '',
+    `In stock: ${sets} ${sets === 1 ? 'set' : 'sets'}.`,
   ]
     .filter(Boolean)
     .join(' ');
@@ -138,82 +132,45 @@ function wheelMeta(wheel: BrandWheelItem): PageMeta {
         '@type': 'Offer',
         price: wheel.priceZAR,
         priceCurrency: 'ZAR',
-        availability: isInStock(wheel) ? 'https://schema.org/InStock' : 'https://schema.org/PreOrder',
+        // Only in-stock listings have a page, so every offer is in stock.
+        availability: 'https://schema.org/InStock',
         url: path,
       },
     },
   };
 }
 
-/** Metadata for a site path. Unknown wheel, product and preview pages are kept out of search results. */
+/**
+ * Metadata for a site path. Unknown or sold wheels, removed pages and the unlisted admin and
+ * preview pages are kept out of search results.
+ */
 export function metaForPath(rawPath: string): PageMeta {
-  const path = (rawPath.split(/[?#]/)[0] || '/').replace(/\/+$/, '') || '/';
+  const path = normalizePath(rawPath);
 
   if (path === '/') return HOME;
 
   if (path.startsWith('/wheels/')) {
     const slug = path.slice('/wheels/'.length).split('/')[0];
     const wheel = findWheelBySlug(slug);
-    // An unknown slug still renders a wheel page; do not let it be indexed as a duplicate.
+    // A sold or unknown wheel has no page; do not let the address be indexed.
     return wheel ? wheelMeta(wheel) : hidden(path);
   }
 
-  if (path.startsWith('/store/products/')) {
-    const slug = path.slice('/store/products/'.length).split('/')[0].toLowerCase();
-    const product = getAllStoreProducts().find((p) => p.slug.toLowerCase() === slug);
-    if (!product) return hidden(path);
-    return page(
-      product.title,
-      `${product.title}. ${product.technicalSpecs.frontWheelSize} front, ${product.technicalSpecs.rearWheelSize} rear, ${product.technicalSpecs.boltPattern}. ${formatZAR(product.priceZAR)} per set of four.`,
-      `/store/products/${product.slug}`
-    );
-  }
-
-  if (path.startsWith('/store/collections/')) {
-    const slug = path.slice('/store/collections/'.length).split('/')[0];
-    const { node, make } = resolveCollectionBySlug(slug);
-    // An unknown slug falls back to another model's collection; do not let it be indexed as a duplicate.
-    if (node.collectionSlug.toLowerCase() !== slug.toLowerCase()) return hidden(path);
-    return page(
-      `Forged wheels for ${make} ${node.model}`,
-      `Forged wheel sets that fit the ${make} ${node.model}, with sizes, offsets and Rand prices per set of four.`,
-      path
-    );
-  }
-
   switch (path) {
-    case '/store':
+    case '/installs':
       return page(
-        'Find forged wheels for your BMW',
-        'Choose your BMW model and year to see the forged wheel sets that fit it, with sizes, offsets and Rand prices.',
+        'Past installs on BMW M cars',
+        'Customer BMW M cars on forged wheel sets, shown as studio re-shoots of each customer’s own photo.',
         path
       );
-    case '/client-fitments':
-    case '/store/client-fitments':
+    case '/contact':
       return page(
-        'Client fitments',
-        'Client BMW M cars on forged wheel sets, shown as studio re-shoots of each customer’s own photo.',
-        '/client-fitments'
-      );
-    case '/sixnine-wheels':
-    case '/official-dealer-sixnine-wheels':
-      return page(
-        'Sixnine Wheels official dealer',
-        `${SITE_NAME} is an official dealer of Sixnine forged wheels. See the FF-ONE and FF-THREE designs, finishes and prices.`,
-        '/sixnine-wheels'
-      );
-    case '/dealer-application':
-    case '/store/dealer-application':
-      return page(
-        'Dealer and trade application',
-        `Apply to become a ${SITE_NAME} trade partner.`,
-        '/dealer-application'
+        'Contact us about forged wheels',
+        'Ask about forged wheels for your BMW M car. Send your model and the wheels you like.',
+        path
       );
     case '/privacy-policy':
       return page('Privacy policy', `How ${SITE_NAME} collects, uses and protects personal information.`, path);
-    case '/account':
-    case '/garage':
-      return page('Your account and garage', 'Sign in to save your vehicle and preferred finish.', '/account', true);
     default:
       break;
   }
@@ -225,7 +182,7 @@ export function metaForPath(rawPath: string): PageMeta {
   // Anything else is not a page on this site.
   return {
     title: `Page not found | ${SITE_NAME}`,
-    description: `That page does not exist on ${SITE_NAME}. Browse the forged wheel catalogue instead.`,
+    description: `That page does not exist on ${SITE_NAME}. See the forged wheels in stock instead.`,
     canonicalPath: path,
     noindex: true,
   };
@@ -354,20 +311,14 @@ export function applyPageMeta(meta: PageMeta, origin: string = SITE_ORIGIN): voi
   if (!existing) document.head.appendChild(script);
 }
 
-/** Every indexable page path: the fixed pages plus one per wheel, product and car collection. */
+/** Every indexable page path: the home page, one page per in-stock wheel, installs, contact and the privacy policy. */
 export function sitemapPaths(): string[] {
   const candidates = [
     '/',
-    '/store',
-    '/client-fitments',
-    '/sixnine-wheels',
-    '/dealer-application',
+    ...getAllBrandWheels().map((w) => `/wheels/${w.slug}`),
+    '/installs',
+    '/contact',
     '/privacy-policy',
-    ...BRAND_WHEELS.map((w) => `/wheels/${w.slug}`),
-    ...getAllStoreProducts().map((p) => `/store/products/${p.slug}`),
-    ...Object.values(VEHICLE_FITMENT_TREE).flatMap((nodes) =>
-      nodes.map((n) => `/store/collections/${n.collectionSlug}`)
-    ),
   ];
   // Keep only pages that are their own canonical URL and are allowed in search results.
   const paths = candidates.filter((path) => {

@@ -57,3 +57,18 @@ export function cameraDistanceScale(aspect: number, visibleHeightFraction = 1): 
   const heightFit = 0.78 / Math.min(1, Math.max(0.35, visibleHeightFraction));
   return Math.max(1, widthFit, heightFit);
 }
+
+/**
+ * Whether a finish name describes a matte or satin paint ("Black Matte", "Satin Bronze").
+ * The studio paints each catalogue finish with one gloss setting; a matte name flattens it so a
+ * matte wheel is not shown with a gloss clear coat.
+ */
+export function isMatteFinishName(finishName?: string | null): boolean {
+  return /\b(matte|matt|satin|flat)\b/i.test(finishName ?? '');
+}
+
+/** True when the visitor has asked their device to reduce motion. False outside a browser. */
+export function prefersReducedMotion(): boolean {
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false;
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}

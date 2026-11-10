@@ -68,6 +68,7 @@ export const StudioPreviewPage: React.FC<{ slug: string }> = ({ slug }) => {
               <WheelStudio
                 wheelModel={wheel.name}
                 wheelSeries={wheel.series}
+                advanced
                 selectedFinish={finish}
                 availableFinishes={ALL_FINISHES}
                 onSelectFinish={setFinish}

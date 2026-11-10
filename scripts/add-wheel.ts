@@ -1,29 +1,28 @@
 #!/usr/bin/env tsx
 /**
- * FORGED Custom wheels — CLI Wheel & Fitment Product Generator
+ * FORGED Custom wheels — CLI wheel listing generator
+ *
+ * Adds (or updates) one stock listing in src/data/customWheels.json: one design in one finish.
+ * A listing shows on the site only while --sets is above zero, so `--sets 0` takes it off.
  *
  * Usage (CLI flags):
  *   npm run add-wheel -- \
- *     --name "TYPE 60" \
- *     --series "CARBON SERIES" \
+ *     --name "TYPE 60 BRONZE" \
  *     --price 75000 \
- *     --image "/assets/wheels/type-60.png" \
+ *     --sets 1 \
+ *     --cars "M3 Competition Sedan (G80)" \
+ *     --sizes "20 inch / 21 inch" \
+ *     --spec "PCD 5×112 · ET8/15 · CB66.6" \
+ *     --image "/images/wheels/type-60-bronze/front.webp" \
  *     --glb "/models/wheels/type-60.glb" \
- *     --marques "BMW,PORSCHE,FERRARI" \
- *     --make "BMW" \
- *     --model "M3" \
- *     --year "2024 ONWARDS" \
- *     --diameter '20-21"' \
- *     --finish "satin-black" \
- *     --geometry "aero-disc-f1" \
- *     --part-no "FCW-TYPE60-BLK-2021"
+ *     --finish "champagne-bronze"
  *
  * Usage (Interactive prompt):
  *   npm run add-wheel
  *
  * Usage (List or remove):
  *   npm run add-wheel -- --list
- *   npm run add-wheel -- --remove type-60
+ *   npm run add-wheel -- --remove type-60-bronze
  */
 
 import fs from 'node:fs';
@@ -33,32 +32,31 @@ import { stdin as input, stdout as output } from 'node:process';
 import {
   BrandWheelItem,
   SpokeGeometryType,
-  StoreProductItem,
   WheelFinishId,
   formatZAR,
+  isInStock,
 } from '../src/data/catalogue';
-import { createWheelAndProductEntries } from '../src/utils/wheelBuilder';
+import { createWheelEntry } from '../src/utils/wheelBuilder';
+
+/** An entry is a complete listing, or (for a stock-sheet slug) just extra photography; see catalogue.ts. */
+type CustomWheelEntry = Partial<BrandWheelItem> & { slug: string };
 
 interface CustomWheelsFile {
-  brandWheels: BrandWheelItem[];
-  storeProducts: StoreProductItem[];
+  brandWheels: CustomWheelEntry[];
 }
 
 const DATA_FILE_PATH = path.resolve(process.cwd(), 'src/data/customWheels.json');
 
 function readCustomWheelsFile(): CustomWheelsFile {
   if (!fs.existsSync(DATA_FILE_PATH)) {
-    return { brandWheels: [], storeProducts: [] };
+    return { brandWheels: [] };
   }
   try {
     const raw = fs.readFileSync(DATA_FILE_PATH, 'utf-8');
     const parsed = JSON.parse(raw) as Partial<CustomWheelsFile>;
-    return {
-      brandWheels: Array.isArray(parsed.brandWheels) ? parsed.brandWheels : [],
-      storeProducts: Array.isArray(parsed.storeProducts) ? parsed.storeProducts : [],
-    };
+    return { brandWheels: Array.isArray(parsed.brandWheels) ? parsed.brandWheels : [] };
   } catch {
-    return { brandWheels: [], storeProducts: [] };
+    return { brandWheels: [] };
   }
 }
 
@@ -92,42 +90,39 @@ function parseCliArgs(argv: string[]): Record<string, string | boolean> {
 
 function printHelp(): void {
   console.log(`
-FORGED Custom wheels — Wheel & Store Product CLI Script
-=======================================================
+FORGED Custom wheels — add a stock listing
+==========================================
+
+One listing is one design in one finish. It shows on the site only while it has sets in stock.
 
 Usage:
   npm run add-wheel -- [options]
 
 Options:
-  --name <string>            Wheel model name (e.g. "TYPE 60", "RS-X") [Required]
-  --price <number>           Price in South African Rand for a set of 4 (e.g. 75000) [Required]
-  --original-price <number>  Optional previous Rand price to trigger SALE badge
-  --series <string>          Series label (default: "FORGED SERIES")
-  --image <url|path>         Primary wheel image URL or path (e.g. "/wheels/type-60.png")
-  --gallery <urls>           Comma-separated extra gallery image URLs
-  --glb <path>               Photoreal .glb rim model served from /public (e.g. "/models/wheels/type-60.glb");
-                             loads in the 360° 3D studio in place of the procedural reference rim
-  --marques <list>           Comma-separated marques (default: "BMW")
-  --make <string>            Store fitment vehicle make (default: "BMW")
-  --model <string>           Store fitment vehicle model (default: "M3")
-  --year <string>            Store fitment year range (default: "2024 ONWARDS")
-  --diameter <string>        Diameter badge: '20"' | '20-21"' | '22"' | '23"' (default: '20-21"')
-  --finish <id>              Default finish: silver | satin-black | champagne-bronze | dark-gunmetal
-  --geometry <id>            SVG fallback spoke geometry:
-                             ten-spoke-ring | y-spoke-forged | split-five-rs | aero-disc-f1 |
-                             multi-spoke-gt | dish-beadlock | directional-turbine | classic-horseshoe
-  --front-size <string>      Front wheel spec (default: "9.5 X 20 ET18")
-  --rear-size <string>       Rear wheel spec (default: "10.5 X 21 ET20")
-  --bolt-pattern <string>    Bolt pattern (default: "5 X 112")
-  --part-no <string>         Technical Part No (auto-generated if omitted)
-  --headline <string>        Editorial headline for Brand Showcase PDP
-  --description <string>     Editorial / technical description copy
-  --list                     List all custom wheels in src/data/customWheels.json
-  --remove <slug>            Remove a custom wheel by slug
-  --help                     Show this help message
+  --name <string>        Listing name (e.g. "TYPE 60 BRONZE") [Required]
+  --price <number>       Price in South African Rand for a set of 4 (e.g. 75000) [Required]
+  --sets <number>        Complete sets in stock (default 1). 0 takes the listing off the site
+  --cars <string>        Car it fits (default: none shown), e.g. "M3 Competition Sedan (G80)"
+  --sizes <string>       Diameters on offer, e.g. "20 inch / 21 inch"
+  --spec <string>        Bolt pattern, offsets and centre bore, e.g. "PCD 5×112 · ET8/15 · CB66.6"
+  --series <string>      Series label (default: "FORGED SERIES")
+  --image <url|path>     Primary photo URL or path (e.g. "/images/wheels/type-60/front.webp")
+  --gallery <urls>       Comma-separated extra photo URLs
+  --glb <path>           Photoreal .glb rim model served from /public (e.g. "/models/wheels/type-60.glb");
+                         loads in the 3D viewer in place of the procedural reference rim
+  --marques <list>       Comma-separated marques (default: "BMW")
+  --finish <id>          Finish: silver | satin-black | champagne-bronze | dark-gunmetal
+  --geometry <id>        Drawn fallback spoke geometry:
+                         ten-spoke-ring | y-spoke-forged | split-five-rs | aero-disc-f1 |
+                         multi-spoke-gt | dish-beadlock | directional-turbine | classic-horseshoe
+  --headline <string>    Headline on the wheel page
+  --description <string> Short description on the wheel page
+  --list                 List the entries in src/data/customWheels.json
+  --remove <slug>        Remove an entry by slug
+  --help                 Show this help message
 
 Example:
-  npm run add-wheel -- --name "TYPE 60" --series "CARBON FORGED" --price 75000 --image "/images/type60.png" --marques "BMW" --make "BMW" --model "M3"
+  npm run add-wheel -- --name "TYPE 60 BRONZE" --price 75000 --sets 1 --cars "M3 Competition Sedan (G80)" --sizes "20 inch / 21 inch" --finish champagne-bronze
 `);
 }
 
@@ -143,15 +138,26 @@ async function main() {
 
   if (args.list) {
     if (currentData.brandWheels.length === 0) {
-      console.log('No custom wheels in src/data/customWheels.json yet.');
+      console.log('No entries in src/data/customWheels.json yet.');
       return;
     }
-    console.log(`Custom Wheels (${currentData.brandWheels.length}):`);
+    console.log(`Entries (${currentData.brandWheels.length}):`);
     for (const w of currentData.brandWheels) {
+      if (w.model === undefined || w.priceZAR === undefined) {
+        // Photography for a stock-sheet listing: the name, price and stock come from the sheet.
+        console.log(`  - [${w.slug}] photos for a stock-sheet listing`);
+        continue;
+      }
+      const listed = isInStock({
+        stockStatus: w.stockStatus,
+        stockQuantitySets: w.stockQuantitySets,
+      });
       console.log(
-        `  - [${w.slug}] ${w.model} | ${w.series} — ${formatZAR(w.priceZAR)} (${w.marques.join(', ')}) ${
-          w.imageUrl ? `[Image: ${w.imageUrl}]` : '[Procedural 3D SVG]'
-        } ${w.modelUrl ? `[3D: ${w.modelUrl}]` : '[3D: procedural rim]'}`
+        `  - [${w.slug}] ${w.model} | ${w.series} — ${formatZAR(w.priceZAR)} · ${
+          listed ? `${w.stockQuantitySets} in stock` : 'NOT LISTED (no sets in stock)'
+        } ${w.imageUrl ? `[Image: ${w.imageUrl}]` : '[drawn stand-in image]'} ${
+          w.modelUrl ? `[3D: ${w.modelUrl}]` : '[3D: procedural rim]'
+        }`
       );
     }
     return;
@@ -161,29 +167,21 @@ async function main() {
     const targetSlug = args.remove.toLowerCase().trim();
     const beforeCount = currentData.brandWheels.length;
     currentData.brandWheels = currentData.brandWheels.filter((w) => w.slug !== targetSlug);
-    currentData.storeProducts = currentData.storeProducts.filter(
-      (p) => p.wheelSlug !== targetSlug && p.slug !== targetSlug
-    );
     writeCustomWheelsFile(currentData);
     console.log(
-      `Removed ${beforeCount - currentData.brandWheels.length} wheel entry matching "${targetSlug}".`
+      `Removed ${beforeCount - currentData.brandWheels.length} entry matching "${targetSlug}".`
     );
     return;
   }
 
   let name = typeof args.name === 'string' ? args.name : '';
   let priceStr = typeof args.price === 'string' ? args.price : '';
+  let setsStr = typeof args.sets === 'string' ? args.sets : '1';
   let series = typeof args.series === 'string' ? args.series : 'FORGED SERIES';
   let imageUrl = typeof args.image === 'string' ? args.image : '';
   let marquesRaw = typeof args.marques === 'string' ? args.marques : 'BMW';
-  let make = typeof args.make === 'string' ? args.make : 'BMW';
-  let vehicleModel = typeof args.model === 'string' ? args.model : 'M3';
-  let yearRange = typeof args.year === 'string' ? args.year : '2024 ONWARDS';
-  let diameter = (typeof args.diameter === 'string' ? args.diameter : '20-21"') as
-    | '20"'
-    | '20-21"'
-    | '22"'
-    | '23"';
+  let compatibleCars = typeof args.cars === 'string' ? args.cars : '';
+  let sizesAvailable = typeof args.sizes === 'string' ? args.sizes : '';
   let finish = (typeof args.finish === 'string' ? args.finish : 'satin-black') as WheelFinishId;
   let geometry = (
     typeof args.geometry === 'string' ? args.geometry : 'y-spoke-forged'
@@ -197,86 +195,71 @@ async function main() {
     }
     const rl = readline.createInterface({ input, output });
     try {
-      console.log('\n--- Add or Update FORGED Custom wheels Entry ---\n');
+      console.log('\n--- Add or Update a FORGED Custom wheels Listing ---\n');
       if (!name) {
-        name = (await rl.question('1. Wheel Model Name (e.g. TYPE 60): ')).trim();
+        name = (await rl.question('1. Listing name (e.g. TYPE 60 BRONZE): ')).trim();
       }
       if (!priceStr) {
         priceStr = (await rl.question('2. Price in Rand for a set of 4 (e.g. 75000): ')).trim();
       }
-      const seriesAns = (
-        await rl.question(`3. Series [${series}]: `)
-      ).trim();
-      if (seriesAns) series = seriesAns;
+      const setsAns = (await rl.question(`3. Sets in stock [${setsStr}]: `)).trim();
+      if (setsAns) setsStr = setsAns;
+
+      const carsAns = (await rl.question('4. Car it fits (e.g. M3 Competition Sedan (G80)): ')).trim();
+      if (carsAns) compatibleCars = carsAns;
+
+      const sizesAns = (await rl.question('5. Sizes (e.g. 20 inch / 21 inch): ')).trim();
+      if (sizesAns) sizesAvailable = sizesAns;
 
       const imgAns = (
-        await rl.question('4. Image URL or Path (leave blank for 3D Studio SVG): ')
+        await rl.question('6. Photo URL or path (leave blank for a drawn stand-in): ')
       ).trim();
       if (imgAns) imageUrl = imgAns;
 
-      const marquesAns = (
-        await rl.question(`5. Compatible Marques comma-separated [${marquesRaw}]: `)
-      ).trim();
-      if (marquesAns) marquesRaw = marquesAns;
-
-      const makeAns = (await rl.question(`6. Store Fitment Make [${make}]: `)).trim();
-      if (makeAns) make = makeAns;
-
-      const modelAns = (await rl.question(`7. Store Fitment Model [${vehicleModel}]: `)).trim();
-      if (modelAns) vehicleModel = modelAns;
+      const seriesAns = (await rl.question(`7. Series [${series}]: `)).trim();
+      if (seriesAns) series = seriesAns;
     } finally {
       rl.close();
     }
   }
 
   const priceZAR = Number(priceStr);
-  const originalPriceZAR =
-    typeof args['original-price'] === 'string' ? Number(args['original-price']) : undefined;
   const galleryImages =
     typeof args.gallery === 'string'
       ? args.gallery.split(',').map((s) => s.trim()).filter(Boolean)
       : undefined;
 
-  const { brandWheel, storeProduct } = createWheelAndProductEntries({
+  const brandWheel = createWheelEntry({
     name,
     series,
     priceZAR,
-    originalPriceZAR,
+    stockQuantitySets: Number(setsStr),
     imageUrl: imageUrl || undefined,
     galleryImages,
     modelUrl: typeof args.glb === 'string' ? args.glb : undefined,
     marques: marquesRaw.split(',').map((s) => s.trim()),
-    make,
-    vehicleModel,
-    yearRange,
-    diameterBadge: diameter,
+    compatibleCars: compatibleCars || undefined,
+    sizesAvailable: sizesAvailable || undefined,
+    technicalSpecSheet: typeof args.spec === 'string' ? args.spec : undefined,
     defaultFinish: finish,
     geometry,
-    frontWheelSize: typeof args['front-size'] === 'string' ? args['front-size'] : undefined,
-    rearWheelSize: typeof args['rear-size'] === 'string' ? args['rear-size'] : undefined,
-    boltPattern: typeof args['bolt-pattern'] === 'string' ? args['bolt-pattern'] : undefined,
-    partNo: typeof args['part-no'] === 'string' ? args['part-no'] : undefined,
     headline: typeof args.headline === 'string' ? args.headline : undefined,
     description: typeof args.description === 'string' ? args.description : undefined,
   });
 
   // Upsert by slug
   const filteredBrand = currentData.brandWheels.filter((w) => w.slug !== brandWheel.slug);
-  const filteredStore = currentData.storeProducts.filter((p) => p.slug !== storeProduct.slug);
+  writeCustomWheelsFile({ brandWheels: [brandWheel, ...filteredBrand] });
 
-  const updatedData: CustomWheelsFile = {
-    brandWheels: [brandWheel, ...filteredBrand],
-    storeProducts: [storeProduct, ...filteredStore],
-  };
-
-  writeCustomWheelsFile(updatedData);
-
-  console.log(`✅ Successfully added wheel "${brandWheel.model}" to src/data/customWheels.json!`);
-  console.log(`   • Brand Showcase Route : /wheels/${brandWheel.slug}`);
-  console.log(`   • Store Technical PDP  : /store/products/${storeProduct.slug}`);
-  console.log(`   • Price (Set of 4)     : ${formatZAR(brandWheel.priceZAR)}`);
-  console.log(`   • Image Asset          : ${brandWheel.imageUrl || 'Procedural 3D Forged SVG (' + brandWheel.geometry + ')'}`);
-  console.log(`   • 3D Model (.glb)      : ${brandWheel.modelUrl || 'none — 3D studio shows the procedural reference rim'}`);
+  const listed = isInStock(brandWheel);
+  console.log(`✅ Saved "${brandWheel.model}" to src/data/customWheels.json.`);
+  console.log(
+    `   • Wheel page  : ${listed ? `/wheels/${brandWheel.slug}` : 'not shown on the site (no sets in stock)'}`
+  );
+  console.log(`   • In stock    : ${brandWheel.stockQuantitySets} ${brandWheel.stockQuantitySets === 1 ? 'set' : 'sets'}`);
+  console.log(`   • Price       : ${formatZAR(brandWheel.priceZAR)} per set of 4`);
+  console.log(`   • Photo       : ${brandWheel.imageUrl || 'drawn stand-in (' + brandWheel.geometry + ')'}`);
+  console.log(`   • 3D (.glb)   : ${brandWheel.modelUrl || 'none — the 3D viewer shows the procedural reference rim'}`);
 }
 
 main().catch((err) => {

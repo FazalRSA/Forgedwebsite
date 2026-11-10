@@ -1,6 +1,6 @@
 {
   "name": "FORGED Custom Wheels — Forged Alloy Wheels for BMW M",
-  "description": "Brand showcase and technical fitment storefront for FORGED Custom Wheels: in-stock forged wheel sets for BMW M cars priced in Rand, a vehicle fitment finder, 360° 3D wheel studio with per-wheel models, client accounts with a garage, and interest requests in place of a checkout.",
+  "description": "Website for FORGED Custom Wheels: the forged wheel sets for BMW M cars that are in stock, priced in Rand, a 3D viewer for each wheel, past customer installs, and enquiries in place of a checkout.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

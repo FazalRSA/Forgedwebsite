@@ -1,171 +1,151 @@
 import React, { useMemo, useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
 import {
   BrandWheelItem,
-  WHEEL_MODEL_FILTERS,
-  WheelModelFilter,
   getAllBrandWheels,
   getWheelImages,
   formatZAR,
 } from '../../data/catalogue';
 import { useForgedStore } from '../../store/useForgedStore';
-import { useRouter } from '../../utils/router';
+import { Link } from '../../utils/router';
+import { ContactCta, CTA_SECONDARY_CLASS } from './ContactCta';
+
+const ALL = 'All';
+
+/** The design a listing belongs to, e.g. "FSA002". Each listing is one design in one finish. */
+export const designOf = (wheel: BrandWheelItem): string => wheel.modelCode || wheel.model;
+
+/** "20 inch / 21 inch" becomes 20" / 21". */
+const formatSizes = (sizes?: string): string =>
+  (sizes ?? '').replace(/\s*inch(?:es)?/gi, '"').trim();
+
+/** A generated stand-in picture (no real photo yet) is never shown to visitors; a plain tile is used instead. */
+const isGeneratedPlaceholder = (src: string): boolean => src.startsWith('data:');
+
+const WheelCard: React.FC<{ wheel: BrandWheelItem; index: number }> = ({ wheel, index }) => {
+  const design = designOf(wheel);
+  const finish = wheel.finishName ?? '';
+  const sizes = formatSizes(wheel.sizesAvailable);
+  const photo = getWheelImages(wheel).images[0];
+  const hasPhoto = Boolean(photo) && !isGeneratedPlaceholder(photo);
+
+  return (
+    <li>
+      <Link to={`/wheels/${wheel.slug}`} className="group block">
+        <div className="aspect-square overflow-hidden rounded-xl bg-[#F0F0F1]">
+          {hasPhoto ? (
+            <img
+              src={photo}
+              alt={`Forged wheel, ${design}${finish ? ` in ${finish}` : ''}`}
+              width={800}
+              height={800}
+              // The first row is what a phone shows on arrival, so it must not wait to be scrolled to.
+              loading={index < 2 ? 'eager' : 'lazy'}
+              fetchPriority={index === 0 ? 'high' : undefined}
+              decoding="async"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            // No photo yet: a plain wheel outline, with the name and finish in the text below it.
+            <div aria-hidden="true" className="w-full h-full bg-[#121215] flex items-center justify-center">
+              <svg viewBox="0 0 100 100" className="w-1/2 h-1/2 text-[#33333E]" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="50" cy="50" r="46" />
+                <circle cx="50" cy="50" r="38" />
+                <circle cx="50" cy="50" r="9" />
+                {[0, 72, 144, 216, 288].map((angle) => (
+                  <line key={angle} x1="50" y1="41" x2="50" y2="12" transform={`rotate(${angle} 50 50)`} strokeWidth="5" strokeLinecap="round" />
+                ))}
+              </svg>
+            </div>
+          )}
+        </div>
+
+        <div className="mt-3 space-y-0.5">
+          <h3 className="text-base font-medium text-white group-hover:underline underline-offset-4">
+            {design}
+          </h3>
+          {finish && <p className="text-sm text-neutral-300">{finish}</p>}
+          {sizes && <p className="text-sm text-neutral-400">{sizes}</p>}
+          <p className="pt-1.5 text-lg font-medium text-white tabular-nums">
+            {formatZAR(wheel.priceZAR)}
+            <span className="block text-xs font-normal text-neutral-400">per set of 4</span>
+          </p>
+        </div>
+      </Link>
+    </li>
+  );
+};
 
 export const WheelCatalogue: React.FC = () => {
-  const { customBrandWheels } = useForgedStore();
-  const [activeModelFilter, setActiveModelFilter] = useState<WheelModelFilter>('ALL');
+  const customBrandWheels = useForgedStore((state) => state.customBrandWheels);
+  const [selectedDesign, setSelectedDesign] = useState<string>(ALL);
 
-  const { navigate } = useRouter();
+  // getAllBrandWheels returns only wheels that are in stock.
+  const wheels = useMemo(() => getAllBrandWheels(customBrandWheels), [customBrandWheels]);
+  const designs = useMemo(() => Array.from(new Set(wheels.map(designOf))), [wheels]);
 
-  const allWheels = useMemo(
-    () => getAllBrandWheels(customBrandWheels),
-    [customBrandWheels]
-  );
-
-  const filteredWheels = useMemo(() => {
-    if (activeModelFilter === 'ALL') return allWheels;
-    return allWheels.filter(
-      (wheel) =>
-        wheel.modelCode?.toUpperCase() === activeModelFilter ||
-        wheel.model.toUpperCase().startsWith(activeModelFilter)
-    );
-  }, [activeModelFilter, allWheels]);
-
-  /** A card opens the wheel's own page, which leads with the 3D studio when the wheel has a model. */
-  const openWheelPage = (wheel: BrandWheelItem) => {
-    navigate(`/wheels/${wheel.slug}`);
-  };
+  const activeDesign = designs.includes(selectedDesign) ? selectedDesign : ALL;
+  const visibleWheels =
+    activeDesign === ALL ? wheels : wheels.filter((wheel) => designOf(wheel) === activeDesign);
 
   return (
     <section
       id="catalogue"
-      className="scroll-mt-20 max-w-7xl mx-auto px-4 sm:px-6 md:px-10 py-14 border-t border-[#26262E]"
+      aria-labelledby="catalogue-heading"
+      className="scroll-mt-20 max-w-7xl mx-auto px-4 sm:px-6 md:px-10 py-12 sm:py-16 border-t border-[#26262E]"
     >
-      {/* Catalogue Header & Model Filter */}
-      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-10">
-        <h2 className="text-3xl sm:text-5xl font-light tracking-[-0.03em] leading-tight text-white">
-          The Collection
-        </h2>
-
-        {/* Minimalist Segmented Model Filter */}
-        <div
-          role="tablist"
-          aria-label="Filter wheels by model"
-          className="flex flex-wrap items-center gap-1 p-1 bg-[#121215] border border-[#26262E] rounded-xl self-start lg:self-auto"
-        >
-          {WHEEL_MODEL_FILTERS.map((modelKey) => {
-            const isActive = activeModelFilter === modelKey;
-            return (
-              <button
-                key={modelKey}
-                type="button"
-                role="tab"
-                aria-selected={isActive}
-                onClick={() => setActiveModelFilter(modelKey)}
-                className={`px-3.5 py-1.5 text-xs font-mono uppercase tracking-wider rounded-lg transition-colors cursor-pointer ${
-                  isActive
-                    ? 'bg-[#1E1E24] text-white font-medium'
-                    : 'text-neutral-400 hover:text-white'
-                }`}
-              >
-                {modelKey}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Minimalist 2-Column Grid of Wheel Cards */}
-      <div
-        className="grid grid-cols-1 sm:grid-cols-2 gap-8 sm:gap-10"
-        data-testid="brand-wheel-catalogue-grid"
+      <h2
+        id="catalogue-heading"
+        className="text-3xl sm:text-4xl font-light tracking-[-0.03em] leading-tight text-white"
       >
-        <AnimatePresence mode="popLayout">
-          {filteredWheels.map((wheel) => {
-            const wheelData = getWheelImages(wheel);
-            const cardImage = wheelData.images[0];
-            const displayPrice =
-              formatZAR(wheel.priceZAR);
+        Wheels in stock
+      </h2>
 
-            return (
-              <motion.div
-                layout
-                initial={{ opacity: 0, scale: 0.98 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.98 }}
-                transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                key={wheel.id}
-                role="button"
-                tabIndex={0}
-                onClick={() => openWheelPage(wheel)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    openWheelPage(wheel);
-                  }
-                }}
-                className="group text-left flex flex-col focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white cursor-pointer select-none"
-              >
-                {/* Clean Uncluttered Image Stage */}
-                <div className="w-full bg-[#121215] border border-[#222228] group-hover:border-neutral-600 rounded-2xl aspect-square relative overflow-hidden transition-colors duration-300">
-                  <motion.img
-                    src={cardImage}
-                    alt={`${wheel.model} forged wheel`}
-                    loading="lazy"
-                    referrerPolicy="no-referrer"
-                    initial={{ scale: 1 }}
-                    whileHover={{ scale: 1.05 }}
-                    transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-                    className="w-full h-full object-cover will-change-transform"
-                  />
-                  {wheel.modelUrl && (
-                    <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/70 border border-white/15 text-[10px] font-mono font-semibold tracking-[0.18em] text-white">
-                      VIEW IN 3D
-                    </span>
-                  )}
-                </div>
+      {wheels.length === 0 ? (
+        <div className="mt-8 space-y-5">
+          <p className="text-neutral-300">No wheels are listed in stock right now.</p>
+          <ContactCta
+            message="Hi, what wheels do you have available?"
+            enquirySubject="Which wheels are available?"
+            label="Ask on WhatsApp"
+            fallbackLabel="Ask what is available"
+            className={CTA_SECONDARY_CLASS}
+          />
+        </div>
+      ) : (
+        <>
+          {designs.length > 1 && (
+            <div role="group" aria-label="Filter by design" className="mt-6 flex flex-wrap gap-2">
+              {[ALL, ...designs].map((design) => {
+                const active = activeDesign === design;
+                return (
+                  <button
+                    key={design}
+                    type="button"
+                    aria-pressed={active}
+                    onClick={() => setSelectedDesign(design)}
+                    className={`min-h-11 px-4 rounded-full text-sm font-medium transition-colors cursor-pointer ${
+                      active
+                        ? 'bg-[#F5F5F7] text-[#0A0A0A]'
+                        : 'border border-[#33333E] text-neutral-300 hover:border-neutral-500 hover:text-white'
+                    }`}
+                  >
+                    {design}
+                  </button>
+                );
+              })}
+            </div>
+          )}
 
-                {/* Minimalist 2-Line Typography Below Card */}
-                <div className="mt-3.5 px-0.5 space-y-1">
-                  <div className="flex items-baseline justify-between gap-4">
-                    <h3 className="text-base font-medium tracking-tight text-white truncate">
-                      {/* A real link to the wheel's page for search engines and "open in new tab";
-                          a normal click is handled by the card, which navigates without a reload. */}
-                      <a
-                        href={`/wheels/${wheel.slug}`}
-                        tabIndex={-1}
-                        onClick={(e) => {
-                          if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
-                            e.stopPropagation();
-                            return;
-                          }
-                          e.preventDefault();
-                        }}
-                      >
-                        {wheel.model}
-                      </a>
-                    </h3>
-                    <span className="text-sm font-mono text-neutral-200 tabular-nums shrink-0">
-                      {displayPrice}
-                    </span>
-                  </div>
-
-                  <p className="text-xs text-neutral-500 truncate">
-                    {[
-                      wheel.sizesAvailable,
-                      wheel.compatibleCars,
-                      wheel.otherFinishes,
-                    ]
-                      .filter(Boolean)
-                      .join(' · ')}
-                  </p>
-                </div>
-              </motion.div>
-            );
-          })}
-        </AnimatePresence>
-      </div>
-
+          <ul
+            data-testid="brand-wheel-catalogue-grid"
+            className="mt-8 grid grid-cols-2 lg:grid-cols-3 gap-x-3 sm:gap-x-6 gap-y-9"
+          >
+            {visibleWheels.map((wheel, index) => (
+              <WheelCard key={wheel.id} wheel={wheel} index={index} />
+            ))}
+          </ul>
+        </>
+      )}
     </section>
   );
 };

@@ -198,9 +198,9 @@ export const PrivacyPolicyPage: React.FC = () => {
                   trackers.
                 </>,
                 <>
-                  <Strong>Preferences stored on your device</Strong>: your saved vehicle selection,
-                  wishlist, wheels previewed in the admin tool, and a copy of enquiries you have submitted
-                  are kept in your browser&apos;s local storage (see section 06). These stay on your device
+                  <Strong>Preferences stored on your device</Strong>: a copy of enquiries you have
+                  submitted, and wheels previewed in the admin tool, are kept in your browser&apos;s
+                  local storage (see section 06). These stay on your device
                   and are not transmitted to us by that mechanism.
                 </>,
               ]}
@@ -299,8 +299,8 @@ export const PrivacyPolicyPage: React.FC = () => {
             <Bullets
               items={[
                 <>
-                  <Strong>Local storage</Strong>: your saved vehicle selection, wishlist, admin preview
-                  wheels and a record of enquiries you have submitted, so that they survive a page reload.
+                  <Strong>Local storage</Strong>: admin preview wheels and a record of enquiries you
+                  have submitted, so that they survive a page reload.
                   This data never leaves your device through this mechanism.
                 </>,
                 <>
@@ -311,8 +311,8 @@ export const PrivacyPolicyPage: React.FC = () => {
             />
             <p className="pt-1">
               You can clear this storage at any time through your browser settings. Doing so signs you
-              out and resets your saved preferences, but does not delete your account or Garage, which
-              you can remove from the Account page.
+              out and resets your saved preferences, but does not delete any account or Garage you
+              created earlier. To have those deleted, write to us at the privacy address in section 09.
             </p>
           </Section>
 

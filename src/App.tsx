@@ -1,10 +1,11 @@
 import React, { Suspense, lazy, useEffect } from 'react';
 import { RouterProvider, useRouter } from './utils/router';
+import { normalizePath } from './utils/redirects';
 import { applyPageMeta, isHomePath, metaForPath } from './utils/seo';
-import { FirebaseProvider } from './context/FirebaseContext';
+import { findWheelBySlug } from './data/catalogue';
+import { useForgedStore } from './store/useForgedStore';
 import { BrandHeader } from './components/brand/BrandHeader';
 import { HeroSection } from './components/brand/HeroSection';
-import { TrustedByBmwSection } from './components/brand/TrustedByBmwSection';
 import { EditorialFlow } from './components/brand/EditorialFlow';
 import { WheelCatalogue } from './components/brand/WheelCatalogue';
 import { GlobalOverlays } from './components/shared/GlobalOverlays';
@@ -16,15 +17,14 @@ const NotFoundPage = lazy(() =>
     default: m.NotFoundPage,
   }))
 );
-
-const DealerApplicationPage = lazy(() =>
-  import('./components/brand/DealerApplicationPage').then((m) => ({
-    default: m.DealerApplicationPage,
-  }))
-);
 const ClientFitmentsPage = lazy(() =>
   import('./components/brand/ClientFitmentsPage').then((m) => ({
     default: m.ClientFitmentsPage,
+  }))
+);
+const ContactPage = lazy(() =>
+  import('./components/brand/ContactPage').then((m) => ({
+    default: m.ContactPage,
   }))
 );
 const WheelShowcasePDP = lazy(() =>
@@ -32,29 +32,9 @@ const WheelShowcasePDP = lazy(() =>
     default: m.WheelShowcasePDP,
   }))
 );
-const AccountGaragePage = lazy(() =>
-  import('./components/brand/AccountGaragePage').then((m) => ({
-    default: m.AccountGaragePage,
-  }))
-);
 const AdminWheelUploader = lazy(() =>
   import('./components/admin/AdminWheelUploader').then((m) => ({
     default: m.AdminWheelUploader,
-  }))
-);
-const VehicleFitmentWidget = lazy(() =>
-  import('./components/store/VehicleFitmentWidget').then((m) => ({
-    default: m.VehicleFitmentWidget,
-  }))
-);
-const FitmentCollectionView = lazy(() =>
-  import('./components/store/FitmentCollectionView').then((m) => ({
-    default: m.FitmentCollectionView,
-  }))
-);
-const TechnicalProductView = lazy(() =>
-  import('./components/store/TechnicalProductView').then((m) => ({
-    default: m.TechnicalProductView,
   }))
 );
 const PrivacyPolicyPage = lazy(() =>
@@ -65,12 +45,6 @@ const PrivacyPolicyPage = lazy(() =>
 const StudioPreviewPage = lazy(() =>
   import('./components/brand/StudioPreviewPage').then((m) => ({
     default: m.StudioPreviewPage,
-  }))
-);
-
-const SixnineDealerPage = lazy(() =>
-  import('./components/brand/SixnineDealerPage').then((m) => ({
-    default: m.SixnineDealerPage,
   }))
 );
 
@@ -85,7 +59,7 @@ function RouteLoadingFallback() {
         <div className="w-10 h-10 rounded-full border-2 border-[#26262E] border-t-[#FF5500] animate-spin" />
       </div>
       <span className="mt-4 text-xs font-mono tracking-[0.2em] uppercase text-neutral-400">
-        LOADING ARCHITECTURE...
+        Loading
       </span>
     </div>
   );
@@ -97,7 +71,6 @@ function BrandHomePage() {
       <BrandHeader />
       <main>
         <HeroSection />
-        <TrustedByBmwSection />
         <WheelCatalogue />
         <EditorialFlow />
       </main>
@@ -107,6 +80,7 @@ function BrandHomePage() {
 
 function AppRoutes() {
   const { pathname } = useRouter();
+  const { customBrandWheels } = useForgedStore();
 
   // Give every route its own title, description, canonical URL and structured data.
   useEffect(() => {
@@ -118,95 +92,35 @@ function AppRoutes() {
     }
   }, [pathname]);
 
-  // Route: /sixnine-wheels — Official Dealer of Sixnine Wheels
-  if (
-    pathname === '/sixnine-wheels' ||
-    pathname === '/sixnine-wheels/' ||
-    pathname === '/official-dealer-sixnine-wheels' ||
-    pathname === '/official-dealer-sixnine-wheels/'
-  ) {
-    return <SixnineDealerPage />;
-  }
+  // Old addresses (/store, /client-fitments, ...) are redirected by the router before this runs.
+  const path = normalizePath(pathname);
 
-  // Route: /account or /garage — Client Account & Vehicle Garage
-  if (
-    pathname === '/account' ||
-    pathname === '/account/' ||
-    pathname === '/garage' ||
-    pathname === '/garage/'
-  ) {
-    return <AccountGaragePage />;
-  }
-
-  // Route: /privacy-policy — Legal Governance & Data Privacy Policy
-  if (pathname === '/privacy-policy' || pathname === '/privacy-policy/') {
-    return <PrivacyPolicyPage />;
-  }
-
-  // Protected Route: /admin or /admin/wheels — Admin Wheel Uploader
-  if (
-    pathname === '/admin' ||
-    pathname === '/admin/' ||
-    pathname.startsWith('/admin/')
-  ) {
-    return <AdminWheelUploader />;
-  }
-
-  // Route: /dealer-application — Dealer & Trade Partner Application Page
-  if (
-    pathname === '/dealer-application' ||
-    pathname === '/dealer-application/' ||
-    pathname === '/store/dealer-application'
-  ) {
-    return <DealerApplicationPage />;
-  }
-
-  // Route: /client-fitments — 4x4 Scrollable Bento Grid of Client Fitments with Lightbox
-  if (
-    pathname === '/client-fitments' ||
-    pathname === '/client-fitments/' ||
-    pathname === '/store/client-fitments'
-  ) {
-    return <ClientFitmentsPage />;
-  }
-
-  // Route: /studio/[slug] — unlisted 3D studio preview for a wheel not yet in the catalogue
-  if (pathname.startsWith('/studio/')) {
-    const slug = pathname.replace('/studio/', '').split('/')[0];
-    return <StudioPreviewPage slug={slug} />;
-  }
-
-  // Route 2: /wheels/[slug] — Editorial Wheel Showcase PDP with 360° 3D Studio
-  if (pathname.startsWith('/wheels/')) {
-    const slug = pathname.replace('/wheels/', '').split('/')[0] || 'fsa001-black-matte';
+  // /wheels/:slug: one in-stock listing. A sold or unknown wheel is not a page on this site.
+  if (path.startsWith('/wheels/')) {
+    const slug = path.slice('/wheels/'.length).split('/')[0];
+    if (!findWheelBySlug(slug, customBrandWheels)) return <NotFoundPage />;
     return <WheelShowcasePDP slug={slug} />;
   }
 
-  // Route 4: /store/collections/[fitmentSlug] — Filtered Vehicle Fitment PLP
-  if (pathname.startsWith('/store/collections/')) {
-    const fitmentSlug =
-      pathname.replace('/store/collections/', '').split('/')[0] ||
-      'bmw-m3-2024-onwards-alloy-wheels';
-    return <FitmentCollectionView fitmentSlug={fitmentSlug} />;
+  // /installs: real customer cars on the wheels
+  if (path === '/installs') return <ClientFitmentsPage />;
+
+  // /contact: WhatsApp, phone, address, areas served
+  if (path === '/contact') return <ContactPage />;
+
+  if (path === '/privacy-policy') return <PrivacyPolicyPage />;
+
+  // Unlisted: /studio/:slug previews a wheel's 3D model before it is in the catalogue.
+  if (path.startsWith('/studio/')) {
+    const slug = path.slice('/studio/'.length).split('/')[0];
+    return <StudioPreviewPage slug={slug} />;
   }
 
-  // Route 5: /store/products/[productSlug] — Technical E-Commerce PDP with 360° 3D Studio
-  if (pathname.startsWith('/store/products/')) {
-    const productSlug =
-      pathname.replace('/store/products/', '').split('/')[0] ||
-      'bmw-m3-fsa001-black-matte';
-    return <TechnicalProductView productSlug={productSlug} />;
-  }
+  // Unlisted: /admin and anything under it. Not linked from anywhere on the site.
+  if (path === '/admin' || path.startsWith('/admin/')) return <AdminWheelUploader />;
 
-  // Route 3: /store — Storefront & Vehicle Fitment Finder
-  if (pathname === '/store' || pathname === '/store/') {
-    return <VehicleFitmentWidget />;
-  }
-
-  // Route 1: / — Brand Editorial Landing Page & Interactive Wheel Catalogue
-  if (isHomePath(pathname)) {
-    return <BrandHomePage />;
-  }
+  // /: in-stock wheels, then proof of work
+  if (isHomePath(path)) return <BrandHomePage />;
 
   // Anything else is not a page on this site.
   return <NotFoundPage />;
@@ -229,11 +143,9 @@ function MainLayout() {
 
 export default function App() {
   return (
-    <FirebaseProvider>
-      <RouterProvider>
-        <MainLayout />
-        <GlobalOverlays />
-      </RouterProvider>
-    </FirebaseProvider>
+    <RouterProvider>
+      <MainLayout />
+      <GlobalOverlays />
+    </RouterProvider>
   );
 }
