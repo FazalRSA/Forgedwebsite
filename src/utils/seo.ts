@@ -384,3 +384,29 @@ export function buildSitemapXml(origin: string = `https://${SITE.domain}`): stri
     .join('\n');
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
 }
+
+const PAGE_ROUTES_BEGIN = '# BEGIN generated page routes';
+const PAGE_ROUTES_END = '# END generated page routes';
+
+/**
+ * Put one Render rewrite rule per sitemap page between the markers in render.yaml, pointing the
+ * page's address at its prerendered HTML file. Render does not map /wheels/x to wheels/x.html on
+ * its own, and its catch-all rule would otherwise serve the bare app shell to preview bots.
+ */
+export function withRenderPageRoutes(renderYaml: string): string {
+  const start = renderYaml.indexOf(PAGE_ROUTES_BEGIN);
+  const end = renderYaml.indexOf(PAGE_ROUTES_END);
+  if (start === -1 || end === -1 || end < start) {
+    throw new Error('render.yaml is missing the generated page routes markers');
+  }
+  const lineStart = renderYaml.lastIndexOf('\n', start) + 1;
+  const indent = renderYaml.slice(lineStart, start);
+  const rules = sitemapPaths()
+    .filter((p) => !isHomePath(p))
+    .map(
+      (p) =>
+        `${indent}- type: rewrite\n${indent}  source: ${p}\n${indent}  destination: ${p}.html`
+    );
+  const block = [PAGE_ROUTES_BEGIN, ...rules].join('\n') + `\n${indent}`;
+  return renderYaml.slice(0, start) + block + renderYaml.slice(end);
+}

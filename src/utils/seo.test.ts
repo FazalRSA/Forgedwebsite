@@ -15,6 +15,7 @@ import {
   homeJsonLd,
   metaForPath,
   sitemapPaths,
+  withRenderPageRoutes,
   wheelBrand,
 } from './seo';
 import { BRAND_WHEELS, STORE_PRODUCTS, VEHICLE_FITMENT_TREE, getAllStoreProducts } from '../data/catalogue';
@@ -214,4 +215,17 @@ test('renderPageHtml bakes a page\'s own title, description, canonical, image an
 
   const hiddenPage = renderPageHtml(shell, metaForPath('/no-such-page'));
   assert.ok(hiddenPage.includes('<meta name="robots" content="noindex, nofollow" />'));
+});
+
+test('render.yaml has a rewrite rule to the prerendered file for every sitemap page, and is up to date', () => {
+  const renderYaml = readFileSync(path.join(PUBLIC_DIR, '..', 'render.yaml'), 'utf8');
+  assert.equal(withRenderPageRoutes(renderYaml), renderYaml, 'run `npm run build` to regenerate render.yaml');
+  for (const p of sitemapPaths()) {
+    if (isHomePath(p)) continue;
+    assert.ok(renderYaml.includes(`source: ${p}\n`), p);
+    assert.ok(renderYaml.includes(`destination: ${p}.html\n`), p);
+  }
+  // The catch-all for the single-page app must stay after the per-page rules.
+  assert.ok(renderYaml.indexOf('source: /*') > renderYaml.indexOf('# END generated page routes'));
+  assert.throws(() => withRenderPageRoutes('services: []'), /markers/);
 });
