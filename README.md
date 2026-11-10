@@ -246,8 +246,6 @@ A wheel with a `modelUrl` opens in the studio (`src/components/visuals/WheelStud
 
 **Accuracy of the current models.** The FSA002, FSA003, FSA004, FF-1 and FF-3 models were traced from face-on product photos. Spoke layout, window shapes, bolt positions and hubs follow the photos; spoke sculpting, cap logos and engraving are simplified, and depth is estimated except on FSA002. Replacing them with 3D scans of the physical wheels is the planned upgrade. The FSA001 brake meshes use assumed G80 brake dimensions, not a measured caliper.
 
-`public/models/wheels/sample-reference-rim.glb` is a low-poly test asset with the correct axes and names. It is not a real product.
-
 ## Search and sharing
 
 All search metadata is produced by `src/utils/seo.ts` and applied on every route change.
