@@ -11,7 +11,7 @@ import { WheelCatalogue } from './components/brand/WheelCatalogue';
 import { IndustryPartnersSection } from './components/brand/IndustryPartnersSection';
 import { AskAiSection } from './components/brand/AskAiSection';
 import { GlobalOverlays } from './components/shared/GlobalOverlays';
-import { StackedCircularFooter } from '@/components/ui/stacked-circular-footer';
+import { SiteFooter } from './components/brand/SiteFooter';
 
 // Lazy-loaded route components for code-splitting and faster initial bundle evaluation
 const NotFoundPage = lazy(() =>
@@ -139,8 +139,6 @@ function AppRoutes() {
 }
 
 function MainLayout() {
-  const { navigate } = useRouter();
-
   return (
     <div className="min-h-screen flex flex-col justify-between bg-[#0A0A0A] text-[#F5F5F7]">
       <div className="flex-1">
@@ -148,7 +146,7 @@ function MainLayout() {
           <AppRoutes />
         </Suspense>
       </div>
-      <StackedCircularFooter onNavigate={navigate} useBrandLinks={true} />
+      <SiteFooter />
     </div>
   );
 }
