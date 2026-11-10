@@ -7,9 +7,13 @@ photography instead.
 A wheel with a model opens in the **wheel studio** (`WheelStudio.tsx`): paint finishes, fixed
 camera views, exploded view, optional brake check and an optional Front / Rear switch.
 
-`stf399-front.glb` and `stf399-rear.glb` are the STF399 prototype (19×9.5 and 20×11). STF399 is
-not in the catalogue yet; it is viewable at the unlisted page `/studio/stf399`. Its brake meshes
-use assumed G80/G82 M3/M4 brake dimensions, not a measured caliper.
+`stf399-front.glb` and `stf399-rear.glb` are the FSA001 2-piece wheel (19×9.5 front, 20×11 rear),
+shown on `/wheels/fsa001-black-matte` and at the unlisted preview page `/studio/stf399`. Their brake
+meshes use assumed G80/G82 M3/M4 brake dimensions, not a measured caliper.
+
+`fsa002.glb`, `fsa003.glb`, `fsa004.glb`, `ff-1.glb` and `ff-3.glb` are one model per design, shared
+by every finish of that design (see `MODEL_URL_BY_CODE` in `src/data/catalogue.ts`). They were traced
+from face-on product photos and ship without baked textures, because the studio applies its own paint.
 
 ## How a wheel gets its model
 
