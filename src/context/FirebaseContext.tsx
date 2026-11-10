@@ -25,6 +25,7 @@ import {
   OperationType,
 } from '../lib/firebase';
 import { WheelFinishId } from '../data/kahnData';
+import { SITE } from '../config/site';
 
 export type BrakeSystemType =
   | 'M Compound Steel'
@@ -245,7 +246,7 @@ export const FirebaseProvider: React.FC<{ children: React.ReactNode }> = ({
       if (!profile) {
         await setDoc(userDocRef, {
           uid: user.uid,
-          email: clampStr(user.email || 'client@forged.co.uk', 150, 'client@forged.co.uk'),
+          email: clampStr(user.email || `client@${SITE.domain}`, 150, `client@${SITE.domain}`),
           ...sanitized,
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),

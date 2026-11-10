@@ -94,7 +94,7 @@ export const StoreHeader: React.FC = () => {
               type="button"
               onClick={() =>
                 openEnquiryModal({
-                  subject: 'FORGED Custom wheels Direct Telephone Callback (+44 1274 749 999)',
+                  subject: 'FORGED Custom Wheels telephone callback request',
                   domain: 'store',
                 })
               }

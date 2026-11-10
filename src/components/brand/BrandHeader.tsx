@@ -9,6 +9,7 @@ import {
   User as UserIcon,
 } from 'lucide-react';
 import { useRouter } from '../../utils/router';
+import { displayAddress } from '../../config/site';
 import { useKahnStore } from '../../store/useKahnStore';
 import { useFirebaseAuth } from '../../context/FirebaseContext';
 import { LogoPlaceholder } from '../shared/LogoPlaceholder';
@@ -304,7 +305,7 @@ export const BrandHeader: React.FC<BrandHeaderProps> = () => {
               {/* Quiet Architectural Atelier Address */}
               <div className="text-center">
                 <p className="text-xs font-tech-mono text-neutral-400">
-                  240 CANAL ROAD · BRADFORD · UNITED KINGDOM
+                  {displayAddress()}
                 </p>
               </div>
 

@@ -98,7 +98,7 @@ export function createWheelAndProductEntries(input: NewWheelInput): {
       'Precision CNC-machined from aerospace-grade 6061-T6 forged aluminium billet.',
     editorialBody:
       input.description?.trim() ||
-      `Engineered in our UK design studio, the ${cleanName} combines high-load structural rigidity with reduced unsprung rotational mass and direct OEM hub-centric fitment.`,
+      `Engineered for South African roads and circuits, the ${cleanName} combines high-load structural rigidity with reduced unsprung rotational mass and direct OEM hub-centric fitment.`,
     marques,
     geometry,
     spokeCount: 10,
@@ -113,7 +113,7 @@ export function createWheelAndProductEntries(input: NewWheelInput): {
       material: '6061-T6 Aerospace Forged Aluminium',
       diameters: `${diameterBadge} Staggered & Square Fitments`,
       finishOptions: 'Satin Black · Liquid Silver · Champagne Bronze · Anthracite Gunmetal',
-      testing: 'JWL / VIA & German TÜV Impact + Radial Fatigue Certified',
+      testing: 'Load rating and fitment specification supplied with every set',
       warranty: '3-Year Structural & 2-Year Finish Craftsmanship Guarantee',
     },
     compatibleStoreProductSlug: storeSlug,
@@ -163,7 +163,7 @@ export function createWheelAndProductEntries(input: NewWheelInput): {
     ],
     importantInfoBullets: [
       'Price displayed is for a complete set of 4 forged alloy wheels.',
-      'Worldwide insured shipping available from FORGED Custom wheels UK headquarters.',
+      'Insured delivery nationwide across South Africa; export shipping on request.',
     ],
   };
 

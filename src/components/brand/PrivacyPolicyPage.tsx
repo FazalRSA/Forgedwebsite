@@ -3,6 +3,7 @@ import { ArrowLeft, Lock, Mail, MapPin, Phone, ShieldCheck } from 'lucide-react'
 import { BrandHeader } from './BrandHeader';
 import { useRouter } from '../../utils/router';
 import { useKahnStore } from '../../store/useKahnStore';
+import { SITE } from '../../config/site';
 
 /**
  * Responsible-party details published in the notice (POPIA s18(1)(b)).
@@ -10,12 +11,12 @@ import { useKahnStore } from '../../store/useKahnStore';
  * name once confirmed; empty strings are simply not rendered.
  */
 const RESPONSIBLE_PARTY = {
-  tradingName: 'FORGED Custom Wheels',
+  tradingName: SITE.name,
   registrationNumber: '',
-  physicalAddress: '',
-  country: 'South Africa',
+  physicalAddress: SITE.addressLine,
+  country: SITE.country,
   informationOfficerName: '',
-  privacyEmail: 'privacy@forgedcustomwheels.com',
+  privacyEmail: SITE.privacyEmail,
 };
 
 const LAST_REVISED = '9 November 2026';

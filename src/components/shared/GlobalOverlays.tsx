@@ -1,5 +1,5 @@
 import React, { useState, Suspense, lazy } from 'react';
-import { X, MessageSquare, Send, CheckCircle2, ShieldCheck, FileText } from 'lucide-react';
+import { X, CheckCircle2, ShieldCheck, FileText } from 'lucide-react';
 import { useKahnStore } from '../../store/useKahnStore';
 import { useRouter } from '../../utils/router';
 
@@ -8,17 +8,13 @@ const AddWheelModal = lazy(() =>
 );
 
 export const GlobalOverlays: React.FC = () => {
-  const { pathname, navigate } = useRouter();
+  const { navigate } = useRouter();
   const {
     isAddWheelModalOpen,
     enquiryModal,
     closeEnquiryModal,
     submitEnquiryRecord,
     submittedEnquiries,
-    isChatOpen,
-    setChatOpen,
-    chatMessages,
-    sendChatMessage,
   } = useKahnStore();
 
   const [customerName, setCustomerName] = useState('');
@@ -30,10 +26,6 @@ export const GlobalOverlays: React.FC = () => {
   const [notes, setNotes] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
   const [submittedSuccessId, setSubmittedSuccessId] = useState<string | null>(null);
-
-  const [chatInput, setChatInput] = useState('');
-
-  const isStoreDomain = pathname.startsWith('/store');
 
   const handleEnquirySubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,13 +68,6 @@ export const GlobalOverlays: React.FC = () => {
     setSubmittedSuccessId(null);
     setFormError(null);
     closeEnquiryModal();
-  };
-
-  const handleChatSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!chatInput.trim()) return;
-    sendChatMessage(chatInput);
-    setChatInput('');
   };
 
   return (
@@ -217,7 +202,7 @@ export const GlobalOverlays: React.FC = () => {
                       required
                       value={customerPhone}
                       onChange={(e) => setCustomerPhone(e.target.value)}
-                      placeholder="+44 7700 900077"
+                      placeholder="+27 82 000 0000"
                       className="w-full h-11 px-3.5 bg-[#141418] border border-[#26262E] text-[#F5F5F7] text-xs sm:text-sm rounded-lg focus:outline-none focus:border-[#FF5500] transition-colors"
                     />
                   </div>
@@ -353,91 +338,6 @@ export const GlobalOverlays: React.FC = () => {
         </div>
       )}
 
-      {/* Concierge Live Chat floating widget on Store domain */}
-      {isStoreDomain && (
-        <div className="fixed bottom-5 right-5 z-40">
-          {isChatOpen && (
-            <div
-              role="dialog"
-              aria-label="FORGED Custom wheels Live Fitment Chat"
-              className="mb-3 w-80 sm:w-96 bg-[#0A0A0A] border border-[#26262E] rounded-2xl shadow-2xl overflow-hidden text-[#F5F5F7]"
-            >
-              <div className="bg-[#121215] text-[#F5F5F7] px-4 py-3 flex items-center justify-between border-b border-[#26262E]">
-                <div>
-                  <p className="text-xs font-tech-mono font-bold uppercase tracking-wider text-[#FF5500]">
-                    FORGED CUSTOM WHEELS CONCIERGE
-                  </p>
-                  <p className="text-[10px] font-tech-mono text-[#C2C2CC]">
-                    DIRECT BRADFORD &amp; CHELSEA TECHNICAL TEAM
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setChatOpen(false)}
-                  aria-label="Close Live Chat"
-                  className="text-[#C2C2CC] hover:text-[#FF5500] cursor-pointer"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-
-              <div className="h-64 overflow-y-auto p-4 space-y-3 bg-[#0A0A0A]">
-                {chatMessages.map((msg) => (
-                  <div
-                    key={msg.id}
-                    className={`flex flex-col ${
-                      msg.sender === 'user' ? 'items-end' : 'items-start'
-                    }`}
-                  >
-                    <div
-                      className={`max-w-[85%] p-3 text-xs leading-relaxed ${
-                        msg.sender === 'user'
-                          ? 'bg-[#FF5500] text-white rounded-2xl rounded-br-xs'
-                          : 'bg-[#18181D] border border-[#26262E] text-[#F5F5F7] rounded-2xl rounded-bl-xs'
-                      }`}
-                    >
-                      {msg.text}
-                    </div>
-                    <span className="text-[10px] font-tech-mono text-[#C2C2CC] mt-1">
-                      {msg.timestamp}
-                    </span>
-                  </div>
-                ))}
-              </div>
-
-              <form
-                onSubmit={handleChatSubmit}
-                className="p-2.5 bg-[#121215] border-t border-[#26262E] flex items-center gap-2"
-              >
-                <input
-                  type="text"
-                  value={chatInput}
-                  onChange={(e) => setChatInput(e.target.value)}
-                  placeholder="Ask about vehicle fitment, offsets, or finishes..."
-                  aria-label="Chat message input"
-                  className="flex-1 text-xs px-3 py-2 bg-[#18181D] border border-[#26262E] text-[#F5F5F7] placeholder-neutral-500 rounded-lg focus:outline-none focus:border-[#FF5500]"
-                />
-                <button
-                  type="submit"
-                  aria-label="Send chat message"
-                  className="w-9 h-9 bg-[#FF5500] text-white rounded-lg flex items-center justify-center hover:bg-[#FF6B1A] transition-colors cursor-pointer shrink-0"
-                >
-                  <Send className="w-4 h-4" />
-                </button>
-              </form>
-            </div>
-          )}
-
-          <button
-            type="button"
-            onClick={() => setChatOpen(!isChatOpen)}
-            aria-label="Toggle FORGED Custom wheels Live Fitment Chat"
-            className="bg-[#FF5500] text-white w-12 h-12 rounded-full shadow-[0_0_24px_rgba(255,85,0,0.45)] flex items-center justify-center hover:bg-[#FF6B1A] hover:scale-105 transition-all cursor-pointer ml-auto"
-          >
-            {isChatOpen ? <X className="w-5 h-5" /> : <MessageSquare className="w-5 h-5" />}
-          </button>
-        </div>
-      )}
     </>
   );
 };

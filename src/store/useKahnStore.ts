@@ -41,13 +41,6 @@ export interface SubmittedEnquiryRecord {
   createdAt: string;
 }
 
-export interface ChatMessage {
-  id: string;
-  sender: 'concierge' | 'user';
-  text: string;
-  timestamp: string;
-}
-
 interface KahnStoreState {
   // Admin Protected Route Auth State
   isAdminAuthenticated: boolean;
@@ -112,11 +105,6 @@ interface KahnStoreState {
   submittedEnquiries: SubmittedEnquiryRecord[];
   submitEnquiryRecord: (record: Omit<SubmittedEnquiryRecord, 'id' | 'createdAt'>) => void;
 
-  // Live Concierge Chat
-  isChatOpen: boolean;
-  setChatOpen: (open: boolean) => void;
-  chatMessages: ChatMessage[];
-  sendChatMessage: (text: string) => void;
 }
 
 export const useKahnStore = create<KahnStoreState>()(
@@ -294,41 +282,6 @@ export const useKahnStore = create<KahnStoreState>()(
         set({
           submittedEnquiries: [newRecord, ...get().submittedEnquiries],
         });
-      },
-
-      isChatOpen: false,
-      setChatOpen: (open: boolean) => set({ isChatOpen: open }),
-      chatMessages: [
-        {
-          id: 'welcome-1',
-          sender: 'concierge',
-          text: 'Welcome to FORGED Custom wheels Technical Fitment Concierge. Share your vehicle model or wheel enquiry for immediate hub-centric fitment verification.',
-          timestamp: '11:18',
-        },
-      ],
-      sendChatMessage: (text: string) => {
-        const trimmed = text.trim();
-        if (!trimmed) return;
-        const userMsg: ChatMessage = {
-          id: `u-${Date.now()}`,
-          sender: 'user',
-          text: trimmed,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        };
-        const lower = trimmed.toLowerCase();
-        let replyText =
-          'Our Chelsea & Bradford technical specialists have logged your query. All forged sets ship with TUV certification and direct hub-centric bore machining.';
-        if (lower.includes('m3') || lower.includes('bmw')) {
-          replyText =
-            'For the G80/G81 BMW M3 (2024 Onwards), our Type 52 and RS 3.0 Forged sets use staggered 9.5x20 ET18 front and 10.5x21 ET20 rear specs—100% flush with M Carbon Ceramic clearance.';
-        }
-        const replyMsg: ChatMessage = {
-          id: `c-${Date.now() + 1}`,
-          sender: 'concierge',
-          text: replyText,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        };
-        set({ chatMessages: [...get().chatMessages, userMsg, replyMsg] });
       },
     }),
     {
