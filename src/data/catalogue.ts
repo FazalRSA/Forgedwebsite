@@ -153,14 +153,14 @@ function createWheelPlaceholderDataUrl(
         ${spokes.join('')}
       </g>
       <circle cx="400" cy="340" r="48" fill="#121216" stroke="${finishHex}" stroke-opacity="0.6" stroke-width="2.5" />
-      <circle cx="400" cy="340" r="18" fill="none" stroke="#FF5500" stroke-width="2" />
+      <circle cx="400" cy="340" r="18" fill="none" stroke="#1D4ED8" stroke-width="2" />
       <circle cx="400" cy="320" r="3.5" fill="#7C7C8A" />
       <circle cx="419" cy="334" r="3.5" fill="#7C7C8A" />
       <circle cx="412" cy="356" r="3.5" fill="#7C7C8A" />
       <circle cx="388" cy="356" r="3.5" fill="#7C7C8A" />
       <circle cx="381" cy="334" r="3.5" fill="#7C7C8A" />
     </g>
-    <text x="400" y="620" text-anchor="middle" fill="#F5F5F7" font-family="sans-serif" font-size="26" font-weight="600" letter-spacing="1.5">${escapeXml(modelName.toUpperCase())}</text>
+    <text x="400" y="620" text-anchor="middle" fill="#EDEBE4" font-family="sans-serif" font-size="26" font-weight="600" letter-spacing="1.5">${escapeXml(modelName.toUpperCase())}</text>
     <text x="400" y="656" text-anchor="middle" fill="#8E8E9E" font-family="sans-serif" font-size="18" letter-spacing="2">${escapeXml(finishLabel.toUpperCase())}</text>
   </svg>`;
 

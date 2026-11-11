@@ -30,7 +30,7 @@ const REGULATOR = {
   site: 'https://inforegulator.org.za',
 };
 
-const LINK_CLASS = 'text-[#FF5500] font-tech-mono hover:underline';
+const LINK_CLASS = 'text-[#F43F5E] font-tech-mono hover:underline';
 
 const Section: React.FC<{ index: string; title: string; children: React.ReactNode }> = ({
   index,
@@ -42,7 +42,7 @@ const Section: React.FC<{ index: string; title: string; children: React.ReactNod
     className="space-y-3 bg-[#121215] border border-[#26262E] rounded-2xl p-6 sm:p-8 scroll-mt-24"
   >
     <h2 className="text-xl font-semibold text-white flex items-center gap-2">
-      <span className="text-xs font-tech-mono text-[#FF5500]">{index}.</span>
+      <span className="text-xs font-tech-mono text-[#F43F5E]">{index}.</span>
       <span>{title}</span>
     </h2>
     {children}
@@ -58,7 +58,7 @@ const Bullets: React.FC<{ items: React.ReactNode[] }> = ({ items }) => (
 );
 
 const Strong: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <strong className="text-[#F5F5F7] font-semibold">{children}</strong>
+  <strong className="text-[#EDEBE4] font-semibold">{children}</strong>
 );
 
 /** The ways to reach the business that are actually configured: WhatsApp, phone, and email if set. */
@@ -120,7 +120,7 @@ export const PrivacyPolicyPage: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-[#F5F5F7]">
+    <div className="min-h-screen bg-[#111111] text-[#EDEBE4]">
       <BrandHeader forceLight={false} />
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 py-12 md:py-20 space-y-12">
@@ -129,19 +129,19 @@ export const PrivacyPolicyPage: React.FC = () => {
           <button
             type="button"
             onClick={() => navigate('/')}
-            className="hover:text-[#FF5500] inline-flex items-center gap-1 cursor-pointer transition-colors"
+            className="hover:text-[#F43F5E] inline-flex items-center gap-1 cursor-pointer transition-colors"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>HOME</span>
           </button>
           <span>/</span>
-          <span className="text-[#FF5500] font-semibold">PRIVACY NOTICE</span>
+          <span className="text-[#F43F5E] font-semibold">PRIVACY NOTICE</span>
         </div>
 
         {/* Header */}
         <div className="space-y-4 border-b border-[#26262E] pb-8">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#18181D] border border-[#FF5500]/40 text-[#FF5500] text-xs font-tech-mono uppercase tracking-[0.16em]">
-            <Lock className="w-3.5 h-3.5 text-[#FF5500]" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#18181D] border border-[#1D4ED8]/40 text-[#F43F5E] text-xs font-tech-mono uppercase tracking-[0.16em]">
+            <Lock className="w-3.5 h-3.5 text-[#F43F5E]" />
             <span>Protection of Personal Information Act 4 of 2013</span>
           </div>
 
@@ -167,8 +167,8 @@ export const PrivacyPolicyPage: React.FC = () => {
             <ol className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1 text-xs font-tech-mono text-neutral-400">
               {toc.map(([idx, label]) => (
                 <li key={idx}>
-                  <a href={`#s-${idx}`} className="hover:text-[#FF5500] transition-colors">
-                    <span className="text-[#FF5500]">{idx}</span> · {label}
+                  <a href={`#s-${idx}`} className="hover:text-[#F43F5E] transition-colors">
+                    <span className="text-[#F43F5E]">{idx}</span> · {label}
                   </a>
                 </li>
               ))}
@@ -348,9 +348,9 @@ export const PrivacyPolicyPage: React.FC = () => {
                   href={requestLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-[#18181D] border border-[#33333E] hover:border-[#FF5500] text-white hover:text-[#FF5500] rounded-full px-5 py-2.5 text-xs font-tech-mono uppercase tracking-wider transition-colors cursor-pointer inline-flex items-center gap-2"
+                  className="bg-[#18181D] border border-[#33333E] hover:border-[#1D4ED8] text-white hover:text-[#F43F5E] rounded-full px-5 py-2.5 text-xs font-tech-mono uppercase tracking-wider transition-colors cursor-pointer inline-flex items-center gap-2"
                 >
-                  <MessageCircle className="w-3.5 h-3.5 text-[#FF5500]" />
+                  <MessageCircle className="w-3.5 h-3.5 text-[#F43F5E]" />
                   <span>Send a privacy request on WhatsApp</span>
                 </a>
               </div>
@@ -381,13 +381,13 @@ export const PrivacyPolicyPage: React.FC = () => {
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 text-xs">
               <div className="p-4 bg-[#18181D] border border-[#26262E] rounded-xl space-y-2">
-                <p className="font-tech-mono text-[#FF5500] font-semibold uppercase">{REGULATOR.name}</p>
+                <p className="font-tech-mono text-[#F43F5E] font-semibold uppercase">{REGULATOR.name}</p>
                 <p className="flex items-start gap-2 text-neutral-400">
-                  <MapPin className="w-3.5 h-3.5 text-[#FF5500] shrink-0 mt-0.5" />
+                  <MapPin className="w-3.5 h-3.5 text-[#F43F5E] shrink-0 mt-0.5" />
                   <span>{REGULATOR.address}</span>
                 </p>
                 <p className="flex items-start gap-2 text-neutral-400">
-                  <Phone className="w-3.5 h-3.5 text-[#FF5500] shrink-0 mt-0.5" />
+                  <Phone className="w-3.5 h-3.5 text-[#F43F5E] shrink-0 mt-0.5" />
                   <span>
                     {REGULATOR.phone} · toll free {REGULATOR.tollFree}
                   </span>
@@ -396,13 +396,13 @@ export const PrivacyPolicyPage: React.FC = () => {
               <div className="p-4 bg-[#18181D] border border-[#26262E] rounded-xl space-y-2 font-tech-mono">
                 <p>
                   <span className="text-neutral-500">Complaints: </span>
-                  <a href={`mailto:${REGULATOR.complaints}`} className="text-[#FF5500] hover:underline break-all">
+                  <a href={`mailto:${REGULATOR.complaints}`} className="text-[#F43F5E] hover:underline break-all">
                     {REGULATOR.complaints}
                   </a>
                 </p>
                 <p>
                   <span className="text-neutral-500">Enquiries: </span>
-                  <a href={`mailto:${REGULATOR.enquiries}`} className="text-[#FF5500] hover:underline break-all">
+                  <a href={`mailto:${REGULATOR.enquiries}`} className="text-[#F43F5E] hover:underline break-all">
                     {REGULATOR.enquiries}
                   </a>
                 </p>
@@ -412,7 +412,7 @@ export const PrivacyPolicyPage: React.FC = () => {
                     href={REGULATOR.portal}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[#FF5500] hover:underline break-all"
+                    className="text-[#F43F5E] hover:underline break-all"
                   >
                     eservices.inforegulator.org.za
                   </a>
@@ -423,7 +423,7 @@ export const PrivacyPolicyPage: React.FC = () => {
                     href={REGULATOR.site}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[#FF5500] hover:underline break-all"
+                    className="text-[#F43F5E] hover:underline break-all"
                   >
                     inforegulator.org.za
                   </a>
@@ -443,7 +443,7 @@ export const PrivacyPolicyPage: React.FC = () => {
         {/* Contact strip */}
         <div className="pt-8 border-t border-[#26262E] flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs font-tech-mono text-neutral-400">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-[#FF5500]" />
+            <ShieldCheck className="w-4 h-4 text-[#F43F5E]" />
             <span>
               {RESPONSIBLE_PARTY.tradingName} · {RESPONSIBLE_PARTY.country}
               {SITE.phoneDisplay ? ` · ${SITE.phoneDisplay}` : ''}
@@ -452,7 +452,7 @@ export const PrivacyPolicyPage: React.FC = () => {
           <button
             type="button"
             onClick={() => navigate('/')}
-            className="text-[#FF5500] hover:underline cursor-pointer"
+            className="text-[#F43F5E] hover:underline cursor-pointer"
           >
             ← Return to the showcase
           </button>

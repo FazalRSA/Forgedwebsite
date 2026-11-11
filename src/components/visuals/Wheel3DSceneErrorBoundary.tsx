@@ -41,13 +41,13 @@ export class Wheel3DSceneErrorBoundary extends React.Component<Props, State> {
           className={`relative w-full overflow-hidden rounded-2xl border border-[#26262E] bg-[#121215] flex items-center justify-center ${className}`}
         >
           <div className="flex flex-col items-center gap-3 text-neutral-300 text-center px-6">
-            <AlertTriangle className="w-6 h-6 text-[#FF5500]" />
+            <AlertTriangle className="w-6 h-6 text-[#F43F5E]" />
             <p className="text-sm">The 3D view could not load. Check your connection and try again.</p>
             <div className="flex flex-wrap items-center justify-center gap-2">
               <button
                 type="button"
                 onClick={() => window.location.reload()}
-                className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-[#FF5500] px-5 text-sm font-semibold text-[#0A0A0A] cursor-pointer hover:bg-[#FF6B1A]"
+                className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-[#1D4ED8] px-5 text-sm font-semibold text-white cursor-pointer hover:bg-[#2563EB]"
               >
                 <RefreshCw className="w-4 h-4" aria-hidden="true" />
                 <span>Reload page</span>
@@ -56,7 +56,7 @@ export class Wheel3DSceneErrorBoundary extends React.Component<Props, State> {
                 <button
                   type="button"
                   onClick={onClose}
-                  className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full border border-[#33333E] px-5 text-sm font-semibold text-white cursor-pointer hover:border-[#FF5500]"
+                  className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full border border-[#33333E] px-5 text-sm font-semibold text-white cursor-pointer hover:border-[#1D4ED8]"
                 >
                   <X className="w-4 h-4" aria-hidden="true" />
                   <span>Close 3D</span>

@@ -69,7 +69,7 @@ export const SiteFooter: React.FC = () => {
   const columns = contactColumns();
 
   return (
-    <footer className="bg-[#0A0A0A] text-[#F5F5F7] border-t border-[#26262E]">
+    <footer className="bg-[#111111] text-[#EDEBE4] border-t border-[#26262E]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 pt-14 md:pt-20">
         <Link to="/" aria-label="FORGED Custom Wheels, home" className="block">
           <img
@@ -100,7 +100,7 @@ export const SiteFooter: React.FC = () => {
                         <span className="max-w-xs">{link.text}</span>
                         <ArrowUpRight
                           aria-hidden="true"
-                          className="w-3.5 h-3.5 mt-0.5 shrink-0 text-neutral-500 group-hover:text-[#FF5500] transition-colors"
+                          className="w-3.5 h-3.5 mt-0.5 shrink-0 text-neutral-500 group-hover:text-[#F43F5E] transition-colors"
                         />
                       </a>
                     </li>

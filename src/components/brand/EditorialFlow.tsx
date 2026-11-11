@@ -48,7 +48,7 @@ export const EditorialFlow: React.FC = () => {
             </h2>
             <Link
               to="/installs"
-              className="inline-flex items-center min-h-11 text-sm font-medium text-[#FF5500] hover:text-[#FF6B1A] whitespace-nowrap"
+              className="inline-flex items-center min-h-11 text-sm font-medium text-[#F43F5E] hover:text-[#F43F5E] whitespace-nowrap"
             >
               See all installs
             </Link>
