@@ -14,7 +14,7 @@ import {
   stockLabel,
   wheelEnquiryMessage,
 } from './wheelEnquiry';
-import { STUDIO_FINISH_PBR, getStudioFinish } from '../data/studioFinishes';
+import { LIQUID_METAL_PBR, STUDIO_FINISH_PBR, getStudioFinish, isLiquidMetalName } from '../data/studioFinishes';
 import { WHEEL_FINISHES } from '../data/catalogue';
 
 test('classifyStudioPart recognises the documented mesh names and the short legacy names', () => {
@@ -64,6 +64,17 @@ test('every catalogue finish has studio paint settings within physical ranges', 
     }
   }
   assert.equal(getStudioFinish('not-a-finish'), STUDIO_FINISH_PBR.silver);
+});
+
+test('Liquid Metal is polished further than Silver, and only the silver id is affected', () => {
+  assert.equal(isLiquidMetalName('Liquid Metal'), true);
+  assert.equal(isLiquidMetalName('LiquidMetal'), true);
+  assert.equal(isLiquidMetalName('Silver'), false);
+  assert.equal(isLiquidMetalName(undefined), false);
+  assert.equal(getStudioFinish('silver', 'Silver'), STUDIO_FINISH_PBR.silver);
+  assert.equal(getStudioFinish('silver', 'Liquid Metal'), LIQUID_METAL_PBR);
+  assert.ok(LIQUID_METAL_PBR.roughness < STUDIO_FINISH_PBR.silver.roughness);
+  assert.equal(getStudioFinish('satin-black', 'Liquid Metal'), STUDIO_FINISH_PBR['satin-black']);
 });
 
 test('isMatteFinishName flattens matte and satin names only', () => {

@@ -13,6 +13,13 @@ meshes use assumed G80/G82 M3/M4 brake dimensions, not a measured caliper.
 `fsa002.glb`, `fsa003.glb`, `fsa004.glb`, `ff-1.glb` and `ff-3.glb` are one model per design, shared
 by every finish of that design (see `MODEL_URL_BY_CODE` in `src/data/catalogue.ts`). They were traced
 from face-on product photos and ship without baked textures, because the studio applies its own paint.
+`ff-1.glb`, `ff-3.glb`, `fsa002.glb`, `fsa003.glb` and `fsa004.glb` have since been rebuilt from that trace at about 200,000 triangles each (the FSA faces by subdividing the traced surface, which keeps the traced shape exactly): the
+outline, radii and step heights are unchanged, and the face now has chamfered and crowned spokes,
+chamfered lug pockets and tilted lip steps. Each also carries ambient occlusion baked in Blender as vertex colours (`COLOR_0`)
+on `Rim_Face_Spokes` and `Rim_Barrel`, which the studio multiplies into the paint so pockets and the
+back of the dish read darker. They are above the 150k guideline below and are about 1.4 to 1.5 MB
+each, so check them on a phone before giving another design the same treatment.
+
 On a wheel page the studio offers the listing's own finish and the design's to-order colours
 (`getToOrderFinishes` in `src/data/catalogue.ts`); the page shows the 3-month lead-time notice while a
 to-order colour is selected.
@@ -43,6 +50,8 @@ to-order colour is selected.
   `Hardware_Bolts` keeps its own material. Unrecognised meshes are treated as part of the face.
   Recommended set: `Rim_Barrel`, `Rim_Face_Spokes`, `Hardware_Bolts`, `Center_Cap`.
 - **Materials:** PBR metallic-roughness only (glTF standard). No spec/gloss or Phong.
+- **Vertex colours (optional):** `COLOR_0` on the painted parts is read as baked ambient occlusion
+  (white = open, darker = occluded). A model without it is shown unshaded, as before.
 - **Textures:** 2K BaseColor, Normal (OpenGL +Y), packed ORM (occlusion / roughness / metalness).
 - **Geometry:** 0.5–1 mm chamfers or baked normals on spoke edges; keep under ~150k triangles
   for fast mobile loads (the studio reports mesh and triangle counts after load).

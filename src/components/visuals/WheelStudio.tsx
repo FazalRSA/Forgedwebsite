@@ -234,14 +234,22 @@ function createStudioEngine(
   scene.add(floor);
 
   // Paint materials: barrel is separate from face so the brake check can ghost it alone.
-  const barrelMat = new THREE.MeshPhysicalMaterial();
-  const faceMat = new THREE.MeshPhysicalMaterial();
+  // Both read vertex colours: a model may carry baked ambient occlusion there, which dims the
+  // reflections inside pockets and behind the spokes. Models without it are given plain white.
+  const barrelMat = new THREE.MeshPhysicalMaterial({ vertexColors: true });
+  const faceMat = new THREE.MeshPhysicalMaterial({ vertexColors: true });
+  const ensureVertexColours = (geometry: THREE.BufferGeometry) => {
+    if (geometry.getAttribute('color')) return;
+    const count = geometry.getAttribute('position')?.count ?? 0;
+    const white = new Uint8Array(count * 3).fill(255);
+    geometry.setAttribute('color', new THREE.BufferAttribute(white, 3, true));
+  };
   const applyFinishTo = (
     mat: THREE.MeshPhysicalMaterial,
     finishId: WheelFinishId,
     finishName?: string
   ) => {
-    const f = getStudioFinish(finishId);
+    const f = getStudioFinish(finishId, finishName);
     const matte = isMatteFinishName(finishName);
     mat.color.set(f.hex);
     mat.metalness = matte ? Math.min(f.metalness, 0.2) : f.metalness;
@@ -432,6 +440,7 @@ function createStudioEngine(
         mesh.receiveShadow = true;
         homes.set(mesh, mesh.position.clone());
         if (FINISH_PARTS.includes(part)) {
+          ensureVertexColours(mesh.geometry);
           mesh.material = part === 'barrel' ? barrelMat : faceMat;
         } else {
           const own = Array.isArray(mesh.material) ? mesh.material : [mesh.material];

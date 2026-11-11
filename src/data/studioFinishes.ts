@@ -17,13 +17,14 @@ export interface StudioFinishPBR {
 }
 
 export const STUDIO_FINISH_PBR: Record<WheelFinishId, StudioFinishPBR> = {
-  // Silver / Liquid Metal: bright metallic silver under a light clear coat.
+  // Silver: brushed metallic silver under a light clear coat. Liquid Metal shares this id and is
+  // polished further by LIQUID_METAL_PBR below.
   silver: {
     hex: '#d9dce1',
     metalness: 1.0,
-    roughness: 0.2,
-    clearcoat: 0.6,
-    clearcoatRoughness: 0.08,
+    roughness: 0.3,
+    clearcoat: 0.5,
+    clearcoatRoughness: 0.12,
     envMapIntensity: 1.1,
   },
   // Black Matte / Gloss Black: near-black paint with a soft clear coat.
@@ -55,7 +56,30 @@ export const STUDIO_FINISH_PBR: Record<WheelFinishId, StudioFinishPBR> = {
   },
 };
 
-/** Settings for a finish id, falling back to silver for an unknown id. */
-export function getStudioFinish(finishId: WheelFinishId | string): StudioFinishPBR {
-  return STUDIO_FINISH_PBR[finishId as WheelFinishId] ?? STUDIO_FINISH_PBR.silver;
+/** Liquid Metal: the silver id polished to a near-mirror, as in the SIXNINE Liquid Metal renders. */
+export const LIQUID_METAL_PBR: StudioFinishPBR = {
+  hex: '#c9ccd2',
+  metalness: 1.0,
+  roughness: 0.06,
+  clearcoat: 1.0,
+  clearcoatRoughness: 0.03,
+  envMapIntensity: 1.25,
+};
+
+/** Whether a listing's finish name is the polished Liquid Metal rather than brushed Silver. */
+export function isLiquidMetalName(finishName?: string | null): boolean {
+  return /liquid\s*metal/i.test(finishName ?? '');
+}
+
+/**
+ * Settings for a finish id, falling back to silver for an unknown id. Silver and Liquid Metal
+ * share one catalogue id, so the listing's own finish name picks between them.
+ */
+export function getStudioFinish(
+  finishId: WheelFinishId | string,
+  finishName?: string | null
+): StudioFinishPBR {
+  const base = STUDIO_FINISH_PBR[finishId as WheelFinishId] ?? STUDIO_FINISH_PBR.silver;
+  if (base === STUDIO_FINISH_PBR.silver && isLiquidMetalName(finishName)) return LIQUID_METAL_PBR;
+  return base;
 }
