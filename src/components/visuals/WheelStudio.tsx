@@ -893,7 +893,7 @@ export const WheelStudio: React.FC<WheelStudioProps> = ({
           className="absolute inset-0 z-30 flex items-center justify-center bg-[#f0f2f5]/90"
         >
           <div className="flex items-center gap-2 text-sm font-semibold tracking-wide text-neutral-600">
-            <Loader2 className="w-4 h-4 animate-spin motion-reduce:animate-none text-[#FF5500]" />
+            <Loader2 className="w-4 h-4 animate-spin motion-reduce:animate-none text-[#F43F5E]" />
             Loading wheel…
           </div>
         </div>
@@ -905,7 +905,7 @@ export const WheelStudio: React.FC<WheelStudioProps> = ({
           className="absolute inset-0 z-30 flex items-center justify-center bg-[#f0f2f5]/95 px-6"
         >
           <div className="flex flex-col items-center gap-3 text-center">
-            <AlertTriangle className="w-6 h-6 text-[#FF5500]" />
+            <AlertTriangle className="w-6 h-6 text-[#F43F5E]" />
             <p className="text-sm text-neutral-700 max-w-xs">{error}</p>
             {engineRef.current && (
               <button

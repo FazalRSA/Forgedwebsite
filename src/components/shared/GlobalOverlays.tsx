@@ -15,10 +15,10 @@ import { Link } from '../../utils/router';
  * There is no backend, e-mail or database behind this form.
  */
 const inputClass =
-  'w-full min-h-12 px-4 bg-[#141418] border border-[#26262E] text-[#F5F5F7] text-base rounded-xl focus:outline-none focus:border-[#FF5500] transition-colors placeholder:text-neutral-500';
+  'w-full min-h-12 px-4 bg-[#141418] border border-[#26262E] text-[#EDEBE4] text-base rounded-xl focus:outline-none focus:border-[#F43F5E] transition-colors placeholder:text-neutral-500';
 const labelClass = 'block text-sm text-[#C2C2CC] mb-1.5';
 const primaryButtonClass =
-  'flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#FF5500] px-6 text-base font-semibold text-[#0A0A0A] hover:bg-[#FF6B1A] transition-colors cursor-pointer';
+  'flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#1D4ED8] px-6 text-base font-semibold text-white hover:bg-[#2563EB] transition-colors cursor-pointer';
 
 const EnquiryDialog: React.FC = () => {
   const { enquiryModal, closeEnquiryModal, submitEnquiryRecord } = useForgedStore();
@@ -102,7 +102,7 @@ const EnquiryDialog: React.FC = () => {
         aria-modal="true"
         aria-labelledby="enquiry-title"
         tabIndex={-1}
-        className="w-full max-w-md max-h-[92svh] overflow-y-auto rounded-t-3xl sm:rounded-3xl bg-[#0E0E12] text-[#F5F5F7] border border-[#26262E] p-5 sm:p-6 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-2xl focus:outline-none"
+        className="w-full max-w-md max-h-[92svh] overflow-y-auto rounded-t-3xl sm:rounded-3xl bg-[#0E0E12] text-[#EDEBE4] border border-[#26262E] p-5 sm:p-6 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-2xl focus:outline-none"
       >
         <div className="flex items-start justify-between gap-4">
           <h2 id="enquiry-title" className="text-xl font-semibold tracking-tight text-white">
@@ -123,7 +123,7 @@ const EnquiryDialog: React.FC = () => {
             {done.whatsappHref ? (
               <>
                 <p className="flex items-start gap-2 text-sm text-[#C2C2CC]">
-                  <CheckCircle2 className="w-5 h-5 text-[#FF5500] shrink-0" aria-hidden="true" />
+                  <CheckCircle2 className="w-5 h-5 text-[#F43F5E] shrink-0" aria-hidden="true" />
                   <span>WhatsApp should be opening with your message. Tap Send there to reach us.</span>
                 </p>
                 <a
@@ -210,7 +210,7 @@ const EnquiryDialog: React.FC = () => {
             </div>
 
             {error && (
-              <p role="alert" className="text-sm text-[#FF7A3D]">
+              <p role="alert" className="text-sm text-[#F43F5E]">
                 {error}
               </p>
             )}

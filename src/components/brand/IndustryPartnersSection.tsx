@@ -26,7 +26,7 @@ const PartnerLogo: React.FC<{ partner: Partner }> = ({ partner }) => {
         <Link
           to={partner.href}
           aria-label={`${partner.name}${partner.caption ? `, ${partner.caption}` : ''}`}
-          className="flex flex-col items-center gap-2 rounded-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#FF5500]"
+          className="flex flex-col items-center gap-2 rounded-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#F43F5E]"
         >
           {logo}
           {caption && <span className="text-sm text-neutral-300 underline underline-offset-4">{partner.caption}</span>}

@@ -125,7 +125,7 @@ export const WheelCatalogue: React.FC = () => {
                     onClick={() => setSelectedDesign(design)}
                     className={`min-h-11 px-4 rounded-full text-sm font-medium transition-colors cursor-pointer ${
                       active
-                        ? 'bg-[#F5F5F7] text-[#0A0A0A]'
+                        ? 'bg-[#EDEBE4] text-[#111111]'
                         : 'border border-[#33333E] text-neutral-300 hover:border-neutral-500 hover:text-white'
                     }`}
                   >

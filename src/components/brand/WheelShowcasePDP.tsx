@@ -37,7 +37,7 @@ interface WheelShowcasePDPProps {
 }
 
 const PRIMARY_BUTTON =
-  'inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[#FF5500] px-6 text-base font-semibold text-[#0A0A0A] hover:bg-[#FF6B1A] active:bg-[#E64D00] transition-colors cursor-pointer';
+  'inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[#1D4ED8] px-6 text-base font-semibold text-white hover:bg-[#2563EB] active:bg-[#1E40AF] transition-colors cursor-pointer';
 
 /** Real photographs only: a generated stand-in picture (data: URL) is not a photo of this wheel. */
 function realPhotos(wheel: BrandWheelItem): string[] {
@@ -51,7 +51,7 @@ export const WheelShowcasePDP: React.FC<WheelShowcasePDPProps> = ({ slug }) => {
 
   if (!wheel) {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] text-[#F5F5F7]">
+      <div className="min-h-screen bg-[#111111] text-[#EDEBE4]">
         <BrandHeader forceLight={false} />
         <main className="mx-auto max-w-xl px-4 py-20 text-center">
           <h1 className="text-2xl font-semibold text-white">This wheel is not available</h1>
@@ -161,7 +161,7 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
   ].filter((row): row is { label: string; value: string } => Boolean(row));
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-[#F5F5F7]">
+    <div className="min-h-screen bg-[#111111] text-[#EDEBE4]">
       <BrandHeader forceLight={false} />
 
       <main className="mx-auto max-w-6xl px-4 sm:px-6 pt-3 pb-40 md:pb-16">
@@ -192,7 +192,7 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
                   The 3D view is a guide to shape and finish. The photos show the real wheels.
                 </p>
                 {previewingToOrder && (
-                  <p className="mt-1 text-xs text-[#FF8A4D]">
+                  <p className="mt-1 text-xs text-[#F43F5E]">
                     This colour is not in stock. {TO_ORDER_NOTICE}
                   </p>
                 )}
@@ -221,7 +221,7 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
               {priceText}{' '}
               <span className="text-base font-normal text-neutral-300">per set of 4</span>
             </p>
-            {stock && <p className="mt-1 text-sm text-[#FF8A4D]">{stock}</p>}
+            {stock && <p className="mt-1 text-sm text-[#F43F5E]">{stock}</p>}
 
             <div className="mt-5" data-testid="finish-options">
               <p className="text-sm text-neutral-400">In stock</p>
@@ -237,7 +237,7 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
                   <Link
                     key={s.slug}
                     to={`/wheels/${s.slug}`}
-                    className="inline-flex min-h-11 items-center gap-2 rounded-full border border-[#33333E] px-4 text-sm text-neutral-200 hover:border-[#FF5500] hover:text-white"
+                    className="inline-flex min-h-11 items-center gap-2 rounded-full border border-[#33333E] px-4 text-sm text-neutral-200 hover:border-[#1D4ED8] hover:text-white"
                   >
                     <Swatch hex={WHEEL_FINISHES[s.defaultFinish]?.swatchHex} />
                     {s.finishName ?? WHEEL_FINISHES[s.defaultFinish]?.name}
@@ -272,7 +272,7 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
                 ref={view3DButtonRef}
                 type="button"
                 onClick={openStudio}
-                className="mt-5 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full border border-[#33333E] px-6 text-base font-semibold text-white hover:border-[#FF5500] transition-colors cursor-pointer"
+                className="mt-5 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full border border-[#33333E] px-6 text-base font-semibold text-white hover:border-[#1D4ED8] transition-colors cursor-pointer"
               >
                 <Play className="w-4 h-4 fill-current" aria-hidden="true" />
                 View in 3D
@@ -312,7 +312,7 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
                 <li key={w.slug}>
                   <Link
                     to={`/wheels/${w.slug}`}
-                    className="flex min-h-14 items-center justify-between gap-3 rounded-xl border border-[#26262E] px-4 py-2 hover:border-[#FF5500]"
+                    className="flex min-h-14 items-center justify-between gap-3 rounded-xl border border-[#26262E] px-4 py-2 hover:border-[#1D4ED8]"
                   >
                     <span className="flex items-center gap-3 min-w-0">
                       <Swatch hex={WHEEL_FINISHES[w.defaultFinish]?.swatchHex} />
@@ -328,7 +328,7 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
       </main>
 
       {/* Phone: price and the one action stay in reach while scrolling. */}
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[#26262E] bg-[#0A0A0A]/95 px-4 pt-2.5 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur md:hidden">
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[#26262E] bg-[#111111]/95 px-4 pt-2.5 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur md:hidden">
         <div className="mb-2 flex items-baseline justify-between gap-3">
           <p className="text-lg font-semibold text-white">
             {priceText} <span className="text-xs font-normal text-neutral-300">per set of 4</span>
@@ -342,7 +342,7 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
 };
 
 const TO_ORDER_CHIP =
-  'inline-flex min-h-11 items-center gap-2 rounded-full border border-dashed border-[#4A4A57] px-4 text-sm text-neutral-200 hover:border-[#FF5500] hover:text-white cursor-pointer';
+  'inline-flex min-h-11 items-center gap-2 rounded-full border border-dashed border-[#4A4A57] px-4 text-sm text-neutral-200 hover:border-[#1D4ED8] hover:text-white cursor-pointer';
 
 /** A colour that is not in stock. Tapping it starts an enquiry that states the lead time. */
 const ToOrderChip: React.FC<{
@@ -390,8 +390,8 @@ const View3DPoster: React.FC<{ onClick: () => void }> = ({ onClick }) => (
     onClick={onClick}
     className="absolute bottom-3 left-3 inline-flex min-h-11 items-center gap-2 rounded-full bg-black/75 px-4 text-sm font-semibold text-white backdrop-blur cursor-pointer hover:bg-black"
   >
-    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#FF5500]">
-      <Play className="h-3 w-3 fill-[#0A0A0A] text-[#0A0A0A]" aria-hidden="true" />
+    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#1D4ED8]">
+      <Play className="h-3 w-3 fill-[#111111] text-[#111111]" aria-hidden="true" />
     </span>
     View in 3D
   </button>
@@ -491,7 +491,7 @@ const PhotoGallery: React.FC<{
               >
                 <span
                   className={`block h-2 w-2 rounded-full transition-colors ${
-                    active === i ? 'bg-[#FF5500]' : 'bg-neutral-600'
+                    active === i ? 'bg-[#1D4ED8]' : 'bg-neutral-600'
                   }`}
                 />
               </button>
@@ -525,7 +525,7 @@ const NoPhotoPanel: React.FC<{
         ref={triggerRef}
         type="button"
         onClick={onView3D}
-        className="inline-flex min-h-12 items-center gap-2 rounded-full bg-[#FF5500] px-6 text-base font-semibold text-[#0A0A0A] hover:bg-[#FF6B1A] cursor-pointer"
+        className="inline-flex min-h-12 items-center gap-2 rounded-full bg-[#1D4ED8] px-6 text-base font-semibold text-white hover:bg-[#2563EB] cursor-pointer"
       >
         <Play className="h-4 w-4 fill-current" aria-hidden="true" />
         View in 3D

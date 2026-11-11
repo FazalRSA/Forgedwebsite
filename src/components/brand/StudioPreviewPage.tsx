@@ -56,7 +56,7 @@ export const StudioPreviewPage: React.FC<{ slug: string }> = ({ slug }) => {
 
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-[#F5F5F7]">
+    <div className="min-h-screen bg-[#111111] text-[#EDEBE4]">
       <BrandHeader />
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
         {wheel ? (

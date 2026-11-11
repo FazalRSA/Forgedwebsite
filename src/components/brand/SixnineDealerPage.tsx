@@ -63,7 +63,7 @@ export const SixnineDealerPage: React.FC = () => {
   }, [wheels]);
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-[#F5F5F7]">
+    <div className="min-h-screen bg-[#111111] text-[#EDEBE4]">
       <BrandHeader />
 
       <main>
@@ -77,7 +77,7 @@ export const SixnineDealerPage: React.FC = () => {
               className="w-28 h-28 sm:w-36 sm:h-36 shrink-0 object-contain"
             />
             <div className="max-w-2xl">
-              <p className="text-sm uppercase tracking-[0.14em] text-[#FF5500]">Official dealer</p>
+              <p className="text-sm uppercase tracking-[0.14em] text-[#F43F5E]">Official dealer</p>
               <h1 className="mt-2 text-4xl sm:text-5xl font-light tracking-[-0.03em] leading-tight text-white">
                 Sixnine Wheels dealer in Durban
               </h1>

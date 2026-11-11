@@ -25,7 +25,7 @@ export const ContactPage: React.FC = () => {
     rows.push({
       label: 'Phone',
       content: (
-        <a href={phoneHref} className="inline-flex items-center min-h-11 text-white underline underline-offset-4 hover:text-[#FF5500]">
+        <a href={phoneHref} className="inline-flex items-center min-h-11 text-white underline underline-offset-4 hover:text-[#F43F5E]">
           {SITE.phoneDisplay}
         </a>
       ),
@@ -35,7 +35,7 @@ export const ContactPage: React.FC = () => {
     rows.push({
       label: 'Email',
       content: (
-        <a href={`mailto:${SITE.tradeEmail}`} className="inline-flex items-center min-h-11 text-white underline underline-offset-4 hover:text-[#FF5500]">
+        <a href={`mailto:${SITE.tradeEmail}`} className="inline-flex items-center min-h-11 text-white underline underline-offset-4 hover:text-[#F43F5E]">
           {SITE.tradeEmail}
         </a>
       ),
@@ -55,7 +55,7 @@ export const ContactPage: React.FC = () => {
           href={SITE.instagramUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center min-h-11 text-white underline underline-offset-4 hover:text-[#FF5500]"
+          className="inline-flex items-center min-h-11 text-white underline underline-offset-4 hover:text-[#F43F5E]"
         >
           Instagram
         </a>
@@ -70,7 +70,7 @@ export const ContactPage: React.FC = () => {
           href={SITE.facebookUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center min-h-11 text-white underline underline-offset-4 hover:text-[#FF5500]"
+          className="inline-flex items-center min-h-11 text-white underline underline-offset-4 hover:text-[#F43F5E]"
         >
           Facebook
         </a>
@@ -79,7 +79,7 @@ export const ContactPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-[#F5F5F7]">
+    <div className="min-h-screen bg-[#111111] text-[#EDEBE4]">
       <BrandHeader />
 
       <main className="max-w-3xl mx-auto px-4 sm:px-6 md:px-10 py-12 sm:py-16">
@@ -97,7 +97,7 @@ export const ContactPage: React.FC = () => {
           enquirySubject="Wheel enquiry"
           label="Message us on WhatsApp"
           fallbackLabel="Send an enquiry"
-          className="mt-8 inline-flex w-full sm:w-auto items-center justify-center gap-3 min-h-14 px-8 rounded-full bg-[#FF5500] text-white text-lg font-medium hover:bg-[#FF6B1A] transition-colors cursor-pointer"
+          className="mt-8 inline-flex w-full sm:w-auto items-center justify-center gap-3 min-h-14 px-8 rounded-full bg-[#1D4ED8] text-white text-lg font-medium hover:bg-[#2563EB] transition-colors cursor-pointer"
         />
 
         {rows.length > 0 && (
@@ -115,7 +115,7 @@ export const ContactPage: React.FC = () => {
           <h2 id="what-to-send" className="text-xl font-medium text-white">
             What to send us
           </h2>
-          <ul className="mt-4 space-y-2 text-neutral-300 list-disc pl-5 marker:text-[#FF5500]">
+          <ul className="mt-4 space-y-2 text-neutral-300 list-disc pl-5 marker:text-[#F43F5E]">
             {WHAT_TO_SEND.map((item) => (
               <li key={item}>{item}</li>
             ))}

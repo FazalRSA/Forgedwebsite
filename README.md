@@ -211,12 +211,13 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
 
 The look is dark, restrained and technical. Keep new work inside it.
 
-- **Colour tokens** live in `src/index.css`: onyx surfaces (`#0A0A0A`, `#121215`, `#18181D`), borders (`#26262E`), text greys and one accent, electric orange (`#FF5500`). Do not add new colours; WhatsApp green and Instagram pink appear only on those channels' own buttons.
+- **Colour tokens** live in `src/index.css`: the brand palette of off-white text (`#EDEBE4`), black background (`#111111`), blue (`#1D4ED8`) for button fills and selected states, and rose (`#F43F5E`) for accent text and keyboard focus, plus onyx surfaces (`#121215`, `#18181D`), borders (`#26262E`) and text greys. Blue text on the black background is too faint to read, so accent text is always rose. Do not add new colours; WhatsApp green and Instagram pink appear only on those channels' own buttons.
 - **Logo.** `public/brand/forged-monogram.svg` (gold) and `public/brand/forged-wordmark.svg` (red and white FORGED SA) were traced from the logo files on the business's WordPress site. Their red and gold belong to the logo only; do not use them as interface colours. Use `BrandLogo` (`src/components/shared/`) for the monogram and wordmark together. The browser icons in `public/` are the monogram on an onyx tile.
 - **Footer.** `SiteFooter` (`src/components/brand/`) is on every page: the wordmark across the full width, then one column per contact channel set in `src/config/site.ts`, then the page links. An empty channel has no column.
 - **Three typefaces**, each with one job:
-  - **Fraunces italic** (`--font-serif`, via `.font-editorial-serif`) for editorial headlines.
-  - **Geist Sans** (`--font-sans`) for body text.
+  - **Satoshi Black** (`--font-display`, self-hosted in `public/fonts`) for every `h1`.
+  - **Nunito** (`--font-heading`) for other headings; `.font-editorial-serif` is Nunito italic for emphasis words.
+  - **Open Sans** (`--font-sans`) for body text.
   - **Geist Mono** (`--font-mono`, via `.font-tech-mono`) for specifications and uppercase labels.
 - **Reuse these components** rather than the plain HTML element:
   - `SafeImage` (`src/components/shared/`) instead of `<img>` for wheel photography. A broken image URL shows the site's placeholder card instead of the browser's broken-image icon.
