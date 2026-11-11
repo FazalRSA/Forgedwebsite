@@ -306,7 +306,7 @@ A wheel with a `modelUrl` opens in the studio (`src/components/visuals/WheelStud
 
 - One model per wheel **design**. `MODEL_URL_BY_CODE` in `catalogue.ts` maps a model code to its `.glb`; every finish of that design shares the file and the studio repaints it. Photo-backed entries in `customWheels.json` carry the same `modelUrl`.
 - FSA001 sets its own front and rear pair on its seed (`modelUrl` and `rearModelUrl`), which enables the Front / Rear switch.
-- Paint settings per finish live in `src/data/studioFinishes.ts`.
+- Paint settings per finish live in `src/data/studioFinishes.ts`. Silver and Liquid Metal share one finish id; a listing named Liquid Metal is painted with the polished `LIQUID_METAL_PBR` instead of brushed silver.
 - On a wheel page the studio offers the listing's own finish plus the design's to-order colours. While a to-order colour is selected, the page shows the lead-time notice under the viewer.
 
 **Model requirements** (full detail in `public/models/wheels/README.md`)
@@ -315,10 +315,10 @@ A wheel with a `modelUrl` opens in the studio (`src/components/visuals/WheelStud
 - Axle bore centre at the origin, face toward +Z, real metres.
 - Sub-meshes named `Rim_Barrel`, `Rim_Face_Spokes`, `Hardware_Bolts`, `Center_Cap`. The barrel, face and cap take the selected finish; bolts keep their own material. A wheel with no cap may omit `Center_Cap`.
 - Optional `Brake_Rotor` and `Brake_Caliper` meshes enable the brake clearance check.
-- Baked textures are not needed: the studio applies its own paint, so models ship without them to keep downloads small (0.4 to 0.8 MB each today).
+- Baked textures are not needed: the studio applies its own paint, so models ship without them to keep downloads small (0.4 to 0.8 MB each today; the rebuilt FF-1 is about 1.5 MB).
 - Keep under roughly 150k triangles for mobile.
 
-**Accuracy of the current models.** The FSA002, FSA003, FSA004, FF-1 and FF-3 models were traced from face-on product photos. Spoke layout, window shapes, bolt positions and hubs follow the photos; spoke sculpting, cap logos and engraving are simplified, and depth is estimated except on FSA002. Replacing them with 3D scans of the physical wheels is the planned upgrade. The FSA001 brake meshes use assumed G80 brake dimensions, not a measured caliper.
+**Accuracy of the current models.** The FSA002, FSA003, FSA004, FF-1 and FF-3 models were traced from face-on product photos. Spoke layout, window shapes, bolt positions and hubs follow the photos; spoke sculpting, cap logos and engraving are simplified, and depth is estimated except on FSA002. The FF-1 model has been rebuilt from its trace at about 200,000 triangles with chamfered spokes and occlusion baked in Blender (see `public/models/wheels/README.md`); it is still an estimate of depth, not a scan. Replacing them with 3D scans of the physical wheels is the planned upgrade. The FSA001 brake meshes use assumed G80 brake dimensions, not a measured caliper.
 
 ## Search and sharing
 
