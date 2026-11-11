@@ -13,7 +13,7 @@ meshes use assumed G80/G82 M3/M4 brake dimensions, not a measured caliper.
 `fsa002.glb`, `fsa003.glb`, `fsa004.glb`, `ff-1.glb` and `ff-3.glb` are one model per design, shared
 by every finish of that design (see `MODEL_URL_BY_CODE` in `src/data/catalogue.ts`). They were traced
 from face-on product photos and ship without baked textures, because the studio applies its own paint.
-`ff-1.glb` and `ff-3.glb` have since been rebuilt from that trace at about 200,000 triangles each: the
+`ff-1.glb`, `ff-3.glb`, `fsa002.glb`, `fsa003.glb` and `fsa004.glb` have since been rebuilt from that trace at about 200,000 triangles each (the FSA faces by subdividing the traced surface, which keeps the traced shape exactly): the
 outline, radii and step heights are unchanged, and the face now has chamfered and crowned spokes,
 chamfered lug pockets and tilted lip steps. Each also carries ambient occlusion baked in Blender as vertex colours (`COLOR_0`)
 on `Rim_Face_Spokes` and `Rim_Barrel`, which the studio multiplies into the paint so pockets and the
