@@ -13,12 +13,12 @@ meshes use assumed G80/G82 M3/M4 brake dimensions, not a measured caliper.
 `fsa002.glb`, `fsa003.glb`, `fsa004.glb`, `ff-1.glb` and `ff-3.glb` are one model per design, shared
 by every finish of that design (see `MODEL_URL_BY_CODE` in `src/data/catalogue.ts`). They were traced
 from face-on product photos and ship without baked textures, because the studio applies its own paint.
-`ff-1.glb` has since been rebuilt from that trace at about 200,000 triangles: the outline, radii and
-step heights are unchanged, and the face now has chamfered and crowned spokes, chamfered lug pockets
-and tilted lip steps. It also carries ambient occlusion baked in Blender as vertex colours (`COLOR_0`)
+`ff-1.glb` and `ff-3.glb` have since been rebuilt from that trace at about 200,000 triangles each: the
+outline, radii and step heights are unchanged, and the face now has chamfered and crowned spokes,
+chamfered lug pockets and tilted lip steps. Each also carries ambient occlusion baked in Blender as vertex colours (`COLOR_0`)
 on `Rim_Face_Spokes` and `Rim_Barrel`, which the studio multiplies into the paint so pockets and the
-back of the dish read darker. It is above the 150k guideline below and is about 1.5 MB, so check it
-on a phone before giving another design the same treatment.
+back of the dish read darker. They are above the 150k guideline below and are about 1.4 to 1.5 MB
+each, so check them on a phone before giving another design the same treatment.
 
 On a wheel page the studio offers the listing's own finish and the design's to-order colours
 (`getToOrderFinishes` in `src/data/catalogue.ts`); the page shows the 3-month lead-time notice while a
