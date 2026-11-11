@@ -96,7 +96,7 @@ npm install --legacy-peer-deps
 
 Do not commit `package-lock.json`; the repository tracks `bun.lock` only.
 
-No environment variables are needed to run or build the site. On Render the build reads `RENDER_EXTERNAL_URL`, which Render sets itself, for the links in `llms.txt`.
+No environment variables are needed to run or build the site.
 
 Two things look like setup and are not:
 
@@ -335,7 +335,7 @@ All search metadata is produced by `src/utils/seo.ts` and applied on every route
 
 ### For AI assistants and coding agents
 
-- **`/llms.txt`** follows the [llmstxt.org](https://llmstxt.org) format. `scripts/generate-llms.ts` writes it into `dist/` at the end of every build, from `src/utils/llms.ts`: every in-stock set with its Rand price, sizes and fitment, the to-order lead time, contact details and the main pages. Assistants cannot run this single-page app, so this file is what they can read. Nothing in it is typed by hand. Its links use the address Render publishes the build at (`RENDER_EXTERNAL_URL`), and fall back to the domain in `src/config/site.ts`.
+- **`/llms.txt`** follows the [llmstxt.org](https://llmstxt.org) format. `scripts/generate-llms.ts` writes it into `dist/` at the end of every build, from `src/utils/llms.ts`: every in-stock set with its Rand price, sizes and fitment, the to-order lead time, contact details and the main pages. Assistants cannot run this single-page app, so this file is what they can read. Nothing in it is typed by hand. Its links always use the production domain in `src/config/site.ts`, like the canonical URLs and the sitemap.
 - **"Ask AI about us"** (`AskAiSection`, links built in `src/utils/askAi.ts`) is a row of buttons on the home page for ChatGPT, Claude, Perplexity and Google AI. Each opens that assistant in a new tab with a question typed in that points at `/llms.txt` on the address the visitor is on. The site sends nothing itself, and the question asks for facts only.
 - **`AGENTS.md`** at the repository root gives AI coding agents the commands and the rules that are easy to break. Keep it in step with this file.
 
@@ -395,7 +395,7 @@ The page rules in `render.yaml` are written by the build. Do not edit the block 
 
 **Checking a deploy.** Render's CDN caches each page's HTML for up to five minutes, so a visitor can see the previous version briefly after a deploy goes live. To check a new deploy straight away, add any query string to the URL, for example `/installs?check=1`.
 
-**Moving the domain.** To go live on `forgedsa.co.za`, add it as a custom domain in the host's dashboard and point the DNS records it gives you at the domain registrar. Canonical URLs and the sitemap already use that domain. `llms.txt` links use Render's own address while Render sets `RENDER_EXTERNAL_URL`; change `scripts/generate-llms.ts` to prefer the domain once it is connected. The domain currently serves the business's existing WordPress site, which the DNS change replaces, so keep anything still needed from it first.
+**Moving the domain.** To go live on `forgedsa.co.za`, add it as a custom domain in the host's dashboard and point the DNS records it gives you at the domain registrar. Canonical URLs, the sitemap and `llms.txt` already use that domain, so their links only resolve to this site once the DNS change is done. If the domain's DNS is managed by the hosting provider (for example DirectAdmin), edit the A record for `@` and the CNAME for `www` there, remove any AAAA records, and leave the MX and mail records alone so email keeps working. The domain currently serves the business's existing WordPress site, which the DNS change replaces, so keep anything still needed from it first.
 
 Vercel's free Hobby plan is for non-commercial use only, so a business site needs Vercel Pro. Render's static sites are free to deploy; check the bandwidth included with the workspace plan against traffic.
 
