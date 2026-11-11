@@ -22,7 +22,7 @@ import {
   stockLabel,
   wheelEnquiryMessage,
 } from '../../utils/wheelEnquiry';
-import { prefersReducedMotion } from '../../utils/wheelStudioParts';
+import { prefersReducedMotion } from '../../wheel-viewer/wheelStudioParts';
 import { BrandHeader } from './BrandHeader';
 import { WheelStage } from '../visuals/WheelStage';
 
