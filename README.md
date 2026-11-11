@@ -20,6 +20,7 @@ It shows the wheels that are in stock, each in photography and an interactive 3D
 ## Contents
 
 1. [What the site does](#what-the-site-does)
+    - [Where to change what](#where-to-change-what)
 2. [Quick start](#quick-start)
 3. [Scripts](#scripts)
 4. [Routes](#routes)
@@ -28,6 +29,7 @@ It shows the wheels that are in stock, each in photography and an interactive 3D
 7. [Inventory](#inventory)
 8. [Catalogue data model](#catalogue-data-model)
 9. [Adding or changing a wheel](#adding-or-changing-a-wheel)
+    - [Adding or correcting a customer install](#adding-or-correcting-a-customer-install)
 10. [3D wheel studio](#3d-wheel-studio)
 11. [Search and sharing](#search-and-sharing)
     - [For AI assistants and coding agents](#for-ai-assistants-and-coding-agents)
@@ -58,6 +60,25 @@ The 3D viewer is a Three.js studio with physically based paint finishes, fixed c
 
 Removed in the simplification: the store and its fitment finder, collections and product pages, dealer applications, and client accounts with a garage. Their old addresses redirect (see [Routes](#routes)).
 
+### Where to change what
+
+Every change below is a file edit, then a pull request. Merging to `main` publishes it.
+
+| To do this | Change this | Then |
+| --- | --- | --- |
+| Mark a set as sold, or change a price, size or stock count | The listing's seed in `INVENTORY_SEEDS`, `src/data/catalogue.ts` | Nothing else. The grid, wheel page, sitemap, `llms.txt` and Sixnine page all read the catalogue |
+| Add photos to a listing | Three WebPs in `public/images/wheels/<slug>/` and an entry in `src/data/customWheels.json` | See [Adding or changing a wheel](#adding-or-changing-a-wheel) |
+| Add a new listing | `bun run add-wheel` | Same section |
+| Add or replace a 3D model | A `.glb` in `public/models/wheels/` and `MODEL_URL_BY_CODE` in `catalogue.ts` | See [3D wheel studio](#3d-wheel-studio) |
+| Change how a finish looks in 3D | `src/data/studioFinishes.ts` | Check the wheel page in the viewer |
+| Change the to-order lead time | `TO_ORDER_LEAD_TIME` in `catalogue.ts` | Nothing else; pages and `llms.txt` read it |
+| Change the phone, WhatsApp, address or social links | `src/config/site.ts` | Nothing else; empty values are hidden |
+| Add or correct a customer install | `scripts/fitment-reshoot/jobs.json`, then the re-shoot scripts | See [Adding or correcting a customer install](#adding-or-correcting-a-customer-install) |
+| Add or remove a partner logo | `src/data/partners.ts` and `public/images/partners/` | Owner's confirmation first |
+| Add a page | `src/App.tsx`, then `metaForPath` and `sitemapPaths` in `src/utils/seo.ts`, a link in `src/utils/llms.ts` | Update `src/utils/seo.test.ts` |
+| Remove a page | Add its address to `src/utils/redirects.ts` and `scripts/legacy-pages.json` | A test checks the two agree |
+| Change a page title or description | `metaForPath` in `src/utils/seo.ts` | Titles stay under 60 characters |
+
 ## Quick start
 
 **Requirements:** [Bun](https://bun.sh) 1.x (the committed lockfile is `bun.lock`) or Node 22+.
@@ -75,7 +96,12 @@ npm install --legacy-peer-deps
 
 Do not commit `package-lock.json`; the repository tracks `bun.lock` only.
 
-No environment variables are needed. On Render the build reads `RENDER_EXTERNAL_URL`, which Render sets itself, for the links in `llms.txt`.
+No environment variables are needed to run or build the site.
+
+Two things look like setup and are not:
+
+- `.env.example` (`GEMINI_API_KEY`, `APP_URL`) is left over from the Google AI Studio starter the project began as. Nothing in the site reads either value.
+- `OPENROUTER_API_KEY` is used only by the install re-shoot scripts in `scripts/fitment-reshoot/`, which run on a developer's machine and never in the build. Set it in your shell's environment; do not put it in a file in the repository.
 
 ## Scripts
 
@@ -90,6 +116,8 @@ No environment variables are needed. On Render the build reads `RENDER_EXTERNAL_
 | `bun run clean` | Removes `dist/` |
 
 Run `lint`, `test` and `build` before every pull request. The repository has no CI, so these local checks are the gate.
+
+`lint` is the TypeScript type check only. `eslint.config.mjs` exists and checks `firestore.rules` alone; no script runs it.
 
 ## Routes
 
@@ -122,6 +150,9 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
 .
 ├─ index.html                     Single-page shell and static share tags
 ├─ AGENTS.md                      Commands and project rules for AI coding agents
+├─ render.yaml · vercel.json      Host configuration (Render is in use)
+├─ vite.config.ts                 Build config: the `@` alias (repository root) and vendor chunks
+├─ metadata.json · .env.example   Left over from the Google AI Studio starter; the site reads neither
 ├─ firebase-applet-config.json    Firebase project config (public web keys)
 ├─ firebase-blueprint.json        JSON Schema for the Firestore documents
 ├─ firestore.rules                Firestore security rules
@@ -129,9 +160,11 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
 ├─ security_spec.md               Rules invariants and adversarial payloads
 ├─ public/
 │  ├─ images/wheels/<slug>/       front.webp · hero.webp · profile.webp per wheel
-│  ├─ models/wheels/              .glb models for the 3D viewer
-│  ├─ assets/fitments/<slug>/     front34.webp · side.webp · original.webp per install
+│  ├─ models/wheels/              .glb models for the 3D viewer, and README.md with the model spec
+│  ├─ assets/fitments/<slug>/     front34.webp · side.webp · original.webp per install, each with an 800 px thumbnail
 │  ├─ images/partners/            Partner logos (transparent WebP)
+│  ├─ brand/                      FORGED monogram and wordmark (SVG)
+│  ├─ favicon.ico · icon.svg · apple-touch-icon.png   Browser and home-screen icons
 │  ├─ robots.txt
 │  └─ sitemap.xml                 Generated on every build
 ├─ scripts/
@@ -141,9 +174,12 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
 │  ├─ legacy-shells.ts            Writes a redirect page for each address in legacy-pages.json
 │  ├─ legacy-pages.json           The removed addresses that still get a redirect page
 │  ├─ generate-llms.ts            Writes dist/llms.txt
-│  └─ fitment-reshoot/            Pipeline for the install studio re-shoots
-├─ components/ui/                 Global footer and shared UI primitives
+│  └─ fitment-reshoot/            Pipeline for the install studio re-shoots (jobs.json, Python scripts, README.md)
+├─ docs/installs-pipeline.md      How the Installs gallery is made, with animated diagrams (docs/assets/)
+├─ components/ui/                 Shared UI primitives (button, input, label, icons)
+├─ lib/utils.ts                   `cn()` class-name helper used by those primitives
 └─ src/
+   ├─ main.tsx · index.css        Entry point; colour and type tokens
    ├─ App.tsx                     Providers, route switch, lazy-loaded pages, page metadata
    ├─ config/site.ts              Business identity and contact channels
    ├─ data/catalogue.ts           Types, the 14 stock listings, in-stock filter, siblings, to-order colours, helpers
@@ -153,6 +189,7 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
    ├─ data/partners.ts            Industry partners shown on the home page
    ├─ store/                      Zustand store (enquiry form, admin preview) in localStorage
    ├─ context/FirebaseContext.tsx Firebase provider (kept, not mounted by any page)
+   ├─ lib/firebase.ts             Firebase setup used by that provider
    ├─ utils/router.tsx            pushState router and crawlable <Link>
    ├─ utils/lazyWithRetry.ts      React.lazy with retries, for the 3D viewer's code
    ├─ utils/redirects.ts          Old address to new address
@@ -161,10 +198,12 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
    ├─ utils/askAi.ts              The "Ask AI about us" links and their question
    ├─ utils/wheelStudioParts.ts   Part classification and camera maths for the viewer
    ├─ utils/wheelBuilder.ts       Builds a stock listing from a short input
+   ├─ utils/wheelEnquiry.ts       Reads the spec line and words the WhatsApp enquiry
    └─ components/
-      ├─ brand/                   Home, catalogue, wheel page, installs, Sixnine dealer page, partners strip, Ask AI, contact, privacy
+      ├─ ui/                      Re-exports of the root components/ui primitives
+      ├─ brand/                   Header, footer, home, catalogue, wheel page, installs, Sixnine dealer page, partners strip, Ask AI, contact, privacy
       ├─ admin/                   Admin uploader
-      ├─ shared/                  Enquiry form, SafeImage
+      ├─ shared/                  BrandLogo, enquiry form, SafeImage
       └─ visuals/                 WheelStudio (3D), WheelStage, its loading skeleton and error boundary
 ```
 
@@ -172,10 +211,13 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
 
 The look is dark, restrained and technical. Keep new work inside it.
 
-- **Colour tokens** live in `src/index.css`: onyx surfaces (`#0A0A0A`, `#121215`, `#18181D`), borders (`#26262E`), text greys and one accent, electric orange (`#FF5500`). Do not add new colours; WhatsApp green and Instagram pink appear only on those channels' own buttons.
+- **Colour tokens** live in `src/index.css`: the brand palette of off-white text (`#EDEBE4`), black background (`#111111`), blue (`#1D4ED8`) for button fills and selected states, and rose (`#F43F5E`) for accent text and keyboard focus, plus onyx surfaces (`#121215`, `#18181D`), borders (`#26262E`) and text greys. Blue text on the black background is too faint to read, so accent text is always rose. Do not add new colours; WhatsApp green and Instagram pink appear only on those channels' own buttons.
+- **Logo.** `public/brand/forged-monogram.svg` (gold) and `public/brand/forged-wordmark.svg` (red and white FORGED SA) were traced from the logo files on the business's WordPress site. Their red and gold belong to the logo only; do not use them as interface colours. Use `BrandLogo` (`src/components/shared/`) for the monogram and wordmark together. The browser icons in `public/` are the monogram on an onyx tile.
+- **Footer.** `SiteFooter` (`src/components/brand/`) is on every page: the wordmark across the full width, then one column per contact channel set in `src/config/site.ts`, then the page links. An empty channel has no column.
 - **Three typefaces**, each with one job:
-  - **Fraunces italic** (`--font-serif`, via `.font-editorial-serif`) for editorial headlines.
-  - **Geist Sans** (`--font-sans`) for body text.
+  - **Satoshi Black** (`--font-display`, self-hosted in `public/fonts`) for every `h1`.
+  - **Nunito** (`--font-heading`) for other headings; `.font-editorial-serif` is Nunito italic for emphasis words.
+  - **Open Sans** (`--font-sans`) for body text.
   - **Geist Mono** (`--font-mono`, via `.font-tech-mono`) for specifications and uppercase labels.
 - **Reuse these components** rather than the plain HTML element:
   - `SafeImage` (`src/components/shared/`) instead of `<img>` for wheel photography. A broken image URL shows the site's placeholder card instead of the browser's broken-image icon.
@@ -241,6 +283,22 @@ bun run add-wheel -- --remove type-60-bronze
 
 The admin page at `/admin` is a local preview tool: wheels created there are stored only in that browser's localStorage and are not published.
 
+### Adding or correcting a customer install
+
+The Installs page shows 22 cars. Each has three photos in `public/assets/fitments/<slug>/`: `front34.webp` and `side.webp` (studio re-shoots made by an image model from the customer's phone photo) and `original.webp` (that photo, with the number plate pixelated and its location data removed).
+
+`src/data/clientFitments.ts` is generated. Do not edit it by hand; change `scripts/fitment-reshoot/jobs.json` and run the scripts.
+
+1. Put the phone photo in `scripts/fitment-reshoot/raw/` (git-ignored) and add the car to `jobs.json`.
+2. Render it with `./batch_reshoot.sh <slug>`. This is the only step that costs money (about US$0.14 per image through OpenRouter) and it needs `OPENROUTER_API_KEY` in your environment.
+3. Run `python3 qa_sheet.py out` and compare each render with its phone photo: body style, paint, wheel design and finish, and no invented parts. The model has added a rear wing and changed a wheel finish before, so a person must look.
+4. Run `python3 build_site_data.py --site ../.. --rawdir raw` to copy the images in and regenerate the data file.
+5. Run `bun run test` and check `/installs` on a phone-sized screen.
+
+To change only a label (wheel model, finish name, city), edit `jobs.json` and run step 4; nothing is re-rendered. [docs/installs-pipeline.md](docs/installs-pipeline.md) has the full guide, the field list and what to check before publishing.
+
+The make, model and paint of each car were read from its photo. They are a best reading until the shop confirms them.
+
 ## 3D wheel studio
 
 A wheel with a `modelUrl` opens in the studio (`src/components/visuals/WheelStudio.tsx`, mounted through `WheelStage.tsx`). Three.js is downloaded only after the visitor taps "View in 3D". If a model fails to load, the studio shows a message with a retry button. If the studio's own code fails to download, `lazyWithRetry` tries twice more, then `Wheel3DSceneErrorBoundary` shows a reload card instead of breaking the page.
@@ -277,7 +335,7 @@ All search metadata is produced by `src/utils/seo.ts` and applied on every route
 
 ### For AI assistants and coding agents
 
-- **`/llms.txt`** follows the [llmstxt.org](https://llmstxt.org) format. `scripts/generate-llms.ts` writes it into `dist/` at the end of every build, from `src/utils/llms.ts`: every in-stock set with its Rand price, sizes and fitment, the to-order lead time, contact details and the main pages. Assistants cannot run this single-page app, so this file is what they can read. Nothing in it is typed by hand. Its links use the address Render publishes the build at (`RENDER_EXTERNAL_URL`), and fall back to the domain in `src/config/site.ts`.
+- **`/llms.txt`** follows the [llmstxt.org](https://llmstxt.org) format. `scripts/generate-llms.ts` writes it into `dist/` at the end of every build, from `src/utils/llms.ts`: every in-stock set with its Rand price, sizes and fitment, the to-order lead time, contact details and the main pages. Assistants cannot run this single-page app, so this file is what they can read. Nothing in it is typed by hand. Its links always use the production domain in `src/config/site.ts`, like the canonical URLs and the sitemap.
 - **"Ask AI about us"** (`AskAiSection`, links built in `src/utils/askAi.ts`) is a row of buttons on the home page for ChatGPT, Claude, Perplexity and Google AI. Each opens that assistant in a new tab with a question typed in that points at `/llms.txt` on the address the visitor is on. The site sends nothing itself, and the question asks for facts only.
 - **`AGENTS.md`** at the repository root gives AI coding agents the commands and the rules that are easy to break. Keep it in step with this file.
 
@@ -353,7 +411,7 @@ The page rules in `render.yaml` are written by the build. Do not edit the block 
 
 **Checking a deploy.** Render's CDN caches each page's HTML for up to five minutes, so a visitor can see the previous version briefly after a deploy goes live. To check a new deploy straight away, add any query string to the URL, for example `/installs?check=1`.
 
-**Moving the domain.** To go live on `forgedsa.co.za`, add it as a custom domain in the host's dashboard and point the DNS records it gives you at the domain registrar. Canonical URLs and the sitemap already use that domain. `llms.txt` links use Render's own address while Render sets `RENDER_EXTERNAL_URL`; change `scripts/generate-llms.ts` to prefer the domain once it is connected. The domain currently serves the business's existing WordPress site, which the DNS change replaces, so keep anything still needed from it first.
+**Moving the domain.** To go live on `forgedsa.co.za`, add it as a custom domain in the host's dashboard and point the DNS records it gives you at the domain registrar. Canonical URLs, the sitemap and `llms.txt` already use that domain, so their links only resolve to this site once the DNS change is done. If the domain's DNS is managed by the hosting provider (for example DirectAdmin), edit the A record for `@` and the CNAME for `www` there, remove any AAAA records, and leave the MX and mail records alone so email keeps working. The domain currently serves the business's existing WordPress site, which the DNS change replaces, so keep anything still needed from it first.
 
 Vercel's free Hobby plan is for non-commercial use only, so a business site needs Vercel Pro. Render's static sites are free to deploy; check the bandwidth included with the workspace plan against traffic.
 
@@ -383,6 +441,9 @@ Build chunks are split per vendor (`react`, `motion`, `three`, `firebase`, `luci
 | **Dealer status** | The Sixnine page says "Official dealer" on the owner's word; no certificate is shown | Add the dealer certificate and the wording it supports |
 | **Privacy notice** | Matches the site, but the retention periods are carried over from an older version, and no Information Officer or registration number is named | Owner to confirm, and have it legally reviewed |
 | **Ask AI buttons** | The link formats follow each assistant's documented pattern; they have not been clicked through signed in | Test each once on the live site |
+| **Install details** | Each car's make, model and paint were read from its photo, not confirmed | Shop to confirm, then correct `jobs.json` |
+| **Leftovers from the starter** | `package.json` still lists `@google/genai`, `express` and `dotenv`, which no file imports. `.env.example`, `metadata.json` and a tracked `.aistudio/` folder (6 MB of screenshots) come from the same starter | Remove in one clean-up pull request |
+| **Automated checks** | Type check, 73 data tests and the build, all run by hand. No CI, no browser tests, and ESLint is not wired to a script | Run the three checks on every pull request with a CI workflow |
 
 ## Contributing
 

@@ -29,7 +29,7 @@ export const Wheel3DSceneSkeleton: React.FC<Props> = ({
       </button>
     )}
     <div role="status" className="flex items-center gap-2 text-sm font-semibold text-neutral-600">
-      <Loader2 className="w-4 h-4 animate-spin motion-reduce:animate-none text-[#FF5500]" />
+      <Loader2 className="w-4 h-4 animate-spin motion-reduce:animate-none text-[#F43F5E]" />
       Loading 3D…
     </div>
   </div>

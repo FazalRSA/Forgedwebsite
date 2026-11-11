@@ -159,7 +159,7 @@ export const AdminWheelUploader: React.FC = () => {
   // Protected Route Authentication Screen
   if (!isAdminAuthenticated) {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] text-[#F5F5F7] flex flex-col justify-between">
+      <div className="min-h-screen bg-[#111111] text-[#EDEBE4] flex flex-col justify-between">
         <BrandHeader />
 
         <main className="flex-1 flex items-center justify-center px-4 py-16">
@@ -168,18 +168,18 @@ export const AdminWheelUploader: React.FC = () => {
             className="w-full max-w-md bg-[#121215] border border-[#26262E] rounded-3xl p-8 sm:p-10 space-y-6 shadow-2xl"
           >
             <div className="flex items-center justify-between">
-              <span className="inline-flex items-center gap-2 text-xs font-tech-mono uppercase tracking-[0.15em] text-[#FF5500] font-bold">
+              <span className="inline-flex items-center gap-2 text-xs font-tech-mono uppercase tracking-[0.15em] text-[#F43F5E] font-bold">
                 <Lock className="w-3.5 h-3.5" />
                 <span>PROTECTED ROUTE · /ADMIN/WHEELS</span>
               </span>
-              <span className="text-[10px] font-tech-mono uppercase tracking-widest px-2.5 py-1 rounded-full bg-[#18181D] border border-[#26262E] text-[#FF5500]">
+              <span className="text-[10px] font-tech-mono uppercase tracking-widest px-2.5 py-1 rounded-full bg-[#18181D] border border-[#26262E] text-[#F43F5E]">
                 BMW STUDIO ONLY
               </span>
             </div>
 
             <div className="space-y-2">
-              <h1 className="text-3xl sm:text-4xl font-normal tracking-[-0.03em] text-[#F5F5F7]">
-                Admin <span className="font-editorial-serif italic text-[#FF5500]">Wheel Uploader</span>.
+              <h1 className="text-3xl sm:text-4xl font-normal tracking-[-0.03em] text-[#EDEBE4]">
+                Admin <span className="font-editorial-serif italic text-[#F43F5E]">Wheel Uploader</span>.
               </h1>
               <p className="text-sm text-[#C2C2CC] leading-relaxed">
                 This route is restricted to authorised FORGED Custom wheels BMW catalogue administrators. Enter your studio key to unlock the wheel uploader.
@@ -195,26 +195,26 @@ export const AdminWheelUploader: React.FC = () => {
                   STUDIO ADMIN PASSCODE
                 </label>
                 <div className="relative">
-                  <KeyRound className="w-4 h-4 text-[#FF5500] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <KeyRound className="w-4 h-4 text-[#F43F5E] absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
                     id="admin-passcode-input"
                     type="password"
                     value={passcode}
                     onChange={(e) => setPasscode(e.target.value)}
                     placeholder="Enter studio passcode"
-                    className="w-full h-12 pl-10 pr-4 bg-[#18181D] border border-[#26262E] rounded-xl text-xs font-tech-mono text-[#F5F5F7] focus:outline-none focus:border-[#FF5500]"
+                    className="w-full h-12 pl-10 pr-4 bg-[#18181D] border border-[#26262E] rounded-xl text-xs font-tech-mono text-[#EDEBE4] focus:outline-none focus:border-[#F43F5E]"
                     required
                   />
                 </div>
               </div>
 
               {authError && (
-                <p className="text-xs font-tech-mono text-[#FF5500]">{authError}</p>
+                <p className="text-xs font-tech-mono text-[#F43F5E]">{authError}</p>
               )}
 
               <button
                 type="submit"
-                className="w-full h-12 bg-[#FF5500] text-white hover:bg-[#FF6B1A] rounded-full text-xs font-tech-mono font-bold uppercase tracking-[0.15em] flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-lg"
+                className="w-full h-12 bg-[#1D4ED8] text-white hover:bg-[#2563EB] rounded-full text-xs font-tech-mono font-bold uppercase tracking-[0.15em] flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-lg"
               >
                 <Unlock className="w-4 h-4" />
                 <span>UNLOCK ADMIN WHEEL UPLOADER</span>
@@ -227,20 +227,20 @@ export const AdminWheelUploader: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-[#F5F5F7] flex flex-col justify-between">
+    <div className="min-h-screen bg-[#111111] text-[#EDEBE4] flex flex-col justify-between">
       <BrandHeader />
 
       <main className="flex-1">
         {/* Top Dark Admin Header Banner */}
-        <section className="bg-[#0A0A0A] text-[#F5F5F7] px-6 md:px-10 py-10 border-b border-[#26262E]">
+        <section className="bg-[#111111] text-[#EDEBE4] px-6 md:px-10 py-10 border-b border-[#26262E]">
           <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div className="space-y-3">
-              <div className="inline-flex items-center gap-2 text-xs font-tech-mono uppercase tracking-[0.15em] text-[#FF5500] font-bold">
+              <div className="inline-flex items-center gap-2 text-xs font-tech-mono uppercase tracking-[0.15em] text-[#F43F5E] font-bold">
                 <ShieldCheck className="w-4 h-4" />
                 <span>AUTHENTICATED · PROTECTED ADMIN ROUTE (/ADMIN/WHEELS)</span>
               </div>
-              <h1 className="text-4xl sm:text-5xl font-normal tracking-[-0.03em] leading-none text-[#F5F5F7]">
-                Admin <span className="font-editorial-serif italic text-[#FF5500]">Wheel Uploader</span>.
+              <h1 className="text-4xl sm:text-5xl font-normal tracking-[-0.03em] leading-none text-[#EDEBE4]">
+                Admin <span className="font-editorial-serif italic text-[#F43F5E]">Wheel Uploader</span>.
               </h1>
               <p className="text-sm text-[#C2C2CC] max-w-2xl">
                 Register new forged wheels directly into the FORGED Custom wheels editorial archive and BMW fitment engine.
@@ -251,16 +251,16 @@ export const AdminWheelUploader: React.FC = () => {
               <button
                 type="button"
                 onClick={() => navigate('/#catalogue')}
-                className="border border-[#26262E] hover:border-[#FF5500] hover:text-[#FF5500] text-[#F5F5F7] rounded-full px-5 py-2.5 text-xs font-tech-mono uppercase tracking-[0.12em] transition-colors cursor-pointer"
+                className="border border-[#26262E] hover:border-[#1D4ED8] hover:text-[#F43F5E] text-[#EDEBE4] rounded-full px-5 py-2.5 text-xs font-tech-mono uppercase tracking-[0.12em] transition-colors cursor-pointer"
               >
                 View Catalogue
               </button>
               <button
                 type="button"
                 onClick={logoutAdmin}
-                className="bg-[#18181D] border border-[#26262E] hover:border-[#FF5500] text-[#C2C2CC] hover:text-white rounded-full px-5 py-2.5 text-xs font-tech-mono uppercase tracking-[0.12em] inline-flex items-center gap-2 transition-colors cursor-pointer"
+                className="bg-[#18181D] border border-[#26262E] hover:border-[#1D4ED8] text-[#C2C2CC] hover:text-white rounded-full px-5 py-2.5 text-xs font-tech-mono uppercase tracking-[0.12em] inline-flex items-center gap-2 transition-colors cursor-pointer"
               >
-                <Lock className="w-3.5 h-3.5 text-[#FF5500]" />
+                <Lock className="w-3.5 h-3.5 text-[#F43F5E]" />
                 <span>Lock Admin Route</span>
               </button>
             </div>
@@ -273,13 +273,13 @@ export const AdminWheelUploader: React.FC = () => {
           className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 py-12"
         >
           {createdWheel && (
-            <div className="mb-8 p-6 bg-[#121215] text-[#F5F5F7] rounded-3xl border border-[#26262E] flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-2xl">
+            <div className="mb-8 p-6 bg-[#121215] text-[#EDEBE4] rounded-3xl border border-[#26262E] flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-2xl">
               <div className="space-y-1.5">
                 <div className="inline-flex items-center gap-2 text-xs font-tech-mono uppercase tracking-[0.14em] text-[#25D366]">
                   <CheckCircle2 className="w-4 h-4" />
                   <span>WHEEL ADDED IN THIS BROWSER</span>
                 </div>
-                <h2 className="text-2xl font-medium tracking-tight text-[#F5F5F7]">
+                <h2 className="text-2xl font-medium tracking-tight text-[#EDEBE4]">
                   {createdWheel.model} — {formatZAR(createdWheel.priceZAR)} (BMW)
                 </h2>
                 <p className="text-xs font-tech-mono text-[#C2C2CC]">
@@ -290,7 +290,7 @@ export const AdminWheelUploader: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => navigate(`/wheels/${createdWheel.wheelSlug}`)}
-                  className="bg-[#FF5500] text-white hover:bg-[#FF6B1A] rounded-full px-5 py-2.5 text-xs font-tech-mono font-bold uppercase tracking-wider inline-flex items-center gap-1.5 cursor-pointer shadow-md"
+                  className="bg-[#1D4ED8] text-white hover:bg-[#2563EB] rounded-full px-5 py-2.5 text-xs font-tech-mono font-bold uppercase tracking-wider inline-flex items-center gap-1.5 cursor-pointer shadow-md"
                 >
                   <span>Open wheel page</span>
                   <ArrowUpRight className="w-3.5 h-3.5" />
@@ -304,7 +304,7 @@ export const AdminWheelUploader: React.FC = () => {
             <div className="lg:col-span-5 space-y-6">
               <div className="bg-[#121215] border border-[#26262E] rounded-3xl p-6 sm:p-8 space-y-5">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-tech-mono font-bold uppercase tracking-[0.14em] text-[#FF5500]">
+                  <span className="text-xs font-tech-mono font-bold uppercase tracking-[0.14em] text-[#F43F5E]">
                     IMAGE UPLOAD PLACEHOLDER
                   </span>
                   <span className="text-[11px] font-tech-mono uppercase tracking-widest text-[#C2C2CC]">
@@ -324,8 +324,8 @@ export const AdminWheelUploader: React.FC = () => {
                   data-testid="wheel-image-upload-placeholder"
                   className={`relative aspect-square rounded-2xl border-2 border-dashed transition-all flex flex-col items-center justify-center p-6 text-center cursor-pointer overflow-hidden ${
                     isDraggingOver
-                      ? 'border-[#FF5500] bg-[#18181D]'
-                      : 'border-[#26262E] bg-[#141418] hover:border-[#FF5500]'
+                      ? 'border-[#1D4ED8] bg-[#18181D]'
+                      : 'border-[#26262E] bg-[#141418] hover:border-[#1D4ED8]'
                   }`}
                 >
                   {/* Architectural Corner Ticks */}
@@ -343,7 +343,7 @@ export const AdminWheelUploader: React.FC = () => {
                         alt={name || 'Uploaded BMW Wheel Preview'}
                         className="w-4/5 h-4/5 object-contain"
                       />
-                      <span className="mt-2 px-3 py-1 rounded-full bg-[#FF5500] text-white text-[10px] font-tech-mono uppercase tracking-widest">
+                      <span className="mt-2 px-3 py-1 rounded-full bg-[#1D4ED8] text-white text-[10px] font-tech-mono uppercase tracking-widest">
                         {imageFileName || 'CUSTOM IMAGE ACTIVE'} · CLICK TO REPLACE
                       </span>
                     </div>
@@ -357,7 +357,7 @@ export const AdminWheelUploader: React.FC = () => {
                         />
                       </div>
                       <div className="space-y-1">
-                        <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#FF5500] text-white text-[11px] font-tech-mono uppercase tracking-[0.14em] shadow-md hover:bg-[#FF6B1A]">
+                        <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#1D4ED8] text-white text-[11px] font-tech-mono uppercase tracking-[0.14em] shadow-md hover:bg-[#2563EB]">
                           <Upload className="w-3.5 h-3.5" />
                           <span>UPLOAD WHEEL IMAGE</span>
                         </div>
@@ -387,7 +387,7 @@ export const AdminWheelUploader: React.FC = () => {
                       htmlFor="admin-wheel-image-url"
                       className="text-[11px] font-tech-mono uppercase tracking-wider text-[#C2C2CC] inline-flex items-center gap-1.5"
                     >
-                      <ImageIcon className="w-3.5 h-3.5 text-[#FF5500]" />
+                      <ImageIcon className="w-3.5 h-3.5 text-[#F43F5E]" />
                       <span>OR PASTE IMAGE URL</span>
                     </label>
                     {imagePreviewUrl && (
@@ -397,7 +397,7 @@ export const AdminWheelUploader: React.FC = () => {
                           setImagePreviewUrl('');
                           setImageFileName('');
                         }}
-                        className="text-[11px] font-tech-mono uppercase text-[#FF5500] hover:underline inline-flex items-center gap-1 cursor-pointer"
+                        className="text-[11px] font-tech-mono uppercase text-[#F43F5E] hover:underline inline-flex items-center gap-1 cursor-pointer"
                       >
                         <RefreshCw className="w-3 h-3" />
                         <span>Reset Placeholder</span>
@@ -413,7 +413,7 @@ export const AdminWheelUploader: React.FC = () => {
                       setImageFileName('EXTERNAL URL');
                     }}
                     placeholder="https://example.com/bmw-wheel.png"
-                    className="w-full h-10 px-3.5 bg-[#18181D] border border-[#26262E] rounded-xl text-xs font-tech-mono text-[#F5F5F7] focus:outline-none focus:border-[#FF5500]"
+                    className="w-full h-10 px-3.5 bg-[#18181D] border border-[#26262E] rounded-xl text-xs font-tech-mono text-[#EDEBE4] focus:outline-none focus:border-[#F43F5E]"
                   />
                 </div>
               </div>
@@ -427,14 +427,14 @@ export const AdminWheelUploader: React.FC = () => {
               >
                 <div className="border-b border-[#26262E] pb-4 flex items-center justify-between">
                   <div>
-                    <p className="text-xs font-tech-mono uppercase tracking-[0.14em] text-[#FF5500] font-bold">
+                    <p className="text-xs font-tech-mono uppercase tracking-[0.14em] text-[#F43F5E] font-bold">
                       NEW CATALOGUE ENTRY
                     </p>
-                    <h2 className="text-2xl font-normal tracking-[-0.02em] text-[#F5F5F7]">
+                    <h2 className="text-2xl font-normal tracking-[-0.02em] text-[#EDEBE4]">
                       Wheel Specification &amp; Fitment
                     </h2>
                   </div>
-                  <span className="px-3 py-1 rounded-full bg-[#18181D] border border-[#26262E] text-[#FF5500] text-[11px] font-tech-mono uppercase tracking-widest font-bold">
+                  <span className="px-3 py-1 rounded-full bg-[#18181D] border border-[#26262E] text-[#F43F5E] text-[11px] font-tech-mono uppercase tracking-widest font-bold">
                     BMW EXCLUSIVE
                   </span>
                 </div>
@@ -454,7 +454,7 @@ export const AdminWheelUploader: React.FC = () => {
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder="e.g. TYPE 68 FORGED"
-                      className="w-full h-11 px-3.5 bg-[#18181D] border border-[#26262E] rounded-xl text-xs font-tech-mono uppercase text-[#F5F5F7] focus:outline-none focus:border-[#FF5500]"
+                      className="w-full h-11 px-3.5 bg-[#18181D] border border-[#26262E] rounded-xl text-xs font-tech-mono uppercase text-[#EDEBE4] focus:outline-none focus:border-[#F43F5E]"
                       required
                     />
                   </div>
@@ -474,7 +474,7 @@ export const AdminWheelUploader: React.FC = () => {
                       value={price}
                       onChange={(e) => setPrice(e.target.value)}
                       placeholder="4850"
-                      className="w-full h-11 px-3.5 bg-[#18181D] border border-[#26262E] rounded-xl text-xs font-tech-mono tabular-nums text-[#F5F5F7] focus:outline-none focus:border-[#FF5500]"
+                      className="w-full h-11 px-3.5 bg-[#18181D] border border-[#26262E] rounded-xl text-xs font-tech-mono tabular-nums text-[#EDEBE4] focus:outline-none focus:border-[#F43F5E]"
                       required
                     />
                   </div>
@@ -491,7 +491,7 @@ export const AdminWheelUploader: React.FC = () => {
                       value={brand}
                       disabled
                       aria-label="Vehicle Brand (BMW Only)"
-                      className="w-full h-11 px-3.5 bg-[#18181D] border border-[#26262E] rounded-xl text-xs font-tech-mono font-bold uppercase text-[#FF5500] cursor-not-allowed"
+                      className="w-full h-11 px-3.5 bg-[#18181D] border border-[#26262E] rounded-xl text-xs font-tech-mono font-bold uppercase text-[#F43F5E] cursor-not-allowed"
                     >
                       <option value="BMW">BMW</option>
                     </select>
@@ -511,7 +511,7 @@ export const AdminWheelUploader: React.FC = () => {
                       id="admin-bmw-model"
                       value={compatibleCars}
                       onChange={(e) => setCompatibleCars(e.target.value)}
-                      className="w-full h-11 px-3.5 bg-[#18181D] border border-[#26262E] rounded-xl text-xs font-tech-mono uppercase text-[#F5F5F7] focus:outline-none focus:border-[#FF5500]"
+                      className="w-full h-11 px-3.5 bg-[#18181D] border border-[#26262E] rounded-xl text-xs font-tech-mono uppercase text-[#EDEBE4] focus:outline-none focus:border-[#F43F5E]"
                     >
                       {BMW_M_MODEL_OPTIONS.map((car) => (
                         <option key={car} value={car}>
@@ -534,7 +534,7 @@ export const AdminWheelUploader: React.FC = () => {
                       value={series}
                       onChange={(e) => setSeries(e.target.value)}
                       placeholder="FORGED SERIES"
-                      className="w-full h-11 px-3.5 bg-[#18181D] border border-[#26262E] rounded-xl text-xs font-tech-mono uppercase text-[#F5F5F7] focus:outline-none focus:border-[#FF5500]"
+                      className="w-full h-11 px-3.5 bg-[#18181D] border border-[#26262E] rounded-xl text-xs font-tech-mono uppercase text-[#EDEBE4] focus:outline-none focus:border-[#F43F5E]"
                     />
                   </div>
 
@@ -551,7 +551,7 @@ export const AdminWheelUploader: React.FC = () => {
                       value={sizesAvailable}
                       onChange={(e) => setSizesAvailable(e.target.value)}
                       placeholder="20 inch / 21 inch"
-                      className="w-full h-11 px-3.5 bg-[#18181D] border border-[#26262E] rounded-xl text-xs font-tech-mono text-[#F5F5F7] focus:outline-none focus:border-[#FF5500]"
+                      className="w-full h-11 px-3.5 bg-[#18181D] border border-[#26262E] rounded-xl text-xs font-tech-mono text-[#EDEBE4] focus:outline-none focus:border-[#F43F5E]"
                     />
                   </div>
                 </div>
@@ -569,7 +569,7 @@ export const AdminWheelUploader: React.FC = () => {
                       id="admin-wheel-finish"
                       value={defaultFinish}
                       onChange={(e) => setDefaultFinish(e.target.value as WheelFinishId)}
-                      className="w-full h-11 px-3.5 bg-[#18181D] border border-[#26262E] rounded-xl text-xs font-tech-mono uppercase text-[#F5F5F7] focus:outline-none focus:border-[#FF5500]"
+                      className="w-full h-11 px-3.5 bg-[#18181D] border border-[#26262E] rounded-xl text-xs font-tech-mono uppercase text-[#EDEBE4] focus:outline-none focus:border-[#F43F5E]"
                     >
                       {Object.values(WHEEL_FINISHES).map((f) => (
                         <option key={f.id} value={f.id}>
@@ -590,7 +590,7 @@ export const AdminWheelUploader: React.FC = () => {
                       id="admin-wheel-geometry"
                       value={geometry}
                       onChange={(e) => setGeometry(e.target.value as SpokeGeometryType)}
-                      className="w-full h-11 px-3.5 bg-[#18181D] border border-[#26262E] rounded-xl text-xs font-tech-mono text-[#F5F5F7] focus:outline-none focus:border-[#FF5500]"
+                      className="w-full h-11 px-3.5 bg-[#18181D] border border-[#26262E] rounded-xl text-xs font-tech-mono text-[#EDEBE4] focus:outline-none focus:border-[#F43F5E]"
                     >
                       {GEOMETRY_OPTIONS.map((g) => (
                         <option key={g.id} value={g.id}>
@@ -614,7 +614,7 @@ export const AdminWheelUploader: React.FC = () => {
                       step="1"
                       value={stockSets}
                       onChange={(e) => setStockSets(e.target.value)}
-                      className="w-full h-11 px-3.5 bg-[#18181D] border border-[#26262E] rounded-xl text-xs font-tech-mono tabular-nums text-[#F5F5F7] focus:outline-none focus:border-[#FF5500]"
+                      className="w-full h-11 px-3.5 bg-[#18181D] border border-[#26262E] rounded-xl text-xs font-tech-mono tabular-nums text-[#EDEBE4] focus:outline-none focus:border-[#F43F5E]"
                     />
                   </div>
                 </div>
@@ -632,12 +632,12 @@ export const AdminWheelUploader: React.FC = () => {
                     rows={3}
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className="w-full p-3.5 bg-[#18181D] border border-[#26262E] rounded-xl text-xs leading-relaxed text-[#F5F5F7] focus:outline-none focus:border-[#FF5500]"
+                    className="w-full p-3.5 bg-[#18181D] border border-[#26262E] rounded-xl text-xs leading-relaxed text-[#EDEBE4] focus:outline-none focus:border-[#F43F5E]"
                   />
                 </div>
 
                 {formError && (
-                  <p className="text-xs font-tech-mono text-[#FF5500]">{formError}</p>
+                  <p className="text-xs font-tech-mono text-[#F43F5E]">{formError}</p>
                 )}
 
                 <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -647,7 +647,7 @@ export const AdminWheelUploader: React.FC = () => {
 
                   <button
                     type="submit"
-                    className="bg-[#FF5500] text-white hover:bg-[#FF6B1A] rounded-full px-7 py-3.5 text-xs font-tech-mono font-bold uppercase tracking-[0.15em] inline-flex items-center justify-center gap-2 transition-colors cursor-pointer whitespace-nowrap shadow-lg"
+                    className="bg-[#1D4ED8] text-white hover:bg-[#2563EB] rounded-full px-7 py-3.5 text-xs font-tech-mono font-bold uppercase tracking-[0.15em] inline-flex items-center justify-center gap-2 transition-colors cursor-pointer whitespace-nowrap shadow-lg"
                   >
                     <Plus className="w-4 h-4" />
                     <span>PUBLISH BMW WHEEL ENTRY</span>
@@ -658,7 +658,7 @@ export const AdminWheelUploader: React.FC = () => {
               {/* Manage Custom Uploaded Wheels */}
               <div className="bg-[#121215] border border-[#26262E] rounded-3xl p-6 sm:p-8 space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-tech-mono font-bold uppercase tracking-[0.14em] text-[#F5F5F7]">
+                  <h3 className="text-sm font-tech-mono font-bold uppercase tracking-[0.14em] text-[#EDEBE4]">
                     UPLOADED CUSTOM BMW WHEELS ({customBrandWheels.length})
                   </h3>
                   <span className="text-xs font-tech-mono text-[#C2C2CC]">
@@ -678,12 +678,12 @@ export const AdminWheelUploader: React.FC = () => {
                         className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                       >
                         <div>
-                          <p className="text-sm font-semibold font-tech-mono uppercase text-[#F5F5F7]">
+                          <p className="text-sm font-semibold font-tech-mono uppercase text-[#EDEBE4]">
                             {wheel.model}{' '}
                             <span className="text-neutral-500 font-normal">|</span>{' '}
                             <span className="text-[#C2C2CC] font-normal">{wheel.series}</span>
                           </p>
-                          <p className="text-xs font-tech-mono text-[#FF5500]">
+                          <p className="text-xs font-tech-mono text-[#F43F5E]">
                             BMW · {formatZAR(wheel.priceZAR)} · {wheel.stockQuantitySets ?? 0} in stock
                           </p>
                         </div>
@@ -692,7 +692,7 @@ export const AdminWheelUploader: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => navigate(`/wheels/${wheel.slug}`)}
-                            className="px-3.5 py-1.5 rounded-full border border-[#26262E] hover:border-[#FF5500] hover:text-[#FF5500] text-xs font-tech-mono uppercase cursor-pointer text-[#F5F5F7]"
+                            className="px-3.5 py-1.5 rounded-full border border-[#26262E] hover:border-[#1D4ED8] hover:text-[#F43F5E] text-xs font-tech-mono uppercase cursor-pointer text-[#EDEBE4]"
                           >
                             Open
                           </button>
@@ -700,7 +700,7 @@ export const AdminWheelUploader: React.FC = () => {
                             type="button"
                             onClick={() => removeCustomWheel(wheel.slug)}
                             aria-label={`Delete ${wheel.model}`}
-                            className="p-2 text-neutral-400 hover:text-[#FF5500] cursor-pointer"
+                            className="p-2 text-neutral-400 hover:text-[#F43F5E] cursor-pointer"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>

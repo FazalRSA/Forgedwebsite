@@ -54,6 +54,7 @@ Run the type check, the tests and the build before you open a pull request. All 
 - `src/utils/seo.ts`: page titles, descriptions, sitemap paths. `src/utils/redirects.ts`: old
   addresses. `src/utils/llms.ts`: `llms.txt`. `src/utils/askAi.ts`: the "Ask AI about us" links.
 - `src/utils/router.tsx`: the client-side router. Routes are matched in `src/App.tsx`.
+- `src/wheel-viewer/`: the 3D wheel viewer, shared with the BMW configurator repo (`FazalRSA/BMW-AND-FORGED-`, copied into its `shared/wheel-viewer/`). It is edited only here. After a change run `npm run wheel-viewer:stamp` (`npm test` fails without it), then tell the owner the configurator needs `node scripts/wheel-viewer-sync.mjs pull`. See its README.
 - `src/components/brand/`: pages and sections. `scripts/`: build steps, in the order in the
   `build` script.
 

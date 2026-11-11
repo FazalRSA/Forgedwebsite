@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="310" viewBox="0 0 900 310" role="img" aria-labelledby="t d">
+  <title id="t">Render loop for one angle</title>
+  <desc id="d">The model generates an image from the phone photo, the job text and the backdrop plate. The car-free top band is scored for hard edges. A clean score saves the image and the side shot is chained off it; a dirty score re-rolls up to three times and keeps the best.</desc>
+  <style>
+    text { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .s-idle { animation: show-idle 12s ease-in-out infinite both; }
+    .s-act  { animation: show-act  12s ease-in-out infinite both; }
+    .s-cool { animation: show-cool 12s ease-in-out infinite both; }
+    @keyframes show-idle { 0%,22%{opacity:1} 27%,100%{opacity:0} }
+    @keyframes show-act  { 0%,27%{opacity:0} 32%,68%{opacity:1} 73%,100%{opacity:0} }
+    @keyframes show-cool { 0%,72%{opacity:0} 77%,95%{opacity:1} 100%{opacity:0} }
+    @keyframes flow { 0% { opacity: 0; offset-distance: 0%; } 5% { opacity: 1; } 95% { opacity: 1; } 100% { opacity: 0; offset-distance: 100%; } }
+    .dot { r: 5; fill: #4a9eff; offset-rotate: 0deg; animation: flow 2.4s linear infinite; }
+    .d1 { offset-path: path("M 190 124 L 230 124"); }
+    .d2 { offset-path: path("M 390 124 L 440 124"); animation-delay: 0.8s; }
+    .d3 { offset-path: path("M 500 124 L 560 124"); animation-delay: 1.6s; fill: #3fb950; }
+    .d4 { offset-path: path("M 710 124 L 750 124"); animation-delay: 2s; fill: #3fb950; }
+  </style>
+  <defs>
+    <marker id="ab" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#4a9eff"/></marker>
+    <marker id="ag" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#3fb950"/></marker>
+    <marker id="ao" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#ff9900"/></marker>
+  </defs>
+  <rect width="900" height="310" fill="#0d1117"/>
+  <text x="450" y="30" text-anchor="middle" fill="#e6edf3" font-size="14">One angle, one loop: generate, score the backdrop, keep or re-roll</text>
+
+  <line x1="190" y1="124" x2="222" y2="124" stroke="#4a9eff" stroke-width="1.5" marker-end="url(#ab)"/>
+  <line x1="390" y1="124" x2="437" y2="124" stroke="#4a9eff" stroke-width="1.5" marker-end="url(#ab)"/>
+  <line x1="500" y1="124" x2="552" y2="124" stroke="#3fb950" stroke-width="1.5" marker-end="url(#ag)"/>
+  <line x1="710" y1="124" x2="742" y2="124" stroke="#3fb950" stroke-width="1.5" marker-end="url(#ag)"/>
+  <text x="526" y="114" text-anchor="middle" fill="#3fb950" font-size="10">YES</text>
+  <!-- NO branch: diamond down to re-roll box, then back up to generate -->
+  <line x1="470" y1="149" x2="470" y2="192" stroke="#ff9900" stroke-width="1.5" marker-end="url(#ao)"/>
+  <text x="482" y="172" fill="#ff9900" font-size="10">NO</text>
+  <path d="M 400 224 L 310 224 L 310 156" fill="none" stroke="#ff9900" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#ao)"/>
+  <text x="330" y="214" fill="#8b949e" font-size="10">again</text>
+
+  <!-- boxes -->
+  <rect x="20" y="100" width="170" height="48" rx="8" fill="#161b22" stroke="#4a9eff" stroke-width="1.5"/>
+  <text x="105" y="118" text-anchor="middle" fill="#e6edf3" font-size="12">photo + job text</text>
+  <text x="105" y="136" text-anchor="middle" fill="#8b949e" font-size="10">+ backdrop plate</text>
+
+  <g class="s-idle"><rect x="230" y="100" width="160" height="48" rx="8" fill="#1a2233" stroke="#4a9eff" stroke-width="1.5"/>
+    <text x="310" y="118" text-anchor="middle" fill="#e6edf3" font-size="12">Gemini generates</text>
+    <text x="310" y="136" text-anchor="middle" fill="#8b949e" font-size="10">attempt 1 of 3</text></g>
+  <g class="s-act"><rect x="230" y="100" width="160" height="48" rx="8" fill="#0d2a1a" stroke="#3fb950" stroke-width="1.5"/>
+    <text x="310" y="118" text-anchor="middle" fill="#3fb950" font-size="12">Gemini generates</text>
+    <text x="310" y="136" text-anchor="middle" fill="#8b949e" font-size="10">clean on attempt 1</text></g>
+  <g class="s-cool"><rect x="230" y="100" width="160" height="48" rx="8" fill="#2a1a0d" stroke="#ff9900" stroke-width="1.5"/>
+    <text x="310" y="118" text-anchor="middle" fill="#ff9900" font-size="12">Gemini generates</text>
+    <text x="310" y="136" text-anchor="middle" fill="#8b949e" font-size="10">attempt 2 of 3</text></g>
+
+  <polygon points="470,99 500,124 470,149 440,124" fill="#161b22" stroke="#ff9900" stroke-width="1.5"/>
+  <text x="470" y="120" text-anchor="middle" fill="#ff9900" font-size="9">score</text>
+  <text x="470" y="132" text-anchor="middle" fill="#ff9900" font-size="9">&lt;= 0.5?</text>
+
+  <rect x="560" y="100" width="150" height="48" rx="8" fill="#161b22" stroke="#3fb950" stroke-width="1.5"/>
+  <text x="635" y="118" text-anchor="middle" fill="#e6edf3" font-size="12">save</text>
+  <text x="635" y="136" text-anchor="middle" fill="#8b949e" font-size="10">4:3 canvas, PNG + WebP</text>
+
+  <rect x="750" y="100" width="130" height="48" rx="8" fill="#161b22" stroke="#3fb950" stroke-width="1.5"/>
+  <text x="815" y="118" text-anchor="middle" fill="#e6edf3" font-size="12">next angle</text>
+  <text x="815" y="136" text-anchor="middle" fill="#8b949e" font-size="10">side uses front34</text>
+
+  <rect x="400" y="200" width="140" height="48" rx="8" fill="#161b22" stroke="#ff9900" stroke-width="1.5"/>
+  <text x="470" y="218" text-anchor="middle" fill="#e6edf3" font-size="12">re-roll</text>
+  <text x="470" y="236" text-anchor="middle" fill="#8b949e" font-size="10">max 3, best score kept</text>
+
+  <circle class="dot d1"/><circle class="dot d2"/><circle class="dot d3"/><circle class="dot d4"/>
+
+  <!-- status bar -->
+  <rect x="0" y="258" width="900" height="30" fill="#161b22"/>
+  <g class="s-idle"><text x="450" y="278" text-anchor="middle" fill="#8b949e" font-size="12">Generating the front 3/4 from the phone photo, the job text and the empty backdrop plate</text></g>
+  <g class="s-act"><text x="450" y="278" text-anchor="middle" fill="#3fb950" font-size="12">Top band score 0.11, clean: saved, and the side profile is generated with this image as a reference</text></g>
+  <g class="s-cool"><text x="450" y="278" text-anchor="middle" fill="#ff9900" font-size="12">Top band score 1.78, a ceiling or light panel was drawn: re-rolling, up to 3 tries, best score kept</text></g>
+</svg>

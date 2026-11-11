@@ -51,10 +51,10 @@ export const ContactCta: React.FC<ContactCtaProps> = ({
   );
 };
 
-/** Shared look for the main orange button so every page's call to action matches. */
+/** Shared look for the main blue button so every page's call to action matches. */
 export const CTA_PRIMARY_CLASS =
-  'inline-flex items-center justify-center gap-2 min-h-11 px-5 rounded-full bg-[#FF5500] text-white text-sm font-medium hover:bg-[#FF6B1A] transition-colors cursor-pointer whitespace-nowrap';
+  'inline-flex items-center justify-center gap-2 min-h-11 px-5 rounded-full bg-[#1D4ED8] text-white text-sm font-medium hover:bg-[#2563EB] transition-colors cursor-pointer whitespace-nowrap';
 
 /** Shared look for the quiet outlined button. */
 export const CTA_SECONDARY_CLASS =
-  'inline-flex items-center justify-center gap-2 min-h-11 px-5 rounded-full border border-[#33333E] text-[#F5F5F7] text-sm font-medium hover:border-[#FF5500] hover:text-white transition-colors cursor-pointer whitespace-nowrap';
+  'inline-flex items-center justify-center gap-2 min-h-11 px-5 rounded-full border border-[#33333E] text-[#EDEBE4] text-sm font-medium hover:border-[#1D4ED8] hover:text-white transition-colors cursor-pointer whitespace-nowrap';

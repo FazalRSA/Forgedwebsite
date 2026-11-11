@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import { Link, useRouter } from '../../utils/router';
-import { LogoPlaceholder } from '../shared/LogoPlaceholder';
+import { BrandLogo } from '../shared/BrandLogo';
 import { ContactCta } from './ContactCta';
 
 interface BrandHeaderProps {
@@ -18,7 +18,7 @@ const NAV_ITEMS = [
 const HEADER_MESSAGE = "Hi, I'd like to ask about your wheels.";
 
 const HEADER_CTA_CLASS =
-  'inline-flex items-center justify-center gap-2 min-h-11 px-4 sm:px-5 rounded-full bg-[#FF5500] text-white text-sm font-medium hover:bg-[#FF6B1A] transition-colors cursor-pointer whitespace-nowrap';
+  'inline-flex items-center justify-center gap-2 min-h-11 px-4 sm:px-5 rounded-full bg-[#1D4ED8] text-white text-sm font-medium hover:bg-[#2563EB] transition-colors cursor-pointer whitespace-nowrap';
 
 export const BrandHeader: React.FC<BrandHeaderProps> = () => {
   const { pathname } = useRouter();
@@ -61,14 +61,14 @@ export const BrandHeader: React.FC<BrandHeaderProps> = () => {
 
   return (
     <>
-      <header className="sticky top-0 z-50 h-16 px-4 sm:px-6 md:px-10 flex items-center justify-between gap-3 bg-[#0A0A0A] text-[#F5F5F7] border-b border-[#26262E]">
+      <header className="sticky top-0 z-50 h-16 px-4 sm:px-6 md:px-10 flex items-center justify-between gap-3 bg-[#111111] text-[#EDEBE4] border-b border-[#26262E]">
         <Link
           to="/"
           onClick={closeMenu}
           aria-label="FORGED Custom Wheels, home"
           className="shrink-0 inline-flex items-center min-h-11"
         >
-          <LogoPlaceholder variant="dark" />
+          <BrandLogo />
         </Link>
 
         <div className="flex items-center gap-1 sm:gap-2">
@@ -103,7 +103,7 @@ export const BrandHeader: React.FC<BrandHeaderProps> = () => {
             aria-label={menuOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={menuOpen}
             aria-controls="mobile-menu"
-            className="md:hidden inline-flex items-center justify-center w-11 h-11 rounded-full text-[#F5F5F7] hover:text-white cursor-pointer"
+            className="md:hidden inline-flex items-center justify-center w-11 h-11 rounded-full text-[#EDEBE4] hover:text-white cursor-pointer"
           >
             {menuOpen ? <X aria-hidden="true" className="w-5 h-5" /> : <Menu aria-hidden="true" className="w-5 h-5" />}
           </button>
@@ -114,7 +114,7 @@ export const BrandHeader: React.FC<BrandHeaderProps> = () => {
             ref={menuRef}
             id="mobile-menu"
             aria-label="Main"
-            className="md:hidden absolute top-full inset-x-0 bg-[#0A0A0A] border-b border-[#26262E] px-4 sm:px-6 pb-2"
+            className="md:hidden absolute top-full inset-x-0 bg-[#111111] border-b border-[#26262E] px-4 sm:px-6 pb-2"
           >
             {NAV_ITEMS.map((item) => (
               <Link

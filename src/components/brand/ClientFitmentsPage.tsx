@@ -202,7 +202,7 @@ export const ClientFitmentsPage: React.FC = () => {
   const closeLightbox = useCallback(() => setOpenId(null), []);
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-[#F5F5F7]">
+    <div className="min-h-screen bg-[#111111] text-[#EDEBE4]">
       <BrandHeader />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 py-10 sm:py-14">
@@ -228,7 +228,7 @@ export const ClientFitmentsPage: React.FC = () => {
                   }}
                   className={`min-h-11 px-4 rounded-full text-sm font-medium transition-colors cursor-pointer ${
                     active
-                      ? 'bg-[#F5F5F7] text-[#0A0A0A]'
+                      ? 'bg-[#EDEBE4] text-[#111111]'
                       : 'border border-[#33333E] text-neutral-300 hover:border-neutral-500 hover:text-white'
                   }`}
                 >

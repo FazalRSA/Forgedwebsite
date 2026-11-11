@@ -11,7 +11,7 @@ import { WheelCatalogue } from './components/brand/WheelCatalogue';
 import { IndustryPartnersSection } from './components/brand/IndustryPartnersSection';
 import { AskAiSection } from './components/brand/AskAiSection';
 import { GlobalOverlays } from './components/shared/GlobalOverlays';
-import { StackedCircularFooter } from '@/components/ui/stacked-circular-footer';
+import { SiteFooter } from './components/brand/SiteFooter';
 
 // Lazy-loaded route components for code-splitting and faster initial bundle evaluation
 const NotFoundPage = lazy(() =>
@@ -60,10 +60,10 @@ function RouteLoadingFallback() {
     <div
       role="status"
       aria-label="Loading page"
-      className="min-h-[60vh] flex flex-col items-center justify-center p-8 bg-[#0A0A0A] text-[#F5F5F7]"
+      className="min-h-[60vh] flex flex-col items-center justify-center p-8 bg-[#111111] text-[#EDEBE4]"
     >
       <div className="relative flex items-center justify-center">
-        <div className="w-10 h-10 rounded-full border-2 border-[#26262E] border-t-[#FF5500] animate-spin" />
+        <div className="w-10 h-10 rounded-full border-2 border-[#26262E] border-t-[#1D4ED8] animate-spin" />
       </div>
       <span className="mt-4 text-xs font-mono tracking-[0.2em] uppercase text-neutral-400">
         Loading
@@ -74,7 +74,7 @@ function RouteLoadingFallback() {
 
 function BrandHomePage() {
   return (
-    <div className="bg-[#0A0A0A] text-[#F5F5F7]">
+    <div className="bg-[#111111] text-[#EDEBE4]">
       <BrandHeader />
       <main>
         <HeroSection />
@@ -139,16 +139,14 @@ function AppRoutes() {
 }
 
 function MainLayout() {
-  const { navigate } = useRouter();
-
   return (
-    <div className="min-h-screen flex flex-col justify-between bg-[#0A0A0A] text-[#F5F5F7]">
+    <div className="min-h-screen flex flex-col justify-between bg-[#111111] text-[#EDEBE4]">
       <div className="flex-1">
         <Suspense fallback={<RouteLoadingFallback />}>
           <AppRoutes />
         </Suspense>
       </div>
-      <StackedCircularFooter onNavigate={navigate} useBrandLinks={true} />
+      <SiteFooter />
     </div>
   );
 }

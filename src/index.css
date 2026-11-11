@@ -1,23 +1,35 @@
 @import "tailwindcss";
 
+/* Satoshi Black is hosted with the site (public/fonts), so no extra third party is contacted. */
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/satoshi-black.woff2') format('woff2');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 @layer base {
   :root {
-    --color-rich-black-base: #0A0A0A;
-    --color-onyx-base: #0A0A0A;
+    --color-rich-black-base: #111111;
+    --color-onyx-base: #111111;
     --color-onyx-surface: #121215;
     --color-onyx-card: #18181D;
     --color-onyx-border: #26262E;
     --color-onyx-border-subtle: #1E1E26;
-    --color-text-primary: #F5F5F7;
+    --color-text-primary: #EDEBE4;
     --color-text-secondary: #C2C2CC;
     --color-text-muted: #727280;
-    --color-electric-orange: #FF5500;
-    --color-electric-orange-hover: #FF6B1A;
+    /* Brand palette: #EDEBE4 text, #111111 background, #1D4ED8 fills, #F43F5E text accents and focus. */
+    --color-brand-blue: #1D4ED8;
+    --color-brand-blue-hover: #2563EB;
+    --color-brand-rose: #F43F5E;
     --color-whatsapp: #25D366;
     --color-instagram: #E1306C;
 
-    --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --font-serif: 'Fraunces', 'Iowan Old Style', Georgia, serif;
+    --font-sans: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-heading: 'Nunito', 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-display: 'Satoshi', 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, monospace;
   }
 
@@ -29,9 +41,23 @@
     letter-spacing: -0.01em;
   }
 
+  /* Type: Satoshi Black for the page title, Nunito for other headings, Open Sans for text. */
+  h1 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading);
+  }
+
   /* One visible keyboard focus style for every link and button on the site. */
   :focus-visible {
-    outline: 2px solid var(--color-electric-orange);
+    outline: 2px solid var(--color-brand-rose);
     outline-offset: 2px;
   }
 
@@ -58,8 +84,14 @@
   }
 }
 
+/* Outside the layers on purpose: a weight utility on an h1 must not thin out Satoshi Black. */
+h1 {
+  font-weight: 900;
+}
+
+/* Emphasis words inside headings. Was an italic serif; now the heading face, italic. */
 .font-editorial-serif {
-  font-family: var(--font-serif);
+  font-family: var(--font-heading);
   font-style: italic;
   letter-spacing: -0.02em;
 }

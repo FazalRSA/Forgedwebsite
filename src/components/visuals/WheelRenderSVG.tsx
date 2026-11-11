@@ -69,7 +69,7 @@ export const WheelRenderSVG: React.FC<WheelRenderSVGProps> = ({
       data-testid="wheel-image-placeholder"
       role="img"
       aria-label={label || `Wheel Image Placeholder (${palette.name})`}
-      className={`relative w-full h-full min-h-[96px] aspect-square rounded-2xl border-2 border-dashed border-[#26262E] bg-[#141418] text-[#F5F5F7] flex flex-col items-center justify-center p-3 sm:p-5 text-center select-none overflow-hidden ${className}`}
+      className={`relative w-full h-full min-h-[96px] aspect-square rounded-2xl border-2 border-dashed border-[#26262E] bg-[#141418] text-[#EDEBE4] flex flex-col items-center justify-center p-3 sm:p-5 text-center select-none overflow-hidden ${className}`}
     >
       {/* Subtle architectural grid background */}
       <div
@@ -98,10 +98,10 @@ export const WheelRenderSVG: React.FC<WheelRenderSVGProps> = ({
         className="relative z-10 flex flex-col items-center justify-center gap-1.5 transition-transform duration-150"
       >
         <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#18181D] border border-[#26262E] flex items-center justify-center shadow-md">
-          <ImageIcon className="w-5 h-5 text-[#FF5500]" />
+          <ImageIcon className="w-5 h-5 text-[#F43F5E]" />
         </div>
 
-        <span className="text-[10px] sm:text-xs font-tech-mono font-bold uppercase tracking-[0.14em] text-[#F5F5F7] leading-tight">
+        <span className="text-[10px] sm:text-xs font-tech-mono font-bold uppercase tracking-[0.14em] text-[#EDEBE4] leading-tight">
           {label || 'WHEEL PLACEHOLDER'}
         </span>
 

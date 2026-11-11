@@ -7,7 +7,7 @@ import {
   classifyStudioPart,
   explodeOffsets,
   isMatteFinishName,
-} from './wheelStudioParts';
+} from '../wheel-viewer/wheelStudioParts';
 import {
   describeWheelForEnquiry,
   parseTechnicalSpecSheet,
