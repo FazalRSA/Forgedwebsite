@@ -123,7 +123,9 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
     requestAnimationFrame(() => view3DButtonRef.current?.focus());
   }, []);
 
-  // No number configured yet: the same button opens the enquiry form, already filled in.
+  // The button opens the enquiry form, already filled in. The form posts the enquiry to the n8n
+  // lead workflow (logged and emailed to the shop) and, with a WhatsApp number configured, then
+  // opens WhatsApp with the same message.
   const openForm = () =>
     openEnquiryModal({
       subject: message,
@@ -132,19 +134,10 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
       domain: 'brand',
     });
 
-  const enquireButton = whatsappHref ? (
-    <a
-      href={whatsappHref}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={PRIMARY_BUTTON}
-    >
-      <MessageCircle className="w-5 h-5" aria-hidden="true" />
-      Enquire on WhatsApp
-    </a>
-  ) : (
+  const enquireButton = (
     <button type="button" onClick={openForm} className={PRIMARY_BUTTON}>
-      Send an enquiry
+      {whatsappHref && <MessageCircle className="w-5 h-5" aria-hidden="true" />}
+      {whatsappHref ? 'Enquire on WhatsApp' : 'Send an enquiry'}
     </button>
   );
 
@@ -256,12 +249,12 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
                         key={finish.id}
                         design={design}
                         finish={finish}
-                        onNoWhatsapp={(subject) => openEnquiryModal({ subject, finish: finish.name, domain: 'brand' })}
+                        onEnquire={(subject) => openEnquiryModal({ subject, finish: finish.name, domain: 'brand' })}
                       />
                     ))}
                   </div>
                   <p className="mt-2 text-sm text-neutral-300">
-                    {TO_ORDER_NOTICE} Tap a colour to ask about it on WhatsApp.
+                    {TO_ORDER_NOTICE} Tap a colour to ask about it.
                   </p>
                 </div>
               )}
@@ -344,33 +337,25 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
 const TO_ORDER_CHIP =
   'inline-flex min-h-11 items-center gap-2 rounded-full border border-dashed border-[#4A4A57] px-4 text-sm text-neutral-200 hover:border-[#1D4ED8] hover:text-white cursor-pointer';
 
-/** A colour that is not in stock. Tapping it starts an enquiry that states the lead time. */
+/**
+ * A colour that is not in stock. Tapping it opens the enquiry form with the lead time stated; the
+ * form logs the enquiry through n8n and then opens WhatsApp when a number is configured.
+ */
 const ToOrderChip: React.FC<{
   design: string;
   finish: WheelFinishOption;
-  onNoWhatsapp: (subject: string) => void;
-}> = ({ design, finish, onNoWhatsapp }) => {
+  onEnquire: (subject: string) => void;
+}> = ({ design, finish, onEnquire }) => {
   const message = `Hi, I'd like the ${design} in ${finish.name}. I understand this colour is made to order, with a lead time of ${TO_ORDER_LEAD_TIME}.`;
-  const href = whatsappLink(message);
-  const content = (
-    <>
-      <Swatch hex={finish.swatchHex} />
-      {finish.name}
-    </>
-  );
-  return href ? (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
+  return (
+    <button
+      type="button"
+      onClick={() => onEnquire(message)}
       aria-label={`Ask about ${finish.name}, made to order, ${TO_ORDER_LEAD_TIME} lead time`}
       className={TO_ORDER_CHIP}
     >
-      {content}
-    </a>
-  ) : (
-    <button type="button" onClick={() => onNoWhatsapp(message)} className={TO_ORDER_CHIP}>
-      {content}
+      <Swatch hex={finish.swatchHex} />
+      {finish.name}
     </button>
   );
 };

@@ -6,7 +6,9 @@ Guidance for AI coding agents working in this repository. People should read `RE
 
 The website for FORGED Custom Wheels: forged wheel sets for BMW M cars, sold in South Africa.
 A static single-page app (React 19, TypeScript, Vite 8, Tailwind CSS v4, Three.js) deployed on
-Render from `main`. There is no backend and no checkout. Every call to action is a WhatsApp enquiry.
+Render from `main`. There is no checkout. Every call to action opens the enquiry form, which posts the
+enquiry to an n8n webhook (logged and emailed to the business; see README → Lead delivery) and then
+opens WhatsApp with the same message when a number is configured.
 
 ## Commands
 

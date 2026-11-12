@@ -159,8 +159,8 @@ export const PrivacyPolicyPage: React.FC = () => {
             This notice explains what personal information {RESPONSIBLE_PARTY.tradingName} (&quot;we&quot;,
             &quot;us&quot;) handles when you use this website or contact us, why, who else sees it, how
             long we keep it, and the rights you have under the Protection of Personal Information Act,
-            2013 (POPIA). This website has no accounts, no sign-in and no forms that send your details
-            to us. Contact happens on WhatsApp or by phone.
+            2013 (POPIA). This website has no accounts and no sign-in. You contact us through the
+            enquiry form on this website, on WhatsApp or by phone.
           </p>
 
           <nav aria-label="Contents" className="pt-4">
@@ -205,11 +205,18 @@ export const PrivacyPolicyPage: React.FC = () => {
             <Bullets
               items={[
                 <>
+                  <Strong>The enquiry form</Strong>: when you send an enquiry from this website we
+                  receive your message, the wheel it is about, your phone number and, if you add them,
+                  your name and email address, together with the page you sent it from and the time.
+                  The form passes this to our automation service (see section 04), which records it,
+                  emails it to us and, if you gave an email address, sends you a receipt with a
+                  reference number. If you have WhatsApp, the form then opens WhatsApp with the same
+                  message typed in; nothing is sent on WhatsApp until you press send there.
+                </>,
+                <>
                   <Strong>Messages and calls to us</Strong>: when you message us on WhatsApp or phone
                   us, we see your phone number, your WhatsApp profile name, and whatever you tell us,
-                  such as your name, your car and the wheels you are asking about. The &quot;WhatsApp&quot;
-                  buttons on this website only open WhatsApp with a message already typed in. Nothing is
-                  sent until you press send in WhatsApp, and this website does not receive your message.
+                  such as your name, your car and the wheels you are asking about.
                 </>,
                 <>
                   <Strong>Technical information</Strong>: like every website, our hosting provider
@@ -256,6 +263,12 @@ export const PrivacyPolicyPage: React.FC = () => {
             <Bullets
               items={[
                 <>
+                  <Strong>Our automation service (n8n GmbH)</Strong>: receives each enquiry sent from
+                  the form, keeps a log of enquiries for us, and sends the emails described in section
+                  02 through <Strong>Google (Gmail)</Strong>. Both act on our instructions as operators
+                  under POPIA.
+                </>,
+                <>
                   <Strong>WhatsApp (Meta Platforms)</Strong>: carries the messages you send us and
                   handles them under its own terms and privacy policy.
                 </>,
@@ -273,8 +286,8 @@ export const PrivacyPolicyPage: React.FC = () => {
 
           <Section index="05" title="Transfers outside South Africa">
             <p>
-              Some of the providers in section 04, including Meta, Google and our hosting provider,
-              store and process information on servers outside South Africa. Section 72 of POPIA allows
+              Some of the providers in section 04, including Meta, Google, n8n and our hosting
+              provider, store and process information on servers outside South Africa. Section 72 of POPIA allows
               this where the recipient is subject to a law, binding corporate rules or a binding
               agreement that provides substantially similar protection to POPIA, where the transfer is
               necessary to perform a contract with you or to take steps at your request before a
@@ -285,9 +298,11 @@ export const PrivacyPolicyPage: React.FC = () => {
 
           <Section index="06" title="Cookies and local storage">
             <p>
-              This website does not set cookies and does not store anything in your browser&apos;s local
-              storage. We do not use advertising, analytics or third-party tracking cookies. When you
-              open WhatsApp from this website, WhatsApp applies its own cookie and privacy practices.
+              This website does not set cookies. We do not use advertising, analytics or third-party
+              tracking cookies. The only thing kept in your browser&apos;s local storage is a copy of an
+              enquiry that could not be sent to us, so that it is not lost; it stays on your device and
+              is never read by us. When you open WhatsApp from this website, WhatsApp applies its own
+              cookie and privacy practices.
             </p>
           </Section>
 

@@ -2,7 +2,7 @@
 
 The website for **FORGED Custom Wheels**, a South African supplier of forged alloy wheel sets for BMW M cars.
 
-It shows the wheels that are in stock, each in photography and an interactive 3D viewer, shows past customer installs, and takes enquiries. There is no online checkout and no backend: every call to action opens WhatsApp with the enquiry typed in.
+It shows the wheels that are in stock, each in photography and an interactive 3D viewer, shows past customer installs, and takes enquiries. There is no online checkout: every call to action opens the enquiry form, which sends the enquiry to the business through n8n and, with a WhatsApp number configured, then opens WhatsApp with the message typed in.
 
 **Stock rule.** A wheel appears on the site only when its `stockStatus` is `In Stock` and `stockQuantitySets` is above zero. Each listing is one design in one finish; the other in-stock finishes of a design are separate listings. Colours a design has no stock of are offered on its wheel page as made to order, always with the notice that a lead time of 3 months applies.
 
@@ -48,7 +48,7 @@ It shows the wheels that are in stock, each in photography and an interactive 3D
 Five pages, plus the privacy notice:
 
 - **Home (`/`).** What is in stock, as a grid you can filter by design, then customer installs, the industry partners strip (SIXNINE Wheels and BMW) and "Ask AI about us".
-- **Wheel page (`/wheels/:slug`).** One in-stock listing: photos, price per set of four, sizes and specification. Colours come in two groups: the design's finishes that are **in stock** (each links to its own listing), and its **other colours, to order**, always shown with the notice that a lead time of 3 months applies. The 3D viewer loads only when the visitor taps "View in 3D" and can preview the to-order colours. The enquiry button opens WhatsApp with the design, finish and sizes filled in; a to-order colour opens WhatsApp with the colour and the lead time filled in.
+- **Wheel page (`/wheels/:slug`).** One in-stock listing: photos, price per set of four, sizes and specification. Colours come in two groups: the design's finishes that are **in stock** (each links to its own listing), and its **other colours, to order**, always shown with the notice that a lead time of 3 months applies. The 3D viewer loads only when the visitor taps "View in 3D" and can preview the to-order colours. The enquiry button opens the enquiry form with the design, finish and sizes filled in; a to-order colour prefills the colour and the lead time. The form logs the enquiry through n8n and then opens WhatsApp (see [Lead delivery](#lead-delivery-n8n)).
 - **Installs (`/installs`).** Customer BMW M cars on FORGED wheels. Each install opens to three photos: two studio re-shoots made from the customer's own photo, then that photo itself with the number plate pixelated.
 - **Sixnine dealer page (`/sixnine-wheels`).** FORGED as an official Sixnine Wheels dealer: the Sixnine sets in stock and a fitment summary. Every number on it is worked out from the catalogue.
 - **Contact (`/contact`).** WhatsApp, phone, address and areas served; any channel not set in `src/config/site.ts` is hidden.
@@ -351,6 +351,22 @@ A value left empty is never shown: the related button falls back to the enquiry 
 
 **Content rule.** Public copy states only what the business can evidence. Do not add certifications, warranty terms, delivery promises, response times, load ratings or dealer status without a source from the owner.
 
+## Lead delivery (n8n)
+
+The enquiry form (`src/components/shared/GlobalOverlays.tsx`, opened by every "Enquire" button and the contact page) posts each submission to one n8n webhook; the site itself has no backend. When a WhatsApp number is configured the form also opens WhatsApp with the message typed, as before.
+
+`src/utils/leads.ts` builds the payload (message, phone, optional name and email, the wheel it is about, the page, a timestamp, consent and a honeypot), POSTs it as JSON with a 10 s timeout and returns the reference n8n issues. If the webhook cannot be reached: with WhatsApp configured the WhatsApp path still carries the message; without it the form keeps the text in the browser and says so, so nothing is silently lost on the visitor's side.
+
+The workflow **FORGED · Website Leads** (production URL `https://novahavensai.app.n8n.cloud/webhook/forged-website-lead`) then:
+
+1. **Normalize & Validate** (Code node): rejects unknown types, filled honeypots and submissions with neither a usable email nor a phone number with HTTP 400; otherwise issues a `FORGED-INT-` reference and builds the emails. The inbox that receives leads and the reply-to address live in the `CONFIG` block at the top of this node; change them there.
+2. **Log lead**: inserts the raw submission into the n8n data table **FORGED Website Leads** (one row per lead, with `status` for triage).
+3. **Respond: accepted**: answers the browser with `{ ok: true, reference }`.
+4. **Email the team**: a summary of the lead, reply-to set to the visitor when they gave an email.
+5. **Confirm to visitor**: a receipt with the reference, only when the visitor gave an email address.
+
+Emails go out through the Gmail credential attached to the workflow. To point a deployment at a different workflow (for example the test URL while developing), set `VITE_LEADS_WEBHOOK_URL`; otherwise `SITE.leadsWebhookUrl` in `src/config/site.ts` is used.
+
 ## Firebase
 
 Client accounts and the garage are gone from the site and no page loads Firebase. The Firebase provider (`src/context/FirebaseContext.tsx`), `firestore.rules` and their tests are kept as they were, for a possible later return of accounts. `firestore.rules` denies everything by default and allows owner-only access with a verified email, exact key sets, bounded string sizes, enum allow-lists, server timestamps and immutable identity fields. `security_spec.md` documents the invariants and the adversarial payloads each rule rejects.
@@ -411,7 +427,7 @@ Build chunks are split per vendor (`react`, `motion`, `three`, `firebase`, `luci
 
 | Area | Today | Planned |
 | --- | --- | --- |
-| **Lead delivery** | Every enquiry button opens WhatsApp with the wheel filled in. The fallback enquiry form is used only if the WhatsApp number is removed from `src/config/site.ts`; it stores entries in the visitor's browser and nothing reaches the business from it. | Send form entries to the business (email or Google Sheets) |
+| **Lead delivery** | Every enquiry is posted to n8n, which logs it and emails the business (see [Lead delivery](#lead-delivery-n8n)); with a WhatsApp number set, the form also opens WhatsApp. The inbox is set inside the n8n workflow. | Route leads into a CRM from the same workflow |
 | **Contact channels** | Set in `src/config/site.ts`; any channel left empty there is hidden (Instagram, Facebook and trade email are empty today) | Fill in once confirmed |
 | **3D accuracy** | Five designs are traced from photos with simplified surfaces | Replace with scans of the physical wheels |
 | **Photography** | Five listings have no product photos and show a plain drawn stand-in (FSA002 Hyper Black and Polished Face, FSA003 Silver, FSA004 Hyper Black and Gloss Black) | Shoot and add |

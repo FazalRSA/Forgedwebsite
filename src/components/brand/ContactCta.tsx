@@ -19,9 +19,10 @@ interface ContactCtaProps {
 }
 
 /**
- * The one "talk to us" button for the whole site. It opens WhatsApp with a prefilled message when a
- * WhatsApp number is set in src/config/site.ts, and otherwise opens the enquiry form. Callers only
- * choose the wording and the styling.
+ * The one "talk to us" button for the whole site. It opens the enquiry form with the message
+ * already typed; the form posts the enquiry to the n8n lead workflow (so it is logged and emailed)
+ * and, when a WhatsApp number is set in src/config/site.ts, then opens WhatsApp with the same
+ * message. Callers only choose the wording and the styling.
  */
 export const ContactCta: React.FC<ContactCtaProps> = ({
   message,
@@ -33,22 +34,7 @@ export const ContactCta: React.FC<ContactCtaProps> = ({
   showIcon = true,
 }) => {
   const openEnquiryModal = useForgedStore((state) => state.openEnquiryModal);
-  const href = whatsappLink(message);
-
-  if (href) {
-    return (
-      <a
-        href={href}
-        target="_blank"
-        rel="noopener noreferrer"
-        onClick={onActivate}
-        className={className}
-      >
-        {showIcon && <MessageCircle aria-hidden="true" className="w-4 h-4 shrink-0" />}
-        <span>{label}</span>
-      </a>
-    );
-  }
+  const waConfigured = whatsappLink(message) !== null;
 
   return (
     <button
@@ -59,7 +45,8 @@ export const ContactCta: React.FC<ContactCtaProps> = ({
       }}
       className={className}
     >
-      <span>{fallbackLabel}</span>
+      {waConfigured && showIcon && <MessageCircle aria-hidden="true" className="w-4 h-4 shrink-0" />}
+      <span>{waConfigured ? label : fallbackLabel}</span>
     </button>
   );
 };
