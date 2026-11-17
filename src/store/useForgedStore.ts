@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { createJSONStorage, persist, type StateStorage } from 'zustand/middleware';
 import { BrandWheelItem } from '../data/catalogue';
 import { NewWheelInput, createWheelEntry } from '../utils/wheelBuilder';
+import { trackEvent } from '../utils/analytics';
 
 export interface SubmittedEnquiryRecord {
   id: string;
@@ -143,13 +144,15 @@ export const useForgedStore = create<ForgedStoreState>()(
         subject: '',
         domain: 'brand',
       },
-      openEnquiryModal: (payload) =>
+      openEnquiryModal: (payload) => {
+        trackEvent('enquiry_open');
         set({
           enquiryModal: {
             isOpen: true,
             ...payload,
           },
-        }),
+        });
+      },
       closeEnquiryModal: () =>
         set((state) => ({
           enquiryModal: {

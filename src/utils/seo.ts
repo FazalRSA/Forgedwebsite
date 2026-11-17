@@ -20,7 +20,7 @@ import { normalizePath } from './redirects';
 export const SITE_NAME = 'FORGED Custom Wheels';
 
 /** Production origin from config/site.ts. Canonical URLs always point here, whichever host served the page. */
-export const SITE_ORIGIN = `https://${SITE.domain}`;
+export const SITE_ORIGIN = `https://${SITE.host}`;
 
 /** Link-preview image for pages that have no picture of their own (a catalogue wheel photo). */
 export const DEFAULT_SHARE_IMAGE = '/images/share/forged-wheels-share.jpg';
@@ -355,12 +355,31 @@ export function sitemapPaths(): string[] {
   return [...new Set(paths)];
 }
 
-/** sitemap.xml for the production domain in config/site.ts. */
-export function buildSitemapXml(origin: string = `https://${SITE.domain}`): string {
+/** sitemap.xml for the production host in config/site.ts. */
+export function buildSitemapXml(origin: string = SITE_ORIGIN): string {
   const urls = sitemapPaths()
     .map((path) => `  <url><loc>${origin}${path === '/' ? '/' : path}</loc></url>`)
     .join('\n');
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
+}
+
+/**
+ * robots.txt: everything is open to crawlers except the two unlisted tools, and the sitemap is
+ * named by its full address on the production host. Written to public/robots.txt by
+ * scripts/generate-sitemap.ts so the host here and in the sitemap cannot differ.
+ */
+export function buildRobotsTxt(origin: string = SITE_ORIGIN): string {
+  return `User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /studio/\n\nSitemap: ${origin}/sitemap.xml\n`;
+}
+
+/**
+ * The Google Search Console ownership tag for the token in config/site.ts, or '' when no token is
+ * set. The token goes into an HTML attribute, so anything but the characters Google's tokens use
+ * is refused rather than escaped.
+ */
+export function searchConsoleTag(token: string = SITE.searchConsoleToken): string {
+  if (!/^[A-Za-z0-9_-]{16,128}$/.test(token)) return '';
+  return `<meta name="google-site-verification" content="${token}" />`;
 }
 
 const PAGE_ROUTES_BEGIN = '# BEGIN generated page routes';

@@ -11,6 +11,7 @@ export interface SiteConfig {
   name: string;
   country: string;
   domain: string;
+  host: string;
   whatsappNumber: string;
   phoneDisplay: string;
   tradeEmail: string;
@@ -21,6 +22,12 @@ export interface SiteConfig {
   serviceAreas: readonly string[];
   /** n8n webhook that receives every website enquiry (see README → Lead delivery). */
   leadsWebhookUrl: string;
+  /** Visit statistics (Umami Cloud): the tracker script's address. Empty means no statistics are collected. */
+  analyticsScriptUrl: string;
+  /** Visit statistics: the website ID (a UUID) from Umami's tracking-code page. Empty means no statistics. */
+  analyticsWebsiteId: string;
+  /** Google Search Console ownership tag: the `content` of the HTML-tag verification. Empty adds no tag. */
+  searchConsoleToken: string;
 }
 
 export const SITE: SiteConfig = {
@@ -28,6 +35,12 @@ export const SITE: SiteConfig = {
   country: 'South Africa',
   /** Primary web domain, used for fallback email addresses. */
   domain: 'forgedsa.co.za',
+  /**
+   * The host the site is actually served from. Canonical URLs, the sitemap, robots.txt and llms.txt
+   * all use it. The bare `domain` redirects here, so it must never be what the pages point to: a
+   * canonical address that redirects back to the page confuses search engines.
+   */
+  host: 'www.forgedsa.co.za',
 
   /** WhatsApp Business number in E.164 digits only, e.g. '27820000000'. */
   whatsappNumber: '27834472654',
@@ -49,6 +62,13 @@ export const SITE: SiteConfig = {
 
   /** Production URL of the "FORGED · Website Leads" n8n workflow. Override per deployment with VITE_LEADS_WEBHOOK_URL. */
   leadsWebhookUrl: 'https://novahavensai.app.n8n.cloud/webhook/forged-website-lead',
+
+  /** Umami Cloud tracker, from its tracking-code page. Leave both empty until the Umami website exists (see README → Search and visit statistics). */
+  analyticsScriptUrl: '',
+  analyticsWebsiteId: '',
+
+  /** Google Search Console HTML-tag token (not needed when the domain is verified with a DNS record). */
+  searchConsoleToken: '',
 };
 
 /** wa.me deep link with an optional prefilled message, or null when no number is configured. */

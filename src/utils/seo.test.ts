@@ -10,11 +10,13 @@ import {
   SITE_ORIGIN,
   absoluteUrl,
   absolutiseJsonLd,
+  buildRobotsTxt,
   isHomePath,
   renderPageHtml,
   buildSitemapXml,
   homeJsonLd,
   metaForPath,
+  searchConsoleTag,
   sitemapPaths,
   withRenderPageRoutes,
   wheelBrand,
@@ -200,8 +202,8 @@ test('Sixnine wheels name their brand; other wheels do not guess one', () => {
   }
 });
 
-test('structured data and canonical URLs are absolute on the production domain', () => {
-  assert.equal(SITE_ORIGIN, `https://${SITE.domain}`);
+test('structured data and canonical URLs are absolute on the production host', () => {
+  assert.equal(SITE_ORIGIN, `https://${SITE.host}`);
   assert.equal(absoluteUrl('/installs'), `${SITE_ORIGIN}/installs`);
   assert.equal(absoluteUrl('https://example.com/x'), 'https://example.com/x');
 
@@ -306,4 +308,31 @@ test('render.yaml has a rewrite rule to the prerendered file for every sitemap p
   // The catch-all for the single-page app must stay after the per-page rules.
   assert.ok(renderYaml.indexOf('source: /*') > renderYaml.indexOf('# END generated page routes'));
   assert.throws(() => withRenderPageRoutes('services: []'), /markers/);
+});
+
+// Search engines are told one address per page. The bare domain redirects to the host the site is
+// served from, so a canonical URL, a sitemap entry or a robots.txt line on the bare domain would
+// point at an address that redirects straight back to the page.
+test('the site names itself by the host it is served from, in the sitemap, robots.txt and the page shell', () => {
+  assert.ok(SITE.host === SITE.domain || SITE.host === `www.${SITE.domain}`, `host ${SITE.host} is not the domain or www.<domain>`);
+  assert.equal(SITE_ORIGIN, `https://${SITE.host}`);
+
+  const robots = readFileSync(path.join(PUBLIC_DIR, 'robots.txt'), 'utf8');
+  assert.equal(robots, buildRobotsTxt(), 'run `npm run build` to regenerate public/robots.txt');
+  assert.ok(robots.includes(`Sitemap: ${SITE_ORIGIN}/sitemap.xml`));
+  assert.ok(robots.includes('Allow: /') && robots.includes('Disallow: /admin') && robots.includes('Disallow: /studio/'));
+  assert.ok(!/^Disallow: \/\s*$/m.test(robots), 'robots.txt must not block the whole site');
+
+  // The raw HTML shell cannot import config, so its share-image URLs are checked here instead.
+  const shell = readFileSync(path.join(PUBLIC_DIR, '..', 'index.html'), 'utf8');
+  const origins = new Set([...shell.matchAll(/https:\/\/[a-z0-9.-]+\.[a-z]{2,}(?=\/images\/)/g)].map((m) => m[0]));
+  assert.deepEqual([...origins], [SITE_ORIGIN], 'index.html share-image URLs must use the site origin');
+});
+
+test('the Search Console ownership tag is added only for a well-formed token', () => {
+  const token = 'dGhpc19pc19hX3Rlc3RfdG9rZW5fZm9yX2ZvcmdlZA-x_9';
+  assert.equal(searchConsoleTag(token), `<meta name="google-site-verification" content="${token}" />`);
+  assert.equal(searchConsoleTag(''), '');
+  assert.equal(searchConsoleTag('short'), '');
+  assert.equal(searchConsoleTag(`${token}"><script>alert(1)</script>`), '');
 });
