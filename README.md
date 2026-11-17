@@ -370,7 +370,7 @@ How it behaves (`src/utils/analytics.ts`): the tracker is added once, after the 
 ### For AI assistants and coding agents
 
 - **`/llms.txt`** follows the [llmstxt.org](https://llmstxt.org) format. `scripts/generate-llms.ts` writes it into `dist/` at the end of every build, from `src/utils/llms.ts`: every in-stock set with its Rand price, sizes and fitment, the to-order lead time, contact details and the main pages. Assistants cannot run this single-page app, so this file is what they can read. Nothing in it is typed by hand. Its links always use the production domain in `src/config/site.ts`, like the canonical URLs and the sitemap.
-- **"Ask AI about us"** (`AskAiSection`, links built in `src/utils/askAi.ts`) is a row of buttons on the home page for ChatGPT, Claude, Perplexity and Google AI. Each opens that assistant in a new tab with a question typed in that points at `/llms.txt` on the address the visitor is on. The site sends nothing itself, and the question asks for facts only.
+- **"Ask AI about us"** (`AskAiSection`, links built in `src/utils/askAi.ts`) is a row of buttons on the home page for ChatGPT, Claude, Perplexity and Google AI. Each opens that assistant in a new tab with a question typed in (ChatGPT, Perplexity and Google AI run it on load; Claude only fills its box) that points at `/llms.txt` on the address the visitor is on. The site sends nothing itself, and the question asks for facts only.
 - **`AGENTS.md`** at the repository root gives AI coding agents the commands and the rules that are easy to break. Keep it in step with this file.
 
 ## Business details and contact channels

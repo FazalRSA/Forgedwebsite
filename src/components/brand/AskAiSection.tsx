@@ -24,7 +24,7 @@ export const AskAiSection: React.FC<{ className?: string }> = ({ className = '' 
         Ask AI about us
       </h2>
       <p className="mt-4 max-w-xl text-neutral-300">
-        Open your AI assistant with a question about our wheels in stock already typed in.
+        Open your AI assistant with a question about our wheels in stock already typed in. ChatGPT, Perplexity and Google AI answer straight away; in Claude, press send.
       </p>
       <ul className="mt-8 grid grid-cols-2 sm:flex sm:flex-wrap gap-3">
         {links.map((link) => (

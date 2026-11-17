@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { BrandHeader } from './BrandHeader';
 import { ContactCta, CTA_PRIMARY_CLASS, CTA_SECONDARY_CLASS } from './ContactCta';
 import { WheelCard } from './WheelCatalogue';
-import { formatZAR, getAllBrandWheels, isSixnineWheel } from '../../data/catalogue';
+import { getAllBrandWheels, isSixnineWheel } from '../../data/catalogue';
 import { useForgedStore } from '../../store/useForgedStore';
 import { Link } from '../../utils/router';
 
@@ -63,13 +63,6 @@ export const SixnineDealerPage: React.FC = () => {
   const designList = joinList(designs);
   const enquiryMessage = `Hi, I'd like to ask about the Sixnine wheels${designList ? ` (${designs.join(' / ')})` : ''}.`;
 
-  const stats = useMemo(() => {
-    const sets = wheels.reduce((sum, wheel) => sum + (wheel.stockQuantitySets ?? 1), 0);
-    const finishes = new Set(wheels.map((wheel) => wheel.finishName).filter(Boolean)).size;
-    const fromPrice = wheels.length > 0 ? Math.min(...wheels.map((wheel) => wheel.priceZAR)) : null;
-    return { sets, finishes, fromPrice };
-  }, [wheels]);
-
   // Fitment facts are shown only where every listed set agrees, so a mixed row is never papered over.
   const fitment = useMemo(() => {
     const rows: { label: string; value: string }[] = [];
@@ -121,28 +114,6 @@ export const SixnineDealerPage: React.FC = () => {
               </div>
             </div>
           </div>
-
-          {wheels.length > 0 && (
-            <dl className="mt-10 grid grid-cols-3 gap-4 border-y border-[#26262E] py-5 text-center sm:text-left">
-              <div>
-                <dt className="text-sm text-neutral-400">Sets in stock</dt>
-                <dd className="mt-1 text-2xl font-light text-white tabular-nums">{stats.sets}</dd>
-              </div>
-              <div>
-                <dt className="text-sm text-neutral-400">Finishes</dt>
-                <dd className="mt-1 text-2xl font-light text-white tabular-nums">{stats.finishes}</dd>
-              </div>
-              {stats.fromPrice !== null && (
-                <div>
-                  <dt className="text-sm text-neutral-400">From</dt>
-                  <dd className="mt-1 text-2xl font-light text-white tabular-nums">
-                    {formatZAR(stats.fromPrice)}
-                    <span className="block text-xs font-normal text-neutral-400">per set of 4</span>
-                  </dd>
-                </div>
-              )}
-            </dl>
-          )}
         </section>
 
         <section
