@@ -104,7 +104,7 @@ export const SixnineDealerPage: React.FC = () => {
                 Sixnine Wheels dealer in Durban
               </h1>
               <p className="mt-4 text-lg text-neutral-300">
-                We supply Sixnine Wheels for BMW M cars.
+                We supply forged Sixnine wheels for BMW M cars.
                 {designList ? ` The ${designList} sets below are in stock now.` : ''}
               </p>
               <div className="mt-6 flex flex-col sm:flex-row gap-3">

@@ -164,7 +164,7 @@ export function metaForPath(rawPath: string): PageMeta {
     case '/sixnine-wheels':
       return page(
         'Official Sixnine Wheels dealer',
-        `${SITE_NAME} is an official dealer of Sixnine Wheels, the German wheel brand. See every Sixnine FF set in stock, with sizes and Rand prices.`,
+        `${SITE_NAME} is an official dealer of Sixnine Wheels, the German wheel brand. See every forged Sixnine FF set in stock, with sizes and Rand prices.`,
         path
       );
     case '/contact':

@@ -69,7 +69,7 @@ export function buildLlmsTxt(origin: string = SITE_ORIGIN): string {
     '',
     `- [Wheels in stock](${origin}/): the full catalogue with photos and a 3D viewer`,
     `- [Installs](${origin}/installs): ${CLIENT_FITMENTS.length} customer cars fitted with our wheels`,
-    `- [Sixnine Wheels dealer](${origin}/sixnine-wheels): what Sixnine Wheels is, and the Sixnine ${sixnineDesigns} sets in stock`,
+    `- [Sixnine Wheels dealer](${origin}/sixnine-wheels): what Sixnine Wheels is, and the forged Sixnine ${sixnineDesigns} sets in stock`,
     `- [Contact](${origin}/contact): WhatsApp, phone and address`,
     '',
     '## Optional',
