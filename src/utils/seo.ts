@@ -6,7 +6,7 @@ import {
   isSixnineWheel,
   type BrandWheelItem,
 } from '../data/catalogue';
-import { SITE } from '../config/site';
+import { SITE, socialLinks } from '../config/site';
 import { normalizePath } from './redirects';
 
 /**
@@ -44,7 +44,7 @@ export function wheelBrand(wheel: BrandWheelItem): string | undefined {
  * phone number and street address appear only once they are filled in there.
  */
 export function homeJsonLd(): Record<string, unknown> {
-  const sameAs = [SITE.instagramUrl, SITE.facebookUrl].filter(Boolean);
+  const sameAs = socialLinks().map((link) => link.href);
   return {
     '@context': 'https://schema.org',
     '@graph': [

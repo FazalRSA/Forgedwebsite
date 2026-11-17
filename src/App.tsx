@@ -9,6 +9,8 @@ import { HeroSection } from './components/brand/HeroSection';
 import { EditorialFlow } from './components/brand/EditorialFlow';
 import { WheelCatalogue } from './components/brand/WheelCatalogue';
 import { IndustryPartnersSection } from './components/brand/IndustryPartnersSection';
+import { GoogleReviewsSection } from './components/brand/GoogleReviewsSection';
+import { FloatingWhatsApp } from './components/shared/FloatingWhatsApp';
 import { AskAiSection } from './components/brand/AskAiSection';
 import { GlobalOverlays } from './components/shared/GlobalOverlays';
 import { SiteFooter } from './components/brand/SiteFooter';
@@ -80,6 +82,7 @@ function BrandHomePage() {
         <HeroSection />
         <WheelCatalogue />
         <EditorialFlow />
+        <GoogleReviewsSection />
         <IndustryPartnersSection />
         <AskAiSection />
       </main>
@@ -155,6 +158,7 @@ export default function App() {
   return (
     <RouterProvider>
       <MainLayout />
+      <FloatingWhatsApp />
       <GlobalOverlays />
     </RouterProvider>
   );

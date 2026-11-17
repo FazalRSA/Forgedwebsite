@@ -1,9 +1,10 @@
 import React from 'react';
 import { ArrowUpRight } from 'lucide-react';
-import { SITE, telLink, whatsappLink } from '../../config/site';
+import { SITE, socialLinks, telLink, whatsappLink } from '../../config/site';
 import { Link } from '../../utils/router';
 import { WORDMARK_HEIGHT, WORDMARK_WIDTH } from '../shared/BrandLogo';
 import { ContactCta } from './ContactCta';
+import { SocialButtons } from '../shared/SocialIcon';
 
 const FOOTER_LINKS = [
   { label: 'Wheels', to: '/#catalogue' },
@@ -54,11 +55,6 @@ function contactColumns(): ContactColumn[] {
       phoneClass: 'col-span-2 order-last md:order-none',
     });
   }
-  const social = [
-    SITE.instagramUrl && { text: 'Instagram', href: SITE.instagramUrl, external: true },
-    SITE.facebookUrl && { text: 'Facebook', href: SITE.facebookUrl, external: true },
-  ].filter(Boolean) as ContactColumn['links'];
-  if (social.length > 0) columns.push({ key: 'social', label: 'Follow us', links: social });
   const phoneHref = telLink();
   if (phoneHref && SITE.phoneDisplay) {
     columns.push({ key: 'phone', label: 'Phone', links: [{ text: SITE.phoneDisplay, href: phoneHref }] });
@@ -75,6 +71,7 @@ const columnLinkClass =
  */
 export const SiteFooter: React.FC = () => {
   const columns = contactColumns();
+  const social = socialLinks();
 
   return (
     <footer className="bg-[#111111] text-[#EDEBE4] border-t border-[#26262E]">
@@ -126,6 +123,15 @@ export const SiteFooter: React.FC = () => {
                 </ul>
               </div>
             ))}
+          </div>
+        )}
+
+        {social.length > 0 && (
+          <div className="mt-6 flex flex-wrap items-center gap-4">
+            <p className="text-[11px] font-tech-mono font-semibold tracking-[0.18em] uppercase text-neutral-400">
+              Follow us
+            </p>
+            <SocialButtons links={social} />
           </div>
         )}
 
