@@ -9,7 +9,7 @@ interface BrandLogoProps {
 }
 
 /**
- * The FORGED logo: the gold monogram beside the red and white FORGED SA wordmark.
+ * The FORGED logo: the gold monogram beside the gold FORGED SA wordmark.
  * Both are SVGs traced from the business's own logo files, in public/brand/.
  * The images carry no alt text because the link around the logo names it.
  */
