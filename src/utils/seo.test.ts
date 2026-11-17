@@ -86,8 +86,13 @@ test('installs, contact and the Sixnine dealer page are indexable pages with the
       const m = metaForPath(variant);
       assert.equal(m.canonicalPath, p, variant);
       assert.equal(m.noindex, false, variant);
-      assert.equal(m.jsonLd, undefined, variant);
     }
+    // Each plain page says what kind of page it is and where it sits (Home, then itself).
+    const nodes = (metaForPath(p).jsonLd as Graph)['@graph'];
+    assert.ok(nodes.some((n) => ['CollectionPage', 'ContactPage', 'WebPage'].includes(n['@type'])), p);
+    const crumbs = breadcrumbsOf(metaForPath(p).jsonLd);
+    assert.deepEqual(crumbs.itemListElement.map((i: Record<string, any>) => i.item), ['/', p], p);
+    assert.equal(nodes.find((n) => n['@type'] === 'ContactPage') !== undefined, p === '/contact');
   }
   assert.notEqual(metaForPath('/installs').title, metaForPath('/contact').title);
   assert.notEqual(metaForPath('/sixnine-wheels').title, metaForPath('/contact').title);
