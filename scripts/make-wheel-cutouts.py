@@ -3,9 +3,8 @@
 
 For every folder in public/images/wheels/ this reads hero.webp (the three-quarter view, shot on
 white) and writes cutout.webp next to it: the same square framing, with a transparent background,
-1000 x 1000 px. The home page's design cards use it (see designCutoutSrc in
-src/components/brand/WheelCatalogue.tsx), and src/data/wheelCutouts.test.ts checks every photo
-has one.
+1000 x 1000 px. The home page's design cards use it (see cutoutSrcFor in
+src/utils/designCards.ts), and src/utils/designCards.test.ts checks every photo has one.
 
 Run it after adding or replacing wheel photos:
 
@@ -21,6 +20,7 @@ the spokes must be gone, and silver spokes must not be eaten away.
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 from pathlib import Path
 
@@ -38,7 +38,14 @@ def cut_out(session, source: Path, target: Path) -> None:
     photo = Image.open(source).convert("RGB")
     cut = remove(photo, session=session)
     cut = cut.convert("RGBA").resize((SIZE, SIZE), Image.LANCZOS)
-    cut.save(target, "WEBP", quality=85, method=6)
+    # Write to a temporary file and rename it, so an interrupted run never leaves a half-written
+    # cutout.webp that later runs would skip as already done.
+    temporary = target.with_name(target.name + ".tmp")
+    try:
+        cut.save(temporary, "WEBP", quality=85, method=6)
+        os.replace(temporary, target)
+    finally:
+        temporary.unlink(missing_ok=True)
 
 
 def main() -> int:
@@ -67,11 +74,7 @@ def main() -> int:
             continue
         try:
             cut_out(session, source, target)
-        except (OSError, ValueError) as error:
-            print(f"failed: {source.relative_to(ROOT)}: {error}", file=sys.stderr)
-            failed += 1
-            continue
-        except Exception as error:  # the model itself can fail on an odd image
+        except Exception as error:  # unreadable photo, failed write, or the model failing on an odd image
             print(f"failed: {source.relative_to(ROOT)}: {error}", file=sys.stderr)
             failed += 1
             continue

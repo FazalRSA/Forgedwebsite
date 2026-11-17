@@ -67,7 +67,7 @@ export function buildDesignCards(wheels: BrandWheelItem[]): DesignCard[] {
     const priceLine = `${samePrice ? '' : 'From '}${formatZAR(minPrice)} per set of 4`;
     const finishes = unique(listings.map((w) => w.finishName ?? '').filter(Boolean));
     const sizes = unique(listings.map((w) => formatSizes(w.sizesAvailable)).filter(Boolean));
-    const badge = listings.length > 1 ? `${listings.length} finishes in stock` : 'In stock';
+    const badge = finishes.length > 1 ? `${finishes.length} finishes in stock` : 'In stock';
 
     return {
       design,

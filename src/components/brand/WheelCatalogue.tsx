@@ -120,7 +120,7 @@ const DesignCard: React.FC<{
       <Link
         to={`/wheels/${card.representative.slug}`}
         aria-label={card.label}
-        className={`group relative block overflow-hidden rounded-3xl border border-[#26262E] bg-[#18181D] aspect-square sm:aspect-[4/5] ${SHAPE_CLASSES[width]}`}
+        className={`group relative block overflow-hidden rounded-3xl border border-[#26262E] bg-[#18181D] aspect-square ${fillTabletRow ? 'sm:aspect-[16/10]' : 'sm:aspect-[4/5]'} ${SHAPE_CLASSES[width]}`}
       >
         {/* A soft lighter glow behind the wheel. */}
         <div
@@ -144,9 +144,9 @@ const DesignCard: React.FC<{
               alt=""
               width={1000}
               height={1000}
-              // The first card is what a phone shows on arrival, so it must not wait to be scrolled to.
-              loading={index < 2 ? 'eager' : 'lazy'}
-              fetchPriority={index === 0 ? 'high' : undefined}
+              // The catalogue sits below the hero, so only the first card loads straight away and none
+              // competes with the hero image for priority.
+              loading={index === 0 ? 'eager' : 'lazy'}
               decoding="async"
               className={`h-full w-full object-contain drop-shadow-[0_24px_40px_rgba(0,0,0,0.55)] transition-transform duration-500 ease-out group-hover:scale-[1.06] motion-reduce:transition-none ${
                 card.cutout ? '' : 'rounded-2xl'
