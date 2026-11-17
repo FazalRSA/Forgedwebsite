@@ -58,6 +58,57 @@ services:
         source: /wheels/fsa004-hyper-black
         destination: /wheels/fsa004-hyper-black.html
       - type: rewrite
+        source: /blog
+        destination: /blog.html
+      - type: rewrite
+        source: /blog/forged-wheel-basics
+        destination: /blog/forged-wheel-basics.html
+      - type: rewrite
+        source: /blog/bmw-m-wheel-fitment
+        destination: /blog/bmw-m-wheel-fitment.html
+      - type: rewrite
+        source: /blog/buying-forged-wheels-south-africa
+        destination: /blog/buying-forged-wheels-south-africa.html
+      - type: rewrite
+        source: /blog/wheel-care
+        destination: /blog/wheel-care.html
+      - type: rewrite
+        source: /blog/forged-wheel-basics/forged-vs-cast-vs-flow-formed-wheels
+        destination: /blog/forged-wheel-basics/forged-vs-cast-vs-flow-formed-wheels.html
+      - type: rewrite
+        source: /blog/forged-wheel-basics/unsprung-weight-explained
+        destination: /blog/forged-wheel-basics/unsprung-weight-explained.html
+      - type: rewrite
+        source: /blog/forged-wheel-basics/are-forged-wheels-worth-it
+        destination: /blog/forged-wheel-basics/are-forged-wheels-worth-it.html
+      - type: rewrite
+        source: /blog/bmw-m-wheel-fitment/wheel-fitment-explained-pcd-offset-centre-bore
+        destination: /blog/bmw-m-wheel-fitment/wheel-fitment-explained-pcd-offset-centre-bore.html
+      - type: rewrite
+        source: /blog/bmw-m-wheel-fitment/bmw-g80-m3-forged-wheels
+        destination: /blog/bmw-m-wheel-fitment/bmw-g80-m3-forged-wheels.html
+      - type: rewrite
+        source: /blog/bmw-m-wheel-fitment/staggered-vs-square-wheel-setups
+        destination: /blog/bmw-m-wheel-fitment/staggered-vs-square-wheel-setups.html
+      - type: rewrite
+        source: /blog/buying-forged-wheels-south-africa/how-much-do-forged-wheels-cost-in-south-africa
+        destination: /blog/buying-forged-wheels-south-africa/how-much-do-forged-wheels-cost-in-south-africa.html
+      - type: rewrite
+        source: /blog/buying-forged-wheels-south-africa/in-stock-vs-made-to-order-forged-wheels
+        destination: /blog/buying-forged-wheels-south-africa/in-stock-vs-made-to-order-forged-wheels.html
+      - type: rewrite
+        source: /blog/buying-forged-wheels-south-africa/choosing-a-wheel-finish-for-your-bmw-m-car
+        destination: /blog/buying-forged-wheels-south-africa/choosing-a-wheel-finish-for-your-bmw-m-car.html
+      - type: rewrite
+        source: /blog/wheel-care/how-to-clean-forged-wheels
+        destination: /blog/wheel-care/how-to-clean-forged-wheels.html
+      - type: rewrite
+        source: /blog/wheel-care/wheel-bolt-torque-and-care
+        destination: /blog/wheel-care/wheel-bolt-torque-and-care.html
+      - type: rewrite
+        source: /blog/wheel-care/protecting-wheels-from-potholes
+        destination: /blog/wheel-care/protecting-wheels-from-potholes.html
+      - type: rewrite
         source: /installs
         destination: /installs.html
       - type: rewrite

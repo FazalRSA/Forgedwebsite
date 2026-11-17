@@ -7,6 +7,8 @@ import { formatZAR, getAllBrandWheels, isSixnineWheel, TO_ORDER_LEAD_TIME } from
 import { CLIENT_FITMENTS } from '../data/clientFitments';
 import { SITE, whatsappLink } from '../config/site';
 import { SITE_ORIGIN } from './seo';
+import { BLOG_PILLARS, blogPillarPath, blogPostPath } from '../data/blog';
+import { BLOG_POSTS, postsInPillar } from '../data/blogPosts';
 
 /** "11 SAINT MARY'S AVENUE · BEREA" -> "11 Saint Mary's Avenue, Berea". */
 function readableAddress(addressLine: string): string {
@@ -71,6 +73,14 @@ export function buildLlmsTxt(origin: string = SITE_ORIGIN): string {
     `- [Installs](${origin}/installs): ${CLIENT_FITMENTS.length} customer cars we have fitted`,
     `- [Sixnine Wheels dealer](${origin}/sixnine-wheels): what Sixnine Wheels is, and the forged Sixnine ${sixnineDesigns} sets in stock`,
     `- [Contact](${origin}/contact): WhatsApp, phone and address`,
+    '',
+    '## Guides',
+    '',
+    `- [Blog](${origin}/blog): ${BLOG_POSTS.length} plain-English guides on forged wheels for BMW M cars, in ${BLOG_PILLARS.length} topics`,
+    ...BLOG_PILLARS.flatMap((pillar) => [
+      `- [${pillar.name}](${origin}${blogPillarPath(pillar)}): ${pillar.description}`,
+      ...postsInPillar(pillar.id).map((post) => `  - [${post.title}](${origin}${blogPostPath(post)}): ${post.description}`),
+    ]),
     '',
     '## Optional',
     '',

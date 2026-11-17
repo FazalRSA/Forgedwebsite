@@ -24,10 +24,14 @@ import {
 } from './seo';
 import { findWheelBySlug, getAllBrandWheels, isInStock } from '../data/catalogue';
 import { SITE } from '../config/site';
+import { blogSitemapPaths } from './blogSeo';
 
 const PUBLIC_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'public');
 
 const WHEELS = getAllBrandWheels();
+
+/** The blog hub, its four pillar pages and every article (see src/data/blog.ts). */
+const BLOG_PATHS = blogSitemapPaths();
 
 type Graph = { '@context': string; '@graph': Array<Record<string, any>> };
 
@@ -227,14 +231,22 @@ test('link-preview images are real files in public/', () => {
   }
 });
 
-test('the sitemap lists the home page, every in-stock wheel once, installs, the Sixnine dealer page, contact and the privacy policy, and nothing else', () => {
+test('the sitemap lists the home page, every in-stock wheel once, the blog, installs, the Sixnine dealer page, contact and the privacy policy, and nothing else', () => {
   const paths = sitemapPaths();
   assert.equal(new Set(paths).size, paths.length);
   assert.deepEqual(
     [...paths].sort(),
-    ['/', '/contact', '/installs', '/privacy-policy', '/sixnine-wheels', ...WHEELS.map((w) => `/wheels/${w.slug}`)].sort()
+    [
+      '/',
+      '/contact',
+      '/installs',
+      '/privacy-policy',
+      '/sixnine-wheels',
+      ...WHEELS.map((w) => `/wheels/${w.slug}`),
+      ...BLOG_PATHS,
+    ].sort()
   );
-  assert.equal(paths.length, 5 + 14);
+  assert.equal(paths.length, 5 + WHEELS.length + BLOG_PATHS.length);
   for (const p of paths.filter((x) => x.startsWith('/wheels/'))) {
     const wheel = findWheelBySlug(p.slice('/wheels/'.length));
     assert.ok(wheel && isInStock(wheel), `${p} must be an in-stock wheel`);
