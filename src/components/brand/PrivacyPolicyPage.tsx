@@ -5,6 +5,7 @@ import { CTA_SECONDARY_CLASS } from './ContactCta';
 import { useRouter } from '../../utils/router';
 import { SITE, telLink, whatsappLink } from '../../config/site';
 import { analyticsScript } from '../../utils/analytics';
+import { CAR_PREVIEW_PROVIDER, carPreviewEnabled } from '../../utils/carPreview';
 
 /**
  * Responsible-party details published in the notice (POPIA s18(1)(b)).
@@ -26,6 +27,12 @@ const LAST_REVISED = '17 November 2026';
  * set up in config/site.ts, so it always matches what the site actually does.
  */
 const STATISTICS = analyticsScript() !== null;
+
+/**
+ * Whether the "See it on my car" preview is switched on (SITE.carPreviewUrl). The notice describes
+ * it, and the company that processes the photo, only when it is.
+ */
+const CAR_PREVIEW = carPreviewEnabled();
 
 const REGULATOR = {
   name: 'Information Regulator (South Africa)',
@@ -252,6 +259,18 @@ export const PrivacyPolicyPage: React.FC = () => {
                       </>,
                     ]
                   : []),
+                ...(CAR_PREVIEW
+                  ? [
+                      <>
+                        <Strong>Car preview</Strong>: if you use &quot;See it on my car&quot;, the photo you
+                        choose is sent, with the name of the wheel, to an AI image service to make the
+                        preview. We do not keep your photo or the result, and the service does not keep them
+                        either (see section 04). The photo is re-saved in your browser before it is sent,
+                        which removes details such as the location it was taken. Please do not include
+                        people or number plates.
+                      </>,
+                    ]
+                  : []),
               ]}
             />
             <p className="pt-1">
@@ -315,6 +334,17 @@ export const PrivacyPolicyPage: React.FC = () => {
                       </>,
                     ]
                   : []),
+                ...(CAR_PREVIEW
+                  ? [
+                      <>
+                        <Strong>Our car-preview service ({CAR_PREVIEW_PROVIDER}, Workers AI)</Strong>:
+                        receives the photo and processes it to make the preview. Its documentation states
+                        that it does not use content processed this way to train AI models and does not
+                        retain inputs or outputs after the request is served, apart from operational
+                        details such as timestamps, sizes and usage counts.
+                      </>,
+                    ]
+                  : []),
                 <>
                   <Strong>Professional advisers and authorities</Strong>: only where the law requires
                   it, or to establish, exercise or defend legal claims.
@@ -325,7 +355,7 @@ export const PrivacyPolicyPage: React.FC = () => {
 
           <Section index="05" title="Transfers outside South Africa">
             <p>
-              Some of the providers in section 04, including Meta, Google, n8n{STATISTICS ? ', Umami' : ''} and our hosting
+              Some of the providers in section 04, including Meta, Google, n8n{STATISTICS ? ', Umami' : ''}{CAR_PREVIEW ? `, ${CAR_PREVIEW_PROVIDER}` : ''} and our hosting
               provider, store and process information on servers outside South Africa. Section 72 of POPIA allows
               this where the recipient is subject to a law, binding corporate rules or a binding
               agreement that provides substantially similar protection to POPIA, where the transfer is

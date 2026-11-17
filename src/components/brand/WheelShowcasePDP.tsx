@@ -1,5 +1,5 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { ArrowLeft, ChevronLeft, ChevronRight, MessageCircle, Play } from 'lucide-react';
+import { ArrowLeft, Camera, ChevronLeft, ChevronRight, MessageCircle, Play } from 'lucide-react';
 import {
   BrandWheelItem,
   WHEEL_FINISHES,
@@ -15,6 +15,7 @@ import {
   isSixnineWheel,
 } from '../../data/catalogue';
 import { whatsappLink } from '../../config/site';
+import { carPreviewEnabled } from '../../utils/carPreview';
 import { Link, useRouter } from '../../utils/router';
 import { cutoutSrcFor, formatSizes } from '../../utils/designCards';
 import { wheelImageSrcSet } from '../../utils/wheelImageSrcSet';
@@ -27,6 +28,7 @@ import {
 } from '../../utils/wheelEnquiry';
 import { prefersReducedMotion } from '../../wheel-viewer/wheelStudioParts';
 import { BrandHeader } from './BrandHeader';
+import { CarPreviewDialog } from './CarPreviewDialog';
 import { WheelOutline } from './WheelCatalogue';
 import { WheelStage } from '../visuals/WheelStage';
 
@@ -45,6 +47,9 @@ interface WheelShowcasePDPProps {
 
 const PRIMARY_BUTTON =
   'inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[#1D4ED8] px-6 text-base font-semibold text-white hover:bg-[#2563EB] active:bg-[#1E40AF] transition-colors cursor-pointer';
+
+const SECONDARY_BUTTON =
+  'inline-flex h-12 w-full items-center justify-center gap-2 rounded-full border border-[#33333E] px-6 text-base font-medium text-neutral-100 hover:border-[#1D4ED8] hover:text-white transition-colors cursor-pointer';
 
 /** The soft lighter glow behind a wheel, as on the home page's design cards. */
 const WHEEL_GLOW = 'bg-[radial-gradient(ellipse_at_50%_40%,rgba(255,255,255,0.09),transparent_65%)]';
@@ -87,6 +92,10 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
   const openEnquiryModal = useForgedStore((state) => state.openEnquiryModal);
 
   const [studioOpen, setStudioOpen] = useState(false);
+  // "See it on my car": only offered once the owner has set the Worker's address (see config/site.ts).
+  const carPreviewOn = carPreviewEnabled();
+  const [carPreviewOpen, setCarPreviewOpen] = useState(false);
+  const carPreviewButtonRef = useRef<HTMLElement | null>(null);
   const stageRef = useRef<HTMLDivElement | null>(null);
   const view3DButtonRef = useRef<HTMLButtonElement | null>(null);
 
@@ -145,6 +154,34 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
       priceZAR: wheel.priceZAR,
       domain: 'brand',
     });
+
+  const closeCarPreview = useCallback(() => setCarPreviewOpen(false), []);
+
+  // Closes the preview first and opens the enquiry on the next frame, so the two dialogs never
+  // overlap (each locks the page's scroll and returns focus when it closes).
+  const enquireAboutPreview = (note: string) => {
+    setCarPreviewOpen(false);
+    requestAnimationFrame(() =>
+      openEnquiryModal({
+        subject: `${message}\n${note}`,
+        finish: finishLabel,
+        priceZAR: wheel.priceZAR,
+        domain: 'brand',
+      })
+    );
+  };
+
+  const openCarPreview = (event: React.MouseEvent<HTMLButtonElement>) => {
+    carPreviewButtonRef.current = event.currentTarget;
+    setCarPreviewOpen(true);
+  };
+
+  const carPreviewButton = carPreviewOn && (
+    <button type="button" onClick={openCarPreview} className={SECONDARY_BUTTON}>
+      <Camera className="w-5 h-5" aria-hidden="true" />
+      See it on my car
+    </button>
+  );
 
   const enquireButton = (
     <button type="button" onClick={openForm} className={PRIMARY_BUTTON}>
@@ -302,7 +339,10 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
               ))}
             </dl>
 
-            <div className="mt-6 hidden lg:block">{enquireButton}</div>
+            <div className="mt-6 hidden lg:block space-y-3">
+              {enquireButton}
+              {carPreviewButton}
+            </div>
           </div>
         </div>
 
@@ -342,10 +382,31 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
           <p className="text-lg font-semibold text-white">
             {priceText} <span className="text-xs font-normal text-neutral-300">per set of 4</span>
           </p>
-          {stock && <p className="text-xs text-neutral-300">{stock}</p>}
+          {carPreviewOn ? (
+            <button
+              type="button"
+              onClick={openCarPreview}
+              className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border border-[#33333E] px-3.5 text-sm font-medium text-neutral-100 hover:border-[#1D4ED8] hover:text-white cursor-pointer"
+            >
+              <Camera className="w-4 h-4" aria-hidden="true" />
+              See it on my car
+            </button>
+          ) : (
+            stock && <p className="text-xs text-neutral-300">{stock}</p>
+          )}
         </div>
         {enquireButton}
       </aside>
+
+      {carPreviewOpen && (
+        <CarPreviewDialog
+          wheelSlug={wheel.slug}
+          wheelName={`${design} — ${finishLabel}`}
+          onClose={closeCarPreview}
+          onEnquire={enquireAboutPreview}
+          returnFocusRef={carPreviewButtonRef}
+        />
+      )}
     </div>
   );
 };

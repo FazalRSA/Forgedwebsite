@@ -1,0 +1,22 @@
+# Cloudflare Worker for the "see these wheels on your car" preview.
+# Free plan only. No KV, R2, D1, Queues or AI Gateway are used: nothing the customer sends is stored.
+name = "forged-car-preview"
+main = "src/index.ts"
+compatibility_date = "2026-11-01"
+
+# Workers AI. No API key is needed: the binding is attached to your account when you deploy.
+[ai]
+binding = "AI"
+
+# Logs and traces stay off so photos, prompts and results can never end up in a log.
+# Do not add [[logpush]] or turn observability on.
+[observability]
+enabled = false
+
+[vars]
+# Browser origins allowed to call this Worker (comma separated). Add "http://localhost:3000" only while testing.
+ALLOWED_ORIGINS = "https://www.forgedsa.co.za"
+# Where the wheel product photos are served from: SITE_ORIGIN/images/wheels/<slug>/hero-400.webp (400 px: the model takes input images under 512 px)
+SITE_ORIGIN = "https://www.forgedsa.co.za"
+# The Workers AI model that edits the photo.
+MODEL = "@cf/black-forest-labs/flux-2-klein-4b"
