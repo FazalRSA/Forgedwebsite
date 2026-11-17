@@ -1,10 +1,13 @@
 {
-  "sha256": "28c2ed08395ea235aa24a2e598beee3147f6cf7418e459279e5cd2d63fb682a2",
+  "sha256": "0f058ebe4d7a5c0514a33a5684131fc44703adb6a779bfe4b1a5f79a144ee187",
   "files": [
+    "FinishSwatch.tsx",
     "README.md",
     "WheelStudio.tsx",
     "index.ts",
     "paint.ts",
+    "studioEnvironment.ts",
+    "swatch.ts",
     "wheel-viewer.css",
     "wheelStudioParts.ts"
   ]
