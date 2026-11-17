@@ -4,6 +4,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import {
+  CATALOGUE_PATH,
   DEFAULT_SHARE_IMAGE,
   SITE_NAME,
   SITE_ORIGIN,
@@ -24,6 +25,24 @@ import { SITE } from '../config/site';
 const PUBLIC_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'public');
 
 const WHEELS = getAllBrandWheels();
+
+type Graph = { '@context': string; '@graph': Array<Record<string, any>> };
+
+/** The Product node of a wheel page's structured data. */
+function productOf(jsonLd: unknown): Record<string, any> {
+  const graph = (jsonLd as Graph)['@graph'];
+  assert.ok(Array.isArray(graph), 'wheel structured data is a @graph');
+  const product = graph.find((node) => node['@type'] === 'Product');
+  assert.ok(product, 'the graph has a Product');
+  return product;
+}
+
+/** The BreadcrumbList node of a wheel page's structured data. */
+function breadcrumbsOf(jsonLd: unknown): Record<string, any> {
+  const crumbs = (jsonLd as Graph)['@graph'].find((node) => node['@type'] === 'BreadcrumbList');
+  assert.ok(crumbs, 'the graph has a BreadcrumbList');
+  return crumbs;
+}
 
 /** Addresses that were pages before the site was cut down to home, wheel, installs, the Sixnine dealer page and contact. */
 const REMOVED_ROUTES = [
@@ -75,7 +94,9 @@ test('every catalogue wheel gets a unique title, a Rand price and Product struct
     assert.equal(m.noindex, false);
     assert.ok(m.title.includes(wheel.model));
     assert.match(m.description, /R\s?[\d,. ]+/);
-    const ld = m.jsonLd as { '@type': string; offers: { price: number; priceCurrency: string; availability: string } };
+    assert.equal((m.jsonLd as Graph)['@context'], 'https://schema.org');
+    assert.equal((m.jsonLd as Graph)['@graph'].length, 2);
+    const ld = productOf(m.jsonLd);
     assert.equal(ld['@type'], 'Product');
     assert.equal(ld.offers.price, wheel.priceZAR);
     assert.equal(ld.offers.priceCurrency, 'ZAR');
@@ -84,6 +105,25 @@ test('every catalogue wheel gets a unique title, a Rand price and Product struct
     titles.add(m.title);
   }
   assert.equal(titles.size, WHEELS.length);
+});
+
+test('every wheel page carries a two-step breadcrumb: the wheels in stock, then the wheel', () => {
+  assert.equal(CATALOGUE_PATH, '/#catalogue');
+  for (const wheel of WHEELS) {
+    const path = `/wheels/${wheel.slug}`;
+    const crumbs = breadcrumbsOf(metaForPath(path).jsonLd);
+    assert.deepEqual(crumbs, {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Wheels in stock', item: CATALOGUE_PATH },
+        { '@type': 'ListItem', position: 2, name: wheel.model, item: path },
+      ],
+    });
+    // Crumb addresses are made absolute with the rest of the structured data.
+    const absolute = breadcrumbsOf(absolutiseJsonLd(metaForPath(path).jsonLd!, 'https://example.test'));
+    assert.equal(absolute.itemListElement[0].item, 'https://example.test/#catalogue');
+    assert.equal(absolute.itemListElement[1].item, `https://example.test${path}`);
+  }
 });
 
 test('an unknown wheel slug is kept out of search results', () => {
@@ -128,9 +168,16 @@ test('home page structured data describes the organisation and website from site
   assert.equal(org['@type'], 'Organization');
   assert.equal(org.name, SITE.name);
   assert.equal(site['@type'], 'WebSite');
-  // Nothing the repo does not know: no address, phone, reviews or ratings.
-  for (const key of ['address', 'telephone', 'aggregateRating', 'review', 'logo']) {
+  // Nothing the repo does not know: no reviews, ratings or logo.
+  for (const key of ['aggregateRating', 'review', 'logo']) {
     assert.equal(key in org, false, key);
+  }
+  // The phone number and street address come from the site config, and only once they are set there.
+  assert.equal('telephone' in org, Boolean(SITE.phoneDisplay));
+  if (SITE.phoneDisplay) assert.equal(org.telephone, SITE.phoneDisplay);
+  assert.equal('address' in org, Boolean(SITE.addressLine));
+  if (SITE.addressLine) {
+    assert.deepEqual(org.address, { '@type': 'PostalAddress', streetAddress: SITE.addressLine, addressCountry: 'ZA' });
   }
   // Social profiles appear only once they are configured.
   assert.equal('sameAs' in org, Boolean(SITE.instagramUrl || SITE.facebookUrl));
@@ -140,7 +187,7 @@ test('home page structured data describes the organisation and website from site
 
 test('Sixnine wheels name their brand; other wheels do not guess one', () => {
   for (const wheel of WHEELS) {
-    const ld = metaForPath(`/wheels/${wheel.slug}`).jsonLd as { brand?: { '@type': string; name: string } };
+    const ld = productOf(metaForPath(`/wheels/${wheel.slug}`).jsonLd);
     if (wheel.modelCode === 'FF-1' || wheel.modelCode === 'FF-3') {
       assert.equal(wheelBrand(wheel), 'Sixnine');
       assert.deepEqual(ld.brand, { '@type': 'Brand', name: 'Sixnine' });
@@ -164,10 +211,7 @@ test('structured data and canonical URLs are absolute on the production domain',
   assert.equal(home['@graph'][1].publisher?.['@id'], `${SITE_ORIGIN}/#organization`);
 
   const wheel = WHEELS[0];
-  const product = absolutiseJsonLd(metaForPath(`/wheels/${wheel.slug}`).jsonLd!, 'https://example.test') as {
-    url: string;
-    offers: { url: string };
-  };
+  const product = productOf(absolutiseJsonLd(metaForPath(`/wheels/${wheel.slug}`).jsonLd!, 'https://example.test'));
   assert.equal(product.url, `https://example.test/wheels/${wheel.slug}`);
   assert.equal(product.offers.url, `https://example.test/wheels/${wheel.slug}`);
 });
@@ -236,6 +280,7 @@ test('renderPageHtml bakes a page\'s own title, description, canonical, image an
   assert.ok(html.includes('<meta property="og:url" content="https://example.test/wheels/fsa002-gold" />'));
   assert.ok(html.includes(`<meta property="og:image" content="https://example.test${meta.image}" />`));
   assert.ok(html.includes('"@type":"Product"'));
+  assert.ok(html.includes('"@type":"BreadcrumbList"'));
   assert.ok(!html.includes('noindex'));
   assert.ok(html.includes('<div id="root"></div>'), 'the app shell body is untouched');
 

@@ -205,7 +205,7 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
       ├─ ui/                      Re-exports of the root components/ui primitives
       ├─ brand/                   Header, footer, home, catalogue, wheel page, installs, Sixnine dealer page, partners strip, Ask AI, contact, privacy
       ├─ admin/                   Admin uploader
-      ├─ shared/                  BrandLogo, enquiry form, SafeImage
+      ├─ shared/                  BrandLogo, enquiry form
       └─ visuals/                 WheelStudio (3D), WheelStage, its loading skeleton and error boundary
 ```
 
@@ -222,7 +222,7 @@ The look is dark, restrained and technical. Keep new work inside it.
   - **Open Sans** (`--font-sans`) for body text.
   - **Geist Mono** (`--font-mono`, via `.font-tech-mono`) for specifications and uppercase labels.
 - **Reuse these components** rather than the plain HTML element:
-  - `SafeImage` (`src/components/shared/`) instead of `<img>` for wheel photography. A broken image URL shows the site's placeholder card instead of the browser's broken-image icon.
+  - A plain `<img>` with `width`, `height` and the attributes from `wheelImageSrcSet()` (`src/utils/wheelImageSrcSet.ts`) for wheel photography, or from `fitmentImageSrcSet()` (`src/utils/fitmentImageSrcSet.ts`) for install photos, so phones download the smaller copies.
   - `WheelStage` for any 3D view. It downloads Three.js only when it's needed.
 
 ## Inventory
@@ -342,7 +342,7 @@ All search metadata is produced by `src/utils/seo.ts` and applied on every route
 
 - **Titles and descriptions** per route, with titles capped at 60 characters. The home title is "Forged wheels for BMW M cars in stock | FORGED Custom Wheels".
 - **Canonical URLs** always on the production domain in `src/config/site.ts`.
-- **Link previews**: Open Graph and Twitter tags on every route. Link-preview bots and crawlers that do not run JavaScript read the same tags from each page's own HTML file, written by `scripts/prerender-meta.ts`. `index.html` keeps generic tags because it is also the fallback for unknown paths.
+- **Link previews**: Open Graph and Twitter tags on every route. Link-preview bots and crawlers that do not run JavaScript read the same tags from each page's own HTML file, written by `scripts/prerender-meta.ts`. `index.html` keeps generic tags because it is also the fallback for unknown paths; the only thing the build adds to it is a preload for the hero wheel image (the first design card's cut-out, from the catalogue), so wide screens start fetching it before the JavaScript runs.
 - **Structured data**: `Organization` and `WebSite` on the home page; `Product` with the Rand price, in stock, on wheel pages.
 - **Sitemap**: `public/sitemap.xml` is regenerated from the catalogue on every build. It lists `/`, one page per in-stock wheel, `/installs`, `/sixnine-wheels`, `/contact` and `/privacy-policy`, and nothing else.
 - **Noindex**: admin, preview, sold or unknown wheels, and unknown addresses. `public/robots.txt` keeps crawlers out of `/admin` and `/studio/`.
@@ -394,7 +394,7 @@ firebase deploy --only firestore:rules
 
 ## Testing
 
-`bun run test` runs ten test files (87 tests) with `node:test`. The files are listed by name in the `test` script in `package.json`, so a new test file does not run until it is added there.
+`bun run test` runs eleven test files (96 tests) with `node:test`. The files are listed by name in the `test` script in `package.json`, so a new test file does not run until it is added there.
 
 | Suite | Covers |
 | --- | --- |
@@ -402,6 +402,7 @@ firebase deploy --only firestore:rules
 | `src/data/clientFitments.test.ts` | Customer installs data |
 | `src/utils/designCards.test.ts` | Home page design cards: one per design, badge, price and link from the data, the 3-then-2 row plan, and a cut-out on disk for every photographed listing |
 | `src/utils/wheelImageSrcSet.test.ts` | The `srcset` for each wheel photo (site photos only; nothing for admin uploads or placeholders) and that every smaller copy exists on disk |
+| `src/utils/fitmentImageSrcSet.test.ts` | The `srcset` for the install thumbnails (800 px copy, then the original) and that every install photo has its 800 px copy on disk |
 | `src/utils/wheelStudioParts.test.ts` | Viewer part classification, exploded-view offsets, camera distance |
 | `src/utils/seo.test.ts` | Per-route metadata, canonical URLs, structured data, share images, sitemap (no removed route), `render.yaml` |
 | `src/utils/redirects.test.ts` | Old address to new address, `replaceState`, no loops, and every address in `scripts/legacy-pages.json` has a redirect |

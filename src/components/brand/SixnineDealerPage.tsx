@@ -171,7 +171,7 @@ export const SixnineDealerPage: React.FC = () => {
                 Its best-known idea is the FF-ONE: one wheel with swappable inlays, so the same wheel can take on five
                 different looks.
               </p>
-              <p className="text-sm text-neutral-500">
+              <p className="text-sm text-neutral-400">
                 Source:{' '}
                 <a
                   href={SIXNINE_SOURCE_URL}
@@ -196,7 +196,7 @@ export const SixnineDealerPage: React.FC = () => {
                       {stocked && (
                         <a
                           href="#sixnine-stock"
-                          className="shrink-0 rounded-full bg-[#EDEBE4] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#111111]"
+                          className="inline-flex min-h-9 shrink-0 items-center rounded-full bg-[#EDEBE4] px-2.5 text-[11px] font-semibold uppercase tracking-wide text-[#111111]"
                         >
                           In stock
                         </a>

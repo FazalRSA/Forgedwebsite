@@ -1,4 +1,5 @@
 import { type BrandWheelItem, formatZAR, getWheelImages } from '../data/catalogue';
+import { wheelImageSrcSet, type WheelImageSources } from './wheelImageSrcSet';
 
 /**
  * The home page shows one card per wheel design. Everything a card says is worked out here from
@@ -82,6 +83,29 @@ export function buildDesignCards(wheels: BrandWheelItem[]): DesignCard[] {
 }
 
 const unique = (values: string[]): string[] => Array.from(new Set(values));
+
+/**
+ * The home page hero shows the first design's cut-out, decoratively, on screens at least this wide
+ * (Tailwind's lg). Narrower screens neither draw it nor download it. The same query gates the
+ * <img> in HeroSection and the preload that scripts/prerender-meta.ts writes into dist/index.html.
+ */
+export const HERO_WHEEL_MEDIA = '(min-width: 1024px)';
+
+/**
+ * How wide the hero wheel is drawn, as a CSS sizes attribute. It is 82% of the hero's height, which
+ * the two-line headline sets, so it was measured in the built site: 340 px at both 1024 and 1440 px.
+ */
+export const HERO_WHEEL_SIZES = '340px';
+
+/**
+ * The hero wheel's src, srcset and sizes: the first design card's cut-out, or undefined when no
+ * in-stock design has one (then the hero shows no wheel and nothing is preloaded). HeroSection and
+ * prerender-meta.ts both use this, so the preloaded file is exactly the one the <img> requests.
+ */
+export function heroWheelImage(wheels: BrandWheelItem[]): WheelImageSources | undefined {
+  const cutout = buildDesignCards(wheels)[0]?.cutout;
+  return cutout ? wheelImageSrcSet(cutout, HERO_WHEEL_SIZES) : undefined;
+}
 
 /**
  * How many cards go in each row on wide screens: rows of 3 and 2 alternate, starting with 3.

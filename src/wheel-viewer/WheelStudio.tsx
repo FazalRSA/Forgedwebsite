@@ -213,7 +213,7 @@ function createStudioEngine(mount: HTMLDivElement, callbacks: EngineCallbacks, o
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.0;
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
   renderer.domElement.style.display = 'block';
   // Dragging the picture must not scroll the page. A page that mounts the viewer only on request (the
   // website's "View in 3D") keeps this safe; a page that always shows it should leave room to scroll past.

@@ -5,12 +5,19 @@ import { ContactCta, CTA_PRIMARY_CLASS, CTA_SECONDARY_CLASS } from './ContactCta
 import { fitmentCar, fitmentMessage, fitmentTitle, fitmentWheels } from './fitmentFormat';
 import { Link } from '../../utils/router';
 import { CLIENT_FITMENTS, FITMENT_FAMILIES, type ClientFitment } from '../../data/clientFitments';
+import { fitmentImageSrcSet } from '../../utils/fitmentImageSrcSet';
 
 const ALL = 'All';
 
 const FOCUSABLE = 'a[href], button:not([disabled])';
 
 const PHOTO_COUNT = 3;
+
+/**
+ * How wide a card's picture is drawn: two columns on a phone, three from 768 px, four from 1024 px,
+ * inside the 1280 px page (padding and gaps taken off). Lets the browser pick the 800 px copy.
+ */
+const CARD_SIZES = '(min-width:1280px) 285px, (min-width:1024px) 24vw, (min-width:768px) 31vw, 48vw';
 
 /** Photos of one customer car, with the details that are known and a way to ask about the setup. */
 const InstallLightbox: React.FC<{ fitment: ClientFitment; onClose: () => void }> = ({
@@ -214,7 +221,11 @@ export const ClientFitmentsPage: React.FC = () => {
         </p>
 
         {FITMENT_FAMILIES.length > 1 && (
-          <div role="group" aria-label="Filter by car" className="mt-6 flex flex-wrap gap-2">
+          <div
+            role="group"
+            aria-label="Filter by car"
+            className="-mx-4 mt-6 flex gap-2 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:flex-wrap sm:px-0"
+          >
             {[ALL, ...FITMENT_FAMILIES].map((option) => {
               const active = family === option;
               return (
@@ -226,7 +237,7 @@ export const ClientFitmentsPage: React.FC = () => {
                     setOpenId(null);
                     setFamily(option);
                   }}
-                  className={`min-h-11 px-4 rounded-full text-sm font-medium transition-colors cursor-pointer ${
+                  className={`min-h-11 shrink-0 px-4 rounded-full text-sm font-medium transition-colors cursor-pointer ${
                     active
                       ? 'bg-[#EDEBE4] text-[#111111]'
                       : 'border border-[#33333E] text-neutral-300 hover:border-neutral-500 hover:text-white'
@@ -248,12 +259,11 @@ export const ClientFitmentsPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setOpenId(item.id)}
-                aria-label={`Open photos of ${fitmentTitle(item)}`}
                 className="group block w-full text-left cursor-pointer"
               >
                 <div className="aspect-[4/3] overflow-hidden rounded-xl bg-[#18181D]">
                   <img
-                    src={item.images[0]}
+                    {...fitmentImageSrcSet(item.images[0], CARD_SIZES)}
                     alt=""
                     width={1600}
                     height={1200}
@@ -263,6 +273,7 @@ export const ClientFitmentsPage: React.FC = () => {
                   />
                 </div>
                 <span className="mt-3 block text-base font-medium text-white group-hover:underline underline-offset-4">
+                  <span className="sr-only">Open photos of </span>
                   {fitmentCar(item)}
                 </span>
                 <span className="block text-sm text-neutral-300">{item.paint}</span>

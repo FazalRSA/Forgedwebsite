@@ -5,9 +5,13 @@ import { useForgedStore } from '../../store/useForgedStore';
 import { Link } from '../../utils/router';
 import { designOf } from './WheelCatalogue';
 import { fitmentCar, fitmentTitle, fitmentWheels } from './fitmentFormat';
+import { fitmentImageSrcSet } from '../../utils/fitmentImageSrcSet';
 
 /** How many installs the home page previews; the rest are on /installs. */
 const STRIP_COUNT = 4;
+
+/** How wide a strip picture is drawn: two columns on a phone, four from 1024 px, inside the 1280 px page. */
+const STRIP_SIZES = '(min-width:1280px) 282px, (min-width:1024px) 24vw, 47vw';
 
 /**
  * Below the wheels on the home page: a short look at real customer cars, then a row of facts.
@@ -60,7 +64,7 @@ export const EditorialFlow: React.FC = () => {
                 <Link to="/installs" className="group block">
                   <div className="aspect-[4/3] overflow-hidden rounded-xl bg-[#18181D]">
                     <img
-                      src={fitment.images[0]}
+                      {...fitmentImageSrcSet(fitment.images[0], STRIP_SIZES)}
                       alt={`${fitmentTitle(fitment)} on forged wheels`}
                       width={1600}
                       height={1200}
@@ -86,13 +90,15 @@ export const EditorialFlow: React.FC = () => {
           aria-label="The site in numbers"
           className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 py-10 border-t border-[#26262E]"
         >
-          <ul className="flex flex-col sm:flex-row sm:flex-wrap gap-x-12 gap-y-3">
+          {/* Each number sits above its label, so the three numbers line up whatever the label's length. */}
+          <dl className="grid grid-cols-3 gap-4 border-y border-[#26262E] py-5">
             {facts.map((fact) => (
-              <li key={fact.label} className="text-base text-neutral-300">
-                <span className="font-medium text-white tabular-nums">{fact.value}</span> {fact.label}
-              </li>
+              <div key={fact.label} className="flex flex-col">
+                <dt className="mt-1 text-sm text-neutral-400">{fact.label}</dt>
+                <dd className="order-first text-2xl font-light text-white tabular-nums">{fact.value}</dd>
+              </div>
             ))}
-          </ul>
+          </dl>
         </section>
       )}
     </>

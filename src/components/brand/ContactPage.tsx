@@ -2,6 +2,7 @@ import React from 'react';
 import { BrandHeader } from './BrandHeader';
 import { ContactCta } from './ContactCta';
 import { SITE, telLink, whatsappLink } from '../../config/site';
+import { mapsLink } from './SiteFooter';
 
 const CONTACT_MESSAGE = "Hi, I'd like to ask about your wheels.";
 
@@ -42,7 +43,20 @@ export const ContactPage: React.FC = () => {
     });
   }
   if (SITE.addressLine) {
-    rows.push({ label: 'Address', content: <span className="inline-flex items-center min-h-11 py-1.5 text-white">{SITE.addressLine}</span> });
+    // Tappable, like the footer's address: opens the street address in Google Maps.
+    rows.push({
+      label: 'Address',
+      content: (
+        <a
+          href={mapsLink(SITE.addressLine)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center min-h-11 text-white underline underline-offset-4 hover:text-[#F43F5E]"
+        >
+          {SITE.addressLine}
+        </a>
+      ),
+    });
   }
   if (SITE.serviceAreas.length > 0) {
     rows.push({ label: 'Areas we serve', content: <span className="inline-flex items-center min-h-11 py-1.5 text-white">{SITE.serviceAreas.join(', ')}</span> });

@@ -25,7 +25,7 @@ interface ContactColumn {
 }
 
 /** A Google Maps search for the street address, so "Visit" opens directions. */
-function mapsLink(address: string): string {
+export function mapsLink(address: string): string {
   const query = address.split('·').map((part) => part.trim()).join(', ');
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
 }
@@ -94,7 +94,7 @@ export const SiteFooter: React.FC = () => {
           <div className="mt-12 md:mt-16 border-t border-[#1E1E26] pt-6 grid grid-cols-2 gap-x-6 gap-y-4 md:flex md:justify-between md:gap-10">
             {columns.map((column) => (
               <div key={column.key} className={`min-w-0 ${column.phoneClass ?? ''}`}>
-                <p className="text-[11px] font-tech-mono font-semibold tracking-[0.18em] uppercase text-neutral-500">
+                <p className="text-[11px] font-tech-mono font-semibold tracking-[0.18em] uppercase text-neutral-400">
                   {column.label}
                 </p>
                 {column.enquiry && (
@@ -144,7 +144,7 @@ export const SiteFooter: React.FC = () => {
               ))}
             </ul>
           </nav>
-          <p className="flex items-center gap-2.5 text-xs text-neutral-500">
+          <p className="flex items-center gap-2.5 text-xs text-neutral-400">
             <img src="/brand/forged-monogram.svg" alt="" width={20} height={20} loading="lazy" className="h-5 w-5" />
             <span>
               © {new Date().getFullYear()} {SITE.name} · {SITE.country}

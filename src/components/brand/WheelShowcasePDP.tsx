@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { ArrowLeft, ChevronLeft, ChevronRight, MessageCircle, Play } from 'lucide-react';
 import {
   BrandWheelItem,
@@ -16,7 +16,7 @@ import {
 } from '../../data/catalogue';
 import { whatsappLink } from '../../config/site';
 import { Link, useRouter } from '../../utils/router';
-import { formatSizes } from '../../utils/designCards';
+import { cutoutSrcFor, formatSizes } from '../../utils/designCards';
 import { wheelImageSrcSet } from '../../utils/wheelImageSrcSet';
 import { useForgedStore } from '../../store/useForgedStore';
 import {
@@ -27,12 +27,16 @@ import {
 } from '../../utils/wheelEnquiry';
 import { prefersReducedMotion } from '../../wheel-viewer/wheelStudioParts';
 import { BrandHeader } from './BrandHeader';
+import { WheelOutline } from './WheelCatalogue';
 import { WheelStage } from '../visuals/WheelStage';
 
 /**
  * One wheel in stock: photos first, then name, price, sizes and specs, with a single call to
  * action (enquire on WhatsApp). The 3D view is opt-in: nothing 3D (no WebGL, no three.js, no GLB)
  * loads until the visitor taps "View in 3D".
+ *
+ * Layout: one column up to 1024 px (phones and tablets get a full-width gallery and a sticky price
+ * bar); two columns from `lg:` with the details column sticky beside the photos.
  */
 
 interface WheelShowcasePDPProps {
@@ -41,6 +45,9 @@ interface WheelShowcasePDPProps {
 
 const PRIMARY_BUTTON =
   'inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[#1D4ED8] px-6 text-base font-semibold text-white hover:bg-[#2563EB] active:bg-[#1E40AF] transition-colors cursor-pointer';
+
+/** The soft lighter glow behind a wheel, as on the home page's design cards. */
+const WHEEL_GLOW = 'bg-[radial-gradient(ellipse_at_50%_40%,rgba(255,255,255,0.09),transparent_65%)]';
 
 /** Real photographs only: a generated stand-in picture (data: URL) is not a photo of this wheel. */
 function realPhotos(wheel: BrandWheelItem): string[] {
@@ -85,6 +92,8 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
 
   const has3D = Boolean(wheel.modelUrl);
   const photos = realPhotos(wheel);
+  // The transparent cut-out of the three-quarter photo opens the gallery on the dark page colour.
+  const cutout = cutoutSrcFor(getWheelImages(wheel).images[1]);
   const siblings = getSiblingListings(wheel, customBrandWheels);
   const toOrderFinishes = getToOrderFinishes(wheel, customBrandWheels);
   // The colour shown in the 3D view: the stocked one, or a to-order colour being previewed.
@@ -153,14 +162,13 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
       value: /^\d+(\.\d+)?$/.test(specs.cb) ? `${specs.cb} mm` : specs.cb,
     },
     construction && { label: 'Build', value: construction },
-    stock && { label: 'Stock', value: stock },
   ].filter((row): row is { label: string; value: string } => Boolean(row));
 
   return (
     <div className="min-h-screen bg-[#111111] text-[#EDEBE4]">
       <BrandHeader forceLight={false} />
 
-      <main className="mx-auto max-w-6xl px-4 sm:px-6 pt-3 pb-40 md:pb-16">
+      <main className="mx-auto max-w-6xl px-4 sm:px-6 pt-3 pb-12 lg:pb-16">
         <Link
           to="/#catalogue"
           className="inline-flex min-h-11 items-center gap-1.5 text-sm text-neutral-300 hover:text-white"
@@ -169,7 +177,7 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
           Wheels in stock
         </Link>
 
-        <div className="mt-1 md:grid md:grid-cols-2 md:gap-10 md:items-start">
+        <div className="mt-1 lg:grid lg:grid-cols-2 lg:gap-10 lg:items-start">
           {/* Photos first; the 3D stage takes this slot once the visitor asks for it. */}
           <div ref={stageRef} className="scroll-mt-20">
             {studioOpen && has3D ? (
@@ -196,20 +204,21 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
             ) : photos.length > 0 ? (
               <PhotoGallery
                 photos={photos}
+                cutout={cutout}
                 altBase={`${wheel.model} forged wheel`}
                 onView3D={has3D ? openStudio : undefined}
+                triggerRef={view3DButtonRef}
               />
             ) : (
               <NoPhotoPanel
                 label={wheel.model}
-                swatchHex={WHEEL_FINISHES[wheel.defaultFinish]?.swatchHex}
                 onView3D={has3D ? openStudio : undefined}
                 triggerRef={view3DButtonRef}
               />
             )}
           </div>
 
-          <div className="mt-5 md:mt-0 md:sticky md:top-24">
+          <div className="mt-5 lg:mt-0 lg:sticky lg:top-24">
             <h1 className="text-3xl sm:text-4xl font-semibold tracking-[-0.02em] text-white">
               {wheel.model}
             </h1>
@@ -224,7 +233,13 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
               {priceText}{' '}
               <span className="text-base font-normal text-neutral-300">per set of 4</span>
             </p>
-            {stock && <p className="mt-1 text-sm text-[#F43F5E]">{stock}</p>}
+            {stock && (
+              <p className="mt-2">
+                <span className="inline-flex rounded-full bg-[#EDEBE4] px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-[#111111]">
+                  {stock}
+                </span>
+              </p>
+            )}
             {wheel.compatibleCars && (
               <p className="mt-2 text-sm text-neutral-300">
                 Fits BMW {wheel.compatibleCars}. Send us your car and we confirm the fit.
@@ -275,18 +290,6 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
               )}
             </div>
 
-            {has3D && !studioOpen && photos.length > 0 && (
-              <button
-                ref={view3DButtonRef}
-                type="button"
-                onClick={openStudio}
-                className="mt-5 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full border border-[#33333E] px-6 text-base font-semibold text-white hover:border-[#1D4ED8] transition-colors cursor-pointer"
-              >
-                <Play className="w-4 h-4 fill-current" aria-hidden="true" />
-                View in 3D
-              </button>
-            )}
-
             <dl className="mt-6 border-t border-[#26262E]">
               {specRows.map((row) => (
                 <div
@@ -299,7 +302,7 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
               ))}
             </dl>
 
-            <div className="mt-6 hidden md:block">{enquireButton}</div>
+            <div className="mt-6 hidden lg:block">{enquireButton}</div>
           </div>
         </div>
 
@@ -328,8 +331,13 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
         )}
       </main>
 
-      {/* Phone: price and the one action stay in reach while scrolling. */}
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[#26262E] bg-[#111111]/95 px-4 pt-2.5 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur md:hidden">
+      {/* Phones and tablets: price and the one action stay in reach while scrolling. Sticky, not
+          fixed: the bar sits at the foot of the viewport while this page is on screen and scrolls
+          away with the end of the page, so it never covers the site footer below. */}
+      <aside
+        aria-label="Price and enquiry"
+        className="sticky bottom-0 z-40 border-t border-[#26262E] bg-[#111111]/95 px-4 pt-2.5 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur lg:hidden"
+      >
         <div className="mb-2 flex items-baseline justify-between gap-3">
           <p className="text-lg font-semibold text-white">
             {priceText} <span className="text-xs font-normal text-neutral-300">per set of 4</span>
@@ -337,7 +345,7 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
           {stock && <p className="text-xs text-neutral-300">{stock}</p>}
         </div>
         {enquireButton}
-      </div>
+      </aside>
     </div>
   );
 };
@@ -376,9 +384,16 @@ const Swatch: React.FC<{ hex?: string }> = ({ hex }) => (
   />
 );
 
-/** The poster for the 3D view: a play-style button laid over the first photo. */
-const View3DPoster: React.FC<{ onClick: () => void }> = ({ onClick }) => (
+/**
+ * The one "View in 3D" control on a page with photos: a play-style button laid over the first
+ * slide. Closing the 3D view returns focus to it through triggerRef.
+ */
+const View3DPoster: React.FC<{ onClick: () => void; triggerRef: React.Ref<HTMLButtonElement> }> = ({
+  onClick,
+  triggerRef,
+}) => (
   <button
+    ref={triggerRef}
     type="button"
     onClick={onClick}
     className="absolute bottom-3 left-3 inline-flex min-h-11 items-center gap-2 rounded-full bg-black/75 px-4 text-sm font-semibold text-white backdrop-blur cursor-pointer hover:bg-black"
@@ -391,28 +406,45 @@ const View3DPoster: React.FC<{ onClick: () => void }> = ({ onClick }) => (
 );
 
 /**
- * How wide a gallery photo is drawn, so the browser can pick the smallest copy that fills it (see
- * wheelImageSrcSet): the full page width on phones, half of the 1152 px container from 768 px.
- * Measured in the built site at 390, 768 and 1440 px wide.
+ * How wide a gallery slide is drawn, so the browser can pick the smallest copy that fills it (see
+ * wheelImageSrcSet): the full page width up to 1024 px (phones and tablets), then half of the
+ * container (1152 px at most) beside the details column.
  */
-const GALLERY_SIZES = '(min-width:1200px) 532px, (min-width:768px) 44vw, 92vw';
+const GALLERY_SIZES = '(min-width:1200px) 532px, (min-width:1024px) 46vw, 92vw';
+
+/** One slide: the transparent cut-out floats on the dark page colour; a photo fills its frame. */
+interface GallerySlide {
+  src: string;
+  kind: 'cutout' | 'photo';
+  /** The pixel size of the file, for the img width/height attributes. */
+  size: number;
+}
 
 /**
- * Swipeable photos (scroll-snap, so vertical page scrolling is never trapped). The first photo is
- * the page's largest image and loads eagerly at high priority; the rest load lazily.
+ * Swipeable slides (scroll-snap, so vertical page scrolling is never trapped): the wheel's cut-out
+ * first when it has one, then the real photos. The first slide is the page's largest image and
+ * loads eagerly at high priority; the rest load lazily.
  */
 const PhotoGallery: React.FC<{
   photos: string[];
+  cutout?: string;
   altBase: string;
   onView3D?: () => void;
-}> = ({ photos, altBase, onView3D }) => {
+  triggerRef: React.Ref<HTMLButtonElement>;
+}> = ({ photos, cutout, altBase, onView3D, triggerRef }) => {
   const trackRef = useRef<HTMLDivElement | null>(null);
   const [active, setActive] = useState(0);
+
+  const slides: GallerySlide[] = [
+    ...(cutout ? [{ src: cutout, kind: 'cutout' as const, size: 1000 }] : []),
+    ...photos.map((src) => ({ src, kind: 'photo' as const, size: 1600 })),
+  ];
+  const count = slides.length;
 
   const goTo = (index: number) => {
     const track = trackRef.current;
     if (!track) return;
-    const clamped = (index + photos.length) % photos.length;
+    const clamped = (index + count) % count;
     track.scrollTo({
       left: clamped * track.clientWidth,
       behavior: prefersReducedMotion() ? 'auto' : 'smooth',
@@ -423,70 +455,85 @@ const PhotoGallery: React.FC<{
   const handleScroll = () => {
     const track = trackRef.current;
     if (!track || track.clientWidth === 0) return;
-    setActive(Math.round(track.scrollLeft / track.clientWidth));
+    setActive(Math.min(count - 1, Math.round(track.scrollLeft / track.clientWidth)));
   };
 
+  const slideAlt = (slide: GallerySlide, i: number) =>
+    slide.kind === 'cutout'
+      ? `${altBase}, cut-out, 1 of ${count}`
+      : `${altBase}, photo ${i + 1} of ${count}`;
+
   return (
-    <div
-      role="region"
-      aria-roledescription="carousel"
-      aria-label={`${altBase} photos`}
-      className="relative"
-    >
-      <div
-        ref={trackRef}
-        onScroll={handleScroll}
-        tabIndex={0}
-        onKeyDown={(e) => {
-          if (e.key === 'ArrowRight') goTo(active + 1);
-          if (e.key === 'ArrowLeft') goTo(active - 1);
-        }}
-        className="flex snap-x snap-mandatory overflow-x-auto rounded-2xl border border-[#26262E] bg-[#121215] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-      >
-        {photos.map((src, i) => (
-          <div key={src} className="relative aspect-square w-full shrink-0 snap-center">
-            <img
-              {...wheelImageSrcSet(src, GALLERY_SIZES)}
-              alt={`${altBase}, photo ${i + 1} of ${photos.length}`}
-              width={1600}
-              height={1600}
-              // The first photo is the largest thing on the page: never lazy.
-              loading={i === 0 ? 'eager' : 'lazy'}
-              fetchPriority={i === 0 ? 'high' : 'auto'}
-              decoding={i === 0 ? 'sync' : 'async'}
-              className="h-full w-full object-cover"
-            />
-            {i === 0 && onView3D && <View3DPoster onClick={onView3D} />}
-          </div>
-        ))}
+    <div role="region" aria-roledescription="carousel" aria-label={`${altBase} photos`}>
+      {/* The frame clips the slides and keeps the arrows inside it. */}
+      <div className="relative overflow-hidden rounded-2xl border border-[#26262E] bg-[#18181D]">
+        <div
+          ref={trackRef}
+          onScroll={handleScroll}
+          tabIndex={0}
+          role="group"
+          aria-label="Photos; use the arrow keys"
+          onKeyDown={(e) => {
+            if (e.key === 'ArrowRight') goTo(active + 1);
+            if (e.key === 'ArrowLeft') goTo(active - 1);
+          }}
+          className="flex snap-x snap-mandatory overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
+          {slides.map((slide, i) => (
+            <div key={slide.src} className="relative aspect-square w-full shrink-0 snap-center">
+              {slide.kind === 'cutout' && <div aria-hidden="true" className={`absolute inset-0 ${WHEEL_GLOW}`} />}
+              <img
+                {...wheelImageSrcSet(slide.src, GALLERY_SIZES)}
+                alt={slideAlt(slide, i)}
+                width={slide.size}
+                height={slide.size}
+                // The first slide is the largest thing on the page: never lazy.
+                loading={i === 0 ? 'eager' : 'lazy'}
+                fetchPriority={i === 0 ? 'high' : 'auto'}
+                decoding={i === 0 ? 'sync' : 'async'}
+                className={`relative h-full w-full ${
+                  slide.kind === 'cutout'
+                    ? 'object-contain p-8 drop-shadow-[0_24px_40px_rgba(0,0,0,0.55)]'
+                    : 'object-cover'
+                }`}
+              />
+              {i === 0 && onView3D && <View3DPoster onClick={onView3D} triggerRef={triggerRef} />}
+            </div>
+          ))}
+        </div>
+
+        {count > 1 && (
+          <>
+            <button
+              type="button"
+              onClick={() => goTo(active - 1)}
+              aria-label="Previous photo"
+              className="absolute left-2 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black md:flex cursor-pointer"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => goTo(active + 1)}
+              aria-label="Next photo"
+              className="absolute right-2 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black md:flex cursor-pointer"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </>
+        )}
       </div>
 
-      {photos.length > 1 && (
+      {count > 1 && (
         <>
-          <button
-            type="button"
-            onClick={() => goTo(active - 1)}
-            aria-label="Previous photo"
-            className="absolute left-2 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black md:flex cursor-pointer"
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </button>
-          <button
-            type="button"
-            onClick={() => goTo(active + 1)}
-            aria-label="Next photo"
-            className="absolute right-2 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black md:flex cursor-pointer"
-          >
-            <ChevronRight className="h-5 w-5" />
-          </button>
           <div className="mt-1 flex justify-center">
-            {photos.map((_, i) => (
+            {slides.map((slide, i) => (
               <button
-                key={i}
+                key={slide.src}
                 type="button"
                 onClick={() => goTo(i)}
-                aria-label={`Show photo ${i + 1} of ${photos.length}`}
-                aria-current={active === i}
+                aria-label={`Show photo ${i + 1} of ${count}`}
+                aria-current={active === i ? 'true' : undefined}
                 className="flex h-11 w-9 items-center justify-center cursor-pointer"
               >
                 <span
@@ -497,6 +544,9 @@ const PhotoGallery: React.FC<{
               </button>
             ))}
           </div>
+          <p className="sr-only" aria-live="polite">
+            Photo {active + 1} of {count}
+          </p>
         </>
       )}
     </div>
@@ -506,26 +556,22 @@ const PhotoGallery: React.FC<{
 /** A listing with no photos yet: say so plainly, and offer the 3D view if there is one. */
 const NoPhotoPanel: React.FC<{
   label: string;
-  swatchHex?: string;
   onView3D?: () => void;
   triggerRef: React.Ref<HTMLButtonElement>;
-}> = ({ label, swatchHex, onView3D, triggerRef }) => (
-  <div className="flex aspect-square w-full flex-col items-center justify-center gap-4 rounded-2xl border border-[#26262E] bg-[#121215] p-6 text-center">
-    <span
-      aria-hidden="true"
-      className="h-16 w-16 rounded-full border border-white/20"
-      style={{ background: swatchHex ?? '#888' }}
-    />
-    <div>
+}> = ({ label, onView3D, triggerRef }) => (
+  <div className="relative flex aspect-square md:aspect-[4/3] w-full flex-col items-center justify-center gap-4 overflow-hidden rounded-2xl border border-[#26262E] bg-[#18181D] p-6 text-center">
+    <div aria-hidden="true" className={`absolute inset-0 ${WHEEL_GLOW}`} />
+    <WheelOutline className="relative h-28 w-28 text-[#33333E]" />
+    <div className="relative">
       <p className="text-lg font-semibold text-white">{label}</p>
-      <p className="mt-1 text-sm text-neutral-300">Photos coming soon.</p>
+      <p className="mt-1 text-sm text-neutral-300">{onView3D ? 'No photos yet. See it in 3D.' : 'No photos yet.'}</p>
     </div>
     {onView3D && (
       <button
         ref={triggerRef}
         type="button"
         onClick={onView3D}
-        className="inline-flex min-h-12 items-center gap-2 rounded-full bg-[#1D4ED8] px-6 text-base font-semibold text-white hover:bg-[#2563EB] cursor-pointer"
+        className="relative inline-flex min-h-12 items-center gap-2 rounded-full bg-[#1D4ED8] px-6 text-base font-semibold text-white hover:bg-[#2563EB] cursor-pointer"
       >
         <Play className="h-4 w-4 fill-current" aria-hidden="true" />
         View in 3D
