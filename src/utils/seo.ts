@@ -105,6 +105,42 @@ function page(title: string, description: string, canonicalPath: string, noindex
   return { title: withSite.length <= MAX_TITLE_LENGTH ? withSite : title, description, canonicalPath, noindex };
 }
 
+/**
+ * Structured data for the site's plain pages (installs, the Sixnine dealer page, contact, privacy):
+ * the kind of page it is, and where it sits (Home, then this page), so search results can show the path.
+ */
+function innerPageJsonLd(
+  type: 'CollectionPage' | 'ContactPage' | 'WebPage',
+  name: string,
+  description: string,
+  path: string
+): Record<string, unknown> {
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      { '@type': type, name, description, url: path, inLanguage: 'en-ZA', isPartOf: { '@type': 'WebSite', name: SITE_NAME, url: '/' } },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: '/' },
+          { '@type': 'ListItem', position: 2, name, item: path },
+        ],
+      },
+    ],
+  };
+}
+
+/** A plain page's metadata with its structured data attached. */
+function plainPage(
+  type: 'CollectionPage' | 'ContactPage' | 'WebPage',
+  crumb: string,
+  title: string,
+  description: string,
+  path: string
+): PageMeta {
+  return { ...page(title, description, path), jsonLd: innerPageJsonLd(type, crumb, description, path) };
+}
+
 function wheelMeta(wheel: BrandWheelItem): PageMeta {
   const path = `/wheels/${wheel.slug}`;
   const facts = [
@@ -179,25 +215,31 @@ export function metaForPath(rawPath: string): PageMeta {
 
   switch (path) {
     case '/installs':
-      return page(
+      return plainPage(
+        'CollectionPage',
+        'Installs',
         'Customer installs',
         'Customer cars on forged wheel sets, shown as studio re-shoots of each customer’s own photo.',
         path
       );
     case '/sixnine-wheels':
-      return page(
+      return plainPage(
+        'WebPage',
+        'Sixnine Wheels dealer',
         'Official Sixnine Wheels dealer',
         `${SITE_NAME} is an official dealer of Sixnine Wheels, the German wheel brand. See every forged Sixnine FF set in stock, with sizes and Rand prices.`,
         path
       );
     case '/contact':
-      return page(
+      return plainPage(
+        'ContactPage',
+        'Contact',
         'Contact us about forged wheels',
         'Ask about forged wheels for your BMW M car. Send your model and the wheels you like.',
         path
       );
     case '/privacy-policy':
-      return page('Privacy notice', `How ${SITE_NAME} collects, uses and protects personal information.`, path);
+      return plainPage('WebPage', 'Privacy notice', 'Privacy notice', `How ${SITE_NAME} collects, uses and protects personal information.`, path);
     default:
       break;
   }
