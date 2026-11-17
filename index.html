@@ -24,7 +24,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preload" href="/fonts/satoshi-black.woff2" as="font" type="font/woff2" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,600;0,700;0,800;1,600;1,700&family=Open+Sans:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- The Google Fonts stylesheet loads without blocking the first paint: it is fetched as a
+         preload and switched to a stylesheet once it arrives (text shows in the fallback font until
+         then). The noscript copy keeps the fonts for visitors without JavaScript. -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,600;0,700;0,800;1,600;1,700&family=Open+Sans:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,600;0,700;0,800;1,600;1,700&family=Open+Sans:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
     <link rel="alternate" type="text/markdown" href="/llms.txt" title="Summary for AI assistants" />
   </head>
   <body class="bg-[#111111] text-[#EDEBE4] antialiased selection:bg-[#1D4ED8] selection:text-white">
