@@ -70,8 +70,8 @@ export const SITE: SiteConfig = {
   /** Google reviews. Fill from the Google Business Profile; never type a rating that Google does not show. */
   googleReviewsUrl: '',
   googleWriteReviewUrl: '',
-  googleRating: null,
-  googleReviewCount: null,
+  googleRating: 5,
+  googleReviewCount: 8,
 
   /** One-line street address for the header/footer, e.g. 'UNIT 4 · 12 EXAMPLE ROAD · SANDTON · JOHANNESBURG'. */
   addressLine: "11 SAINT MARY'S AVENUE · WINDERMERE · BEREA · DURBAN · 4001",

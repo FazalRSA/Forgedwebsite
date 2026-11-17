@@ -1,5 +1,5 @@
-import React from 'react';
-import { Star } from 'lucide-react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
 import { SITE } from '../../config/site';
 import { GOOGLE_REVIEWS } from '../../data/googleReviews';
 import { CTA_PRIMARY_CLASS, CTA_SECONDARY_CLASS } from './ContactCta';
@@ -11,6 +11,83 @@ const Stars: React.FC<{ count: number }> = ({ count }) => (
     ))}
   </span>
 );
+
+const arrowClass =
+  'inline-flex items-center justify-center w-11 h-11 rounded-full border border-[#33333E] text-[#EDEBE4] hover:border-[#1D4ED8] hover:text-white transition-colors disabled:opacity-30 disabled:hover:border-[#33333E] disabled:cursor-default cursor-pointer';
+
+/**
+ * The reviews as a row that scrolls sideways and snaps card by card. It works by swipe, scroll or
+ * keyboard (the row can be focused and scrolled with the arrow keys) as well as the two buttons.
+ * It does not move on its own.
+ */
+const ReviewCarousel: React.FC = () => {
+  const trackRef = useRef<HTMLUListElement | null>(null);
+  const [canPrev, setCanPrev] = useState(false);
+  const [canNext, setCanNext] = useState(false);
+
+  const update = useCallback(() => {
+    const el = trackRef.current;
+    if (!el) return;
+    setCanPrev(el.scrollLeft > 4);
+    setCanNext(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
+  }, []);
+
+  useEffect(() => {
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, [update]);
+
+  const scrollByCard = (direction: 1 | -1) => {
+    const el = trackRef.current;
+    if (!el) return;
+    const card = el.querySelector('li');
+    const step = card ? card.getBoundingClientRect().width + 16 : el.clientWidth;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    el.scrollBy({ left: direction * step, behavior: reduce ? 'auto' : 'smooth' });
+  };
+
+  return (
+    <div className="mt-8" role="group" aria-roledescription="carousel" aria-label="Google reviews">
+      <ul
+        ref={trackRef}
+        onScroll={update}
+        tabIndex={0}
+        aria-label="Reviews, scroll sideways"
+        className="relative flex items-start gap-4 overflow-x-auto snap-x snap-mandatory pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden focus-visible:outline-2 focus-visible:outline-[#1D4ED8] rounded-xl"
+      >
+        {GOOGLE_REVIEWS.map((review, index) => (
+          <li
+            key={`${review.author ?? 'google'}-${index}`}
+            aria-roledescription="slide"
+            aria-label={`${index + 1} of ${GOOGLE_REVIEWS.length}`}
+            className="snap-start shrink-0 basis-[85%] sm:basis-[calc(50%-8px)] lg:basis-[calc(33.333%-11px)] rounded-xl border border-[#26262E] bg-[#18181D] p-5"
+          >
+            <figure className="h-full flex flex-col">
+              <div className="flex items-center gap-2">
+                <Stars count={review.stars} />
+                <span className="sr-only">{review.stars} out of 5 stars</span>
+              </div>
+              <blockquote className="mt-3 text-neutral-200 whitespace-pre-line">{review.text}</blockquote>
+              <figcaption className="mt-auto pt-3 text-sm text-neutral-400">
+                {review.author ?? 'Google review'}
+                {review.author && review.when ? ` \u00b7 ${review.when}` : ''}
+              </figcaption>
+            </figure>
+          </li>
+        ))}
+      </ul>
+      <div className="mt-4 flex gap-3">
+        <button type="button" onClick={() => scrollByCard(-1)} disabled={!canPrev} aria-label="Previous review" className={arrowClass}>
+          <ChevronLeft aria-hidden="true" className="w-5 h-5" />
+        </button>
+        <button type="button" onClick={() => scrollByCard(1)} disabled={!canNext} aria-label="Next review" className={arrowClass}>
+          <ChevronRight aria-hidden="true" className="w-5 h-5" />
+        </button>
+      </div>
+    </div>
+  );
+};
 
 /**
  * Google reviews on the home page. The review text is real, crawlable HTML (not an iframe or a
@@ -44,25 +121,7 @@ export const GoogleReviewsSection: React.FC = () => {
         </p>
       )}
 
-      {GOOGLE_REVIEWS.length > 0 && (
-        <ul className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {GOOGLE_REVIEWS.map((review) => (
-            <li key={`${review.author}-${review.text.slice(0, 24)}`} className="rounded-xl border border-[#26262E] bg-[#18181D] p-5">
-              <figure>
-                <div className="flex items-center gap-2">
-                  <Stars count={review.stars} />
-                  <span className="sr-only">{review.stars} out of 5 stars</span>
-                </div>
-                <blockquote className="mt-3 text-neutral-200">{review.text}</blockquote>
-                <figcaption className="mt-3 text-sm text-neutral-400">
-                  {review.author}
-                  {review.when ? ` · ${review.when}` : ''}
-                </figcaption>
-              </figure>
-            </li>
-          ))}
-        </ul>
-      )}
+      {GOOGLE_REVIEWS.length > 0 && <ReviewCarousel />}
 
       {(googleReviewsUrl || googleWriteReviewUrl) && (
         <div className="mt-8 flex flex-col sm:flex-row gap-3">
