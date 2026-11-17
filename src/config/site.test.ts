@@ -49,3 +49,14 @@ test('the car-preview address is empty or an https address', () => {
 test('the host is the domain or www.<domain>', () => {
   assert.ok(SITE.host === SITE.domain || SITE.host === `www.${SITE.domain}`);
 });
+
+test('social and Google review links are empty or https, and the rating is real', () => {
+  for (const url of [SITE.instagramUrl, SITE.facebookUrl, SITE.tiktokUrl, SITE.youtubeUrl, SITE.googleReviewsUrl, SITE.googleWriteReviewUrl]) {
+    if (url) assert.ok(url.startsWith('https://'), `${url} must be https`);
+  }
+  assert.equal(SITE.googleRating === null, SITE.googleReviewCount === null, 'set the rating and the review count together');
+  if (SITE.googleRating !== null) {
+    assert.ok(SITE.googleRating >= 1 && SITE.googleRating <= 5);
+    assert.ok(Number.isInteger(SITE.googleReviewCount) && (SITE.googleReviewCount as number) > 0);
+  }
+});

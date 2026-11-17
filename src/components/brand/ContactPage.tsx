@@ -1,7 +1,8 @@
 import React from 'react';
 import { BrandHeader } from './BrandHeader';
 import { ContactCta } from './ContactCta';
-import { SITE, telLink, whatsappLink } from '../../config/site';
+import { SITE, socialLinks, telLink, whatsappLink } from '../../config/site';
+import { SocialButtons } from '../shared/SocialIcon';
 import { mapsLink } from './SiteFooter';
 
 const CONTACT_MESSAGE = "Hi, I'd like to ask about your wheels.";
@@ -61,35 +62,9 @@ export const ContactPage: React.FC = () => {
   if (SITE.serviceAreas.length > 0) {
     rows.push({ label: 'Areas we serve', content: <span className="inline-flex items-center min-h-11 py-1.5 text-white">{SITE.serviceAreas.join(', ')}</span> });
   }
-  if (SITE.instagramUrl) {
-    rows.push({
-      label: 'Instagram',
-      content: (
-        <a
-          href={SITE.instagramUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center min-h-11 text-white underline underline-offset-4 hover:text-[#F43F5E]"
-        >
-          Instagram
-        </a>
-      ),
-    });
-  }
-  if (SITE.facebookUrl) {
-    rows.push({
-      label: 'Facebook',
-      content: (
-        <a
-          href={SITE.facebookUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center min-h-11 text-white underline underline-offset-4 hover:text-[#F43F5E]"
-        >
-          Facebook
-        </a>
-      ),
-    });
+  const social = socialLinks();
+  if (social.length > 0) {
+    rows.push({ label: 'Follow us', content: <SocialButtons links={social} className="py-1" /> });
   }
 
   return (

@@ -1,9 +1,6 @@
-import React, { useMemo } from 'react';
-import { getAllBrandWheels } from '../../data/catalogue';
+import React from 'react';
 import { CLIENT_FITMENTS } from '../../data/clientFitments';
-import { useForgedStore } from '../../store/useForgedStore';
 import { Link } from '../../utils/router';
-import { designOf } from './WheelCatalogue';
 import { fitmentCar, fitmentTitle, fitmentWheels } from './fitmentFormat';
 import { fitmentImageSrcSet } from '../../utils/fitmentImageSrcSet';
 
@@ -14,26 +11,10 @@ const STRIP_COUNT = 4;
 const STRIP_SIZES = '(min-width:1280px) 282px, (min-width:1024px) 24vw, 47vw';
 
 /**
- * Below the wheels on the home page: a short look at real customer cars, then a row of facts.
- * Every number here is counted from the same data the rest of the site uses.
+ * Below the wheels on the home page: a short look at real customer cars.
  */
 export const EditorialFlow: React.FC = () => {
-  const customBrandWheels = useForgedStore((state) => state.customBrandWheels);
-  const wheels = useMemo(() => getAllBrandWheels(customBrandWheels), [customBrandWheels]);
-  const designCount = useMemo(() => new Set(wheels.map(designOf)).size, [wheels]);
   const installs = CLIENT_FITMENTS.slice(0, STRIP_COUNT);
-
-  const facts: { value: number; label: string }[] = [];
-  if (wheels.length > 0) {
-    facts.push({ value: designCount, label: designCount === 1 ? 'design in stock' : 'designs in stock' });
-    facts.push({ value: wheels.length, label: wheels.length === 1 ? 'set to choose from' : 'sets to choose from' });
-  }
-  if (CLIENT_FITMENTS.length > 0) {
-    facts.push({
-      value: CLIENT_FITMENTS.length,
-      label: CLIENT_FITMENTS.length === 1 ? 'customer car on the installs page' : 'customer cars on the installs page',
-    });
-  }
 
   return (
     <>
@@ -82,23 +63,6 @@ export const EditorialFlow: React.FC = () => {
               </li>
             ))}
           </ul>
-        </section>
-      )}
-
-      {facts.length > 0 && (
-        <section
-          aria-label="The site in numbers"
-          className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 py-10 border-t border-[#26262E]"
-        >
-          {/* Each number sits above its label, so the three numbers line up whatever the label's length. */}
-          <dl className="grid grid-cols-3 gap-4 border-y border-[#26262E] py-5">
-            {facts.map((fact) => (
-              <div key={fact.label} className="flex flex-col">
-                <dt className="mt-1 text-sm text-neutral-400">{fact.label}</dt>
-                <dd className="order-first text-2xl font-light text-white tabular-nums">{fact.value}</dd>
-              </div>
-            ))}
-          </dl>
         </section>
       )}
     </>

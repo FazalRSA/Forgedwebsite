@@ -18,6 +18,16 @@ export interface SiteConfig {
   privacyEmail: string;
   instagramUrl: string;
   facebookUrl: string;
+  tiktokUrl: string;
+  youtubeUrl: string;
+  /** Public Google Business Profile reviews page (the "See all reviews" link). Empty hides the reviews section. */
+  googleReviewsUrl: string;
+  /** Google's "write a review" link for the profile. Empty hides the "Leave a review" button. */
+  googleWriteReviewUrl: string;
+  /** The profile's star rating exactly as Google shows it (0 to 5). Null hides the rating. */
+  googleRating: number | null;
+  /** The number of Google reviews, exactly as Google shows it. Null hides the rating. */
+  googleReviewCount: number | null;
   addressLine: string;
   serviceAreas: readonly string[];
   /** n8n webhook that receives every website enquiry (see README → Lead delivery). */
@@ -57,8 +67,16 @@ export const SITE: SiteConfig = {
   /** Privacy contact email, shown in the privacy notice when set. Must be on `domain`; leave empty until the mailbox exists. */
   privacyEmail: '',
 
-  instagramUrl: '',
+  instagramUrl: 'https://www.instagram.com/forged_sa1/',
   facebookUrl: '',
+  tiktokUrl: '',
+  youtubeUrl: '',
+
+  /** Google reviews. Fill from the Google Business Profile; never type a rating that Google does not show. */
+  googleReviewsUrl: '',
+  googleWriteReviewUrl: '',
+  googleRating: 5,
+  googleReviewCount: 8,
 
   /** One-line street address for the header/footer, e.g. 'UNIT 4 · 12 EXAMPLE ROAD · SANDTON · JOHANNESBURG'. */
   addressLine: "11 SAINT MARY'S AVENUE · WINDERMERE · BEREA · DURBAN · 4001",
@@ -105,4 +123,21 @@ export function displayAddress(): string {
 /** Trade contact email with privacy email as fallback. */
 export function tradeContactEmail(): string {
   return SITE.tradeEmail || SITE.privacyEmail;
+}
+
+export interface SocialLink {
+  key: 'instagram' | 'facebook' | 'tiktok' | 'youtube';
+  label: string;
+  href: string;
+}
+
+/** Social profiles that are filled in above, in a fixed order. Empty values are left out. */
+export function socialLinks(): SocialLink[] {
+  const all: SocialLink[] = [
+    { key: 'instagram', label: 'Instagram', href: SITE.instagramUrl },
+    { key: 'facebook', label: 'Facebook', href: SITE.facebookUrl },
+    { key: 'tiktok', label: 'TikTok', href: SITE.tiktokUrl },
+    { key: 'youtube', label: 'YouTube', href: SITE.youtubeUrl },
+  ];
+  return all.filter((link) => link.href);
 }
