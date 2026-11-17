@@ -35,6 +35,7 @@ It shows the wheels that are in stock, each in photography and an interactive 3D
     - [The blog](#the-blog)
     - [Search Console and visit statistics](#search-console-and-visit-statistics)
     - [For AI assistants and coding agents](#for-ai-assistants-and-coding-agents)
+    - [See it on my car (AI preview)](#see-it-on-my-car-ai-preview)
 12. [Business details and contact channels](#business-details-and-contact-channels)
 13. [Firebase](#firebase)
 14. [Testing](#testing)
@@ -50,7 +51,7 @@ It shows the wheels that are in stock, each in photography and an interactive 3D
 Five pages, plus the privacy notice:
 
 - **Home (`/`).** What is in stock, as one large dark card per wheel design (rows of three and two on wide screens, a lone last design full width; two columns on tablets, one on phones). Each card shows the design's wheel cut out on the dark card, its name, how many finishes are in stock, the lowest price per set of four, the finishes and sizes, all worked out from the catalogue (`src/utils/designCards.ts`); it links to the design's first photographed listing, whose page offers the other finishes. Then customer installs, the industry partners strip (Sixnine Wheels and BMW) and "Ask AI about us".
-- **Wheel page (`/wheels/:slug`).** One in-stock listing: photos, price per set of four, sizes and specification. Colours are **photoreal swatches** (`ColourSwatches.tsx`: a ball in the finish's own paint under the 3D studio's reflections, drawn once and cached; a drawn ball stands in until it is ready or without WebGL). They come in two groups: the design's finishes that are **in stock** (the one on this page shows on the 3D wheel when tapped; the others open their own listing), and its **other colours, to order**, always shown with the notice that a lead time of 3 months applies. Tapping a to-order swatch opens the 3D view in that colour and offers an "Ask about" button. The 3D viewer loads only when the visitor taps "View in 3D" (or a colour swatch). The enquiry button opens the enquiry form with the design, finish and sizes filled in; a to-order colour prefills the colour and the lead time. The form logs the enquiry through n8n and then opens WhatsApp (see [Lead delivery](#lead-delivery-n8n)).
+- **Wheel page (`/wheels/:slug`).** One in-stock listing: photos, price per set of four, sizes and specification. Colours are **photoreal swatches** (`ColourSwatches.tsx`: a ball in the finish's own paint under the 3D studio's reflections, drawn once and cached; a drawn ball stands in until it is ready or without WebGL). They come in two groups: the design's finishes that are **in stock** (the one on this page shows on the 3D wheel when tapped; the others open their own listing), and its **other colours, to order**, always shown with the notice that a lead time of 3 months applies. Tapping a to-order swatch opens the 3D view in that colour and offers an "Ask about" button. The 3D viewer loads only when the visitor taps "View in 3D" (or a colour swatch). Once the preview Worker is set up, a "See it on my car" button lets a visitor choose a photo of their car and see an AI-made impression of the wheel on it (see [See it on my car](#see-it-on-my-car-ai-preview)). The enquiry button opens the enquiry form with the design, finish and sizes filled in; a to-order colour prefills the colour and the lead time. The form logs the enquiry through n8n and then opens WhatsApp (see [Lead delivery](#lead-delivery-n8n)).
 - **Installs (`/installs`).** Customer cars the shop has fitted (BMW M cars and one Audi RS3; no install is linked to a catalogue wheel). Each install opens to three photos: two studio re-shoots made from the customer's own photo, then that photo itself with the number plate pixelated.
 - **Sixnine dealer page (`/sixnine-wheels`, "Sixnine" in the menu).** FORGED as an official Sixnine Wheels dealer: what Sixnine Wheels is and its range (from sixnine-wheels.com, with a source link), every Sixnine set in stock, and a fitment summary. A wheel is Sixnine when its design code starts with `FF` (`isSixnineWheel` in `src/data/catalogue.ts`), so a new FF design appears on the page by itself. Every number on it is worked out from the catalogue; the brand text and range list are in `SixnineDealerPage.tsx`.
 - **Blog (`/blog`).** Twelve guides in four content pillars (forged wheel basics, BMW M wheel fitment, buying in South Africa, wheel care), at `/blog`, `/blog/:pillar` and `/blog/:pillar/:post`. Every price, size, offset, bolt pattern, lead time and stock count in an article is read from the catalogue, never typed (see [The blog](#the-blog)).
@@ -76,6 +77,7 @@ Every change below is a file edit, then a pull request. Merging to `main` publis
 | Change how a finish looks in 3D | `src/data/studioFinishes.ts` | Check the wheel page in the viewer. Its swatches are drawn from the same numbers, so they follow |
 | Change the to-order lead time | `TO_ORDER_LEAD_TIME` in `catalogue.ts` | Nothing else; pages and `llms.txt` read it |
 | Change the phone, WhatsApp, address or social links | `src/config/site.ts` | Nothing else; empty values are hidden |
+| Switch on "See it on my car" | Deploy `worker/car-preview/`, then set `carPreviewUrl` in `src/config/site.ts` | See [See it on my car](#see-it-on-my-car-ai-preview); the privacy notice updates itself |
 | Add or correct a customer install | `scripts/fitment-reshoot/jobs.json`, then the re-shoot scripts | See [Adding or correcting a customer install](#adding-or-correcting-a-customer-install) |
 | Add or remove a partner logo | `src/data/partners.ts` and `public/images/partners/` | Owner's confirmation first |
 | Add or edit a blog article | `src/data/blogPosts.ts` | See [The blog](#the-blog); `src/data/blog.test.ts` checks it |
@@ -186,6 +188,7 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
 │  ├─ make-wheel-sizes.py         Makes the 800, 400 and 600 px copies of the wheel photos that the srcsets list (run by hand)
 │  └─ fitment-reshoot/            Pipeline for the install studio re-shoots (jobs.json, Python scripts, README.md)
 ├─ docs/installs-pipeline.md      How the Installs gallery is made, with animated diagrams (docs/assets/)
+├─ worker/car-preview/            Cloudflare Worker behind "See it on my car" (not part of the website build): src/handler.ts, its tests, wrangler.toml, dev-server.mjs, README.md
 ├─ components/ui/                 Shared UI primitives (button, input, label, icons)
 ├─ lib/utils.ts                   `cn()` class-name helper used by those primitives
 └─ src/
@@ -211,12 +214,13 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
    ├─ utils/seo.ts                Per-route metadata, structured data, sitemap paths
    ├─ utils/llms.ts               Builds llms.txt from the catalogue, installs and site config
    ├─ utils/askAi.ts              The "Ask AI about us" links and their question
+   ├─ utils/carPreview.ts         "See it on my car": is it on, shrink the photo, talk to the Worker
    ├─ utils/wheelStudioParts.ts   Part classification and camera maths for the viewer
    ├─ utils/wheelBuilder.ts       Builds a stock listing from a short input
    ├─ utils/wheelEnquiry.ts       Reads the spec line and words the WhatsApp enquiry
    └─ components/
       ├─ ui/                      Re-exports of the root components/ui primitives
-      ├─ brand/                   Header, footer, home, catalogue, wheel page, installs, Sixnine dealer page, partners strip, Ask AI, contact, privacy
+      ├─ brand/                   Header, footer, home, catalogue, wheel page, car-preview dialog, installs, Sixnine dealer page, partners strip, Ask AI, contact, privacy
       ├─ admin/                   Admin uploader
       ├─ shared/                  BrandLogo, enquiry form
       └─ visuals/                 WheelStudio (3D), WheelStage, its loading skeleton and error boundary
@@ -403,6 +407,26 @@ Both are off until the site is given the values they need. Nothing is loaded or 
 
 How it behaves (`src/utils/analytics.ts`): the tracker is added once, after the page has loaded; it counts only `SITE.host` (not the Render address or a developer's localhost); it respects a browser's Do Not Track setting. Two events are counted, `enquiry_open` and `enquiry_sent` (with `delivered` yes or no, and the channel), each with the page address only. Never put a name, phone number, email or message in an event. The privacy notice describes the statistics and lists Umami as a recipient only while they are set up, and says there are none otherwise; both read the same check, so they cannot disagree.
 
+### See it on my car (AI preview)
+
+On every wheel page a **See it on my car** button lets a visitor choose a photo of their car and see an AI-made impression of that wheel on it. It is **off until `carPreviewUrl` in `src/config/site.ts` is set**: while it is empty there is no button, no request and no preview text in the privacy notice.
+
+How it works:
+
+1. The browser (`src/utils/carPreview.ts`, `CarPreviewDialog.tsx`) re-saves the photo as a JPEG at most 512 px on its longest side, which also strips the location and camera details stored in the original, and sends it with only the wheel's name, after the visitor ticks a consent box.
+2. A small Cloudflare Worker (`worker/car-preview/`, **separate from the website and its Render deploy**) fetches that wheel's own 400 px product photo from this site, and asks Cloudflare's Workers AI model `@cf/black-forest-labs/flux-2-klein-4b` to put the wheel on the car. The instruction is fixed in the Worker, and only a catalogue wheel name is accepted, so it cannot be used as a general image editor.
+   The button is black with white text. While a preview is being made, a neon gradient laser runs round its edge, both on the dialog's button and on the wheel page's button behind it (`.laser-button` in `src/index.css`, switched by `data-working`). For visitors who prefer reduced motion the ring is still instead of moving.
+3. The picture comes back to the browser and is shown with "AI preview" marking and the line "This is an AI-generated impression, not a photograph. The wheel's shape, size and fit can differ from the real thing. We confirm fit for your exact car before you order." Nothing is stored: not in the browser, and the Worker keeps no photo, result or log (`wrangler.toml` turns logs off; do not turn them on).
+
+To switch it on (one time, by the owner; Cloudflare's Workers setup pages do not mention a payment card for the Free plan, but we could not test the sign-up, so check you are on Free): create a free Cloudflare account, then from `worker/car-preview/` run `npx wrangler login` and `npx wrangler deploy`, paste the address it prints into `carPreviewUrl` (it must be `https`), and deploy the website. Test one real preview with `curl` as in [worker/car-preview/README.md](worker/car-preview/README.md). To try the site without Cloudflare, run `npx tsx worker/car-preview/dev-server.mjs` (a pretend model that returns the customer's own photo) and point `carPreviewUrl` at it only on your own machine; **never commit a local address**.
+
+Things to know before relying on it:
+
+- **Free limit.** Workers AI's free plan allows 10,000 Neurons a day and is a hard stop: when it is used up the dialog says so and offers the WhatsApp route. By Cloudflare's published prices one preview costs roughly 100 to 150 Neurons, so expect on the order of 70 to 100 previews a day (our estimate, not a Cloudflare figure; the dashboard shows the real use). Do not move the account to the Paid plan unless you want to pay for extra use.
+- **Quality is unproven.** The model was not tested here (no Cloudflare account). Cloudflare says input images must be under 512 px, which is why the photos are small. The result is an impression: spoke shape and count can differ from the real wheel. If the real results look poor, the Worker's `MODEL` setting can be changed, or a paid image model used instead.
+- **Photos are personal information.** A car photo can show people or a number plate. The dialog asks the visitor not to include either, and the privacy notice (which describes this only while the feature is on) names Cloudflare as the recipient and covers the transfer outside South Africa. If you change what is sent or where, change the notice in the same pull request.
+- **Black Forest Labs' terms** do not plainly state that commercial use of outputs is allowed. The previews are for the visitor's own photo; check before reusing generated pictures in advertising.
+
 ### For AI assistants and coding agents
 
 - **`/llms.txt`** follows the [llmstxt.org](https://llmstxt.org) format. `scripts/generate-llms.ts` writes it into `dist/` at the end of every build, from `src/utils/llms.ts`: every in-stock set with its Rand price, sizes and fitment, the to-order lead time, contact details and the main pages. Assistants cannot run this single-page app, so this file is what they can read. Nothing in it is typed by hand. Its links always use the production domain in `src/config/site.ts`, like the canonical URLs and the sitemap.
@@ -449,7 +473,7 @@ firebase deploy --only firestore:rules
 
 ## Testing
 
-`bun run test` runs fifteen test files (130 tests) with `node:test`. The files are listed by name in the `test` script in `package.json`, so a new test file does not run until it is added there.
+`bun run test` runs eighteen test files (192 tests) with `node:test`. The files are listed by name in the `test` script in `package.json`, so a new test file does not run until it is added there.
 
 | Suite | Covers |
 | --- | --- |
@@ -462,7 +486,9 @@ firebase deploy --only firestore:rules
 | `src/utils/seo.test.ts` | Per-route metadata, canonical URLs, structured data, share images, sitemap (no removed route), `render.yaml`; that the sitemap, `robots.txt` and `index.html` all use the same host; the Search Console tag (added once, never from an unsafe token) |
 | `src/utils/analytics.test.ts` | Visit statistics are off until both values are set, refuse a non-https address or a malformed ID, add one tracker that counts only the production host and respects Do Not Track, and never let a tracker failure reach the page |
 | `src/utils/redirects.test.ts` | Old address to new address, `replaceState`, no loops, and every address in `scripts/legacy-pages.json` has a redirect |
-| `src/config/site.test.ts` | Published emails are empty or on the business domain; the host is the domain or `www.<domain>`; the statistics and Search Console values are well formed and set together; the privacy notice does not describe removed features |
+| `src/config/site.test.ts` | Published emails are empty or on the business domain; the host is the domain or `www.<domain>`; the statistics and Search Console values are well formed and set together; the car-preview address is empty or https; the privacy notice does not describe removed features |
+| `src/utils/carPreview.test.ts` | "See it on my car": off unless the address is https, shrinking keeps the shape and never enlarges, the request carries only the photo, wheel name and size and no cookies, every Worker error and malformed reply becomes a message fit to show |
+| `worker/car-preview/src/handler.test.ts` | The Worker, with a pretend model: allowed origins only, photo type checked from its first bytes, size limits, unknown wheels, the fixed prompt and image order, each error status, timeout, and that nothing the customer sent is logged |
 | `src/utils/llms.test.ts` | `llms.txt` shape, one link and price per in-stock wheel, contact details from the site config, no unbacked claims; the Ask AI links carry the question |
 | `src/data/blog.test.ts` | Four pillars of three or more articles; titles, descriptions and keywords; structure and length; every internal link resolves and no wheel page is hand-linked; no orphan articles; no typed price, size, offset, bolt pattern, lead time or phone number; no unbacked claim; catalogue-built text is correct and never reads "undefined"; blog path resolution |
 | `src/utils/blogSeo.test.ts` | Blog metadata and canonical URLs, noindex for unknown blog addresses, `BlogPosting`, `BreadcrumbList` and `FAQPage` data matching the page, the sitemap with `lastmod`, the RSS feed (and that the file on disk is current), prerendered article HTML, and `llms.txt` listing every article |

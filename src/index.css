@@ -141,3 +141,85 @@ h1 {
 .writing-vertical-rl {
   writing-mode: vertical-rl;
 }
+
+/*
+ * "See it on my car" button: black with white text. While a preview is being made (data-working="true")
+ * a neon gradient "laser" runs round the whole edge of the button, with a soft glow behind it.
+ * The angle is animated with a registered custom property, so the arc travels round a button of any
+ * shape. For people who ask for less motion the ring stays still and full instead of moving.
+ */
+@property --laser-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.laser-button {
+  position: relative;
+  isolation: isolate;
+  border: 1px solid #3a3a46;
+  border-radius: 9999px;
+  background: #000;
+  color: #fff;
+  transition: border-color 0.2s;
+}
+.laser-button:hover:not(:disabled) {
+  border-color: #6b6b7b;
+}
+.laser-button:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+.laser-button::before,
+.laser-button::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  padding: 3px;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s;
+  background: conic-gradient(
+    from var(--laser-angle),
+    transparent 0deg,
+    transparent 190deg,
+    #22d3ee 260deg,
+    #a855f7 320deg,
+    #ff2bd6 345deg,
+    #ffffff 358deg,
+    transparent 360deg
+  );
+  /* Keep only the 3px rim of the gradient: paint it everywhere, then cut out the inside. */
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+.laser-button::after {
+  filter: blur(9px) saturate(1.4);
+}
+
+.laser-button[data-working='true']::before {
+  opacity: 1;
+}
+.laser-button[data-working='true']::after {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .laser-button[data-working='true']::before,
+  .laser-button[data-working='true']::after {
+    animation: laser-run 1.8s linear infinite;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .laser-button[data-working='true']::before,
+  .laser-button[data-working='true']::after {
+    background: conic-gradient(from 0deg, #22d3ee, #a855f7, #ff2bd6, #22d3ee);
+  }
+}
+@keyframes laser-run {
+  to {
+    --laser-angle: 360deg;
+  }
+}

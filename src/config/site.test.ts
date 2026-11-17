@@ -37,6 +37,15 @@ test('visit statistics are either fully set up or fully off, and the values are 
   if (searchConsoleToken) assert.match(searchConsoleToken, /^[A-Za-z0-9_-]{16,128}$/);
 });
 
+// The car preview is off while this is empty. A set value must be an https address: the visitor's
+// photo is sent to it, so it must never go over plain http.
+test('the car-preview address is empty or an https address', () => {
+  const { carPreviewUrl } = SITE;
+  if (carPreviewUrl === '') return;
+  assert.ok(carPreviewUrl.startsWith('https://'), 'carPreviewUrl must be https');
+  assert.doesNotThrow(() => new URL(carPreviewUrl), 'carPreviewUrl must be a valid URL');
+});
+
 test('the host is the domain or www.<domain>', () => {
   assert.ok(SITE.host === SITE.domain || SITE.host === `www.${SITE.domain}`);
 });
