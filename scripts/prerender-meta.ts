@@ -24,7 +24,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { getAllBrandWheels } from '../src/data/catalogue';
 import { HERO_WHEEL_MEDIA, heroWheelImage } from '../src/utils/designCards';
-import { isHomePath, metaForPath, renderPageHtml, searchConsoleTag, sitemapPaths } from '../src/utils/seo';
+import { isHomePath, metaForPath, renderPageHtml, sitemapPaths, withSearchConsoleTag } from '../src/utils/seo';
 
 const distDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'dist');
 const shellPath = path.join(distDir, 'index.html');
@@ -52,8 +52,8 @@ try {
   const rawShell = readFileSync(shellPath, 'utf8');
   if (!rawShell.includes('</head>')) throw new Error(`${shellPath} has no </head> to add tags to`);
   // The ownership tag goes into the shell first, so the home page and every page file made from it carry it.
-  const verification = searchConsoleTag();
-  const shell = verification ? rawShell.replace('</head>', `    ${verification}\n  </head>`) : rawShell;
+  const shell = withSearchConsoleTag(rawShell);
+  const verification = shell !== rawShell;
   let written = 0;
   for (const pagePath of sitemapPaths()) {
     if (isHomePath(pagePath)) continue;
@@ -65,7 +65,7 @@ try {
   }
   // Written last, so the per-page files above do not inherit the preload.
   const preload = heroWheelPreload();
-  const homeHtml = preload ? shell.replace('</head>', `    ${preload}\n  </head>`) : shell;
+  const homeHtml = preload && !shell.includes(preload) ? shell.replace('</head>', `    ${preload}\n  </head>`) : shell;
   if (homeHtml !== rawShell) writeFileSync(shellPath, homeHtml);
   console.log(
     `prerender: wrote page metadata into ${written} HTML files in ${distDir}` +

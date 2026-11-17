@@ -413,7 +413,7 @@ firebase deploy --only firestore:rules
 
 ## Testing
 
-`bun run test` runs twelve test files (109 tests) with `node:test`. The files are listed by name in the `test` script in `package.json`, so a new test file does not run until it is added there.
+`bun run test` runs thirteen test files (112 tests) with `node:test`. The files are listed by name in the `test` script in `package.json`, so a new test file does not run until it is added there.
 
 | Suite | Covers |
 | --- | --- |
@@ -423,9 +423,10 @@ firebase deploy --only firestore:rules
 | `src/utils/wheelImageSrcSet.test.ts` | The `srcset` for each wheel photo (site photos only; nothing for admin uploads or placeholders) and that every smaller copy exists on disk |
 | `src/utils/fitmentImageSrcSet.test.ts` | The `srcset` for the install thumbnails (800 px copy, then the original) and that every install photo has its 800 px copy on disk |
 | `src/utils/wheelStudioParts.test.ts` | Viewer part classification, exploded-view offsets, camera distance |
-| `src/utils/seo.test.ts` | Per-route metadata, canonical URLs, structured data, share images, sitemap (no removed route), `render.yaml` |
+| `src/utils/seo.test.ts` | Per-route metadata, canonical URLs, structured data, share images, sitemap (no removed route), `render.yaml`; that the sitemap, `robots.txt` and `index.html` all use the same host; the Search Console tag (added once, never from an unsafe token) |
+| `src/utils/analytics.test.ts` | Visit statistics are off until both values are set, refuse a non-https address or a malformed ID, add one tracker that counts only the production host and respects Do Not Track, and never let a tracker failure reach the page |
 | `src/utils/redirects.test.ts` | Old address to new address, `replaceState`, no loops, and every address in `scripts/legacy-pages.json` has a redirect |
-| `src/config/site.test.ts` | Published emails are empty or on the business domain; the privacy notice does not describe removed features |
+| `src/config/site.test.ts` | Published emails are empty or on the business domain; the host is the domain or `www.<domain>`; the statistics and Search Console values are well formed and set together; the privacy notice does not describe removed features |
 | `src/utils/llms.test.ts` | `llms.txt` shape, one link and price per in-stock wheel, contact details from the site config, no unbacked claims; the Ask AI links carry the question |
 | `firestore.rules.test.ts` | Structure of the Firestore security rules |
 

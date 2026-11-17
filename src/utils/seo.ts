@@ -382,6 +382,16 @@ export function searchConsoleTag(token: string = SITE.searchConsoleToken): strin
   return `<meta name="google-site-verification" content="${token}" />`;
 }
 
+/**
+ * Add the Search Console ownership tag to a built HTML shell, once: a shell that already carries
+ * one, has no <head> to add it to, or has no valid token to add is returned unchanged.
+ */
+export function withSearchConsoleTag(shell: string, token: string = SITE.searchConsoleToken): string {
+  const tag = searchConsoleTag(token);
+  if (!tag || !shell.includes('</head>') || shell.includes('name="google-site-verification"')) return shell;
+  return shell.replace('</head>', () => `    ${tag}\n  </head>`);
+}
+
 const PAGE_ROUTES_BEGIN = '# BEGIN generated page routes';
 const PAGE_ROUTES_END = '# END generated page routes';
 

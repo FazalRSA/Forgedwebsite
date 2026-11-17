@@ -18,6 +18,7 @@ import {
   metaForPath,
   searchConsoleTag,
   sitemapPaths,
+  withSearchConsoleTag,
   withRenderPageRoutes,
   wheelBrand,
 } from './seo';
@@ -335,4 +336,18 @@ test('the Search Console ownership tag is added only for a well-formed token', (
   assert.equal(searchConsoleTag(''), '');
   assert.equal(searchConsoleTag('short'), '');
   assert.equal(searchConsoleTag(`${token}"><script>alert(1)</script>`), '');
+});
+
+test('withSearchConsoleTag adds the tag once, and leaves a shell alone when there is nothing valid to add', () => {
+  const token = 'dGhpc19pc19hX3Rlc3RfdG9rZW5fZm9yX2ZvcmdlZA-x_9';
+  const shell = '<html><head><title>x</title></head><body></body></html>';
+  const tagged = withSearchConsoleTag(shell, token);
+  assert.ok(tagged.includes(`<meta name="google-site-verification" content="${token}" />\n  </head>`));
+  assert.equal(tagged.split('google-site-verification').length - 1, 1);
+  assert.equal(withSearchConsoleTag(tagged, token), tagged, 'running it again must not add a second tag');
+  assert.equal(withSearchConsoleTag(shell, ''), shell, 'no token, no tag');
+  assert.equal(withSearchConsoleTag(shell, 'bad token"><script>'), shell, 'an unsafe token is refused');
+  assert.equal(withSearchConsoleTag('<body>no head</body>', token), '<body>no head</body>');
+  // A "$&" style pattern in a token can never reach String.replace as a replacement pattern.
+  assert.ok(!withSearchConsoleTag(shell, token).includes('$'));
 });

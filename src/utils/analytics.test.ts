@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { analyticsScript, loadAnalytics, trackEvent } from './analytics';
+import { analyticsScript, loadAnalytics, startAnalytics, trackEvent } from './analytics';
 
 const SET_UP = {
   analyticsScriptUrl: 'https://cloud.example.net/script.js',
@@ -89,4 +89,23 @@ test('trackEvent does nothing when the tracker is not running, and never throws'
     },
   } as unknown as Window;
   assert.doesNotThrow(() => trackEvent('enquiry_open', {}, throwing));
+});
+
+test('startAnalytics loads the tracker at once when the page is already loaded', () => {
+  const { doc, added } = fakeDocument();
+  const win = { document: Object.assign(doc, { readyState: 'complete' }), addEventListener: () => assert.fail('no listener needed') };
+  // The real SITE has statistics off, so this checks only that nothing is added and nothing throws.
+  startAnalytics(win as unknown as Window);
+  assert.equal(added.length, 0);
+});
+
+test('startAnalytics waits for the load event while the page is still loading', () => {
+  const { doc } = fakeDocument();
+  const listeners: Array<{ type: string; once?: boolean }> = [];
+  const win = {
+    document: Object.assign(doc, { readyState: 'loading' }),
+    addEventListener: (type: string, _fn: () => void, options?: { once?: boolean }) => listeners.push({ type, once: options?.once }),
+  };
+  startAnalytics(win as unknown as Window);
+  assert.deepEqual(listeners, [{ type: 'load', once: true }]);
 });

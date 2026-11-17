@@ -238,15 +238,17 @@ export const PrivacyPolicyPage: React.FC = () => {
                   ? [
                       <>
                         <Strong>Visit statistics</Strong>: this website counts visits with Umami, a
-                        privacy-focused statistics service. For each page you open it records the page
-                        address, the website you came from, your browser, operating system and device
-                        type, screen size, language and your approximate country (worked out from your IP
-                        address, which is not kept in the statistics). It tells visits apart with an
-                        anonymous identifier made from a one-way hash of technical details and a salt that
-                        changes regularly. It sets no cookies, and if your browser sends a Do Not Track
-                        signal your visit is not counted. We also count, without any personal details,
-                        when the enquiry form is opened and when it is sent. We use these numbers to see
-                        which pages are used, not to identify you and not for advertising.
+                        statistics service that does not use cookies. For each page you open it records the
+                        page address and title, any parameters in the web address, the website you came
+                        from, your browser, operating system and device type, screen size, language and your
+                        approximate location (country, region or city, worked out from your IP address,
+                        which is not kept in the statistics). It tells visits apart with a pseudonymous
+                        identifier made from a one-way hash of technical details and a salt that changes
+                        about once a month, so it can link your visits only within that time. If your
+                        browser sends a Do Not Track signal your visit is not counted. We also count, without
+                        any personal details, when the enquiry form is opened and when it is sent. We use
+                        these numbers to see which pages are used, not to identify you and not for
+                        advertising.
                       </>,
                     ]
                   : []),
@@ -254,7 +256,7 @@ export const PrivacyPolicyPage: React.FC = () => {
             />
             <p className="pt-1">
               We do not run accounts, sign-in or mailing lists, and we do not use advertising
-              {STATISTICS ? ' trackers; the only statistics we keep are the anonymous visit counts described above' : ' or analytics trackers'}. We do not collect special personal information (such as health,
+              {STATISTICS ? ' trackers; the only statistics we keep are the visit counts described above' : ' or analytics trackers'}. We do not collect special personal information (such as health,
               religious or biometric data) or information about children. No law requires you to
               contact us; if you choose not to, we simply cannot answer your question.
             </p>
@@ -336,9 +338,9 @@ export const PrivacyPolicyPage: React.FC = () => {
           <Section index="06" title="Cookies and local storage">
             <p>
               This website does not set cookies. We do not use advertising, analytics or third-party
-              tracking cookies.{STATISTICS ? ' The visit statistics described in section 02 work without cookies.' : ''} The only thing kept in your browser&apos;s local storage is a copy of an
-              enquiry that could not be sent to us, so that it is not lost; it stays on your device and
-              is never read by us. When you open WhatsApp from this website, WhatsApp applies its own
+              tracking cookies.{STATISTICS ? ' The visit statistics described in section 02 work without cookies.' : ''} This website keeps one small entry in your browser&apos;s local storage. It
+              holds only a copy of an enquiry that could not be sent to us, so that it is not lost, and
+              is empty otherwise; it stays on your device and is never read by us. When you open WhatsApp from this website, WhatsApp applies its own
               cookie and privacy practices.
             </p>
           </Section>
