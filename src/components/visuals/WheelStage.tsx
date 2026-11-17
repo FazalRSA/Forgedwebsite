@@ -21,6 +21,8 @@ export interface WheelStageProps {
   onSelectFinish: (finish: WheelFinishId) => void;
   /** The wheel's finish name, e.g. "Black Matte". */
   finishName?: string;
+  /** The listing's own wording for a colour in the finish row, e.g. { 'satin-black': 'Glossy Black' }. */
+  finishNames?: Partial<Record<WheelFinishId, string>>;
   /** The wheel's .glb. Without one there is no 3D stage and the page shows photography instead. */
   modelUrl?: string | null;
   rearModelUrl?: string | null;
