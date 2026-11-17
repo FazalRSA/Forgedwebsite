@@ -62,7 +62,7 @@ export const SITE: SiteConfig = {
   /** Privacy contact email, shown in the privacy notice when set. Must be on `domain`; leave empty until the mailbox exists. */
   privacyEmail: '',
 
-  instagramUrl: '',
+  instagramUrl: 'https://www.instagram.com/forged_sa1/',
   facebookUrl: '',
   tiktokUrl: '',
   youtubeUrl: '',
