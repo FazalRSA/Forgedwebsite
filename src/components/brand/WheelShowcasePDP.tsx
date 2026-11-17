@@ -12,9 +12,12 @@ import {
   TO_ORDER_LEAD_TIME,
   TO_ORDER_NOTICE,
   getWheelImages,
+  isSixnineWheel,
 } from '../../data/catalogue';
 import { whatsappLink } from '../../config/site';
 import { Link, useRouter } from '../../utils/router';
+import { formatSizes } from '../../utils/designCards';
+import { wheelImageSrcSet } from '../../utils/wheelImageSrcSet';
 import { useForgedStore } from '../../store/useForgedStore';
 import {
   describeWheelForEnquiry,
@@ -142,7 +145,7 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
   );
 
   const specRows: { label: string; value: string }[] = [
-    wheel.sizesAvailable && { label: 'Sizes', value: wheel.sizesAvailable },
+    wheel.sizesAvailable && { label: 'Sizes', value: formatSizes(wheel.sizesAvailable) },
     specs.pcd && { label: 'PCD (bolt pattern)', value: specs.pcd },
     specs.et && { label: 'ET (offset)', value: specs.et },
     specs.cb && {
@@ -210,11 +213,23 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
             <h1 className="text-3xl sm:text-4xl font-semibold tracking-[-0.02em] text-white">
               {wheel.model}
             </h1>
+            {isSixnineWheel(wheel) && (
+              <p className="mt-1 text-sm text-neutral-300">
+                <Link to="/sixnine-wheels" className="underline underline-offset-4 hover:text-white">
+                  Sixnine Wheels · official dealer
+                </Link>
+              </p>
+            )}
             <p className="mt-2 text-2xl font-semibold text-white">
               {priceText}{' '}
               <span className="text-base font-normal text-neutral-300">per set of 4</span>
             </p>
             {stock && <p className="mt-1 text-sm text-[#F43F5E]">{stock}</p>}
+            {wheel.compatibleCars && (
+              <p className="mt-2 text-sm text-neutral-300">
+                Fits BMW {wheel.compatibleCars}. Send us your car and we confirm the fit.
+              </p>
+            )}
 
             <div className="mt-5" data-testid="finish-options">
               <p className="text-sm text-neutral-400">In stock</p>
@@ -283,13 +298,6 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
                 </div>
               ))}
             </dl>
-
-            {wheel.compatibleCars && (
-              <p className="mt-4 text-sm text-neutral-300">
-                Listed for BMW {wheel.compatibleCars}. We confirm fitment for your exact car on
-                WhatsApp.
-              </p>
-            )}
 
             <div className="mt-6 hidden md:block">{enquireButton}</div>
           </div>
@@ -383,6 +391,13 @@ const View3DPoster: React.FC<{ onClick: () => void }> = ({ onClick }) => (
 );
 
 /**
+ * How wide a gallery photo is drawn, so the browser can pick the smallest copy that fills it (see
+ * wheelImageSrcSet): the full page width on phones, half of the 1152 px container from 768 px.
+ * Measured in the built site at 390, 768 and 1440 px wide.
+ */
+const GALLERY_SIZES = '(min-width:1200px) 532px, (min-width:768px) 44vw, 92vw';
+
+/**
  * Swipeable photos (scroll-snap, so vertical page scrolling is never trapped). The first photo is
  * the page's largest image and loads eagerly at high priority; the rest load lazily.
  */
@@ -431,7 +446,7 @@ const PhotoGallery: React.FC<{
         {photos.map((src, i) => (
           <div key={src} className="relative aspect-square w-full shrink-0 snap-center">
             <img
-              src={src}
+              {...wheelImageSrcSet(src, GALLERY_SIZES)}
               alt={`${altBase}, photo ${i + 1} of ${photos.length}`}
               width={1600}
               height={1600}

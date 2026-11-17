@@ -1,7 +1,23 @@
-import React from 'react';
+import React, { useMemo } from 'react';
+import { SITE } from '../../config/site';
+import { formatZAR, getAllBrandWheels } from '../../data/catalogue';
+import { useForgedStore } from '../../store/useForgedStore';
+
+/** The fallback sentence when nothing is listed in stock (the counts below come from the catalogue). */
+const STATIC_LINE = 'Every set below is in stock. Prices are in Rand for a set of four.';
 
 /** One headline, one sentence, one button. The wheels themselves start directly below. */
 export const HeroSection: React.FC = () => {
+  const customBrandWheels = useForgedStore((state) => state.customBrandWheels);
+  // "14 sets in stock in South Africa, from R 65,000 per set of four": counted from the live catalogue.
+  const stockLine = useMemo(() => {
+    const wheels = getAllBrandWheels(customBrandWheels);
+    if (wheels.length === 0) return STATIC_LINE;
+    const sets = wheels.reduce((sum, wheel) => sum + (wheel.stockQuantitySets ?? 0), 0);
+    const minPrice = Math.min(...wheels.map((wheel) => wheel.priceZAR));
+    return `${sets} sets in stock in ${SITE.country}, from ${formatZAR(minPrice)} per set of four.`;
+  }, [customBrandWheels]);
+
   const jumpToCatalogue = (event: React.MouseEvent<HTMLAnchorElement>) => {
     const target = document.getElementById('catalogue');
     if (!target) return; // fall back to the plain #catalogue link
@@ -29,7 +45,7 @@ export const HeroSection: React.FC = () => {
           Forged wheels for BMW M cars.
         </h1>
         <p className="mt-5 max-w-xl text-base sm:text-lg leading-relaxed text-neutral-300">
-          Every set below is in stock. Prices are in Rand for a set of four.
+          {stockLine}
         </p>
         <a
           href="#catalogue"

@@ -47,9 +47,9 @@ It shows the wheels that are in stock, each in photography and an interactive 3D
 
 Five pages, plus the privacy notice:
 
-- **Home (`/`).** What is in stock, as one large dark card per wheel design (rows of three and two on wide screens, a lone last design full width; two columns on tablets, one on phones). Each card shows the design's wheel cut out on the dark card, its name, how many finishes are in stock, the lowest price per set of four, the finishes and sizes, all worked out from the catalogue (`src/utils/designCards.ts`); it links to the design's first photographed listing, whose page offers the other finishes. Then customer installs, the industry partners strip (SIXNINE Wheels and BMW) and "Ask AI about us".
+- **Home (`/`).** What is in stock, as one large dark card per wheel design (rows of three and two on wide screens, a lone last design full width; two columns on tablets, one on phones). Each card shows the design's wheel cut out on the dark card, its name, how many finishes are in stock, the lowest price per set of four, the finishes and sizes, all worked out from the catalogue (`src/utils/designCards.ts`); it links to the design's first photographed listing, whose page offers the other finishes. Then customer installs, the industry partners strip (Sixnine Wheels and BMW) and "Ask AI about us".
 - **Wheel page (`/wheels/:slug`).** One in-stock listing: photos, price per set of four, sizes and specification. Colours come in two groups: the design's finishes that are **in stock** (each links to its own listing), and its **other colours, to order**, always shown with the notice that a lead time of 3 months applies. The 3D viewer loads only when the visitor taps "View in 3D" and can preview the to-order colours. The enquiry button opens the enquiry form with the design, finish and sizes filled in; a to-order colour prefills the colour and the lead time. The form logs the enquiry through n8n and then opens WhatsApp (see [Lead delivery](#lead-delivery-n8n)).
-- **Installs (`/installs`).** Customer BMW M cars on FORGED wheels. Each install opens to three photos: two studio re-shoots made from the customer's own photo, then that photo itself with the number plate pixelated.
+- **Installs (`/installs`).** Customer cars the shop has fitted (BMW M cars and one Audi RS3; no install is linked to a catalogue wheel). Each install opens to three photos: two studio re-shoots made from the customer's own photo, then that photo itself with the number plate pixelated.
 - **Sixnine dealer page (`/sixnine-wheels`, "Sixnine" in the menu).** FORGED as an official Sixnine Wheels dealer: what Sixnine Wheels is and its range (from sixnine-wheels.com, with a source link), every Sixnine set in stock, and a fitment summary. A wheel is Sixnine when its design code starts with `FF` (`isSixnineWheel` in `src/data/catalogue.ts`), so a new FF design appears on the page by itself. Every number on it is worked out from the catalogue; the brand text and range list are in `SixnineDealerPage.tsx`.
 - **Contact (`/contact`).** WhatsApp, phone, address and areas served; any channel not set in `src/config/site.ts` is hidden.
 - **Privacy notice (`/privacy-policy`).** Describes what the site does today: no accounts, no cookies, nothing stored in the browser, contact by WhatsApp or phone.
@@ -127,7 +127,7 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
 | --- | --- | --- |
 | `/` | `BrandHomePage` | Hero, wheels in stock (`#catalogue`), customer installs, partners strip (`#partners`), Ask AI (`#ask-ai`) |
 | `/wheels/:slug` | `WheelShowcasePDP` | Wheel page: photos, 3D viewer, price, sizes, in-stock and to-order colours, enquire. A sold or unknown slug shows the 404 page |
-| `/installs` | `ClientFitmentsPage` | Customer cars on the wheels |
+| `/installs` | `ClientFitmentsPage` | Customer cars the shop has fitted |
 | `/sixnine-wheels` | `SixnineDealerPage` | Official Sixnine dealer page: about Sixnine Wheels, every FF set in stock, fitment summary |
 | `/contact` | `ContactPage` | WhatsApp, phone, address, areas served |
 | `/privacy-policy` | `PrivacyPolicyPage` | Privacy notice (POPIA): what is collected, by whom, and how to make a request |
@@ -175,6 +175,7 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
 │  ├─ legacy-pages.json           The removed addresses that still get a redirect page
 │  ├─ generate-llms.ts            Writes dist/llms.txt
 │  ├─ make-wheel-cutouts.py       Makes the transparent wheel cut-outs for the home page's design cards (run by hand)
+│  ├─ make-wheel-sizes.py         Makes the 800, 400 and 600 px copies of the wheel photos that the srcsets list (run by hand)
 │  └─ fitment-reshoot/            Pipeline for the install studio re-shoots (jobs.json, Python scripts, README.md)
 ├─ docs/installs-pipeline.md      How the Installs gallery is made, with animated diagrams (docs/assets/)
 ├─ components/ui/                 Shared UI primitives (button, input, label, icons)
@@ -275,6 +276,12 @@ To attach photos or add a new listing:
    .venv-cutouts/bin/python scripts/make-wheel-cutouts.py
    ```
 
+   Then make the smaller copies phones and tablets download instead of the full-size files: `scripts/make-wheel-sizes.py` writes `front-800.webp` and `front-400.webp` beside each `front.webp` (likewise `hero` and `profile`) and `cutout-600.webp` beside each `cutout.webp`. It needs only Pillow, skips copies that are newer than their photo, and `--force` redoes them all. The pages list the copies in each `<img srcset>` through `wheelImageSrcSet()` in `src/utils/wheelImageSrcSet.ts`; a test fails if a copy is missing.
+
+   ```bash
+   python3 scripts/make-wheel-sizes.py
+   ```
+
 3. **Point to them.** For a stock-sheet listing, add `{ "slug": ..., "images": [...], "imageLabels": [...] }` to `brandWheels` in `src/data/customWheels.json`. For a new listing use the CLI below. Reference images as `/images/wheels/<slug>/front.webp` (leading slash, no `public/`).
 4. **Add the 3D model** (see below) by setting `modelUrl`, or add the design to `MODEL_URL_BY_CODE`.
 5. Run `bun run lint`, `bun run test` and `bun run dev`, check `/wheels/<slug>` and `/#catalogue`, then open a pull request.
@@ -363,7 +370,7 @@ A value left empty is never shown: the related button falls back to the enquiry 
 
 The enquiry form (`src/components/shared/GlobalOverlays.tsx`, opened by every "Enquire" button and the contact page) posts each submission to one n8n webhook; the site itself has no backend. When a WhatsApp number is configured the form also opens WhatsApp with the message typed, as before.
 
-`src/utils/leads.ts` builds the payload (message, phone, optional name and email, the wheel it is about, the page, a timestamp, consent and a honeypot), POSTs it as JSON with a 10 s timeout and returns the reference n8n issues. If the webhook cannot be reached: with WhatsApp configured the WhatsApp path still carries the message; without it the form keeps the text in the browser and says so, so nothing is silently lost on the visitor's side.
+`src/utils/leads.ts` builds the payload (message, phone, optional car (`vehicle`), name and email, the wheel it is about, the page, a timestamp, consent and a honeypot), POSTs it as JSON with a 10 s timeout and returns the reference n8n issues. If the webhook cannot be reached: with WhatsApp configured the WhatsApp path still carries the message; without it the form keeps the text in the browser and says so, so nothing is silently lost on the visitor's side.
 
 The workflow **FORGED · Website Leads** (production URL `https://novahavensai.app.n8n.cloud/webhook/forged-website-lead`) then:
 
@@ -394,6 +401,7 @@ firebase deploy --only firestore:rules
 | `src/data/catalogue.test.ts` | The stock rule (every exported wheel is in stock, 14 listings across 6 designs, one finish each), siblings, to-order colours (never a colour the design has in stock), no store exports, wheel builder, and that every listed wheel has a 3D model and photos that exist |
 | `src/data/clientFitments.test.ts` | Customer installs data |
 | `src/utils/designCards.test.ts` | Home page design cards: one per design, badge, price and link from the data, the 3-then-2 row plan, and a cut-out on disk for every photographed listing |
+| `src/utils/wheelImageSrcSet.test.ts` | The `srcset` for each wheel photo (site photos only; nothing for admin uploads or placeholders) and that every smaller copy exists on disk |
 | `src/utils/wheelStudioParts.test.ts` | Viewer part classification, exploded-view offsets, camera distance |
 | `src/utils/seo.test.ts` | Per-route metadata, canonical URLs, structured data, share images, sitemap (no removed route), `render.yaml` |
 | `src/utils/redirects.test.ts` | Old address to new address, `replaceState`, no loops, and every address in `scripts/legacy-pages.json` has a redirect |

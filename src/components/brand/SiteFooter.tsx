@@ -3,18 +3,21 @@ import { ArrowUpRight } from 'lucide-react';
 import { SITE, telLink, whatsappLink } from '../../config/site';
 import { Link } from '../../utils/router';
 import { WORDMARK_HEIGHT, WORDMARK_WIDTH } from '../shared/BrandLogo';
+import { ContactCta } from './ContactCta';
 
 const FOOTER_LINKS = [
   { label: 'Wheels', to: '/#catalogue' },
   { label: 'Installs', to: '/installs' },
   { label: 'Contact', to: '/contact' },
-  { label: 'Privacy policy', to: '/privacy-policy' },
+  { label: 'Privacy notice', to: '/privacy-policy' },
 ] as const;
 
 interface ContactColumn {
   key: string;
   label: string;
   links: { text: string; href: string; external?: boolean }[];
+  /** Opens the enquiry form (like every other call to action) instead of linking anywhere. */
+  enquiry?: { message: string; subject: string; label: string };
   /** Plain text under the label when the column is not a link. */
   text?: string;
   /** Classes that place the column in the phone grid. */
@@ -30,9 +33,14 @@ function mapsLink(address: string): string {
 /** Only the channels filled in src/config/site.ts become columns; an empty value hides its column. */
 function contactColumns(): ContactColumn[] {
   const columns: ContactColumn[] = [];
-  const whatsappHref = whatsappLink("Hi, I'd like to ask about your wheels.");
-  if (whatsappHref) {
-    columns.push({ key: 'whatsapp', label: 'WhatsApp', links: [{ text: 'Message us', href: whatsappHref, external: true }] });
+  // The WhatsApp column opens the enquiry form, so the enquiry is logged before WhatsApp opens.
+  if (whatsappLink()) {
+    columns.push({
+      key: 'whatsapp',
+      label: 'WhatsApp',
+      links: [],
+      enquiry: { message: "Hi, I'd like to ask about your wheels.", subject: 'Wheel enquiry', label: 'Message us' },
+    });
   }
   if (SITE.tradeEmail) {
     columns.push({ key: 'email', label: 'Email', links: [{ text: SITE.tradeEmail, href: `mailto:${SITE.tradeEmail}` }] });
@@ -89,6 +97,16 @@ export const SiteFooter: React.FC = () => {
                 <p className="text-[11px] font-tech-mono font-semibold tracking-[0.18em] uppercase text-neutral-500">
                   {column.label}
                 </p>
+                {column.enquiry && (
+                  <ContactCta
+                    message={column.enquiry.message}
+                    enquirySubject={column.enquiry.subject}
+                    label={column.enquiry.label}
+                    fallbackLabel="Send an enquiry"
+                    showIcon={false}
+                    className={`${columnLinkClass} cursor-pointer`}
+                  />
+                )}
                 <ul>
                   {column.links.map((link) => (
                     <li key={link.href}>

@@ -157,8 +157,8 @@ export function metaForPath(rawPath: string): PageMeta {
   switch (path) {
     case '/installs':
       return page(
-        'Past installs on BMW M cars',
-        'Customer BMW M cars on forged wheel sets, shown as studio re-shoots of each customer’s own photo.',
+        'Customer installs',
+        'Customer cars on forged wheel sets, shown as studio re-shoots of each customer’s own photo.',
         path
       );
     case '/sixnine-wheels':
@@ -174,7 +174,7 @@ export function metaForPath(rawPath: string): PageMeta {
         path
       );
     case '/privacy-policy':
-      return page('Privacy policy', `How ${SITE_NAME} collects, uses and protects personal information.`, path);
+      return page('Privacy notice', `How ${SITE_NAME} collects, uses and protects personal information.`, path);
     default:
       break;
   }
@@ -315,7 +315,7 @@ export function applyPageMeta(meta: PageMeta, origin: string = SITE_ORIGIN): voi
   if (!existing) document.head.appendChild(script);
 }
 
-/** Every indexable page path: the home page, one page per in-stock wheel, installs, the Sixnine dealer page, contact and the privacy policy. */
+/** Every indexable page path: the home page, one page per in-stock wheel, installs, the Sixnine dealer page, contact and the privacy notice. */
 export function sitemapPaths(): string[] {
   const candidates = [
     '/',

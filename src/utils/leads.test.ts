@@ -58,7 +58,7 @@ test('buildLeadPayload stamps page, time, consent and source onto the input', ()
 test('submitLead posts JSON to the webhook and returns the reference n8n issued', async () => {
   const calls: FetchCall[] = [];
   const result = await submitLead(
-    { type: 'interest', name: 'Ada', email: 'ada@example.com', phone: '+27 82 000 0000', subject: 'FSA002 Gold' },
+    { type: 'interest', name: 'Ada', email: 'ada@example.com', phone: '+27 82 000 0000', subject: 'FSA002 Gold', vehicle: 'G80 M3' },
     { fetchImpl: fakeFetch({ status: 200, body: { ok: true, reference: 'FORGED-INT-654321' } }, calls), url: 'https://hook.test/lead', page: '/wheels/fsa002-gold', now: new Date('2026-11-10T10:00:00.000Z') }
   );
   assert.deepEqual(result, { delivered: true, reference: 'FORGED-INT-654321', message: null });
@@ -69,6 +69,8 @@ test('submitLead posts JSON to the webhook and returns the reference n8n issued'
   assert.equal(sent.type, 'interest');
   assert.equal(sent.email, 'ada@example.com');
   assert.equal(sent.page, '/wheels/fsa002-gold');
+  // The optional car from the form travels with the lead.
+  assert.equal(sent.vehicle, 'G80 M3');
   assert.equal(sent.consent, true);
   assert.equal(sent.submittedAt, '2026-11-10T10:00:00.000Z');
 });

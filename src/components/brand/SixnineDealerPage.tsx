@@ -101,7 +101,7 @@ export const SixnineDealerPage: React.FC = () => {
             <div className="max-w-2xl">
               <p className="text-sm uppercase tracking-[0.14em] text-[#F43F5E]">Official dealer</p>
               <h1 className="mt-2 text-4xl sm:text-5xl font-light tracking-[-0.03em] leading-tight text-white">
-                Sixnine Wheels dealer in Durban
+                Official Sixnine Wheels dealer
               </h1>
               <p className="mt-4 text-lg text-neutral-300">
                 We supply forged Sixnine wheels for BMW M cars.
@@ -111,8 +111,8 @@ export const SixnineDealerPage: React.FC = () => {
                 <ContactCta
                   message={enquiryMessage}
                   enquirySubject="Sixnine wheels enquiry"
-                  label="Ask about Sixnine wheels"
-                  fallbackLabel="Ask about Sixnine wheels"
+                  label="Enquire on WhatsApp"
+                  fallbackLabel="Send an enquiry"
                   className={CTA_PRIMARY_CLASS}
                 />
                 <a href="#sixnine-stock" className={CTA_SECONDARY_CLASS}>
@@ -159,7 +159,7 @@ export const SixnineDealerPage: React.FC = () => {
           <div className="mt-6 grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
             <div className="max-w-2xl space-y-4 text-neutral-300">
               <p>
-                SIXNINE Wheels is a German aftermarket wheel brand from Neumarkt, Germany. Its wheels are designed and
+                Sixnine Wheels is a German aftermarket wheel brand from Neumarkt, Germany. Its wheels are designed and
                 developed in Germany, and made together with one of the largest alloy wheel manufacturers in the world.
               </p>
               <p>
@@ -264,7 +264,7 @@ export const SixnineDealerPage: React.FC = () => {
             <ContactCta
               message={enquiryMessage}
               enquirySubject="Sixnine wheels enquiry"
-              label="Message us on WhatsApp"
+              label="Enquire on WhatsApp"
               fallbackLabel="Send an enquiry"
               className={CTA_PRIMARY_CLASS}
             />

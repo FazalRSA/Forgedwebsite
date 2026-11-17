@@ -17,7 +17,7 @@ export interface Partner {
 export const PARTNERS: readonly Partner[] = [
   {
     id: 'sixnine',
-    name: 'SIXNINE Wheels',
+    name: 'Sixnine Wheels',
     logo: '/images/partners/sixnine.webp',
     caption: 'Official dealer',
     href: '/sixnine-wheels',

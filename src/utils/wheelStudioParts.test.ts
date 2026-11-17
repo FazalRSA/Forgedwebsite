@@ -100,10 +100,10 @@ test('the enquiry wording names design, finish, sizes and price', () => {
     sizes: '20 inch / 21 inch',
     price: 'R 75,000',
   });
-  assert.equal(descriptor, 'FSA002 in Gold (20 inch / 21 inch), R 75,000 per set of 4');
+  assert.equal(descriptor, 'FSA002 in Gold (20" / 21"), R 75,000 per set of 4');
   assert.equal(
     wheelEnquiryMessage(descriptor),
-    "Hi, I'd like to ask about the FSA002 in Gold (20 inch / 21 inch), R 75,000 per set of 4. Is it still available?"
+    "Hi, I'd like to ask about the FSA002 in Gold (20\" / 21\"), R 75,000 per set of 4. Is it still available?"
   );
   assert.equal(
     describeWheelForEnquiry({ design: 'FF-1', finish: 'Silver', price: 'R 80,000' }),

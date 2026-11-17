@@ -95,7 +95,7 @@ export const ContactPage: React.FC = () => {
         <ContactCta
           message={CONTACT_MESSAGE}
           enquirySubject="Wheel enquiry"
-          label="Message us on WhatsApp"
+          label="Enquire on WhatsApp"
           fallbackLabel="Send an enquiry"
           className="mt-8 inline-flex w-full sm:w-auto items-center justify-center gap-3 min-h-14 px-8 rounded-full bg-[#1D4ED8] text-white text-lg font-medium hover:bg-[#2563EB] transition-colors cursor-pointer"
         />
