@@ -50,7 +50,7 @@ Five pages, plus the privacy notice:
 - **Home (`/`).** What is in stock, as a grid you can filter by design, then customer installs, the industry partners strip (SIXNINE Wheels and BMW) and "Ask AI about us".
 - **Wheel page (`/wheels/:slug`).** One in-stock listing: photos, price per set of four, sizes and specification. Colours come in two groups: the design's finishes that are **in stock** (each links to its own listing), and its **other colours, to order**, always shown with the notice that a lead time of 3 months applies. The 3D viewer loads only when the visitor taps "View in 3D" and can preview the to-order colours. The enquiry button opens the enquiry form with the design, finish and sizes filled in; a to-order colour prefills the colour and the lead time. The form logs the enquiry through n8n and then opens WhatsApp (see [Lead delivery](#lead-delivery-n8n)).
 - **Installs (`/installs`).** Customer BMW M cars on FORGED wheels. Each install opens to three photos: two studio re-shoots made from the customer's own photo, then that photo itself with the number plate pixelated.
-- **Sixnine dealer page (`/sixnine-wheels`).** FORGED as an official Sixnine Wheels dealer: the Sixnine sets in stock and a fitment summary. Every number on it is worked out from the catalogue.
+- **Sixnine dealer page (`/sixnine-wheels`, "Sixnine" in the menu).** FORGED as an official Sixnine Wheels dealer: what Sixnine Wheels is and its range (from sixnine-wheels.com, with a source link), every Sixnine set in stock, and a fitment summary. A wheel is Sixnine when its design code starts with `FF` (`isSixnineWheel` in `src/data/catalogue.ts`), so a new FF design appears on the page by itself. Every number on it is worked out from the catalogue; the brand text and range list are in `SixnineDealerPage.tsx`.
 - **Contact (`/contact`).** WhatsApp, phone, address and areas served; any channel not set in `src/config/site.ts` is hidden.
 - **Privacy notice (`/privacy-policy`).** Describes what the site does today: no accounts, no cookies, nothing stored in the browser, contact by WhatsApp or phone.
 - **Search-ready pages.** Per-route titles, descriptions, canonical URLs, link-preview tags, structured data and a generated sitemap.
@@ -128,7 +128,7 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
 | `/` | `BrandHomePage` | Hero, wheels in stock (`#catalogue`), customer installs, partners strip (`#partners`), Ask AI (`#ask-ai`) |
 | `/wheels/:slug` | `WheelShowcasePDP` | Wheel page: photos, 3D viewer, price, sizes, in-stock and to-order colours, enquire. A sold or unknown slug shows the 404 page |
 | `/installs` | `ClientFitmentsPage` | Customer cars on the wheels |
-| `/sixnine-wheels` | `SixnineDealerPage` | Official Sixnine dealer page: Sixnine sets in stock, fitment summary |
+| `/sixnine-wheels` | `SixnineDealerPage` | Official Sixnine dealer page: about Sixnine Wheels, every FF set in stock, fitment summary |
 | `/contact` | `ContactPage` | WhatsApp, phone, address, areas served |
 | `/privacy-policy` | `PrivacyPolicyPage` | Privacy notice (POPIA): what is collected, by whom, and how to make a request |
 | `/studio/:slug` | `StudioPreviewPage` | Unlisted, noindex 3D preview (currently `stf399`) |

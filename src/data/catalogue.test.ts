@@ -15,6 +15,7 @@ import {
   getWheelBySlug,
   getWheelImages,
   isInStock,
+  isSixnineWheel,
   type BrandWheelItem,
 } from './catalogue';
 import { createWheelEntry } from '../utils/wheelBuilder';
@@ -299,4 +300,16 @@ test('to-order colours are exactly the palette colours a design has no stock of'
   }
   assert.equal(TO_ORDER_LEAD_TIME, '3 months');
   assert.ok(TO_ORDER_NOTICE.includes('3 months'));
+});
+
+test('isSixnineWheel: every design code starting with FF is Sixnine, and nothing else is', () => {
+  assert.ok(isSixnineWheel({ modelCode: 'FF-1' }));
+  assert.ok(isSixnineWheel({ modelCode: 'FF-3' }));
+  assert.ok(isSixnineWheel({ modelCode: 'ff-2' }), 'case does not matter');
+  assert.ok(!isSixnineWheel({ modelCode: 'FSA002' }));
+  assert.ok(!isSixnineWheel({ modelCode: undefined }));
+  assert.deepEqual(
+    getAllBrandWheels().filter(isSixnineWheel).map((w) => w.slug).sort(),
+    ['ff-1-liquid-metal', 'ff-1-silver', 'ff-3-glossy-black', 'ff-3-liquid-metal', 'ff-3-pure-bronze']
+  );
 });

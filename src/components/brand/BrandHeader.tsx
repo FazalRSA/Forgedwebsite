@@ -11,6 +11,7 @@ interface BrandHeaderProps {
 
 const NAV_ITEMS = [
   { label: 'Wheels', to: '/#catalogue' },
+  { label: 'Sixnine', to: '/sixnine-wheels' },
   { label: 'Installs', to: '/installs' },
   { label: 'Contact', to: '/contact' },
 ] as const;

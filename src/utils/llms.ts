@@ -3,7 +3,7 @@
  * assistants, which cannot run this single-page app. Everything comes from the catalogue, the
  * installs list and SITE, so it cannot drift from the pages or state anything they do not.
  */
-import { formatZAR, getAllBrandWheels, TO_ORDER_LEAD_TIME } from '../data/catalogue';
+import { formatZAR, getAllBrandWheels, isSixnineWheel, TO_ORDER_LEAD_TIME } from '../data/catalogue';
 import { CLIENT_FITMENTS } from '../data/clientFitments';
 import { SITE, whatsappLink } from '../config/site';
 import { SITE_ORIGIN } from './seo';
@@ -21,6 +21,12 @@ export function buildLlmsTxt(origin: string = SITE_ORIGIN): string {
   const prices = wheels.map((w) => w.priceZAR);
   const sets = wheels.reduce((sum, w) => sum + (w.stockQuantitySets ?? 0), 0);
   const wa = whatsappLink();
+  // "FF-1 and FF-3": the Sixnine designs in stock, read from the catalogue.
+  const sixnineCodes = Array.from(new Set(wheels.filter(isSixnineWheel).map((w) => w.modelCode)));
+  const sixnineDesigns =
+    sixnineCodes.length > 1
+      ? `${sixnineCodes.slice(0, -1).join(', ')} and ${sixnineCodes[sixnineCodes.length - 1]}`
+      : sixnineCodes[0] ?? 'FF';
 
   const wheelLines = wheels.map((w) => {
     const facts = [
@@ -63,7 +69,7 @@ export function buildLlmsTxt(origin: string = SITE_ORIGIN): string {
     '',
     `- [Wheels in stock](${origin}/): the full catalogue with photos and a 3D viewer`,
     `- [Installs](${origin}/installs): ${CLIENT_FITMENTS.length} customer cars fitted with our wheels`,
-    `- [Sixnine Wheels dealer](${origin}/sixnine-wheels): the Sixnine FF-1 and FF-3 sets in stock`,
+    `- [Sixnine Wheels dealer](${origin}/sixnine-wheels): what Sixnine Wheels is, and the Sixnine ${sixnineDesigns} sets in stock`,
     `- [Contact](${origin}/contact): WhatsApp, phone and address`,
     '',
     '## Optional',
