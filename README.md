@@ -47,7 +47,7 @@ It shows the wheels that are in stock, each in photography and an interactive 3D
 
 Five pages, plus the privacy notice:
 
-- **Home (`/`).** What is in stock, as a grid you can filter by design, then customer installs, the industry partners strip (SIXNINE Wheels and BMW) and "Ask AI about us".
+- **Home (`/`).** What is in stock, as one large dark card per wheel design (rows of three and two on wide screens, a lone last design full width; two columns on tablets, one on phones). Each card shows the design's wheel cut out on the dark card, its name, how many finishes are in stock, the lowest price per set of four, the finishes and sizes, all worked out from the catalogue (`src/utils/designCards.ts`); it links to the design's first photographed listing, whose page offers the other finishes. Then customer installs, the industry partners strip (SIXNINE Wheels and BMW) and "Ask AI about us".
 - **Wheel page (`/wheels/:slug`).** One in-stock listing: photos, price per set of four, sizes and specification. Colours come in two groups: the design's finishes that are **in stock** (each links to its own listing), and its **other colours, to order**, always shown with the notice that a lead time of 3 months applies. The 3D viewer loads only when the visitor taps "View in 3D" and can preview the to-order colours. The enquiry button opens the enquiry form with the design, finish and sizes filled in; a to-order colour prefills the colour and the lead time. The form logs the enquiry through n8n and then opens WhatsApp (see [Lead delivery](#lead-delivery-n8n)).
 - **Installs (`/installs`).** Customer BMW M cars on FORGED wheels. Each install opens to three photos: two studio re-shoots made from the customer's own photo, then that photo itself with the number plate pixelated.
 - **Sixnine dealer page (`/sixnine-wheels`, "Sixnine" in the menu).** FORGED as an official Sixnine Wheels dealer: what Sixnine Wheels is and its range (from sixnine-wheels.com, with a source link), every Sixnine set in stock, and a fitment summary. A wheel is Sixnine when its design code starts with `FF` (`isSixnineWheel` in `src/data/catalogue.ts`), so a new FF design appears on the page by itself. Every number on it is worked out from the catalogue; the brand text and range list are in `SixnineDealerPage.tsx`.
@@ -111,7 +111,7 @@ Two things look like setup and are not:
 | `bun run build` | Five steps, in order: regenerate `public/sitemap.xml` and the page rules in `render.yaml` from the catalogue; build to `dist/`; write each page's own HTML file with its title and share image (`prerender-meta.ts`); write a redirect page for every removed address (`legacy-shells.ts`); write `dist/llms.txt` (`generate-llms.ts`) |
 | `bun run preview` | Serves the production build locally |
 | `bun run lint` | Type-check with `tsc --noEmit` |
-| `bun run test` | Data, SEO, redirect, business-details, `llms.txt`, 3D-studio and security-rules tests (`node:test` via `tsx`) |
+| `bun run test` | Data, home-page design-card, SEO, redirect, business-details, `llms.txt`, 3D-studio and security-rules tests (`node:test` via `tsx`) |
 | `bun run add-wheel` | Catalogue CLI (`--help` for options) |
 | `bun run clean` | Removes `dist/` |
 
@@ -174,6 +174,7 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
 │  ├─ legacy-shells.ts            Writes a redirect page for each address in legacy-pages.json
 │  ├─ legacy-pages.json           The removed addresses that still get a redirect page
 │  ├─ generate-llms.ts            Writes dist/llms.txt
+│  ├─ make-wheel-cutouts.py       Makes the transparent wheel cut-outs for the home page's design cards (run by hand)
 │  └─ fitment-reshoot/            Pipeline for the install studio re-shoots (jobs.json, Python scripts, README.md)
 ├─ docs/installs-pipeline.md      How the Installs gallery is made, with animated diagrams (docs/assets/)
 ├─ components/ui/                 Shared UI primitives (button, input, label, icons)
@@ -265,6 +266,13 @@ To attach photos or add a new listing:
    public/images/wheels/fsa003-pure-bronze/front.webp
    public/images/wheels/fsa003-pure-bronze/hero.webp
    public/images/wheels/fsa003-pure-bronze/profile.webp
+   ```
+
+   Then make the cut-out the home page's design card floats on the dark background: `scripts/make-wheel-cutouts.py` turns each `hero.webp` (the three-quarter view) into a transparent `cutout.webp` beside it, 1000×1000, with the `birefnet-general` model of [rembg](https://github.com/danielgatis/rembg) (a 1 GB download on first run, cached in `~/.rembg`). It skips folders that already have one; `--force` redoes them all. Look at each result on a dark background before committing: background between the spokes must be gone and silver spokes intact. A test fails if a photographed listing has no cut-out.
+
+   ```bash
+   python3 -m venv .venv-cutouts && .venv-cutouts/bin/pip install "rembg[cpu]" pillow
+   .venv-cutouts/bin/python scripts/make-wheel-cutouts.py
    ```
 
 3. **Point to them.** For a stock-sheet listing, add `{ "slug": ..., "images": [...], "imageLabels": [...] }` to `brandWheels` in `src/data/customWheels.json`. For a new listing use the CLI below. Reference images as `/images/wheels/<slug>/front.webp` (leading slash, no `public/`).
@@ -379,12 +387,13 @@ firebase deploy --only firestore:rules
 
 ## Testing
 
-`bun run test` runs eight test files (73 tests) with `node:test`. The files are listed by name in the `test` script in `package.json`, so a new test file does not run until it is added there.
+`bun run test` runs ten test files (87 tests) with `node:test`. The files are listed by name in the `test` script in `package.json`, so a new test file does not run until it is added there.
 
 | Suite | Covers |
 | --- | --- |
 | `src/data/catalogue.test.ts` | The stock rule (every exported wheel is in stock, 14 listings across 6 designs, one finish each), siblings, to-order colours (never a colour the design has in stock), no store exports, wheel builder, and that every listed wheel has a 3D model and photos that exist |
 | `src/data/clientFitments.test.ts` | Customer installs data |
+| `src/utils/designCards.test.ts` | Home page design cards: one per design, badge, price and link from the data, the 3-then-2 row plan, and a cut-out on disk for every photographed listing |
 | `src/utils/wheelStudioParts.test.ts` | Viewer part classification, exploded-view offsets, camera distance |
 | `src/utils/seo.test.ts` | Per-route metadata, canonical URLs, structured data, share images, sitemap (no removed route), `render.yaml` |
 | `src/utils/redirects.test.ts` | Old address to new address, `replaceState`, no loops, and every address in `scripts/legacy-pages.json` has a redirect |
