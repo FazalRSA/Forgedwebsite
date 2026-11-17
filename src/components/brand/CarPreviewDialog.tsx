@@ -30,6 +30,9 @@ const FOCUSABLE =
 
 const PRIMARY_BUTTON =
   'flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#1D4ED8] px-6 text-base font-semibold text-white hover:bg-[#2563EB] transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#1D4ED8]';
+/** The button that makes the preview: black with white text, with the neon laser while it works (index.css). */
+const LASER_BUTTON =
+  'laser-button flex min-h-12 w-full items-center justify-center gap-2 px-6 text-base font-semibold cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed';
 const SECONDARY_BUTTON =
   'flex min-h-12 w-full items-center justify-center gap-2 rounded-full border border-[#33333E] px-6 text-base font-medium text-neutral-100 hover:border-[#1D4ED8] hover:text-white transition-colors cursor-pointer';
 const SECONDARY_BUTTON_COMPACT =
@@ -57,6 +60,8 @@ interface CarPreviewDialogProps {
   onEnquire: (note: string) => void;
   /** The button that opened the dialog, so focus can go back to it even where a tap does not focus a button. */
   returnFocusRef?: React.RefObject<HTMLElement | null>;
+  /** Told when a preview starts and stops being made, so the button on the page can show it too. */
+  onWorkingChange?: (working: boolean) => void;
 }
 
 export const CarPreviewDialog: React.FC<CarPreviewDialogProps> = ({
@@ -65,6 +70,7 @@ export const CarPreviewDialog: React.FC<CarPreviewDialogProps> = ({
   onClose,
   onEnquire,
   returnFocusRef,
+  onWorkingChange,
 }) => {
   const [step, setStep] = useState<Step>('choose');
   const [photo, setPhoto] = useState<Photo | null>(null);
@@ -88,6 +94,11 @@ export const CarPreviewDialog: React.FC<CarPreviewDialogProps> = ({
   useEffect(() => {
     trackEvent('car_preview_open');
   }, []);
+
+  useEffect(() => {
+    onWorkingChange?.(step === 'working');
+    return () => onWorkingChange?.(false);
+  }, [step, onWorkingChange]);
 
   // Keep the page behind still, keep focus inside (Tab cycles, Escape closes) and give it back on close.
   useEffect(() => {
@@ -352,7 +363,8 @@ export const CarPreviewDialog: React.FC<CarPreviewDialogProps> = ({
                   />
                   <span>{carPreviewConsentText()}</span>
                 </label>
-                <button type="button" onClick={generate} disabled={!consent} className={PRIMARY_BUTTON}>
+                <button type="button" onClick={generate} disabled={!consent} className={LASER_BUTTON}>
+                  <Camera className="h-5 w-5" aria-hidden="true" />
                   Show me this wheel on my car
                 </button>
               </>
@@ -373,11 +385,12 @@ export const CarPreviewDialog: React.FC<CarPreviewDialogProps> = ({
               className="relative mx-auto w-full overflow-hidden rounded-2xl border border-[#26262E] bg-[#141418]"
               style={{ aspectRatio: aspect, maxHeight: '50svh' }}
             >
-              <img src={photo.url} alt="" className="absolute inset-0 h-full w-full object-contain opacity-40" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Loader2 className="h-10 w-10 animate-spin motion-reduce:animate-none text-white" aria-hidden="true" />
-              </div>
+              <img src={photo.url} alt="" className="absolute inset-0 h-full w-full object-contain opacity-50" />
             </div>
+            <button type="button" disabled aria-busy="true" data-working="true" className={`${LASER_BUTTON} disabled:opacity-100 disabled:cursor-progress`}>
+              <Camera className="h-5 w-5" aria-hidden="true" />
+              Fitting the wheels…
+            </button>
             <p role="status" className="text-center text-sm text-[#C2C2CC]">
               Fitting the wheels to your car. This usually takes under a minute.
             </p>

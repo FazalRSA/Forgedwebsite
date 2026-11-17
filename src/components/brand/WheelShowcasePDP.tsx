@@ -48,8 +48,9 @@ interface WheelShowcasePDPProps {
 const PRIMARY_BUTTON =
   'inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[#1D4ED8] px-6 text-base font-semibold text-white hover:bg-[#2563EB] active:bg-[#1E40AF] transition-colors cursor-pointer';
 
-const SECONDARY_BUTTON =
-  'inline-flex h-12 w-full items-center justify-center gap-2 rounded-full border border-[#33333E] px-6 text-base font-medium text-neutral-100 hover:border-[#1D4ED8] hover:text-white transition-colors cursor-pointer';
+/** Black with white text; the neon laser runs round its edge while a preview is being made (index.css). */
+const CAR_PREVIEW_BUTTON =
+  'laser-button inline-flex h-12 w-full items-center justify-center gap-2 px-6 text-base font-medium cursor-pointer';
 
 /** The soft lighter glow behind a wheel, as on the home page's design cards. */
 const WHEEL_GLOW = 'bg-[radial-gradient(ellipse_at_50%_40%,rgba(255,255,255,0.09),transparent_65%)]';
@@ -95,6 +96,8 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
   // "See it on my car": only offered once the owner has set the Worker's address (see config/site.ts).
   const carPreviewOn = carPreviewEnabled();
   const [carPreviewOpen, setCarPreviewOpen] = useState(false);
+  // True while the dialog is making a preview, so the button behind it shows the laser too.
+  const [carPreviewWorking, setCarPreviewWorking] = useState(false);
   const carPreviewButtonRef = useRef<HTMLElement | null>(null);
   const stageRef = useRef<HTMLDivElement | null>(null);
   const view3DButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -177,7 +180,12 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
   };
 
   const carPreviewButton = carPreviewOn && (
-    <button type="button" onClick={openCarPreview} className={SECONDARY_BUTTON}>
+    <button
+      type="button"
+      onClick={openCarPreview}
+      data-working={carPreviewWorking}
+      className={CAR_PREVIEW_BUTTON}
+    >
       <Camera className="w-5 h-5" aria-hidden="true" />
       See it on my car
     </button>
@@ -386,7 +394,8 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
             <button
               type="button"
               onClick={openCarPreview}
-              className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border border-[#33333E] px-3.5 text-sm font-medium text-neutral-100 hover:border-[#1D4ED8] hover:text-white cursor-pointer"
+              data-working={carPreviewWorking}
+              className="laser-button inline-flex min-h-11 shrink-0 items-center gap-1.5 px-3.5 text-sm font-medium cursor-pointer"
             >
               <Camera className="w-4 h-4" aria-hidden="true" />
               See it on my car
@@ -404,6 +413,7 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
           wheelName={`${design} — ${finishLabel}`}
           onClose={closeCarPreview}
           onEnquire={enquireAboutPreview}
+          onWorkingChange={setCarPreviewWorking}
           returnFocusRef={carPreviewButtonRef}
         />
       )}
