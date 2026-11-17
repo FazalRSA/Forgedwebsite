@@ -136,7 +136,7 @@ export const SiteFooter: React.FC = () => {
           </div>
         )}
 
-        <div className="mt-8 border-t border-[#1E1E26] py-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div className="mt-8 border-t border-[#1E1E26] pt-5 pb-24 md:pb-20 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <nav aria-label="Footer">
             <ul className="flex flex-wrap gap-x-6">
               {FOOTER_LINKS.map((item) => (
