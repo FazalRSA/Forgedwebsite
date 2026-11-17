@@ -116,6 +116,45 @@
         "Three-quarter view",
         "Side profile"
       ]
+    },
+    {
+      "slug": "fsa002-hyper-black",
+      "images": [
+        "/images/wheels/fsa002-hyper-black/front.webp",
+        "/images/wheels/fsa002-hyper-black/hero.webp",
+        "/images/wheels/fsa002-hyper-black/profile.webp"
+      ],
+      "imageLabels": [
+        "Front face",
+        "Three-quarter view",
+        "Side profile"
+      ]
+    },
+    {
+      "slug": "fsa002-polished-face",
+      "images": [
+        "/images/wheels/fsa002-polished-face/front.webp",
+        "/images/wheels/fsa002-polished-face/hero.webp",
+        "/images/wheels/fsa002-polished-face/profile.webp"
+      ],
+      "imageLabels": [
+        "Front face",
+        "Three-quarter view",
+        "Side profile"
+      ]
+    },
+    {
+      "slug": "fsa004-gloss-black",
+      "images": [
+        "/images/wheels/fsa004-gloss-black/front.webp",
+        "/images/wheels/fsa004-gloss-black/hero.webp",
+        "/images/wheels/fsa004-gloss-black/profile.webp"
+      ],
+      "imageLabels": [
+        "Front face",
+        "Three-quarter view",
+        "Side profile"
+      ]
     }
   ]
 }

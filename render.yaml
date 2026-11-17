@@ -49,14 +49,14 @@ services:
         source: /wheels/fsa002-polished-face
         destination: /wheels/fsa002-polished-face.html
       - type: rewrite
+        source: /wheels/fsa004-gloss-black
+        destination: /wheels/fsa004-gloss-black.html
+      - type: rewrite
         source: /wheels/fsa003-silver
         destination: /wheels/fsa003-silver.html
       - type: rewrite
         source: /wheels/fsa004-hyper-black
         destination: /wheels/fsa004-hyper-black.html
-      - type: rewrite
-        source: /wheels/fsa004-gloss-black
-        destination: /wheels/fsa004-gloss-black.html
       - type: rewrite
         source: /installs
         destination: /installs.html

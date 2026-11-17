@@ -3,6 +3,7 @@ import {
   formatZAR,
   getAllBrandWheels,
   getWheelImages,
+  isSixnineWheel,
   type BrandWheelItem,
 } from '../data/catalogue';
 import { SITE } from '../config/site';
@@ -27,15 +28,12 @@ export const DEFAULT_SHARE_IMAGE = '/images/share/forged-wheels-share.jpg';
 /** Longest title that search results show without cutting it off. */
 const MAX_TITLE_LENGTH = 60;
 
-/** Catalogue model codes that the stock sheet lists as Sixnine designs (FF-ONE and FF-THREE). */
-const SIXNINE_MODEL_CODES = new Set(['FF-1', 'FF-3']);
-
 /**
- * The manufacturer of a wheel, when the stock sheet says who it is. Only the Sixnine FF-1 and FF-3
- * are attributed to a maker; other wheels return undefined rather than a guess.
+ * The manufacturer of a wheel, when the stock sheet says who it is. Only Sixnine designs (codes
+ * starting with FF) are attributed to a maker; other wheels return undefined rather than a guess.
  */
 export function wheelBrand(wheel: BrandWheelItem): string | undefined {
-  return wheel.modelCode && SIXNINE_MODEL_CODES.has(wheel.modelCode) ? 'Sixnine' : undefined;
+  return isSixnineWheel(wheel) ? 'Sixnine' : undefined;
 }
 
 /** Organization and WebSite structured data for the home page, built only from config/site.ts. */
@@ -166,7 +164,7 @@ export function metaForPath(rawPath: string): PageMeta {
     case '/sixnine-wheels':
       return page(
         'Official Sixnine Wheels dealer',
-        `${SITE_NAME} is an official dealer of Sixnine forged wheels. See the FF-1 and FF-3 sets in stock, with sizes and Rand prices.`,
+        `${SITE_NAME} is an official dealer of Sixnine Wheels, the German wheel brand. See every forged Sixnine FF set in stock, with sizes and Rand prices.`,
         path
       );
     case '/contact':

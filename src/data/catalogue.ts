@@ -580,6 +580,14 @@ export function isInStock(wheel: Pick<BrandWheelItem, 'stockStatus' | 'stockQuan
 }
 
 /**
+ * Sixnine Wheels designs: every design code that starts with "FF" (FF-1, FF-3, and any FF design
+ * added later). The dealer page, its metadata and the Product structured data all use this rule.
+ */
+export function isSixnineWheel(wheel: Pick<BrandWheelItem, 'modelCode'>): boolean {
+  return /^FF/i.test((wheel.modelCode ?? '').trim());
+}
+
+/**
  * Entries in customWheels.json. One whose slug matches a stock-sheet listing only adds to it
  * (today: the photography), so the stock sheet stays the single source for names, sizes and prices.
  * Any other entry is a complete listing, as written by `npm run add-wheel`.
