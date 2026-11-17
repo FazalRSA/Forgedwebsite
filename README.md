@@ -188,6 +188,8 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
 │  ├─ make-wheel-sizes.py         Makes the 800, 400 and 600 px copies of the wheel photos that the srcsets list (run by hand)
 │  └─ fitment-reshoot/            Pipeline for the install studio re-shoots (jobs.json, Python scripts, README.md)
 ├─ docs/installs-pipeline.md      How the Installs gallery is made, with animated diagrams (docs/assets/)
+├─ docs/blog-seo-plan.md          The blog's keyword map, on-page checklist and how to refine it in Search Console
+├─ docs/render-blog-rewrites.md   The 17 blog rewrite rules to paste into a Render service whose routes are set by hand
 ├─ worker/car-preview/            Cloudflare Worker behind "See it on my car" (not part of the website build): src/handler.ts, its tests, wrangler.toml, dev-server.mjs, README.md
 ├─ components/ui/                 Shared UI primitives (button, input, label, icons)
 ├─ lib/utils.ts                   `cn()` class-name helper used by those primitives
@@ -495,6 +497,7 @@ firebase deploy --only firestore:rules
 | `src/utils/llms.test.ts` | `llms.txt` shape, one link and price per in-stock wheel, contact details from the site config, no unbacked claims; the Ask AI links carry the question |
 | `src/data/blog.test.ts` | Four pillars of three or more articles; titles, descriptions and keywords; structure and length; every internal link resolves and no wheel page is hand-linked; no orphan articles; no typed price, size, offset, bolt pattern, lead time or phone number; no unbacked claim; catalogue-built text is correct and never reads "undefined"; blog path resolution |
 | `src/utils/blogSeo.test.ts` | Blog metadata and canonical URLs, noindex for unknown blog addresses, `BlogPosting`, `BreadcrumbList` and `FAQPage` data matching the page, the sitemap with `lastmod`, the RSS feed (and that the file on disk is current), prerendered article HTML, and `llms.txt` listing every article |
+| `src/utils/finishSwatch.test.ts` | Every colour a visitor can pick has paint numbers and so a matching swatch; a swatch is keyed by paint, matte or gloss name and size; with no WebGL a swatch is `null`, never a throw, and nothing is cached; the drawn stand-in is a lit ball in the finish colour |
 | `firestore.rules.test.ts` | Structure of the Firestore security rules |
 
 There are no browser-level tests. Check 3D and layout changes by hand on a phone-sized viewport before merging.
@@ -505,7 +508,7 @@ There are no browser-level tests. Check 3D and layout changes by hand on a phone
 
 | Host | Config file | How to deploy |
 | --- | --- | --- |
-| **Render** (static site, in use) | `render.yaml` | Already deployed as `forged-custom-wheels-gu3l`. To recreate it: Render dashboard → New → Blueprint → select this repository |
+| **Render** (static site, in use) | `render.yaml` | Already deployed (see [Two Render services](#two-render-services) below). To recreate it: Render dashboard → New → Blueprint → select this repository |
 | **Vercel** | `vercel.json` | Vercel dashboard → Add New → Project → import this repository |
 
 Both configurations install with `npm install --legacy-peer-deps`, run `npm run build`, publish `dist/`, apply the single-page rewrite, and cache fingerprinted assets for a year and models and images for a day. Every push to `main` redeploys.
@@ -513,6 +516,17 @@ Both configurations install with `npm install --legacy-peer-deps`, run `npm run 
 The page rules in `render.yaml` are written by the build. Do not edit the block between `BEGIN generated page routes` and `END generated page routes` by hand; run `bun run build` and commit the result.
 
 **After a deploy, check old links.** Twice, straight after a deploy, Render served an empty page for some removed addresses (for example `/client-fitments`). Redeploying once with the build cache cleared fixed it both times. The service also still carries rewrite rules from an earlier `render.yaml` that the file no longer controls; they can be tidied under Redirects/Rewrites in the Render dashboard.
+
+#### Two Render services
+
+Two Render static sites build this repository's `main` (found on 17 November 2026 by listing the services and requesting the same addresses on each):
+
+| Service | Address | What it does today |
+| --- | --- | --- |
+| **Forged Wheels** | `forged-custom-wheels-gu3l.onrender.com` | Its routes appear to have been set by hand in the dashboard, because it ignores the blog rules in `render.yaml`. Its behaviour matches `www.forgedsa.co.za`, so the custom domain appears to be attached to it |
+| **forged-custom-wheels-gu3l** | `forged-custom-wheels-gu3l-lfgl.onrender.com` | Follows `render.yaml`: every page in the sitemap, including the blog, is served from its own prerendered file |
+
+Because of this, **a new page is correct on the second service and wrong on the live domain until its rewrite rule is added to the first**. Today that affects the blog: its 17 addresses (`/blog`, four pillars, twelve articles) return the generic home-page title and no structured data to crawlers and link previews on the live domain; visitors still get the right page, because the app sets the title itself. The fix is either to move the custom domain to the second service (so everything follows `render.yaml` from then on) or to paste the rules in [docs/render-blog-rewrites.md](docs/render-blog-rewrites.md) into the first under Redirects/Rewrites. The Render MCP tools cannot edit routes or domains, so this is done in the dashboard. To check, `curl -s https://www.forgedsa.co.za/blog/wheel-care | grep '<title>'` should show "Forged wheel care", not "Forged wheels for BMW M cars in stock".
 
 **Checking a deploy.** Render's CDN caches each page's HTML for up to five minutes, so a visitor can see the previous version briefly after a deploy goes live. To check a new deploy straight away, add any query string to the URL, for example `/installs?check=1`.
 
@@ -549,7 +563,8 @@ Build chunks are split per vendor (`react`, `motion`, `three`, `firebase`, `luci
 | **Ask AI buttons** | The link formats follow each assistant's documented pattern; they have not been clicked through signed in | Test each once on the live site |
 | **Install details** | Each car's make, model and paint were read from its photo, not confirmed | Shop to confirm, then correct `jobs.json` |
 | **Leftovers from the starter** | `package.json` still lists `@google/genai`, `express` and `dotenv`, which no file imports. `.env.example`, `metadata.json` and a tracked `.aistudio/` folder (6 MB of screenshots) come from the same starter | Remove in one clean-up pull request |
-| **Automated checks** | Type check, 73 data tests and the build, all run by hand. No CI, no browser tests, and ESLint is not wired to a script | Run the three checks on every pull request with a CI workflow |
+| **Render routes** | Two Render services build `main`; the one that appears to carry the live domain ignores `render.yaml`, so the blog's addresses are not served from their prerendered files there (see [Two Render services](#two-render-services)) | Move the domain to the service that follows `render.yaml`, or add the rules in `docs/render-blog-rewrites.md` |
+| **Automated checks** | Type check, 192 tests in 18 files and the build, all run by hand. No CI, no browser tests, and ESLint is not wired to a script | Run the three checks on every pull request with a CI workflow |
 
 ## Contributing
 
