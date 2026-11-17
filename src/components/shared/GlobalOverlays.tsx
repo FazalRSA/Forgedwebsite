@@ -17,6 +17,10 @@ import { submitLead } from '../../utils/leads';
  * - If the workflow cannot be reached and there is no WhatsApp number, the text is saved in this
  *   browser only, and the dialog says so instead of claiming it was received.
  */
+/** What Tab can land on inside the dialog: links, buttons and the form fields that are not hidden. */
+const FOCUSABLE =
+  'a[href], button:not([disabled]), input:not([disabled]):not([tabindex="-1"]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 const inputClass =
   'w-full min-h-12 px-4 bg-[#141418] border border-[#26262E] text-[#EDEBE4] text-base rounded-xl focus:outline-none focus:border-[#F43F5E] transition-colors placeholder:text-neutral-500';
 const labelClass = 'block text-sm text-[#C2C2CC] mb-1.5';
@@ -47,17 +51,43 @@ const EnquiryDialog: React.FC = () => {
   const waConfigured = Boolean(whatsappLink());
   const phoneRequired = !waConfigured;
 
-  // Keep the page behind still, move focus into the dialog, and give focus back when it closes.
+  // Keep the page behind still, move focus into the dialog, keep it there while the dialog is open
+  // (Tab cycles, Escape closes from any field) and give focus back to the opener when it closes.
   useEffect(() => {
     const opener = document.activeElement as HTMLElement | null;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     dialogRef.current?.focus();
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        closeEnquiryModal();
+      } else if (event.key === 'Tab' && dialogRef.current) {
+        const items = Array.from(dialogRef.current.querySelectorAll<HTMLElement>(FOCUSABLE)).filter(
+          (item) => item.offsetParent !== null
+        );
+        if (items.length === 0) return;
+        const first = items[0];
+        const last = items[items.length - 1];
+        const active = document.activeElement;
+        const inside = active instanceof Node && dialogRef.current.contains(active);
+        if (event.shiftKey && (active === first || !inside || active === dialogRef.current)) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && (active === last || !inside)) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
     return () => {
+      window.removeEventListener('keydown', onKeyDown);
       document.body.style.overflow = previousOverflow;
       opener?.focus?.();
     };
-  }, []);
+  }, [closeEnquiryModal]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -128,9 +158,6 @@ const EnquiryDialog: React.FC = () => {
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm sm:p-4"
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) closeEnquiryModal();
-      }}
-      onKeyDown={(e) => {
-        if (e.key === 'Escape') closeEnquiryModal();
       }}
     >
       <div

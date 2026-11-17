@@ -60,7 +60,7 @@ function RouteLoadingFallback() {
     <div
       role="status"
       aria-label="Loading page"
-      className="min-h-[60vh] flex flex-col items-center justify-center p-8 bg-[#111111] text-[#EDEBE4]"
+      className="min-h-[100svh] flex flex-col items-center justify-center p-8 bg-[#111111] text-[#EDEBE4]"
     >
       <div className="relative flex items-center justify-center">
         <div className="w-10 h-10 rounded-full border-2 border-[#26262E] border-t-[#1D4ED8] animate-spin" />

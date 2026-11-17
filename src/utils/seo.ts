@@ -28,6 +28,9 @@ export const DEFAULT_SHARE_IMAGE = '/images/share/forged-wheels-share.jpg';
 /** Longest title that search results show without cutting it off. */
 const MAX_TITLE_LENGTH = 60;
 
+/** The home page section that lists the wheels in stock; the first crumb on every wheel page. */
+export const CATALOGUE_PATH = '/#catalogue';
+
 /**
  * The manufacturer of a wheel, when the stock sheet says who it is. Only Sixnine designs (codes
  * starting with FF) are attributed to a maker; other wheels return undefined rather than a guess.
@@ -36,7 +39,10 @@ export function wheelBrand(wheel: BrandWheelItem): string | undefined {
   return isSixnineWheel(wheel) ? 'Sixnine' : undefined;
 }
 
-/** Organization and WebSite structured data for the home page, built only from config/site.ts. */
+/**
+ * Organization and WebSite structured data for the home page, built only from config/site.ts. The
+ * phone number and street address appear only once they are filled in there.
+ */
 export function homeJsonLd(): Record<string, unknown> {
   const sameAs = [SITE.instagramUrl, SITE.facebookUrl].filter(Boolean);
   return {
@@ -48,6 +54,10 @@ export function homeJsonLd(): Record<string, unknown> {
         name: SITE.name,
         url: '/',
         areaServed: { '@type': 'Country', name: SITE.country },
+        ...(SITE.phoneDisplay ? { telephone: SITE.phoneDisplay } : {}),
+        ...(SITE.addressLine
+          ? { address: { '@type': 'PostalAddress', streetAddress: SITE.addressLine, addressCountry: 'ZA' } }
+          : {}),
         ...(sameAs.length ? { sameAs } : {}),
       },
       {
@@ -119,21 +129,33 @@ function wheelMeta(wheel: BrandWheelItem): PageMeta {
     image: image.startsWith('/') ? image : undefined,
     jsonLd: {
       '@context': 'https://schema.org',
-      '@type': 'Product',
-      name: `${wheel.model} forged wheel set`,
-      description,
-      ...(image.startsWith('/') ? { image } : {}),
-      ...(brand ? { brand: { '@type': 'Brand', name: brand } } : {}),
-      ...(wheel.modelCode ? { sku: wheel.modelCode } : {}),
-      url: path,
-      offers: {
-        '@type': 'Offer',
-        price: wheel.priceZAR,
-        priceCurrency: 'ZAR',
-        // Only in-stock listings have a page, so every offer is in stock.
-        availability: 'https://schema.org/InStock',
-        url: path,
-      },
+      '@graph': [
+        {
+          '@type': 'Product',
+          name: `${wheel.model} forged wheel set`,
+          description,
+          ...(image.startsWith('/') ? { image } : {}),
+          ...(brand ? { brand: { '@type': 'Brand', name: brand } } : {}),
+          ...(wheel.modelCode ? { sku: wheel.modelCode } : {}),
+          url: path,
+          offers: {
+            '@type': 'Offer',
+            price: wheel.priceZAR,
+            priceCurrency: 'ZAR',
+            // Only in-stock listings have a page, so every offer is in stock.
+            availability: 'https://schema.org/InStock',
+            url: path,
+          },
+        },
+        // Where the page sits: the wheels in stock on the home page, then this wheel.
+        {
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Wheels in stock', item: CATALOGUE_PATH },
+            { '@type': 'ListItem', position: 2, name: wheel.model, item: path },
+          ],
+        },
+      ],
     },
   };
 }
@@ -247,14 +269,14 @@ export function absoluteUrl(value: string, origin: string = SITE_ORIGIN): string
   return value.startsWith('/') ? `${origin}${value}` : value;
 }
 
-/** Copy of structured data with every site-relative `url`, `image` and `@id` made absolute. */
+/** Copy of structured data with every site-relative `url`, `image`, `item` and `@id` made absolute. */
 export function absolutiseJsonLd(
   jsonLd: Record<string, unknown>,
   origin: string = SITE_ORIGIN
 ): Record<string, unknown> {
   return JSON.parse(
     JSON.stringify(jsonLd, (key, value) =>
-      (key === 'url' || key === 'image' || key === '@id') && typeof value === 'string'
+      (key === 'url' || key === 'image' || key === '@id' || key === 'item') && typeof value === 'string'
         ? absoluteUrl(value, origin)
         : value
     )
