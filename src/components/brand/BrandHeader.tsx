@@ -13,6 +13,7 @@ const NAV_ITEMS = [
   { label: 'Wheels', to: '/#catalogue' },
   { label: 'Sixnine', to: '/sixnine-wheels' },
   { label: 'Installs', to: '/installs' },
+  { label: 'Blog', to: '/blog' },
   { label: 'Contact', to: '/contact' },
 ] as const;
 
