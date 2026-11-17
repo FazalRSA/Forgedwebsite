@@ -31,6 +31,8 @@ export interface WheelStudioProps {
   onSelectFinish: (finish: WheelFinishId) => void;
   /** The wheel's own finish name, e.g. "Black Matte"; a matte name gives the paint a matte sheen. */
   finishName?: string;
+  /** Names for chips in the finish row where the listing's own wording differs from the palette's ("Glossy Black"). */
+  finishNames?: Partial<Record<WheelFinishId, string>>;
   /** Served path to the wheel's .glb, e.g. "/models/wheels/stf399-front.glb". */
   modelUrl: string;
   /** Optional second model for the rear axle of a staggered set. */
@@ -49,7 +51,7 @@ export interface WheelStudioProps {
 }
 
 /** A catalogue finish as the viewer's row. `nameOverride` names the paint (a matte name flattens it). */
-function toStudioFinish(id: WheelFinishId, nameOverride?: string): StudioFinish | null {
+export function toStudioFinish(id: WheelFinishId, nameOverride?: string): StudioFinish | null {
   const option = WHEEL_FINISHES[id];
   if (!option) return null;
   const { hex, metalness, roughness, clearcoat, clearcoatRoughness, envMapIntensity } = getStudioFinish(id);
@@ -66,11 +68,12 @@ export const WheelStudio: React.FC<WheelStudioProps> = ({
   availableFinishes,
   onSelectFinish,
   finishName,
+  finishNames,
   ...rest
 }) => {
   const finishes = useMemo(
-    () => availableFinishes.map((id) => toStudioFinish(id)).filter((f): f is StudioFinish => !!f),
-    [availableFinishes]
+    () => availableFinishes.map((id) => toStudioFinish(id, finishNames?.[id])).filter((f): f is StudioFinish => !!f),
+    [availableFinishes, finishNames]
   );
   // The selected finish carries the wheel's own name for the matte reading ("Black Matte"); the row
   // keeps the catalogue's chip names.

@@ -17,6 +17,9 @@ On a wheel page the studio offers the listing's own finish and the design's to-o
 (`getToOrderFinishes` in `src/data/catalogue.ts`); the page shows the 3-month lead-time notice while a
 to-order colour is selected.
 
+A listing whose record names no `modelUrl` still opens in 3D when its design has a model in `MODEL_URL_BY_CODE`
+(`modelUrlForDesign` in `src/data/catalogue.ts`); a test fails if any in-stock listing ends up without one.
+
 ## How a wheel gets its model
 
 1. Export the rim as `public/models/wheels/<slug>.glb` where `<slug>` is the wheel's `slug` in
