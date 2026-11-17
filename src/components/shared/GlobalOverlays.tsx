@@ -3,6 +3,7 @@ import { CheckCircle2, MessageCircle, X } from 'lucide-react';
 import { SITE, telLink, whatsappLink } from '../../config/site';
 import { useForgedStore } from '../../store/useForgedStore';
 import { Link } from '../../utils/router';
+import { trackEvent } from '../../utils/analytics';
 import { submitLead } from '../../utils/leads';
 
 /**
@@ -132,6 +133,8 @@ const EnquiryDialog: React.FC = () => {
       website: honeypot,
     });
     setSending(false);
+    // Counted without any of the visitor's details: only whether it reached us and through which channel.
+    trackEvent('enquiry_sent', { delivered: result.delivered ? 'yes' : 'no', channel: href ? 'whatsapp' : 'form' });
 
     if (href) {
       window.open(href, '_blank', 'noopener,noreferrer');

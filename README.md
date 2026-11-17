@@ -9,7 +9,7 @@ It shows the wheels that are in stock, each in photography and an interactive 3D
 | | |
 | --- | --- |
 | **Live site** | [forged-custom-wheels-gu3l.onrender.com](https://forged-custom-wheels-gu3l.onrender.com) (Render, redeploys on every push to `main`) |
-| **Production domain** | `forgedsa.co.za` (set in `src/config/site.ts`). The domain still serves the business's existing WordPress site; its DNS has not been moved to this app yet |
+| **Production domain** | `forgedsa.co.za` (`SITE.domain` in `src/config/site.ts`), served from `www.forgedsa.co.za` (`SITE.host`). The bare domain redirects there with an HTTP 301, so canonical URLs, the sitemap and robots.txt all name the `www` host |
 | **Stack** | React 19 · TypeScript · Vite 8 · Tailwind CSS v4 · Three.js · Zustand |
 | **Type** | Static single-page app with client-side routing |
 | **Inventory** | 14 in-stock wheel listings across 6 designs, priced in South African Rand per set of four |
@@ -32,6 +32,7 @@ It shows the wheels that are in stock, each in photography and an interactive 3D
     - [Adding or correcting a customer install](#adding-or-correcting-a-customer-install)
 10. [3D wheel studio](#3d-wheel-studio)
 11. [Search and sharing](#search-and-sharing)
+    - [Search Console and visit statistics](#search-console-and-visit-statistics)
     - [For AI assistants and coding agents](#for-ai-assistants-and-coding-agents)
 12. [Business details and contact channels](#business-details-and-contact-channels)
 13. [Firebase](#firebase)
@@ -108,7 +109,7 @@ Two things look like setup and are not:
 | Script | What it does |
 | --- | --- |
 | `bun run dev` | Vite dev server on port 3000 |
-| `bun run build` | Five steps, in order: regenerate `public/sitemap.xml` and the page rules in `render.yaml` from the catalogue; build to `dist/`; write each page's own HTML file with its title and share image (`prerender-meta.ts`); write a redirect page for every removed address (`legacy-shells.ts`); write `dist/llms.txt` (`generate-llms.ts`) |
+| `bun run build` | Five steps, in order: regenerate `public/sitemap.xml`, `public/robots.txt` and the page rules in `render.yaml` from the catalogue and `SITE.host`; build to `dist/`; write each page's own HTML file with its title and share image (`prerender-meta.ts`); write a redirect page for every removed address (`legacy-shells.ts`); write `dist/llms.txt` (`generate-llms.ts`) |
 | `bun run preview` | Serves the production build locally |
 | `bun run lint` | Type-check with `tsc --noEmit` |
 | `bun run test` | Data, home-page design-card, SEO, redirect, business-details, `llms.txt`, 3D-studio and security-rules tests (`node:test` via `tsx`) |
@@ -169,7 +170,7 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
 │  └─ sitemap.xml                 Generated on every build
 ├─ scripts/
 │  ├─ add-wheel.ts                CLI that writes src/data/customWheels.json
-│  ├─ generate-sitemap.ts         Writes public/sitemap.xml and the page rules in render.yaml
+│  ├─ generate-sitemap.ts         Writes public/sitemap.xml, public/robots.txt and the page rules in render.yaml
 │  ├─ prerender-meta.ts           Bakes each page's title and share image into dist/
 │  ├─ legacy-shells.ts            Writes a redirect page for each address in legacy-pages.json
 │  ├─ legacy-pages.json           The removed addresses that still get a redirect page
@@ -341,12 +342,30 @@ A wheel with a `modelUrl` opens in the studio (`src/components/visuals/WheelStud
 All search metadata is produced by `src/utils/seo.ts` and applied on every route change.
 
 - **Titles and descriptions** per route, with titles capped at 60 characters. The home title is "Forged wheels for BMW M cars in stock | FORGED Custom Wheels".
-- **Canonical URLs** always on the production domain in `src/config/site.ts`.
+- **Canonical URLs** always on `SITE.host` in `src/config/site.ts`, the address the site is served from (`www.forgedsa.co.za`). The bare domain redirects to it, and a canonical or sitemap entry that redirects back to its own page confuses search engines, so a test checks the sitemap, `robots.txt` and `index.html` all use the same host.
 - **Link previews**: Open Graph and Twitter tags on every route. Link-preview bots and crawlers that do not run JavaScript read the same tags from each page's own HTML file, written by `scripts/prerender-meta.ts`. `index.html` keeps generic tags because it is also the fallback for unknown paths; the only thing the build adds to it is a preload for the hero wheel image (the first design card's cut-out, from the catalogue), so wide screens start fetching it before the JavaScript runs.
 - **Structured data**: `Organization` and `WebSite` on the home page; `Product` with the Rand price, in stock, on wheel pages.
 - **Sitemap**: `public/sitemap.xml` is regenerated from the catalogue on every build. It lists `/`, one page per in-stock wheel, `/installs`, `/sixnine-wheels`, `/contact` and `/privacy-policy`, and nothing else.
-- **Noindex**: admin, preview, sold or unknown wheels, and unknown addresses. `public/robots.txt` keeps crawlers out of `/admin` and `/studio/`.
+- **Noindex**: admin, preview, sold or unknown wheels, and unknown addresses. `public/robots.txt` (generated by `scripts/generate-sitemap.ts`, so its `Sitemap:` line cannot drift from the host) keeps crawlers out of `/admin` and `/studio/`.
 - **Crawlable navigation**: header, footer and catalogue links are real anchors (`Link` in `src/utils/router.tsx`).
+
+### Search Console and visit statistics
+
+Both are off until the site is given the values they need. Nothing is loaded or added to a page without them.
+
+**Google Search Console** shows how Google crawls and indexes the site.
+
+1. In Search Console choose *Add property*. The simplest is a **Domain property** for `forgedsa.co.za`: it covers `www` and the bare domain, `http` and `https`. Google shows a TXT record to add at the domain's DNS host; verify once it is there. This needs no code change (a Domain property can only be verified with a DNS record).
+2. If the DNS cannot be edited, add a **URL-prefix property** for `https://www.forgedsa.co.za/` and choose the *HTML tag* method. Copy the `content` value of the tag Google shows into `searchConsoleToken` in `src/config/site.ts`. The build adds the tag to the home page and to every page file; deploy, then press Verify. Leave the tag in place, because Google checks it again from time to time.
+3. Once verified, open *Sitemaps* and submit `https://www.forgedsa.co.za/sitemap.xml`. Use *URL inspection* on the home page and a wheel page to confirm Google can fetch and render them.
+
+**Visit statistics** use [Umami Cloud](https://umami.is), which sets no cookies and does not store visitors' IP addresses in its statistics. On its pricing page (read 17 November 2026) the free Hobby plan allows 100,000 events a month, one website and six months of history; check the page again before relying on those numbers.
+
+1. Create an Umami Cloud account and pick its data region (United States or European Union); the region cannot be changed afterwards.
+2. Add a website for `www.forgedsa.co.za`. On its *Tracking code* page copy the script address and the website ID (a UUID).
+3. Put them in `analyticsScriptUrl` and `analyticsWebsiteId` in `src/config/site.ts` and deploy. A test fails if only one is set, if the address is not `https`, or if the ID is not a UUID.
+
+How it behaves (`src/utils/analytics.ts`): the tracker is added once, after the page has loaded; it counts only `SITE.host` (not the Render address or a developer's localhost); it respects a browser's Do Not Track setting. Two events are counted, `enquiry_open` and `enquiry_sent` (with `delivered` yes or no, and the channel), each with the page address only. Never put a name, phone number, email or message in an event. The privacy notice describes the statistics and lists Umami as a recipient only while they are set up, and says there are none otherwise; both read the same check, so they cannot disagree.
 
 ### For AI assistants and coding agents
 
@@ -362,7 +381,7 @@ A value left empty is never shown: the related button falls back to the enquiry 
 
 **Partners.** The home page strip reads `src/data/partners.ts` and shows nothing when the list is empty. Add a partner only with the owner's confirmation that the logo may be shown.
 
-**Privacy notice.** `PrivacyPolicyPage` must describe the site as it is. If you add anything that collects, stores or sends visitor data (a form backend, analytics, cookies, a new third party), update the notice in the same pull request. A test fails if the notice mentions features the site no longer has.
+**Privacy notice.** `PrivacyPolicyPage` must describe the site as it is. If you add anything that collects, stores or sends visitor data (a form backend, analytics, cookies, a new third party), update the notice in the same pull request (the visit statistics are described only while they are set up in `src/config/site.ts`). A test fails if the notice mentions features the site no longer has.
 
 **Content rule.** Public copy states only what the business can evidence. Do not add certifications, warranty terms, delivery promises, response times, load ratings or dealer status without a source from the owner.
 
@@ -394,7 +413,7 @@ firebase deploy --only firestore:rules
 
 ## Testing
 
-`bun run test` runs eleven test files (96 tests) with `node:test`. The files are listed by name in the `test` script in `package.json`, so a new test file does not run until it is added there.
+`bun run test` runs thirteen test files (112 tests) with `node:test`. The files are listed by name in the `test` script in `package.json`, so a new test file does not run until it is added there.
 
 | Suite | Covers |
 | --- | --- |
@@ -404,9 +423,10 @@ firebase deploy --only firestore:rules
 | `src/utils/wheelImageSrcSet.test.ts` | The `srcset` for each wheel photo (site photos only; nothing for admin uploads or placeholders) and that every smaller copy exists on disk |
 | `src/utils/fitmentImageSrcSet.test.ts` | The `srcset` for the install thumbnails (800 px copy, then the original) and that every install photo has its 800 px copy on disk |
 | `src/utils/wheelStudioParts.test.ts` | Viewer part classification, exploded-view offsets, camera distance |
-| `src/utils/seo.test.ts` | Per-route metadata, canonical URLs, structured data, share images, sitemap (no removed route), `render.yaml` |
+| `src/utils/seo.test.ts` | Per-route metadata, canonical URLs, structured data, share images, sitemap (no removed route), `render.yaml`; that the sitemap, `robots.txt` and `index.html` all use the same host; the Search Console tag (added once, never from an unsafe token) |
+| `src/utils/analytics.test.ts` | Visit statistics are off until both values are set, refuse a non-https address or a malformed ID, add one tracker that counts only the production host and respects Do Not Track, and never let a tracker failure reach the page |
 | `src/utils/redirects.test.ts` | Old address to new address, `replaceState`, no loops, and every address in `scripts/legacy-pages.json` has a redirect |
-| `src/config/site.test.ts` | Published emails are empty or on the business domain; the privacy notice does not describe removed features |
+| `src/config/site.test.ts` | Published emails are empty or on the business domain; the host is the domain or `www.<domain>`; the statistics and Search Console values are well formed and set together; the privacy notice does not describe removed features |
 | `src/utils/llms.test.ts` | `llms.txt` shape, one link and price per in-stock wheel, contact details from the site config, no unbacked claims; the Ask AI links carry the question |
 | `firestore.rules.test.ts` | Structure of the Firestore security rules |
 
@@ -429,7 +449,7 @@ The page rules in `render.yaml` are written by the build. Do not edit the block 
 
 **Checking a deploy.** Render's CDN caches each page's HTML for up to five minutes, so a visitor can see the previous version briefly after a deploy goes live. To check a new deploy straight away, add any query string to the URL, for example `/installs?check=1`.
 
-**Moving the domain.** To go live on `forgedsa.co.za`, add it as a custom domain in the host's dashboard and point the DNS records it gives you at the domain registrar. Canonical URLs, the sitemap and `llms.txt` already use that domain, so their links only resolve to this site once the DNS change is done. If the domain's DNS is managed by the hosting provider (for example DirectAdmin), edit the A record for `@` and the CNAME for `www` there, remove any AAAA records, and leave the MX and mail records alone so email keeps working. The domain currently serves the business's existing WordPress site, which the DNS change replaces, so keep anything still needed from it first.
+**The domain.** `forgedsa.co.za` is live on the host as a custom domain: the `www` host serves the site and the bare domain redirects to it. To change it, edit the custom domain in the host's dashboard and the DNS records it gives you at the registrar (if the DNS is managed by the hosting provider, for example DirectAdmin, edit the A record for `@` and the CNAME for `www` there, remove any AAAA records, and leave the MX and mail records alone so email keeps working), then change `SITE.host` in `src/config/site.ts` so canonical URLs, the sitemap and `llms.txt` follow it.
 
 Vercel's free Hobby plan is for non-commercial use only, so a business site needs Vercel Pro. Render's static sites are free to deploy; check the bandwidth included with the workspace plan against traffic.
 
@@ -448,11 +468,11 @@ Build chunks are split per vendor (`react`, `motion`, `three`, `firebase`, `luci
 | **Lead delivery** | Every enquiry is posted to n8n, which logs it and emails the business (see [Lead delivery](#lead-delivery-n8n)); with a WhatsApp number set, the form also opens WhatsApp. The inbox is set inside the n8n workflow. | Route leads into a CRM from the same workflow |
 | **Contact channels** | Set in `src/config/site.ts`; any channel left empty there is hidden (Instagram, Facebook and trade email are empty today) | Fill in once confirmed |
 | **3D accuracy** | Five designs are traced from photos with simplified surfaces | Replace with scans of the physical wheels |
-| **Photography** | Five listings have no product photos and show a plain drawn stand-in (FSA002 Hyper Black and Polished Face, FSA003 Silver, FSA004 Hyper Black and Gloss Black) | Shoot and add |
+| **Photography** | Two listings have no product photos and show a plain drawn stand-in (FSA003 Silver and FSA004 Hyper Black) | Add their photos to the Drive folder, then run the studio-photo steps in [Adding or changing a wheel](#adding-or-changing-a-wheel) |
 | **Link previews** | The app is client-rendered; `npm run build` bakes each page's title and share image into its own HTML file so chat apps show the right preview for the pages in the sitemap | Server-render if more pages are added |
 | **Old links** | Redirected in the browser and by a redirect page per removed address, not with an HTTP 301 | Add 301 rules on the host |
 | **Unknown addresses** | Show the noindex not-found page, but the host still answers HTTP 200 | Return HTTP 404 from the host for unknown paths |
-| **Domain** | The new site is live only at its Render address; `forgedsa.co.za` still serves the old WordPress site | Move the domain's DNS to the host (see [Deployment](#deployment)) |
+| **Domain** | Live at `www.forgedsa.co.za`; the bare domain redirects to it. The Render address still answers too (its pages name the `www` host as canonical, and the visit statistics ignore it) | Keep the Render address, or point it at the custom domain in the host's dashboard |
 | **Admin publishing** | The uploader stores wheels locally; publishing is a data-file change and rebuild | Firebase-backed catalogue with authenticated admin writes |
 | **Stock** | Counts are edited in `INVENTORY_SEEDS` and need a rebuild | Read from the stock sheet |
 | **To-order colours** | Every design offers the same four swatch colours to order, with one lead time and no price | Confirm with the owner which colours each design can be ordered in, and their prices |

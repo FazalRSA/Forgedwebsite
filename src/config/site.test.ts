@@ -24,3 +24,19 @@ test('privacy notice does not describe features the site no longer has', () => {
   const hit = source.match(removed);
   assert.equal(hit, null, `privacy notice still mentions "${hit?.[0]}"`);
 });
+
+// Visit statistics and Search Console are set up from this file. A half-filled or malformed value
+// would silently do nothing, so the pairs are checked here.
+test('visit statistics are either fully set up or fully off, and the values are well formed', () => {
+  const { analyticsScriptUrl, analyticsWebsiteId, searchConsoleToken } = SITE;
+  assert.equal(Boolean(analyticsScriptUrl), Boolean(analyticsWebsiteId), 'set both analyticsScriptUrl and analyticsWebsiteId, or neither');
+  if (analyticsScriptUrl) {
+    assert.ok(analyticsScriptUrl.startsWith('https://'), 'analyticsScriptUrl must be https');
+    assert.match(analyticsWebsiteId, /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+  }
+  if (searchConsoleToken) assert.match(searchConsoleToken, /^[A-Za-z0-9_-]{16,128}$/);
+});
+
+test('the host is the domain or www.<domain>', () => {
+  assert.ok(SITE.host === SITE.domain || SITE.host === `www.${SITE.domain}`);
+});

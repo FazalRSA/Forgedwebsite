@@ -4,6 +4,7 @@ import { BrandHeader } from './BrandHeader';
 import { CTA_SECONDARY_CLASS } from './ContactCta';
 import { useRouter } from '../../utils/router';
 import { SITE, telLink, whatsappLink } from '../../config/site';
+import { analyticsScript } from '../../utils/analytics';
 
 /**
  * Responsible-party details published in the notice (POPIA s18(1)(b)).
@@ -18,7 +19,13 @@ const RESPONSIBLE_PARTY = {
   informationOfficerName: '',
 };
 
-const LAST_REVISED = '10 November 2026';
+const LAST_REVISED = '17 November 2026';
+
+/**
+ * Whether this site runs visit statistics (Umami). The notice describes them only when they are
+ * set up in config/site.ts, so it always matches what the site actually does.
+ */
+const STATISTICS = analyticsScript() !== null;
 
 const REGULATOR = {
   name: 'Information Regulator (South Africa)',
@@ -227,11 +234,29 @@ export const PrivacyPolicyPage: React.FC = () => {
                   logs for security and capacity purposes. Page fonts are loaded from Google Fonts, which
                   receives your IP address and browser details when a page loads.
                 </>,
+                ...(STATISTICS
+                  ? [
+                      <>
+                        <Strong>Visit statistics</Strong>: this website counts visits with Umami, a
+                        statistics service that does not use cookies. For each page you open it records the
+                        page address and title, any parameters in the web address, the website you came
+                        from, your browser, operating system and device type, screen size, language and your
+                        approximate location (country, region or city, worked out from your IP address,
+                        which is not kept in the statistics). It tells visits apart with a pseudonymous
+                        identifier made from a one-way hash of technical details and a salt that changes
+                        about once a month, so it can link your visits only within that time. If your
+                        browser sends a Do Not Track signal your visit is not counted. We also count, without
+                        any personal details, when the enquiry form is opened and when it is sent. We use
+                        these numbers to see which pages are used, not to identify you and not for
+                        advertising.
+                      </>,
+                    ]
+                  : []),
               ]}
             />
             <p className="pt-1">
-              We do not run accounts, sign-in or mailing lists, and we do not use advertising or
-              analytics trackers. We do not collect special personal information (such as health,
+              We do not run accounts, sign-in or mailing lists, and we do not use advertising
+              {STATISTICS ? ' trackers; the only statistics we keep are the visit counts described above' : ' or analytics trackers'}. We do not collect special personal information (such as health,
               religious or biometric data) or information about children. No law requires you to
               contact us; if you choose not to, we simply cannot answer your question.
             </p>
@@ -279,6 +304,17 @@ export const PrivacyPolicyPage: React.FC = () => {
                   <Strong>Our website providers</Strong>: Render hosts this website, and Google Fonts
                   supplies its typefaces (see section 02).
                 </>,
+                ...(STATISTICS
+                  ? [
+                      <>
+                        <Strong>Our visit-statistics service (Umami Software, Inc.)</Strong>: receives the
+                        visit information described in section 02 when a page loads and processes it for
+                        us under a data processing agreement. It stores the statistics in the region we
+                        chose when we set it up (the United States or the European Union) and may process
+                        them elsewhere.
+                      </>,
+                    ]
+                  : []),
                 <>
                   <Strong>Professional advisers and authorities</Strong>: only where the law requires
                   it, or to establish, exercise or defend legal claims.
@@ -289,7 +325,7 @@ export const PrivacyPolicyPage: React.FC = () => {
 
           <Section index="05" title="Transfers outside South Africa">
             <p>
-              Some of the providers in section 04, including Meta, Google, n8n and our hosting
+              Some of the providers in section 04, including Meta, Google, n8n{STATISTICS ? ', Umami' : ''} and our hosting
               provider, store and process information on servers outside South Africa. Section 72 of POPIA allows
               this where the recipient is subject to a law, binding corporate rules or a binding
               agreement that provides substantially similar protection to POPIA, where the transfer is
@@ -302,9 +338,9 @@ export const PrivacyPolicyPage: React.FC = () => {
           <Section index="06" title="Cookies and local storage">
             <p>
               This website does not set cookies. We do not use advertising, analytics or third-party
-              tracking cookies. The only thing kept in your browser&apos;s local storage is a copy of an
-              enquiry that could not be sent to us, so that it is not lost; it stays on your device and
-              is never read by us. When you open WhatsApp from this website, WhatsApp applies its own
+              tracking cookies.{STATISTICS ? ' The visit statistics described in section 02 work without cookies.' : ''} This website keeps one small entry in your browser&apos;s local storage. It
+              holds only a copy of an enquiry that could not be sent to us, so that it is not lost, and
+              is empty otherwise; it stays on your device and is never read by us. When you open WhatsApp from this website, WhatsApp applies its own
               cookie and privacy practices.
             </p>
           </Section>

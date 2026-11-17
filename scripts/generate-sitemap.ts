@@ -1,19 +1,30 @@
 /**
- * Writes public/sitemap.xml from the catalogue data, for the domain in src/config/site.ts.
+ * Writes public/sitemap.xml from the catalogue data, for the host in src/config/site.ts, and
+ * public/robots.txt (which names that sitemap).
  * Runs before every production build (see "build" in package.json), so the sitemap always
  * lists the home page, one page per wheel that is in stock, /installs, /contact and /privacy-policy.
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { buildSitemapXml, sitemapPaths, withRenderPageRoutes } from '../src/utils/seo';
+import { buildRobotsTxt, buildSitemapXml, sitemapPaths, withRenderPageRoutes } from '../src/utils/seo';
 
-const out = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'public', 'sitemap.xml');
+const publicDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'public');
+const out = path.join(publicDir, 'sitemap.xml');
 try {
   writeFileSync(out, buildSitemapXml());
   console.log(`sitemap: wrote ${sitemapPaths().length} URLs to ${out}`);
 } catch (err) {
   console.error(`sitemap: could not write ${out}:`, err);
+  process.exit(1);
+}
+
+const robotsOut = path.join(publicDir, 'robots.txt');
+try {
+  writeFileSync(robotsOut, buildRobotsTxt());
+  console.log(`sitemap: wrote ${robotsOut}`);
+} catch (err) {
+  console.error(`sitemap: could not write ${robotsOut}:`, err);
   process.exit(1);
 }
 

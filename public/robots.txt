@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin
 Disallow: /studio/
 
-Sitemap: https://forgedsa.co.za/sitemap.xml
+Sitemap: https://www.forgedsa.co.za/sitemap.xml
