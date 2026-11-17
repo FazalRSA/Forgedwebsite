@@ -2,6 +2,7 @@
  * Plain-text helpers for the wheel page and the enquiry form: reading the spec line from the stock
  * sheet and wording the enquiry. Kept free of React so they can be unit tested.
  */
+import { formatSizes } from './designCards';
 
 export interface TechnicalSpecs {
   /** Bolt pattern, e.g. "5×112". */
@@ -40,15 +41,16 @@ export interface WheelEnquiryFacts {
   design: string;
   /** The wheel's own finish name, e.g. "Gold". */
   finish: string;
-  /** e.g. "20 inch / 21 inch". */
+  /** As the stock sheet writes it, e.g. "20 inch / 21 inch"; shown as 20" / 21" like the cards. */
   sizes?: string;
   /** Already formatted, e.g. "R 75,000". */
   price: string;
 }
 
-/** "FSA002 in Gold (20 inch / 21 inch), R 75,000 per set of 4": what the enquiry is about. */
+/** "FSA002 in Gold (20\" / 21\"), R 75,000 per set of 4": what the enquiry is about. */
 export function describeWheelForEnquiry({ design, finish, sizes, price }: WheelEnquiryFacts): string {
-  const sizePart = sizes ? ` (${sizes})` : '';
+  const formatted = formatSizes(sizes);
+  const sizePart = formatted ? ` (${formatted})` : '';
   return `${design} in ${finish}${sizePart}, ${price} per set of 4`;
 }
 

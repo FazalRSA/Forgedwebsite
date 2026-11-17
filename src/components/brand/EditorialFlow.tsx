@@ -22,7 +22,7 @@ export const EditorialFlow: React.FC = () => {
   const facts: { value: number; label: string }[] = [];
   if (wheels.length > 0) {
     facts.push({ value: designCount, label: designCount === 1 ? 'design in stock' : 'designs in stock' });
-    facts.push({ value: wheels.length, label: wheels.length === 1 ? 'wheel to choose from' : 'wheels to choose from' });
+    facts.push({ value: wheels.length, label: wheels.length === 1 ? 'set to choose from' : 'sets to choose from' });
   }
   if (CLIENT_FITMENTS.length > 0) {
     facts.push({

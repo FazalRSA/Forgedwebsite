@@ -46,8 +46,6 @@ export interface DesignCard {
   priceLine: string;
   finishes: string[];
   sizes: string[];
-  /** The card link's accessible name. */
-  label: string;
 }
 
 /** Group in-stock listings into one card per design, in the order the designs first appear. */
@@ -79,7 +77,6 @@ export function buildDesignCards(wheels: BrandWheelItem[]): DesignCard[] {
       priceLine,
       finishes,
       sizes,
-      label: `${design}, ${badge.toLowerCase()}, ${priceLine.replace(/^From /, 'from ')}`,
     };
   });
 }

@@ -17,9 +17,19 @@ import {
   type DesignCard as DesignCardData,
   type DesignCardWidth,
 } from '../../utils/designCards';
+import { wheelImageSrcSet } from '../../utils/wheelImageSrcSet';
 import { ContactCta, CTA_SECONDARY_CLASS } from './ContactCta';
 
 export { designOf };
+
+/**
+ * How wide each wheel picture is drawn, so the browser can pick the smallest copy that fills it
+ * (see wheelImageSrcSet). Measured in the built site at 390, 768 and 1440 px wide.
+ */
+// WheelCard: two columns on phones and tablets, three from 1024 px, inside the 1280 px container.
+const WHEEL_CARD_SIZES = '(min-width:1280px) 384px, (min-width:1024px) 31vw, (min-width:640px) 45vw, 46vw';
+// DesignCard: the wheel is 66-70% of the card's height; the card is one column on phones, two on tablets.
+const DESIGN_CARD_SIZES = '(min-width:1280px) 350px, (min-width:1024px) 25vw, (min-width:640px) 37vw, 61vw';
 
 /** A plain wheel outline, used wherever a listing has no real photo yet. */
 const WheelOutline: React.FC<{ className?: string }> = ({ className }) => (
@@ -46,7 +56,7 @@ export const WheelCard: React.FC<{ wheel: BrandWheelItem; index: number }> = ({ 
         <div className="aspect-square overflow-hidden rounded-xl bg-[#F0F0F1]">
           {hasPhoto ? (
             <img
-              src={photo}
+              {...wheelImageSrcSet(photo, WHEEL_CARD_SIZES)}
               alt={`Forged wheel, ${design}${finish ? ` in ${finish}` : ''}`}
               width={800}
               height={800}
@@ -119,7 +129,7 @@ const DesignCard: React.FC<{
     <li className={`${WIDTH_CLASSES[width]} ${fillTabletRow ? 'sm:col-span-2' : ''}`}>
       <Link
         to={`/wheels/${card.representative.slug}`}
-        aria-label={card.label}
+        // No aria-label: the link is named by its own text, in reading order (badge, design, price, finishes).
         className={`group relative block overflow-hidden rounded-3xl border border-[#26262E] bg-[#18181D] aspect-square ${fillTabletRow ? 'sm:aspect-[16/10]' : 'sm:aspect-[4/5]'} ${SHAPE_CLASSES[width]}`}
       >
         {/* A soft lighter glow behind the wheel. */}
@@ -140,7 +150,7 @@ const DesignCard: React.FC<{
         >
           {image ? (
             <img
-              src={image}
+              {...wheelImageSrcSet(image, DESIGN_CARD_SIZES)}
               alt=""
               width={1000}
               height={1000}
@@ -224,8 +234,8 @@ export const WheelCatalogue: React.FC = () => {
           <ContactCta
             message="Hi, what wheels do you have available?"
             enquirySubject="Which wheels are available?"
-            label="Ask on WhatsApp"
-            fallbackLabel="Ask what is available"
+            label="Enquire on WhatsApp"
+            fallbackLabel="Send an enquiry"
             className={CTA_SECONDARY_CLASS}
           />
         </div>

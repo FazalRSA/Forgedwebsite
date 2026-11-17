@@ -164,8 +164,8 @@ const InstallLightbox: React.FC<{ fitment: ClientFitment; onClose: () => void }>
               <ContactCta
                 message={fitmentMessage(fitment)}
                 enquirySubject={`Ask about this setup: ${title} (${wheels})`}
-                label="Ask about this setup"
-                fallbackLabel="Ask about this setup"
+                label="Enquire on WhatsApp"
+                fallbackLabel="Send an enquiry"
                 onActivate={onClose}
                 className={CTA_PRIMARY_CLASS}
               />
@@ -210,7 +210,7 @@ export const ClientFitmentsPage: React.FC = () => {
           Installs
         </h1>
         <p className="mt-3 max-w-xl text-neutral-300">
-          Customer cars on our wheels. Tap a car for photos and to ask about the setup.
+          Customer cars we have fitted. Tap a car for photos and to ask about the setup.
         </p>
 
         {FITMENT_FAMILIES.length > 1 && (

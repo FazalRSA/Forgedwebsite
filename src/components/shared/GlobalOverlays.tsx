@@ -6,7 +6,7 @@ import { Link } from '../../utils/router';
 import { submitLead } from '../../utils/leads';
 
 /**
- * The enquiry form. Short on purpose: a message and a phone number (name is optional).
+ * The enquiry form. Short on purpose: a message and a phone number (car, email and name are optional).
  *
  * Where the enquiry goes:
  * - Every submission is posted to the n8n lead workflow (src/utils/leads.ts), which logs it,
@@ -30,6 +30,7 @@ const EnquiryDialog: React.FC = () => {
   // the FSA002 in Gold ..."); from anywhere else it is a short topic, which still makes a fair start.
   const [message, setMessage] = useState(enquiryModal.subject);
   const [phone, setPhone] = useState('');
+  const [car, setCar] = useState('');
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [honeypot, setHoneypot] = useState('');
@@ -78,6 +79,7 @@ const EnquiryDialog: React.FC = () => {
     setError(null);
 
     const lines = [text];
+    if (car.trim()) lines.push(`Car: ${car.trim()}`);
     if (name.trim()) lines.push(`Name: ${name.trim()}`);
     if (phone.trim()) lines.push(`Phone: ${phone.trim()}`);
     const href = whatsappLink(lines.join('\n'));
@@ -91,6 +93,7 @@ const EnquiryDialog: React.FC = () => {
       subject: enquiryModal.subject || 'Website enquiry',
       partNo: enquiryModal.partNo,
       finish: enquiryModal.finish,
+      vehicle: car.trim(),
       notes: text,
       details: {
         priceZAR: enquiryModal.priceZAR ? String(enquiryModal.priceZAR) : '',
@@ -142,11 +145,11 @@ const EnquiryDialog: React.FC = () => {
           <h2 id="enquiry-title" className="text-xl font-semibold tracking-tight text-white">
             {done
               ? done.whatsappHref
-                ? 'Almost there'
+                ? 'Now tap Send in WhatsApp'
                 : done.reference
                   ? 'Enquiry sent'
                   : 'Saved on this device'
-              : 'Send an enquiry'}
+              : 'Send your enquiry'}
           </h2>
           <button
             type="button"
@@ -175,9 +178,13 @@ const EnquiryDialog: React.FC = () => {
                   <MessageCircle className="w-5 h-5" aria-hidden="true" />
                   Open WhatsApp
                 </a>
-                {done.reference && (
+                {done.reference ? (
                   <p className="text-xs text-neutral-400" data-testid="enquiry-reference">
                     We have also logged your enquiry as reference {done.reference}.
+                  </p>
+                ) : (
+                  <p className="text-xs text-neutral-400" data-testid="enquiry-undelivered">
+                    We could not log this enquiry, so WhatsApp is the only copy. Please do send it.
                   </p>
                 )}
               </>
@@ -220,7 +227,7 @@ const EnquiryDialog: React.FC = () => {
           <form onSubmit={handleSubmit} className="pt-4 space-y-4" noValidate>
             <div>
               <label htmlFor="enq-message" className={labelClass}>
-                Your message
+                Your message (required)
               </label>
               <textarea
                 id="enq-message"
@@ -244,6 +251,21 @@ const EnquiryDialog: React.FC = () => {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="082 000 0000"
+                className={inputClass}
+              />
+            </div>
+
+            <div>
+              <label htmlFor="enq-car" className={labelClass}>
+                Your car (optional)
+              </label>
+              <input
+                id="enq-car"
+                type="text"
+                autoComplete="off"
+                value={car}
+                onChange={(e) => setCar(e.target.value)}
+                placeholder="e.g. G80 M3"
                 className={inputClass}
               />
             </div>
@@ -303,7 +325,7 @@ const EnquiryDialog: React.FC = () => {
               className={`${primaryButtonClass} disabled:opacity-60 disabled:cursor-wait`}
             >
               {waConfigured && !sending && <MessageCircle className="w-5 h-5" aria-hidden="true" />}
-              {sending ? 'Sending…' : waConfigured ? 'Send on WhatsApp' : 'Send enquiry'}
+              {sending ? 'Sending…' : waConfigured ? 'Send on WhatsApp' : 'Send an enquiry'}
             </button>
 
             <p className="text-xs text-neutral-400 text-center">
@@ -313,7 +335,7 @@ const EnquiryDialog: React.FC = () => {
                 onClick={closeEnquiryModal}
                 className="underline underline-offset-2 hover:text-white"
               >
-                privacy policy
+                privacy notice
               </Link>
               .
             </p>

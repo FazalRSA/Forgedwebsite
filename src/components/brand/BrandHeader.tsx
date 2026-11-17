@@ -90,8 +90,8 @@ export const BrandHeader: React.FC<BrandHeaderProps> = () => {
           <ContactCta
             message={HEADER_MESSAGE}
             enquirySubject="Wheel enquiry"
-            label="WhatsApp"
-            fallbackLabel="Enquire"
+            label="Enquire"
+            fallbackLabel="Send an enquiry"
             onActivate={closeMenu}
             className={HEADER_CTA_CLASS}
           />

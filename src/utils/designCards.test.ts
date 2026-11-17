@@ -51,8 +51,6 @@ test('one card per design, in catalogue order, with facts from the data', () => 
       card.badge,
       card.listings.length > 1 ? `${card.listings.length} finishes in stock` : 'In stock'
     );
-    assert.ok(card.label.startsWith(`${card.design}, `));
-    assert.ok(card.label.includes(formatZAR(min)));
     if (card.photo) assert.ok(!card.photo.startsWith('data:'));
   }
 });

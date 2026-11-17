@@ -146,7 +146,7 @@ export const PrivacyPolicyPage: React.FC = () => {
           </div>
 
           <h1 className="text-4xl sm:text-5xl font-normal tracking-[-0.03em] text-white">
-            Privacy Notice.
+            Privacy notice
           </h1>
 
           <div className="flex flex-wrap items-center gap-4 text-xs font-tech-mono text-neutral-400">
@@ -207,7 +207,8 @@ export const PrivacyPolicyPage: React.FC = () => {
                 <>
                   <Strong>The enquiry form</Strong>: when you send an enquiry from this website we
                   receive your message, the wheel it is about, your phone number and, if you add them,
-                  your name and email address, together with the page you sent it from and the time.
+                  your car, your name and email address, together with the page you sent it from and the
+                  time.
                   The form passes this to our automation service (see section 04), which records it,
                   emails it to us and, if you gave an email address, sends you a receipt with a
                   reference number. If you have WhatsApp, the form then opens WhatsApp with the same
