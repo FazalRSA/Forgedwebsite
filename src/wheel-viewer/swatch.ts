@@ -103,47 +103,49 @@ function drawSwatches(batch: Pending[]): string[] {
   renderer.toneMappingExposure = 1.0;
   renderer.setClearColor(0x000000, 0);
 
-  const scene = new THREE.Scene();
-  const env = buildStudioEnvironment(renderer);
-  scene.environment = env;
-  const keyLight = new THREE.DirectionalLight(0xffffff, 3.8);
-  keyLight.position.set(1.2, 2.2, 1.0);
-  scene.add(keyLight);
-  scene.add(new THREE.HemisphereLight(0xffffff, 0x8a8f98, 1.4));
-
-  const geometry = new THREE.SphereGeometry(1, 96, 64);
-  // A little above and to the side, so the overhead softbox and a side strip both land on the ball.
-  const camera = new THREE.PerspectiveCamera(22, 1, 0.1, 20);
-  camera.position.set(0.55, 0.9, 4.6);
-  camera.lookAt(0, 0, 0);
-
+  let env: THREE.Texture | null = null;
+  let geometry: THREE.SphereGeometry | null = null;
   const urls: string[] = [];
-  const made = new Map<string, string>();
   try {
+    const scene = new THREE.Scene();
+    env = buildStudioEnvironment(renderer);
+    scene.environment = env;
+    const keyLight = new THREE.DirectionalLight(0xffffff, 3.8);
+    keyLight.position.set(1.2, 2.2, 1.0);
+    scene.add(keyLight);
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x8a8f98, 1.4));
+
+    geometry = new THREE.SphereGeometry(1, 96, 64);
+    // A little above and to the side, so the overhead softbox and a side strip both land on the ball.
+    const camera = new THREE.PerspectiveCamera(22, 1, 0.1, 20);
+    camera.position.set(0.55, 0.9, 4.6);
+    camera.lookAt(0, 0, 0);
+
     for (const { finish, size, paint } of batch) {
       const key = swatchKey(finish, size);
       const cache = cacheFor(paint);
-      const done = cache.get(key) ?? made.get(key);
+      const done = cache.get(key);
       if (done) {
         urls.push(done);
         continue;
       }
-      const px = Math.round(size * pixelRatio);
-      renderer.setSize(px, px, false);
+      renderer.setSize(Math.round(size * pixelRatio), Math.round(size * pixelRatio), false);
       const material = paint.create(THREE.FrontSide, 1, finish);
       const ball = new THREE.Mesh(geometry, material);
       scene.add(ball);
-      renderer.render(scene, camera);
-      const url = renderer.domElement.toDataURL('image/png');
-      scene.remove(ball);
-      material.dispose();
-      made.set(key, url);
-      cache.set(key, url);
-      urls.push(url);
+      try {
+        renderer.render(scene, camera);
+        const url = renderer.domElement.toDataURL('image/png');
+        cache.set(key, url);
+        urls.push(url);
+      } finally {
+        scene.remove(ball);
+        material.dispose();
+      }
     }
   } finally {
-    geometry.dispose();
-    env.dispose();
+    geometry?.dispose();
+    env?.dispose();
     renderer.dispose();
     renderer.forceContextLoss();
   }
