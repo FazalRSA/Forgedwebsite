@@ -2,12 +2,13 @@
  * Writes public/sitemap.xml from the catalogue data, for the host in src/config/site.ts, and
  * public/robots.txt (which names that sitemap).
  * Runs before every production build (see "build" in package.json), so the sitemap always
- * lists the home page, one page per wheel that is in stock, /installs, /contact and /privacy-policy.
+ * lists the home page, one page per wheel that is in stock, the blog (hub, pillars, articles), /installs, /contact and /privacy-policy.
  */
-import { readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { buildRobotsTxt, buildSitemapXml, sitemapPaths, withRenderPageRoutes } from '../src/utils/seo';
+import { SITE_ORIGIN, buildRobotsTxt, buildSitemapXml, sitemapPaths, withRenderPageRoutes } from '../src/utils/seo';
+import { buildBlogFeedXml } from '../src/utils/blogSeo';
 
 const publicDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'public');
 const out = path.join(publicDir, 'sitemap.xml');
@@ -25,6 +26,17 @@ try {
   console.log(`sitemap: wrote ${robotsOut}`);
 } catch (err) {
   console.error(`sitemap: could not write ${robotsOut}:`, err);
+  process.exit(1);
+}
+
+// The blog's RSS feed, at /blog/feed.xml.
+const feedOut = path.join(publicDir, 'blog', 'feed.xml');
+try {
+  mkdirSync(path.dirname(feedOut), { recursive: true });
+  writeFileSync(feedOut, buildBlogFeedXml(SITE_ORIGIN));
+  console.log(`sitemap: wrote ${feedOut}`);
+} catch (err) {
+  console.error(`sitemap: could not write ${feedOut}:`, err);
   process.exit(1);
 }
 

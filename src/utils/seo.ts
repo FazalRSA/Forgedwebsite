@@ -8,6 +8,7 @@ import {
 } from '../data/catalogue';
 import { SITE } from '../config/site';
 import { normalizePath } from './redirects';
+import { blogLastmod, blogMetaForPath, blogSitemapPaths } from './blogSeo';
 
 /**
  * Per-page metadata for search engines and link previews.
@@ -201,6 +202,10 @@ export function metaForPath(rawPath: string): PageMeta {
       break;
   }
 
+  // The blog: the hub, each content pillar and each article. An unknown blog address falls through to "not found".
+  const blog = blogMetaForPath(path);
+  if (blog) return blog;
+
   if (path.startsWith('/admin') || path.startsWith('/studio/')) {
     return hidden(path);
   }
@@ -337,11 +342,12 @@ export function applyPageMeta(meta: PageMeta, origin: string = SITE_ORIGIN): voi
   if (!existing) document.head.appendChild(script);
 }
 
-/** Every indexable page path: the home page, one page per in-stock wheel, installs, the Sixnine dealer page, contact and the privacy notice. */
+/** Every indexable page path: the home page, one page per in-stock wheel, the blog (hub, pillars, articles), installs, the Sixnine dealer page, contact and the privacy notice. */
 export function sitemapPaths(): string[] {
   const candidates = [
     '/',
     ...getAllBrandWheels().map((w) => `/wheels/${w.slug}`),
+    ...blogSitemapPaths(),
     '/installs',
     '/sixnine-wheels',
     '/contact',
@@ -358,7 +364,11 @@ export function sitemapPaths(): string[] {
 /** sitemap.xml for the production host in config/site.ts. */
 export function buildSitemapXml(origin: string = SITE_ORIGIN): string {
   const urls = sitemapPaths()
-    .map((path) => `  <url><loc>${origin}${path === '/' ? '/' : path}</loc></url>`)
+    .map((path) => {
+      // Only blog pages carry a date: it is the date of the article, not the date of the build.
+      const lastmod = blogLastmod(path);
+      return `  <url><loc>${origin}${path === '/' ? '/' : path}</loc>${lastmod ? `<lastmod>${lastmod}</lastmod>` : ''}</url>`;
+    })
     .join('\n');
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
 }
