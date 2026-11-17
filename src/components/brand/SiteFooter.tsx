@@ -9,6 +9,7 @@ import { SocialButtons } from '../shared/SocialIcon';
 const FOOTER_LINKS = [
   { label: 'Wheels', to: '/#catalogue' },
   { label: 'Installs', to: '/installs' },
+  { label: 'Blog', to: '/blog' },
   { label: 'Contact', to: '/contact' },
   { label: 'Privacy notice', to: '/privacy-policy' },
 ] as const;

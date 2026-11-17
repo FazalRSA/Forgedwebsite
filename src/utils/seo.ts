@@ -8,6 +8,7 @@ import {
 } from '../data/catalogue';
 import { SITE, socialLinks } from '../config/site';
 import { normalizePath } from './redirects';
+import { blogLastmod, blogMetaForPath, blogSitemapPaths } from './blogSeo';
 
 /**
  * Per-page metadata for search engines and link previews.
@@ -104,6 +105,42 @@ function page(title: string, description: string, canonicalPath: string, noindex
   return { title: withSite.length <= MAX_TITLE_LENGTH ? withSite : title, description, canonicalPath, noindex };
 }
 
+/**
+ * Structured data for the site's plain pages (installs, the Sixnine dealer page, contact, privacy):
+ * the kind of page it is, and where it sits (Home, then this page), so search results can show the path.
+ */
+function innerPageJsonLd(
+  type: 'CollectionPage' | 'ContactPage' | 'WebPage',
+  name: string,
+  description: string,
+  path: string
+): Record<string, unknown> {
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      { '@type': type, name, description, url: path, inLanguage: 'en-ZA', isPartOf: { '@type': 'WebSite', name: SITE_NAME, url: '/' } },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: '/' },
+          { '@type': 'ListItem', position: 2, name, item: path },
+        ],
+      },
+    ],
+  };
+}
+
+/** A plain page's metadata with its structured data attached. */
+function plainPage(
+  type: 'CollectionPage' | 'ContactPage' | 'WebPage',
+  crumb: string,
+  title: string,
+  description: string,
+  path: string
+): PageMeta {
+  return { ...page(title, description, path), jsonLd: innerPageJsonLd(type, crumb, description, path) };
+}
+
 function wheelMeta(wheel: BrandWheelItem): PageMeta {
   const path = `/wheels/${wheel.slug}`;
   const facts = [
@@ -178,28 +215,38 @@ export function metaForPath(rawPath: string): PageMeta {
 
   switch (path) {
     case '/installs':
-      return page(
+      return plainPage(
+        'CollectionPage',
+        'Installs',
         'Customer installs',
         'Customer cars on forged wheel sets, shown as studio re-shoots of each customer’s own photo.',
         path
       );
     case '/sixnine-wheels':
-      return page(
+      return plainPage(
+        'WebPage',
+        'Sixnine Wheels dealer',
         'Official Sixnine Wheels dealer',
         `${SITE_NAME} is an official dealer of Sixnine Wheels, the German wheel brand. See every forged Sixnine FF set in stock, with sizes and Rand prices.`,
         path
       );
     case '/contact':
-      return page(
+      return plainPage(
+        'ContactPage',
+        'Contact',
         'Contact us about forged wheels',
         'Ask about forged wheels for your BMW M car. Send your model and the wheels you like.',
         path
       );
     case '/privacy-policy':
-      return page('Privacy notice', `How ${SITE_NAME} collects, uses and protects personal information.`, path);
+      return plainPage('WebPage', 'Privacy notice', 'Privacy notice', `How ${SITE_NAME} collects, uses and protects personal information.`, path);
     default:
       break;
   }
+
+  // The blog: the hub, each content pillar and each article. An unknown blog address falls through to "not found".
+  const blog = blogMetaForPath(path);
+  if (blog) return blog;
 
   if (path.startsWith('/admin') || path.startsWith('/studio/')) {
     return hidden(path);
@@ -337,11 +384,12 @@ export function applyPageMeta(meta: PageMeta, origin: string = SITE_ORIGIN): voi
   if (!existing) document.head.appendChild(script);
 }
 
-/** Every indexable page path: the home page, one page per in-stock wheel, installs, the Sixnine dealer page, contact and the privacy notice. */
+/** Every indexable page path: the home page, one page per in-stock wheel, the blog (hub, pillars, articles), installs, the Sixnine dealer page, contact and the privacy notice. */
 export function sitemapPaths(): string[] {
   const candidates = [
     '/',
     ...getAllBrandWheels().map((w) => `/wheels/${w.slug}`),
+    ...blogSitemapPaths(),
     '/installs',
     '/sixnine-wheels',
     '/contact',
@@ -358,7 +406,11 @@ export function sitemapPaths(): string[] {
 /** sitemap.xml for the production host in config/site.ts. */
 export function buildSitemapXml(origin: string = SITE_ORIGIN): string {
   const urls = sitemapPaths()
-    .map((path) => `  <url><loc>${origin}${path === '/' ? '/' : path}</loc></url>`)
+    .map((path) => {
+      // Only blog pages carry a date: it is the date of the article, not the date of the build.
+      const lastmod = blogLastmod(path);
+      return `  <url><loc>${origin}${path === '/' ? '/' : path}</loc>${lastmod ? `<lastmod>${lastmod}</lastmod>` : ''}</url>`;
+    })
     .join('\n');
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
 }

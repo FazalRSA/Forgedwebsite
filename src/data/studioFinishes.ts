@@ -17,23 +17,24 @@ export interface StudioFinishPBR {
 }
 
 export const STUDIO_FINISH_PBR: Record<WheelFinishId, StudioFinishPBR> = {
-  // Silver / Liquid Metal: bright metallic silver under a light clear coat.
+  // Silver / Liquid Metal: polished, bright metallic silver under a crisp clear coat.
   silver: {
-    hex: '#d9dce1',
+    hex: '#e4e7ec',
     metalness: 1.0,
-    roughness: 0.2,
-    clearcoat: 0.6,
-    clearcoatRoughness: 0.08,
-    envMapIntensity: 1.1,
-  },
-  // Black Matte / Gloss Black: near-black paint with a soft clear coat.
-  'satin-black': {
-    hex: '#08080a',
-    metalness: 0.3,
-    roughness: 0.22,
+    roughness: 0.13,
     clearcoat: 0.8,
-    clearcoatRoughness: 0.12,
-    envMapIntensity: 1.1,
+    clearcoatRoughness: 0.04,
+    envMapIntensity: 1.35,
+  },
+  // Black Matte / Gloss Black: deep black paint under a full gloss coat. A matte listing name
+  // ("Black Matte") flattens this in the viewer, so the one row serves both.
+  'satin-black': {
+    hex: '#0a0a0c',
+    metalness: 0.35,
+    roughness: 0.3,
+    clearcoat: 1.0,
+    clearcoatRoughness: 0.03,
+    envMapIntensity: 1.3,
   },
   // Gold / Pure Bronze: warm metallic.
   'champagne-bronze': {

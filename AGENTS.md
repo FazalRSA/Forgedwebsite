@@ -51,6 +51,7 @@ Run the type check, the tests and the build before you open a pull request. All 
 - `src/config/site.ts`: business details.
 - `src/data/catalogue.ts`: wheel listings and stock. `src/data/clientFitments.ts`: installs.
   `src/data/partners.ts`: partner logos.
+- `worker/car-preview/`: the Cloudflare Worker behind "See it on my car" (deployed by the owner, not by Render). The feature stays off while `SITE.carPreviewUrl` is empty; never commit a local address there. `src/utils/carPreview.ts` and `CarPreviewDialog.tsx` are the website side.
 - `src/utils/seo.ts`: page titles, descriptions, sitemap paths. `src/utils/redirects.ts`: old
   addresses. `src/utils/llms.ts`: `llms.txt`. `src/utils/askAi.ts`: the "Ask AI about us" links.
 - `src/utils/router.tsx`: the client-side router. Routes are matched in `src/App.tsx`.

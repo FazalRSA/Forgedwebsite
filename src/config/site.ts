@@ -38,6 +38,11 @@ export interface SiteConfig {
   analyticsWebsiteId: string;
   /** Google Search Console ownership tag: the `content` of the HTML-tag verification. Empty adds no tag. */
   searchConsoleToken: string;
+  /**
+   * "See it on my car": the address of the Cloudflare Worker that makes the preview (see
+   * worker/car-preview/README.md). Empty hides the button on every wheel page; a value must be https.
+   */
+  carPreviewUrl: string;
 }
 
 export const SITE: SiteConfig = {
@@ -87,6 +92,13 @@ export const SITE: SiteConfig = {
 
   /** Google Search Console HTML-tag token (not needed when the domain is verified with a DNS record). */
   searchConsoleToken: '',
+
+  /**
+   * Address of the car-preview Worker, e.g. 'https://forged-car-preview.<account>.workers.dev/'.
+   * Leave empty until the Worker is deployed: the "See it on my car" button and the matching
+   * privacy-notice text stay off until this is set (see worker/car-preview/README.md).
+   */
+  carPreviewUrl: '',
 };
 
 /** wa.me deep link with an optional prefilled message, or null when no number is configured. */

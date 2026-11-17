@@ -3,6 +3,7 @@ import { RouterProvider, useRouter } from './utils/router';
 import { normalizePath } from './utils/redirects';
 import { applyPageMeta, isHomePath, metaForPath } from './utils/seo';
 import { findWheelBySlug } from './data/catalogue';
+import { resolveBlogPath } from './data/blogPosts';
 import { useForgedStore } from './store/useForgedStore';
 import { BrandHeader } from './components/brand/BrandHeader';
 import { HeroSection } from './components/brand/HeroSection';
@@ -12,6 +13,7 @@ import { IndustryPartnersSection } from './components/brand/IndustryPartnersSect
 import { GoogleReviewsSection } from './components/brand/GoogleReviewsSection';
 import { FloatingWhatsApp } from './components/shared/FloatingWhatsApp';
 import { AskAiSection } from './components/brand/AskAiSection';
+import { BlogTeaser } from './components/blog/BlogTeaser';
 import { GlobalOverlays } from './components/shared/GlobalOverlays';
 import { SiteFooter } from './components/brand/SiteFooter';
 
@@ -57,6 +59,22 @@ const StudioPreviewPage = lazy(() =>
   }))
 );
 
+const BlogIndexPage = lazy(() =>
+  import('./components/blog/BlogIndexPage').then((m) => ({
+    default: m.BlogIndexPage,
+  }))
+);
+const BlogTopicPage = lazy(() =>
+  import('./components/blog/BlogTopicPage').then((m) => ({
+    default: m.BlogTopicPage,
+  }))
+);
+const BlogPostPage = lazy(() =>
+  import('./components/blog/BlogPostPage').then((m) => ({
+    default: m.BlogPostPage,
+  }))
+);
+
 function RouteLoadingFallback() {
   return (
     <div
@@ -83,6 +101,7 @@ function BrandHomePage() {
         <WheelCatalogue />
         <EditorialFlow />
         <GoogleReviewsSection />
+        <BlogTeaser />
         <IndustryPartnersSection />
         <AskAiSection />
       </main>
@@ -112,6 +131,15 @@ function AppRoutes() {
     const slug = path.slice('/wheels/'.length).split('/')[0];
     if (!findWheelBySlug(slug, customBrandWheels)) return <NotFoundPage />;
     return <WheelShowcasePDP slug={slug} />;
+  }
+
+  // /blog, /blog/:pillar and /blog/:pillar/:post: forged wheel guides. An unknown blog address is not a page.
+  if (path === '/blog' || path.startsWith('/blog/')) {
+    const route = resolveBlogPath(path);
+    if (!route) return <NotFoundPage />;
+    if (route.kind === 'index') return <BlogIndexPage />;
+    if (route.kind === 'pillar') return <BlogTopicPage pillar={route.pillar} />;
+    return <BlogPostPage post={route.post} />;
   }
 
   // /installs: real customer cars on the wheels

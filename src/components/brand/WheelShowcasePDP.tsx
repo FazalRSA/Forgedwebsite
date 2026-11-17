@@ -1,9 +1,10 @@
-import React, { useCallback, useRef, useState } from 'react';
-import { ArrowLeft, ChevronLeft, ChevronRight, MessageCircle, Play } from 'lucide-react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
+import { ArrowLeft, Camera, ChevronLeft, ChevronRight, MessageCircle, Play } from 'lucide-react';
 import {
   BrandWheelItem,
   WHEEL_FINISHES,
-  WheelFinishOption,
+  type WheelFinishId,
+  type WheelFinishOption,
   findWheelBySlug,
   formatZAR,
   getAllBrandWheels,
@@ -15,6 +16,7 @@ import {
   isSixnineWheel,
 } from '../../data/catalogue';
 import { whatsappLink } from '../../config/site';
+import { carPreviewEnabled } from '../../utils/carPreview';
 import { Link, useRouter } from '../../utils/router';
 import { cutoutSrcFor, formatSizes } from '../../utils/designCards';
 import { wheelImageSrcSet } from '../../utils/wheelImageSrcSet';
@@ -27,6 +29,8 @@ import {
 } from '../../utils/wheelEnquiry';
 import { prefersReducedMotion } from '../../wheel-viewer/wheelStudioParts';
 import { BrandHeader } from './BrandHeader';
+import { CarPreviewDialog } from './CarPreviewDialog';
+import { CatalogueSwatch, ColourSwatches } from './ColourSwatches';
 import { WheelOutline } from './WheelCatalogue';
 import { WheelStage } from '../visuals/WheelStage';
 
@@ -45,6 +49,10 @@ interface WheelShowcasePDPProps {
 
 const PRIMARY_BUTTON =
   'inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[#1D4ED8] px-6 text-base font-semibold text-white hover:bg-[#2563EB] active:bg-[#1E40AF] transition-colors cursor-pointer';
+
+/** Black with white text; the neon laser runs round its edge while a preview is being made (index.css). */
+const CAR_PREVIEW_BUTTON =
+  'laser-button inline-flex h-12 w-full items-center justify-center gap-2 px-6 text-base font-medium cursor-pointer';
 
 /** The soft lighter glow behind a wheel, as on the home page's design cards. */
 const WHEEL_GLOW = 'bg-[radial-gradient(ellipse_at_50%_40%,rgba(255,255,255,0.09),transparent_65%)]';
@@ -87,6 +95,12 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
   const openEnquiryModal = useForgedStore((state) => state.openEnquiryModal);
 
   const [studioOpen, setStudioOpen] = useState(false);
+  // "See it on my car": only offered once the owner has set the Worker's address (see config/site.ts).
+  const carPreviewOn = carPreviewEnabled();
+  const [carPreviewOpen, setCarPreviewOpen] = useState(false);
+  // True while the dialog is making a preview, so the button behind it shows the laser too.
+  const [carPreviewWorking, setCarPreviewWorking] = useState(false);
+  const carPreviewButtonRef = useRef<HTMLElement | null>(null);
   const stageRef = useRef<HTMLDivElement | null>(null);
   const view3DButtonRef = useRef<HTMLButtonElement | null>(null);
 
@@ -105,6 +119,7 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
 
   const design = wheel.modelCode ?? wheel.model;
   const finishLabel = wheel.finishName ?? WHEEL_FINISHES[wheel.defaultFinish]?.name ?? 'Standard';
+  const stageFinishNames = useMemo(() => ({ [wheel.defaultFinish]: finishLabel }), [wheel.defaultFinish, finishLabel]);
   const priceText = formatZAR(wheel.priceZAR);
   const stock = stockLabel(wheel.stockQuantitySets);
   const specs = parseTechnicalSpecSheet(wheel.technicalSpecSheet);
@@ -130,6 +145,15 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
     );
   }, []);
 
+  // A colour swatch shows that colour on the 3D wheel, opening the 3D view first if it is closed.
+  const showColour = useCallback(
+    (finishId: WheelFinishId) => {
+      setPreviewFinish(finishId);
+      if (!studioOpen) openStudio();
+    },
+    [studioOpen, openStudio]
+  );
+
   const closeStudio = useCallback(() => {
     setStudioOpen(false);
     requestAnimationFrame(() => view3DButtonRef.current?.focus());
@@ -145,6 +169,47 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
       priceZAR: wheel.priceZAR,
       domain: 'brand',
     });
+
+  // A to-order colour: the enquiry says it is made to order and states the lead time.
+  const askAboutColour = (finish: WheelFinishOption) =>
+    openEnquiryModal({
+      subject: `Hi, I'd like the ${design} in ${finish.name}. I understand this colour is made to order, with a lead time of ${TO_ORDER_LEAD_TIME}.`,
+      finish: finish.name,
+      domain: 'brand',
+    });
+
+  const closeCarPreview = useCallback(() => setCarPreviewOpen(false), []);
+
+  // Closes the preview first and opens the enquiry on the next frame, so the two dialogs never
+  // overlap (each locks the page's scroll and returns focus when it closes).
+  const enquireAboutPreview = (note: string) => {
+    setCarPreviewOpen(false);
+    requestAnimationFrame(() =>
+      openEnquiryModal({
+        subject: `${message}\n${note}`,
+        finish: finishLabel,
+        priceZAR: wheel.priceZAR,
+        domain: 'brand',
+      })
+    );
+  };
+
+  const openCarPreview = (event: React.MouseEvent<HTMLButtonElement>) => {
+    carPreviewButtonRef.current = event.currentTarget;
+    setCarPreviewOpen(true);
+  };
+
+  const carPreviewButton = carPreviewOn && (
+    <button
+      type="button"
+      onClick={openCarPreview}
+      data-working={carPreviewWorking}
+      className={CAR_PREVIEW_BUTTON}
+    >
+      <Camera className="w-5 h-5" aria-hidden="true" />
+      See it on my car
+    </button>
+  );
 
   const enquireButton = (
     <button type="button" onClick={openForm} className={PRIMARY_BUTTON}>
@@ -188,6 +253,7 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
                   availableFinishes={[wheel.defaultFinish, ...toOrderFinishes.map((f) => f.id)]}
                   onSelectFinish={setPreviewFinish}
                   finishName={previewingToOrder ? WHEEL_FINISHES[previewFinish]?.name ?? finishLabel : finishLabel}
+                  finishNames={stageFinishNames}
                   modelUrl={wheel.modelUrl}
                   rearModelUrl={wheel.rearModelUrl}
                   onClose={closeStudio}
@@ -246,48 +312,20 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
               </p>
             )}
 
-            <div className="mt-5" data-testid="finish-options">
-              <p className="text-sm text-neutral-400">In stock</p>
-              <div className="mt-2 flex flex-wrap gap-2">
-                <span
-                  aria-current="true"
-                  className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white bg-white/10 px-4 text-sm font-medium text-white"
-                >
-                  <Swatch hex={WHEEL_FINISHES[wheel.defaultFinish]?.swatchHex} />
-                  {finishLabel}
-                </span>
-                {siblings.map((s) => (
-                  <Link
-                    key={s.slug}
-                    to={`/wheels/${s.slug}`}
-                    className="inline-flex min-h-11 items-center gap-2 rounded-full border border-[#33333E] px-4 text-sm text-neutral-200 hover:border-[#1D4ED8] hover:text-white"
-                  >
-                    <Swatch hex={WHEEL_FINISHES[s.defaultFinish]?.swatchHex} />
-                    {s.finishName ?? WHEEL_FINISHES[s.defaultFinish]?.name}
-                  </Link>
-                ))}
-              </div>
-
-              {toOrderFinishes.length > 0 && (
-                <div className="mt-4" data-testid="to-order-finishes">
-                  <p className="text-sm text-neutral-400">
-                    Other colours, to order ({TO_ORDER_LEAD_TIME} lead time)
-                  </p>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {toOrderFinishes.map((finish) => (
-                      <ToOrderChip
-                        key={finish.id}
-                        design={design}
-                        finish={finish}
-                        onEnquire={(subject) => openEnquiryModal({ subject, finish: finish.name, domain: 'brand' })}
-                      />
-                    ))}
-                  </div>
-                  <p className="mt-2 text-sm text-neutral-300">
-                    {TO_ORDER_NOTICE} Tap a colour to ask about it.
-                  </p>
-                </div>
-              )}
+            <div className="mt-5">
+              <ColourSwatches
+                current={{ finishId: wheel.defaultFinish, name: finishLabel }}
+                siblings={siblings.map((s) => ({
+                  slug: s.slug,
+                  finishId: s.defaultFinish,
+                  name: s.finishName ?? WHEEL_FINISHES[s.defaultFinish]?.name ?? 'Standard',
+                }))}
+                toOrder={toOrderFinishes}
+                shown={previewFinish}
+                has3D={has3D}
+                onShow={showColour}
+                onAskAbout={askAboutColour}
+              />
             </div>
 
             <dl className="mt-6 border-t border-[#26262E]">
@@ -302,7 +340,10 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
               ))}
             </dl>
 
-            <div className="mt-6 hidden lg:block">{enquireButton}</div>
+            <div className="mt-6 hidden lg:block space-y-3">
+              {enquireButton}
+              {carPreviewButton}
+            </div>
           </div>
         </div>
 
@@ -319,7 +360,7 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
                     className="flex min-h-14 items-center justify-between gap-3 rounded-xl border border-[#26262E] px-4 py-2 hover:border-[#1D4ED8]"
                   >
                     <span className="flex items-center gap-3 min-w-0">
-                      <Swatch hex={WHEEL_FINISHES[w.defaultFinish]?.swatchHex} />
+                      <CatalogueSwatch finishId={w.defaultFinish} name={w.finishName} size={28} />
                       <span className="truncate text-sm font-medium text-white">{w.model}</span>
                     </span>
                     <span className="shrink-0 text-sm text-neutral-300">{formatZAR(w.priceZAR)}</span>
@@ -342,47 +383,36 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
           <p className="text-lg font-semibold text-white">
             {priceText} <span className="text-xs font-normal text-neutral-300">per set of 4</span>
           </p>
-          {stock && <p className="text-xs text-neutral-300">{stock}</p>}
+          {carPreviewOn ? (
+            <button
+              type="button"
+              onClick={openCarPreview}
+              data-working={carPreviewWorking}
+              className="laser-button inline-flex min-h-11 shrink-0 items-center gap-1.5 px-3.5 text-sm font-medium cursor-pointer"
+            >
+              <Camera className="w-4 h-4" aria-hidden="true" />
+              See it on my car
+            </button>
+          ) : (
+            stock && <p className="text-xs text-neutral-300">{stock}</p>
+          )}
         </div>
         {enquireButton}
       </aside>
+
+      {carPreviewOpen && (
+        <CarPreviewDialog
+          wheelSlug={wheel.slug}
+          wheelName={`${design} — ${finishLabel}`}
+          onClose={closeCarPreview}
+          onEnquire={enquireAboutPreview}
+          onWorkingChange={setCarPreviewWorking}
+          returnFocusRef={carPreviewButtonRef}
+        />
+      )}
     </div>
   );
 };
-
-const TO_ORDER_CHIP =
-  'inline-flex min-h-11 items-center gap-2 rounded-full border border-dashed border-[#4A4A57] px-4 text-sm text-neutral-200 hover:border-[#1D4ED8] hover:text-white cursor-pointer';
-
-/**
- * A colour that is not in stock. Tapping it opens the enquiry form with the lead time stated; the
- * form logs the enquiry through n8n and then opens WhatsApp when a number is configured.
- */
-const ToOrderChip: React.FC<{
-  design: string;
-  finish: WheelFinishOption;
-  onEnquire: (subject: string) => void;
-}> = ({ design, finish, onEnquire }) => {
-  const message = `Hi, I'd like the ${design} in ${finish.name}. I understand this colour is made to order, with a lead time of ${TO_ORDER_LEAD_TIME}.`;
-  return (
-    <button
-      type="button"
-      onClick={() => onEnquire(message)}
-      aria-label={`Ask about ${finish.name}, made to order, ${TO_ORDER_LEAD_TIME} lead time`}
-      className={TO_ORDER_CHIP}
-    >
-      <Swatch hex={finish.swatchHex} />
-      {finish.name}
-    </button>
-  );
-};
-
-const Swatch: React.FC<{ hex?: string }> = ({ hex }) => (
-  <span
-    aria-hidden="true"
-    className="inline-block h-3.5 w-3.5 shrink-0 rounded-full border border-white/30"
-    style={{ background: hex ?? '#888' }}
-  />
-);
 
 /**
  * The one "View in 3D" control on a page with photos: a play-style button laid over the first

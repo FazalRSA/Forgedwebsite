@@ -210,6 +210,12 @@ export const MODEL_URL_BY_CODE: Partial<Record<RawInventorySeed['modelCode'], st
   'FF-3': '/models/wheels/ff-3.glb',
 };
 
+/** The traced model of a design, by its code ("FSA002"); undefined for a design with no model yet. */
+export function modelUrlForDesign(modelCode?: string): string | undefined {
+  const code = (modelCode ?? '').trim().toUpperCase();
+  return (MODEL_URL_BY_CODE as Record<string, string | undefined>)[code];
+}
+
 const INVENTORY_SEEDS: RawInventorySeed[] = [
   {
     id: 'wheel-fsa001-black-matte',
@@ -622,7 +628,12 @@ export function getAllBrandWheels(runtimeCustomWheels: BrandWheelItem[] = []): B
       return true;
     })
     .filter(isInStock)
-    .map((w) => ({ ...w, availableFinishes: [w.defaultFinish] }));
+    .map((w) => ({
+      ...w,
+      availableFinishes: [w.defaultFinish],
+      // A listing of a design that has a traced model always opens in 3D, even when its own record names none.
+      modelUrl: w.modelUrl ?? modelUrlForDesign(w.modelCode),
+    }));
 }
 
 /** The other in-stock listings of the same design (same model code), in catalogue order. */

@@ -12,10 +12,15 @@ overwritten by `pull` and a check fails if someone edits it by hand.
 |---|---|
 | `WheelStudio.tsx` | The stage (three.js scene, studio reflections, camera views, exploded view, Front/Rear) and its controls |
 | `paint.ts` | `StudioFinish` rows and the `PaintRenderer` plug-in: how a finish becomes a material |
+| `studioEnvironment.ts` | The studio reflections (softboxes and flags), shared by the stage and the swatches |
+| `swatch.ts`, `FinishSwatch.tsx` | Photoreal finish swatches: a ball in the finish's own paint under the same reflections, drawn once, cached, one WebGL context per batch; a drawn ball when WebGL is missing |
 | `wheelStudioParts.ts` | Which part a mesh is, how far each part moves exploded (pure, unit-tested in the website) |
 | `wheel-viewer.css` | All styles, plain CSS. Theme it with the `--wv-*` variables |
 | `index.ts` | The public exports |
 | `VERSION.json` | Content hash. `verify` compares it with the files |
+
+Use `<FinishSwatch finish={finish} size={36} paint={myPaintRenderer} />` anywhere a finish is offered, so the
+swatch and the wheel are painted alike (the Finish row inside the stage already does).
 
 It needs `react`, `three` (0.181 or newer) and `lucide-react` from the app, nothing else, and no
 Tailwind. It knows nothing about either app's catalogue: the app hands it `StudioFinish` rows.

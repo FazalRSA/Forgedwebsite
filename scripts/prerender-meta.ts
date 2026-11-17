@@ -25,9 +25,12 @@ import path from 'node:path';
 import { getAllBrandWheels } from '../src/data/catalogue';
 import { HERO_WHEEL_MEDIA, heroWheelImage } from '../src/utils/designCards';
 import { isHomePath, metaForPath, renderPageHtml, sitemapPaths, withSearchConsoleTag } from '../src/utils/seo';
+import { blogStaticHtml } from '../src/components/blog/blogStatic';
 
 const distDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'dist');
 const shellPath = path.join(distDir, 'index.html');
+
+const ROOT_MARKER = '<div id="root"></div>';
 
 const escapeAttribute = (value: string): string =>
   value.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
@@ -57,11 +60,26 @@ try {
   let written = 0;
   for (const pagePath of sitemapPaths()) {
     if (isHomePath(pagePath)) continue;
-    const html = renderPageHtml(shell, metaForPath(pagePath));
+    let html = renderPageHtml(shell, metaForPath(pagePath));
+    // Blog pages also get their full text in the HTML, for crawlers that read it before running any
+    // JavaScript. The app replaces it on load (see src/components/blog/blogStatic.tsx).
+    const blogHtml = blogStaticHtml(pagePath);
+    if (blogHtml) {
+      if (!html.includes(ROOT_MARKER)) throw new Error(`${shellPath} has no ${ROOT_MARKER} to put the blog text into`);
+      html = html.replace(ROOT_MARKER, () => `<div id="root">${blogHtml}</div>`);
+    }
     const target = path.join(distDir, `${pagePath.replace(/^\//, '')}.html`);
     mkdirSync(path.dirname(target), { recursive: true });
     writeFileSync(target, html);
     written += 1;
+    // The blog hub and each pillar share their name with a folder (/blog and /blog/<pillar> also hold
+    // pages). Hosts disagree on whether /blog means blog.html or blog/index.html, so write both and
+    // either way the visitor gets this page, never an empty one.
+    if (blogHtml && (pagePath === '/blog' || pagePath.split('/').length === 3)) {
+      const folderIndex = path.join(distDir, pagePath.replace(/^\//, ''), 'index.html');
+      mkdirSync(path.dirname(folderIndex), { recursive: true });
+      writeFileSync(folderIndex, html);
+    }
   }
   // Written last, so the per-page files above do not inherit the preload.
   const preload = heroWheelPreload();
