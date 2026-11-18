@@ -17,7 +17,7 @@ meshes use assumed G80/G82 M3/M4 brake dimensions, not a measured caliper.
 `fsa003-v2.glb` (the 15-spoke FSA003, shared by Gold, Silver and Hyper Black) and `ff-1-sixnine.glb` (the Sixnine FF-1, Y-spokes with a bolt ring, shared by its finishes) were made the same way as `fsa002-forked.glb`, from owner-supplied AI-generated (Tripo) files, and each matches its real photos (spoke pattern, rim, centre cap). Neither needed its width changed. They replace the older traced `fsa003.glb` and `ff-1.glb`, which were removed. As with the others, a few thin streaks from the AI mesh may show at some angles.
 
 `fsa004.glb` is one model per design, shared
-by every finish of that design (see `MODEL_URL_BY_CODE` in `src/data/catalogue.ts`). They were traced
+by every finish of that design (see `MODEL_URL_BY_CODE` in `src/data/catalogue.ts`). It was traced
 from face-on product photos and ship without baked textures, because the studio applies its own paint.
 On a wheel page the studio offers the listing's own finish and the design's to-order colours
 (`getToOrderFinishes` in `src/data/catalogue.ts`); the page shows the 3-month lead-time notice while a
