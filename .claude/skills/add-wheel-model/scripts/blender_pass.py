@@ -8,7 +8,7 @@ checking it in the site viewer and seeing a clear improvement.
 usage: python blender_pass.py IN.glb OUT.glb RENDER_BEFORE.png RENDER_AFTER.png PAINT(black|silver|bronze) [--angle 32]
 Steps: import -> weld -> remove hair/fin faces and loose bits -> consistent normals ->
 sharp-edge shading by angle (crisp spoke/bolt edges, smooth surfaces) -> studio render -> export GLB."""
-import sys, math, bpy, bmesh
+import os, sys, math, bpy, bmesh
 from mathutils import Vector
 
 if len(sys.argv) < 6:
@@ -16,7 +16,21 @@ if len(sys.argv) < 6:
 src, dst, r_before, r_after, paint = sys.argv[1:6]
 if paint not in ('black', 'silver', 'bronze'):
     sys.exit(f'paint must be black, silver or bronze (got {paint!r})')
-angle = float(sys.argv[sys.argv.index('--angle') + 1]) if '--angle' in sys.argv else 32.0
+try:
+    angle = float(sys.argv[sys.argv.index('--angle') + 1]) if '--angle' in sys.argv else 32.0
+except (ValueError, IndexError):
+    sys.exit('--angle needs a number of degrees, e.g. --angle 32')
+if not 0 < angle < 180:
+    sys.exit(f'--angle must be between 0 and 180 degrees (got {angle})')
+if not os.path.isfile(src) or os.path.getsize(src) < 20 or open(src, 'rb').read(4) != b'glTF':
+    sys.exit(f'ERROR: {src} is missing or is not a GLB (a failed download is often an HTML page)')
+for out in (dst, r_before, r_after):
+    folder = os.path.dirname(os.path.abspath(out))
+    try:
+        os.makedirs(folder, exist_ok=True)
+    except OSError as err:
+        sys.exit(f'ERROR: cannot create the output folder {folder}: {err}')
+
 
 def reset():
     bpy.ops.wm.read_factory_settings(use_empty=True)
@@ -24,7 +38,8 @@ def reset():
 def import_glb(path):
     bpy.ops.import_scene.gltf(filepath=path)
     meshes = [o for o in bpy.context.scene.objects if o.type == 'MESH']
-    assert meshes, f'no mesh in {path}'
+    if not meshes:
+        sys.exit(f'ERROR: {path} has no mesh in it')
     return meshes[0]
 
 def studio(obj, out_png, kind):
