@@ -65,22 +65,40 @@ type EventData = Record<string, string | number>;
 declare global {
   interface Window {
     umami?: { track: (name: string, data?: EventData) => void };
+    /** Google Tag Manager's data layer; present only while the container snippet runs (src/utils/googleTagManager.ts). */
+    dataLayer?: unknown[];
   }
 }
 
 /**
  * Count something that happened, such as the enquiry form being opened. The page address is added
  * to every event; pass only anonymous values in `data` (never a name, number, email or message).
- * Does nothing when statistics are not running, and a failure here never reaches the visitor.
+ *
+ * The event goes to Umami when it runs, and to Google Tag Manager's data layer as
+ * `{ event: name, page, ...data }` when the container runs, where a Custom Event trigger can pass it
+ * on to Google Analytics. Does nothing when neither is running, and a failure here never reaches
+ * the visitor.
  */
 export function trackEvent(
   name: string,
   data: EventData = {},
   win: Window | undefined = typeof window === 'undefined' ? undefined : window
 ): void {
+  let payload: EventData;
   try {
-    win?.umami?.track(name, { page: win.location.pathname, ...data });
+    if (!win) return;
+    payload = { page: win.location.pathname, ...data };
+  } catch {
+    return;
+  }
+  try {
+    win.umami?.track(name, payload);
   } catch {
     // Statistics are optional; the page must work without them.
+  }
+  try {
+    if (Array.isArray(win.dataLayer)) win.dataLayer.push({ event: name, ...payload });
+  } catch {
+    // Same for Google Tag Manager.
   }
 }
