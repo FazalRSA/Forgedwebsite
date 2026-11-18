@@ -126,7 +126,7 @@ Two things look like setup and are not:
 | `bun run build` | Five steps, in order: regenerate `public/sitemap.xml`, `public/robots.txt`, the blog's RSS feed (`public/blog/feed.xml`) and the page rules in `render.yaml` from the catalogue and `SITE.host`; build to `dist/`; write each page's own HTML file with its title and share image, plus the full text of each blog page for crawlers, and add the Google Tag Manager snippet to every page (`prerender-meta.ts`); write a redirect page for every removed address (`legacy-shells.ts`); write `dist/llms.txt` (`generate-llms.ts`) |
 | `bun run preview` | Serves the production build locally |
 | `bun run lint` | Type-check with `tsc --noEmit` |
-| `bun run test` | Data, home-page design-card, SEO, redirect, business-details, `llms.txt`, 3D-studio and security-rules tests (`node:test` via `tsx`) |
+| `bun run test` | Data, home-page design-card, hero film, SEO, redirect, business-details, `llms.txt`, 3D-studio and security-rules tests (`node:test` via `tsx`) |
 | `bun run add-wheel` | Catalogue CLI (`--help` for options) |
 | `bun run clean` | Removes `dist/` |
 
@@ -140,7 +140,7 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
 
 | Route | Component | Purpose |
 | --- | --- | --- |
-| `/` | `BrandHomePage` | Hero, wheels in stock (`#catalogue`), customer installs, partners strip (`#partners`), Ask AI (`#ask-ai`) |
+| `/` | `BrandHomePage` | Hero with the brand film, wheels in stock (`#catalogue`), customer installs, partners strip (`#partners`), Ask AI (`#ask-ai`) |
 | `/wheels/:slug` | `WheelShowcasePDP` | Wheel page: photos, 3D viewer, price, sizes, in-stock and to-order colours, enquire. A sold or unknown slug shows the 404 page |
 | `/blog` | `BlogIndexPage` | The blog hub: every content pillar and the latest guides |
 | `/blog/:pillar` | `BlogTopicPage` | One content pillar: the topic explained and every guide in it. An unknown pillar shows the 404 page |
@@ -182,6 +182,7 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
 │  ├─ assets/fitments/<slug>/     front34.webp · side.webp · original.webp per install, each with an 800 px thumbnail
 │  ├─ images/partners/            Partner logos (transparent WebP)
 │  ├─ brand/                      FORGED monogram and wordmark (SVG)
+│  ├─ video/                      The home page hero film: 1280 and 854 px, AV1 and H.264, plus its first frame as posters
 │  ├─ favicon.ico · icon.svg · apple-touch-icon.png   Browser and home-screen icons
 │  ├─ robots.txt
 │  └─ sitemap.xml                 Generated on every build
@@ -194,6 +195,7 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
 │  ├─ generate-llms.ts            Writes dist/llms.txt
 │  ├─ add-blog-rules.sh           Adds the blog's rewrite rules to a Render service whose routes are set by hand (needs a Render API key; previews first)
 │  ├─ make-wheel-cutouts.py       Makes the transparent wheel cut-outs for the home page's design cards (run by hand)
+│  ├─ make-hero-video.sh          Makes the hero film's web files and posters in public/video/ from one source video (run by hand, needs ffmpeg)
 │  ├─ make-wheel-sizes.py         Makes the 800, 400 and 600 px copies of the wheel photos that the srcsets list (run by hand)
 │  └─ fitment-reshoot/            Pipeline for the install studio re-shoots (jobs.json, Python scripts, README.md)
 ├─ docs/installs-pipeline.md      How the Installs gallery is made, with animated diagrams (docs/assets/)
@@ -371,7 +373,7 @@ All search metadata is produced by `src/utils/seo.ts` and applied on every route
 
 - **Titles and descriptions** per route, with titles capped at 60 characters. The home title is "Forged wheels for BMW M cars in stock | FORGED Custom Wheels".
 - **Canonical URLs** always on `SITE.host` in `src/config/site.ts`, the address the site is served from (`www.forgedsa.co.za`). The bare domain redirects to it, and a canonical or sitemap entry that redirects back to its own page confuses search engines, so a test checks the sitemap, `robots.txt` and `index.html` all use the same host.
-- **Link previews**: Open Graph and Twitter tags on every route. Link-preview bots and crawlers that do not run JavaScript read the same tags from each page's own HTML file, written by `scripts/prerender-meta.ts`. `index.html` keeps generic tags because it is also the fallback for unknown paths; the build adds only a preload for the hero wheel image (the first design card's cut-out, from the catalogue), so wide screens start fetching it before the JavaScript runs, and the Google Tag Manager snippet that every page carries (see [Google Tag Manager and Google Analytics](#google-tag-manager-and-google-analytics)).
+- **Link previews**: Open Graph and Twitter tags on every route. Link-preview bots and crawlers that do not run JavaScript read the same tags from each page's own HTML file, written by `scripts/prerender-meta.ts`. `index.html` keeps generic tags because it is also the fallback for unknown paths; the build adds only a preload for the hero's poster (the brand film's first frame, listed in `src/utils/heroVideo.ts`), so every screen starts fetching it before the JavaScript runs, and the Google Tag Manager snippet that every page carries (see [Google Tag Manager and Google Analytics](#google-tag-manager-and-google-analytics)).
 - **Structured data**: `Organization` and `WebSite` on the home page; `Product` with the Rand price, in stock, on wheel pages; `CollectionPage`, `ContactPage` or `WebPage` with a `BreadcrumbList` on installs, the Sixnine dealer page, contact and the privacy notice; `Blog` and `ItemList` on the blog hub, `CollectionPage` on pillar pages, and `BlogPosting`, `BreadcrumbList` and `FAQPage` on articles.
 - **Sitemap**: `public/sitemap.xml` is regenerated from the catalogue and the blog on every build. It lists `/`, one page per in-stock wheel, the blog hub, its four pillar pages and every article (these carry a `lastmod` that is the article's own date), `/installs`, `/sixnine-wheels`, `/contact` and `/privacy-policy`, and nothing else.
 - **Noindex**: admin, preview, sold or unknown wheels, and unknown addresses. `public/robots.txt` (generated by `scripts/generate-sitemap.ts`, so its `Sitemap:` line cannot drift from the host) keeps crawlers out of `/admin` and `/studio/`.
@@ -585,7 +587,7 @@ firebase deploy --only firestore:rules
 
 ## Testing
 
-`bun run test` runs eighteen test files (200 tests) with `node:test`. The files are listed by name in the `test` script in `package.json`, so a new test file does not run until it is added there.
+`bun run test` runs twenty-one test files (227 tests) with `node:test`. The files are listed by name in the `test` script in `package.json`, so a new test file does not run until it is added there.
 
 | Suite | Covers |
 | --- | --- |
@@ -673,7 +675,7 @@ Build chunks are split per vendor (`react`, `motion`, `three`, `firebase`, `luci
 | **Install details** | Each car's make, model and paint were read from its photo, not confirmed | Shop to confirm, then correct `jobs.json` |
 | **Leftovers from the starter** | `package.json` still lists `@google/genai`, `express` and `dotenv`, which no file imports. `.env.example`, `metadata.json` and a tracked `.aistudio/` folder (6 MB of screenshots) come from the same starter | Remove in one clean-up pull request |
 | **Render routes** | Two Render services build `main`; the one that appears to carry the live domain ignores `render.yaml`, so the blog's addresses are not served from their prerendered files there (see [Two Render services](#two-render-services)) | Move the domain to the service that follows `render.yaml`, or add the rules in `docs/render-blog-rewrites.md` |
-| **Automated checks** | Type check, 200 tests in 18 files and the build, all run by hand. No CI, no browser tests, and ESLint is not wired to a script | Run the three checks on every pull request with a CI workflow |
+| **Automated checks** | Type check, 227 tests in 21 files and the build, all run by hand. No CI, no browser tests, and ESLint is not wired to a script | Run the three checks on every pull request with a CI workflow |
 
 ## Contributing
 

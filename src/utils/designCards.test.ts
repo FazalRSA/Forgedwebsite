@@ -8,8 +8,6 @@ import {
   cutoutSrcFor,
   designCardWidths,
   designOf,
-  heroWheelImage,
-  HERO_WHEEL_SIZES,
   planDesignRows,
 } from './designCards';
 
@@ -85,19 +83,6 @@ test('every listing photographed on the site has a cut-out on disk', () => {
   for (const card of buildDesignCards(getAllBrandWheels())) {
     if (card.cutout) assert.ok(existsSync(join(publicDir, card.cutout)), `${card.design}: ${card.cutout}`);
   }
-});
-
-test('the hero wheel is the first design card\'s cut-out with a srcset, and nothing when there is no cut-out', () => {
-  const wheels = getAllBrandWheels();
-  const first = buildDesignCards(wheels)[0];
-  const hero = heroWheelImage(wheels);
-  assert.ok(first.cutout && hero, 'the first design has a cut-out today');
-  assert.equal(hero.src, first.cutout);
-  assert.equal(hero.sizes, HERO_WHEEL_SIZES);
-  assert.match(hero.srcSet ?? '', /cutout-600\.webp 600w, .*cutout\.webp 1000w$/);
-
-  const noPhotos = wheels.map((w) => ({ ...w, images: undefined, imageUrl: undefined, galleryImages: undefined }));
-  assert.equal(heroWheelImage(noPhotos), undefined);
 });
 
 test('each card has one swatch per finish in stock, named as the finish is, in the same order', () => {
