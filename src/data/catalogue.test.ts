@@ -279,12 +279,17 @@ test('FSA001 carries front and rear 3D models that exist in /public; every listi
     assert.ok(wheel.modelUrl, `${wheel.slug} has no 3D model`);
     assert.ok(existsSync(`public${wheel.modelUrl}`), `${wheel.slug}: ${wheel.modelUrl} missing`);
   }
+  // One model per design, except where a listing's photos show a different wheel under the same design code.
+  const OWN_MODEL = new Set(['fsa002-hyper-black', 'fsa002-polished-face']);
   const byCode = new Map<string, Set<string>>();
-  for (const wheel of all) {
+  for (const wheel of all.filter((w) => !OWN_MODEL.has(w.slug))) {
     const code = wheel.modelCode ?? wheel.slug;
     byCode.set(code, (byCode.get(code) ?? new Set()).add(wheel.modelUrl!));
   }
   for (const [code, urls] of byCode) assert.equal(urls.size, 1, `${code} finishes disagree on the model`);
+  for (const slug of OWN_MODEL) {
+    assert.equal(all.find((w) => w.slug === slug)?.modelUrl, '/models/wheels/fsa002-forked.glb', `${slug} shows the forked FSA002`);
+  }
   assert.equal(all.find((w) => w.slug === 'fsa002-gold')?.modelUrl, '/models/wheels/fsa002.glb');
 });
 

@@ -216,6 +216,12 @@ export function modelUrlForDesign(modelCode?: string): string | undefined {
   return (MODEL_URL_BY_CODE as Record<string, string | undefined>)[code];
 }
 
+/**
+ * The forked-spoke FSA002 (the wheel in the Hyper Black and Polished Face photos). The Gold FSA002's
+ * photos show a different wheel, 15 thin spokes, which keeps the design's model in MODEL_URL_BY_CODE.
+ */
+const FSA002_FORKED_MODEL_URL = '/models/wheels/fsa002-forked.glb';
+
 const INVENTORY_SEEDS: RawInventorySeed[] = [
   {
     id: 'wheel-fsa001-black-matte',
@@ -263,6 +269,8 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     stockStatus: 'In Stock',
     stockQuantitySets: 1,
     technicalSpecSheet: 'PCD 5×112 · ET8/15 · CB66.6',
+    // The photos of this listing show the forked-spoke FSA002, so it has its own model.
+    modelUrl: FSA002_FORKED_MODEL_URL,
     defaultFinish: 'dark-gunmetal',
     geometry: 'multi-spoke-gt',
     spokeCount: 10,
@@ -279,6 +287,8 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     stockStatus: 'In Stock',
     stockQuantitySets: 1,
     technicalSpecSheet: 'PCD 5×112 · ET8/15 · CB66.6',
+    // The photos of this listing show the forked-spoke FSA002, so it has its own model.
+    modelUrl: FSA002_FORKED_MODEL_URL,
     defaultFinish: 'silver',
     geometry: 'multi-spoke-gt',
     spokeCount: 10,
