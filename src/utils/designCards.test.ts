@@ -99,3 +99,13 @@ test('the hero wheel is the first design card\'s cut-out with a srcset, and noth
   const noPhotos = wheels.map((w) => ({ ...w, images: undefined, imageUrl: undefined, galleryImages: undefined }));
   assert.equal(heroWheelImage(noPhotos), undefined);
 });
+
+test('each card has one swatch per finish in stock, named as the finish is, in the same order', () => {
+  const cards = buildDesignCards(getAllBrandWheels());
+  for (const card of cards) {
+    assert.deepEqual(card.swatches.map((s) => s.name), card.finishes, `${card.design}: swatches and finishes disagree`);
+    for (const s of card.swatches) assert.ok(s.finishId, `${card.design}: ${s.name} has no finish id`);
+  }
+  const ff3 = cards.find((c) => c.design === 'FF-3')!;
+  assert.deepEqual(ff3.swatches.map((s) => s.finishId), ['pure-bronze', 'glossy-black', 'liquid-metal']);
+});

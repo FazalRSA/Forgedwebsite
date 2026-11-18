@@ -21,6 +21,7 @@ import {
 } from '../../utils/designCards';
 import { wheelImageSrcSet } from '../../utils/wheelImageSrcSet';
 import { ContactCta, CTA_SECONDARY_CLASS } from './ContactCta';
+import { CatalogueSwatch } from './ColourSwatches';
 
 export { designOf };
 
@@ -117,7 +118,9 @@ export const WheelCard: React.FC<{ wheel: BrandWheelItem; index: number }> = ({ 
             <h3 className="font-[family-name:var(--font-display)] font-black uppercase text-xl sm:text-3xl leading-none tracking-[-0.03em] text-white">
               {design}
               {finish && (
-                <span className="block mt-1 font-sans text-xs sm:text-sm font-medium normal-case tracking-normal text-neutral-200">
+                <span className="mt-1 flex items-center gap-1.5 font-sans text-xs sm:text-sm font-medium normal-case tracking-normal text-neutral-200">
+                  {/* the same paint as the 3D viewer, drawn by the viewer's own swatch renderer */}
+                  <CatalogueSwatch finishId={wheel.defaultFinish} name={wheel.finishName} size={18} />
                   {finish}
                 </span>
               )}
@@ -238,6 +241,14 @@ const DesignCard: React.FC<{
               {card.design}
             </h3>
             <p className="mt-2 text-sm font-medium text-neutral-200 tabular-nums">{card.priceLine}</p>
+            {card.swatches.length > 0 && (
+              // decorative: the finish names are in the text below; the swatches are the viewer's own paint
+              <span aria-hidden="true" className="mt-2 flex items-center gap-1.5">
+                {card.swatches.map((sw) => (
+                  <CatalogueSwatch key={sw.name} finishId={sw.finishId} name={sw.name} size={22} />
+                ))}
+              </span>
+            )}
             {(finishes || sizes) && (
               <p className="mt-0.5 text-sm text-neutral-400">
                 {finishes}

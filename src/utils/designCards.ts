@@ -1,4 +1,4 @@
-import { type BrandWheelItem, formatZAR, getWheelImages } from '../data/catalogue';
+import { type BrandWheelItem, type WheelFinishId, formatZAR, getWheelImages } from '../data/catalogue';
 import { wheelImageSrcSet, type WheelImageSources } from './wheelImageSrcSet';
 
 /**
@@ -46,6 +46,8 @@ export interface DesignCard {
   /** "From R 70,000 per set of 4", or without "From" when every finish costs the same. */
   priceLine: string;
   finishes: string[];
+  /** One swatch per finish in stock, in the order of `finishes`: the viewer's own paint for that finish. */
+  swatches: { finishId: WheelFinishId; name: string }[];
   sizes: string[];
 }
 
@@ -65,6 +67,12 @@ export function buildDesignCards(wheels: BrandWheelItem[]): DesignCard[] {
     const samePrice = prices.every((p) => p === minPrice);
     const priceLine = `${samePrice ? '' : 'From '}${formatZAR(minPrice)} per set of 4`;
     const finishes = unique(listings.map((w) => w.finishName ?? '').filter(Boolean));
+    const swatches: DesignCard['swatches'] = [];
+    for (const w of listings) {
+      if (w.finishName && !swatches.some((x) => x.name === w.finishName)) {
+        swatches.push({ finishId: w.defaultFinish, name: w.finishName });
+      }
+    }
     const sizes = unique(listings.map((w) => formatSizes(w.sizesAvailable)).filter(Boolean));
     const badge = finishes.length > 1 ? `${finishes.length} finishes in stock` : 'In stock';
 
@@ -77,6 +85,7 @@ export function buildDesignCards(wheels: BrandWheelItem[]): DesignCard[] {
       badge,
       priceLine,
       finishes,
+      swatches,
       sizes,
     };
   });

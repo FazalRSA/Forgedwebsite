@@ -36,6 +36,10 @@ def main() -> int:
     ap.add_argument('--diameter', type=float, default=0.53, help='rim diameter in metres')
     ap.add_argument('--width', type=float, default=None,
                     help='squash the wheel to this width in metres (AI meshes often come out too deep); default keeps the file\'s proportions')
+    ap.add_argument('--sliver-ratio', type=float, default=0.03,
+                    help='remove triangles thinner than this (area / longest edge squared); higher removes more')
+    ap.add_argument('--sliver-len', type=float, default=0.05,
+                    help='...and longer than this fraction of the wheel diameter; lower removes more')
     ap.add_argument('--flip', action='store_true', help='turn the wheel 180 degrees if the face points to -Z')
     a = ap.parse_args()
     # a negative or zero size would mirror or flatten the wheel without any error, so refuse it up front
@@ -84,7 +88,7 @@ def main() -> int:
     edges = np.stack([np.linalg.norm(v[f[:, i]] - v[f[:, (i + 1) % 3]], axis=1) for i in range(3)], 1)
     longest = edges.max(1)
     dia0 = max(dec.extents[0], dec.extents[1])
-    sliver = (dec.area_faces / (longest ** 2 + 1e-12) < 0.03) & (longest > 0.05 * dia0)
+    sliver = (dec.area_faces / (longest ** 2 + 1e-12) < a.sliver_ratio) & (longest > a.sliver_len * dia0)
     print(f'removed {int(sliver.sum())} web triangles')
     dec.update_faces(~sliver)
     dec.remove_unreferenced_vertices()
