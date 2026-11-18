@@ -21,7 +21,7 @@ const SHELL = [
 ].join('\n');
 
 /** Run the <head> snippet's script as a browser on `hostname` would, and report what it did. */
-function runHeadSnippet(hostname: string) {
+function runHeadSnippet(hostname: string, storedConsent: string | null = null, storageThrows = false) {
   const script = googleTagManagerHead(SET_UP).match(/<script>([\s\S]*)<\/script>/)?.[1];
   assert.ok(script, 'the head snippet has a script');
   const inserted: Array<{ src: string; async: boolean }> = [];
@@ -31,9 +31,28 @@ function runHeadSnippet(hostname: string) {
     getElementsByTagName: () => [firstScript],
     createElement: () => ({ src: '', async: false }),
   };
+  const localStorage = {
+    getItem: (key: string) => {
+      if (storageThrows) throw new Error('blocked');
+      return key === 'forged-analytics-consent' ? storedConsent : null;
+    },
+  };
+  window.localStorage = localStorage;
   vm.runInNewContext(script, { window, document, location: { hostname } });
-  return { inserted, dataLayer: window.dataLayer as Array<Record<string, unknown>> | undefined };
+  const dataLayer = window.dataLayer as unknown[] | undefined;
+  // Consent commands are Arguments objects (as gtag() pushes them); the rest are plain objects.
+  const consent: unknown[][] = JSON.parse(
+    JSON.stringify(
+      (dataLayer ?? [])
+        .filter((e) => Object.prototype.toString.call(e) === '[object Arguments]')
+        .map((e) => Array.from(e as ArrayLike<unknown>))
+    )
+  );
+  const events = (dataLayer ?? []).filter((e) => Object.prototype.toString.call(e) !== '[object Arguments]') as Array<Record<string, unknown>>;
+  return { inserted, dataLayer: dataLayer === undefined ? undefined : events, consent, raw: dataLayer };
 }
+
+const ALL_DENIED = { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied' };
 
 test('Google Tag Manager is off until a container ID is set, and a malformed ID is refused', () => {
   assert.equal(googleTagManagerId(NOT_SET_UP), null);
@@ -57,6 +76,24 @@ test('the head snippet loads the container, with the gtm.js start event, on the 
   assert.equal(dataLayer?.length, 1);
   assert.equal(dataLayer?.[0].event, 'gtm.js');
   assert.equal(typeof dataLayer?.[0]['gtm.start'], 'number');
+});
+
+test('consent is denied by default, before the container starts, for a visitor who has not chosen', () => {
+  const { consent, raw } = runHeadSnippet('www.example.co.za');
+  assert.deepEqual(consent, [['consent', 'default', ALL_DENIED]]);
+  const startIndex = raw!.findIndex((e) => (e as Record<string, unknown>).event === 'gtm.js');
+  assert.ok(startIndex > 0, 'the consent default is pushed before the gtm.js start event');
+});
+
+test('an earlier "Accept" grants analytics only; an earlier "Decline" or blocked storage keeps everything denied', () => {
+  assert.deepEqual(runHeadSnippet('www.example.co.za', 'granted').consent, [
+    ['consent', 'default', ALL_DENIED],
+    ['consent', 'update', { analytics_storage: 'granted' }],
+  ]);
+  assert.deepEqual(runHeadSnippet('www.example.co.za', 'denied').consent, [['consent', 'default', ALL_DENIED]]);
+  const blocked = runHeadSnippet('www.example.co.za', null, true);
+  assert.deepEqual(blocked.consent, [['consent', 'default', ALL_DENIED]]);
+  assert.equal(blocked.inserted.length, 1, 'blocked storage does not stop the container loading');
 });
 
 test('the head snippet does nothing on any other host (a Render preview, localhost)', () => {

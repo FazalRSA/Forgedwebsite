@@ -67,6 +67,8 @@ declare global {
     umami?: { track: (name: string, data?: EventData) => void };
     /** Google Tag Manager's data layer; present only while the container snippet runs (src/utils/googleTagManager.ts). */
     dataLayer?: unknown[];
+    /** Defined by the Google Tag Manager snippet (src/utils/googleTagManager.ts). */
+    gtag?: (...args: unknown[]) => void;
   }
 }
 
