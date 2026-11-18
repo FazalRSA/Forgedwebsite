@@ -2,6 +2,8 @@
 
 In the Render dashboard, open the static site that serves www.forgedsa.co.za, go to **Redirects/Rewrites**, and add these as **Rewrite** rules. Put them above the catch-all `/*` -> `/index.html` rule.
 
+To do it from a terminal instead, run `scripts/add-blog-rules.sh` (a preview with no changes by default; `DRY_RUN=0` applies). It needs a Render API key in `RENDER_API_KEY` and reads these same rules from `render.yaml`.
+
 | # | Source | Destination | Type |
 | --- | --- | --- | --- |
 | 1 | `/blog` | `/blog.html` | Rewrite |
