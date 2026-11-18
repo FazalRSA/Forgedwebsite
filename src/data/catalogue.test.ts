@@ -303,11 +303,11 @@ test('a listing of a design with a traced model opens in 3D even when its own re
   assert.equal(resolved?.modelUrl, '/models/wheels/fsa004.glb');
 });
 
-test('to-order colours are exactly the palette colours a design has no stock of', async () => {
-  const { getAllBrandWheels, getSiblingListings, getToOrderFinishes, WHEEL_FINISHES, TO_ORDER_NOTICE, TO_ORDER_LEAD_TIME } =
+test('to-order colours are exactly the colours a design comes in that it has no stock of', async () => {
+  const { getAllBrandWheels, getSiblingListings, getToOrderFinishes, designPalette, TO_ORDER_NOTICE, TO_ORDER_LEAD_TIME } =
     await import('./catalogue');
-  const palette = Object.keys(WHEEL_FINISHES).sort();
   for (const wheel of getAllBrandWheels()) {
+    const palette = [...designPalette(wheel.modelCode)].sort();
     const inStock = [wheel, ...getSiblingListings(wheel)].map((w) => w.defaultFinish);
     const toOrder = getToOrderFinishes(wheel).map((f) => f.id);
     for (const id of toOrder) assert.ok(!inStock.includes(id), `${wheel.slug}: ${id} is in stock but offered to order`);
@@ -327,4 +327,25 @@ test('isSixnineWheel: every design code starting with FF is Sixnine, and nothing
     getAllBrandWheels().filter(isSixnineWheel).map((w) => w.slug).sort(),
     ['ff-1-liquid-metal', 'ff-1-silver', 'ff-3-glossy-black', 'ff-3-liquid-metal', 'ff-3-pure-bronze']
   );
+});
+
+test('Sixnine designs are offered in Sixnine\'s own published finishes, by their own names, and never Hyper Black', async () => {
+  const { SIXNINE_DESIGN_FINISHES, WHEEL_FINISHES, designPalette, getAllBrandWheels, getToOrderFinishes } = await import('./catalogue');
+  const names = (code: string) => designPalette(code).map((id) => WHEEL_FINISHES[id].name).sort();
+  assert.deepEqual(names('FF-3'), ['Glossy Black', 'Hyper Silver', 'Liquid Metal', 'Pure Bronze']);
+  assert.deepEqual(names('FF-1'), ['Glossy Black', 'Hyper Silver', 'Liquid Metal']);
+  assert.deepEqual(names('ff-3 '), names('FF-3'), 'the design code is read loosely');
+  // every FF design the shop stocks has a published list, and none of them offers the FSA palette's Hyper Black
+  for (const wheel of getAllBrandWheels().filter(isSixnineWheel)) {
+    assert.ok(SIXNINE_DESIGN_FINISHES[wheel.modelCode!], `${wheel.slug}: no Sixnine finish list for ${wheel.modelCode}`);
+    assert.ok(!designPalette(wheel.modelCode).includes('dark-gunmetal'), `${wheel.slug}: Hyper Black is not a Sixnine finish`);
+    // the finish a listing is stocked in is one Sixnine publishes for the design
+    assert.ok(designPalette(wheel.modelCode).includes(wheel.defaultFinish), `${wheel.slug}: ${wheel.defaultFinish} is not a Sixnine finish for ${wheel.modelCode}`);
+  }
+  // FSA designs keep the original four colours
+  assert.deepEqual(designPalette('FSA002').sort(), ['champagne-bronze', 'dark-gunmetal', 'satin-black', 'silver']);
+  // what is left to order: FF-3 has Hyper Silver; FF-1 has Glossy Black
+  const toOrder = (slug: string) => getToOrderFinishes(getAllBrandWheels().find((w) => w.slug === slug)!).map((f) => f.name);
+  assert.deepEqual(toOrder('ff-3-pure-bronze'), ['Hyper Silver']);
+  assert.deepEqual(toOrder('ff-1-silver'), ['Glossy Black']);
 });

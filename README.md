@@ -254,12 +254,12 @@ The catalogue mirrors the stock sheet. All prices are South African Rand for a c
 | FSA002 | Gold · Hyper Black · Polished Face | 20 / 21 inch | 75,000 · 75,000 · 85,000 | `fsa002.glb` |
 | FSA003 | Silver · Hyper Black | 20 / 21 inch | 75,000 | `fsa003.glb` |
 | FSA004 | Silver · Hyper Black · Gloss Black | 20 / 21 inch | 70,000 | `fsa004.glb` |
-| FF-1 | Silver · Liquid Metal | 20 / 21 inch | 80,000 · 95,000 | `ff-1.glb` |
+| FF-1 | Silver (Hyper Silver) · Liquid Metal | 20 / 21 inch | 80,000 · 95,000 | `ff-1.glb` |
 | FF-3 | Pure Bronze · Glossy Black · Liquid Metal | 20 / 21 inch | 80,000 · 80,000 · 95,000 | `ff-3-sixnine.glb` |
 
 All fitments are BMW M3 (G80), 5×112, centre bore 66.6. Stock counts live in the data, not in this file.
 
-**Colours to order.** The table lists the finishes in stock. On each wheel page, every colour in `WHEEL_FINISHES` that the design has no stock of is offered as made to order, with the notice in `TO_ORDER_NOTICE` ("Colours not in stock are made to order. A lead time of 3 months applies."). `getToOrderFinishes(wheel)` returns them. A to-order colour has no listing, no page and no price of its own; the visitor asks about it on WhatsApp. Never show one as in stock or without the notice.
+**Colours to order.** The table lists the finishes in stock. On each wheel page, every colour the design comes in (`designPalette`) that it has no stock of is offered as made to order, with the notice in `TO_ORDER_NOTICE` ("Colours not in stock are made to order. A lead time of 3 months applies."). `getToOrderFinishes(wheel)` returns them. FSA designs use the generic four-colour palette. **Sixnine (FF) designs use Sixnine's own published finishes, by their own names** (`SIXNINE_DESIGN_FINISHES`: FF-3 comes in Liquid Metal, Glossy Black, Hyper Silver and Pure Bronze; FF-1 in Hyper Silver, Liquid Metal and Glossy Black; the owner confirmed the FF-1 "Silver" is Hyper Silver), researched on 2026-11-18 from sixnine-wheels.com and a reseller listing. Sixnine publishes no Hyper Black, so it is never offered on an FF wheel. Check Sixnine's site again when they add a finish. A to-order colour has no listing, no page and no price of its own; the visitor asks about it on WhatsApp. Never show one as in stock or without the notice.
 
 ## Catalogue data model
 

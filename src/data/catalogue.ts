@@ -23,7 +23,16 @@ export const WHEEL_MODEL_FILTERS: WheelModelFilter[] = [
   'FF-3',
 ];
 
-export type WheelFinishId = 'silver' | 'satin-black' | 'champagne-bronze' | 'dark-gunmetal';
+export type WheelFinishId =
+  | 'silver'
+  | 'satin-black'
+  | 'champagne-bronze'
+  | 'dark-gunmetal'
+  // Sixnine Wheels' own finishes, named as Sixnine names them (see SIXNINE_DESIGN_FINISHES).
+  | 'liquid-metal'
+  | 'hyper-silver'
+  | 'glossy-black'
+  | 'pure-bronze';
 
 export interface WheelFinishOption {
   id: WheelFinishId;
@@ -62,7 +71,59 @@ export const WHEEL_FINISHES: Record<WheelFinishId, WheelFinishOption> = {
     secondaryHex: '#26292E',
     rimAccentHex: '#7A8088',
   },
+  'liquid-metal': {
+    id: 'liquid-metal',
+    name: 'Liquid Metal',
+    swatchHex: '#E2E6EC',
+    secondaryHex: '#9AA1AB',
+    rimAccentHex: '#FFFFFF',
+  },
+  'hyper-silver': {
+    id: 'hyper-silver',
+    name: 'Hyper Silver',
+    swatchHex: '#C9CDD3',
+    secondaryHex: '#8E959E',
+    rimAccentHex: '#F3F5F7',
+  },
+  'glossy-black': {
+    id: 'glossy-black',
+    name: 'Glossy Black',
+    swatchHex: '#1B1C1E',
+    secondaryHex: '#0D0E10',
+    rimAccentHex: '#484B52',
+  },
+  'pure-bronze': {
+    id: 'pure-bronze',
+    name: 'Pure Bronze',
+    swatchHex: '#B8864D',
+    secondaryHex: '#6E552B',
+    rimAccentHex: '#D9AE76',
+  },
 };
+
+/** The colours of the FSA designs: the palette of the original four finishes. */
+export const GENERIC_PALETTE: WheelFinishId[] = ['silver', 'satin-black', 'champagne-bronze', 'dark-gunmetal'];
+
+/**
+ * The finishes Sixnine Wheels publishes for each design, by their own names. Researched on
+ * 2026-11-18 from sixnine-wheels.com (model pages, homepage alt text and image names) and the
+ * reseller listing at rims4italy.com; the two agree. Sixnine's pages carry no hex values.
+ *  - FF-3 (FF-THREE): Liquid Metal, Glossy Black, Hyper Silver, Pure Bronze.
+ *  - FF-1 (FF-ONE): Hyper Silver, Liquid Metal and Glossy Black. Sixnine's pages say "Black" for the
+ *    FF-ONE; the owner confirmed on 2026-11-18 that it is Glossy Black, and that the stocked FF-1
+ *    "Silver" is Hyper Silver.
+ * Sixnine does not list Hyper Black, so it is never offered on an FF design.
+ */
+export const SIXNINE_DESIGN_FINISHES: Record<string, WheelFinishId[]> = {
+  'FF-1': ['hyper-silver', 'liquid-metal', 'glossy-black'],
+  'FF-3': ['liquid-metal', 'glossy-black', 'hyper-silver', 'pure-bronze'],
+};
+
+/** The colours a design can be had in: Sixnine's published list for an FF design, otherwise the generic palette. */
+export function designPalette(modelCode?: string): WheelFinishId[] {
+  const code = (modelCode ?? '').trim().toUpperCase();
+  return SIXNINE_DESIGN_FINISHES[code] ?? GENERIC_PALETTE;
+}
 
 export type SpokeGeometryType =
   | 'ten-spoke-ring'
@@ -385,7 +446,7 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     stockStatus: 'In Stock',
     stockQuantitySets: 1,
     technicalSpecSheet: 'PCD 5×112 · ET15/20 · CB66.6',
-    defaultFinish: 'silver',
+    defaultFinish: 'hyper-silver',
     geometry: 'y-spoke-forged',
     spokeCount: 10,
     swatchHex: '#D8DCE3',
@@ -401,7 +462,7 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     stockStatus: 'In Stock',
     stockQuantitySets: 1,
     technicalSpecSheet: 'PCD 5×112 · ET15/17 · CB66.6',
-    defaultFinish: 'champagne-bronze',
+    defaultFinish: 'pure-bronze',
     geometry: 'y-spoke-forged',
     spokeCount: 10,
     swatchHex: '#B8864D',
@@ -417,7 +478,7 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     stockStatus: 'In Stock',
     stockQuantitySets: 1,
     technicalSpecSheet: 'PCD 5×112 · ET15/17 · CB66.6',
-    defaultFinish: 'satin-black',
+    defaultFinish: 'glossy-black',
     geometry: 'y-spoke-forged',
     spokeCount: 10,
     swatchHex: '#3A3D45',
@@ -433,7 +494,7 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     stockStatus: 'In Stock',
     stockQuantitySets: 2,
     technicalSpecSheet: 'PCD 5×112 · ET15/17 · CB66.6',
-    defaultFinish: 'silver',
+    defaultFinish: 'liquid-metal',
     geometry: 'y-spoke-forged',
     spokeCount: 10,
     swatchHex: '#E2E6EC',
@@ -449,7 +510,7 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     stockStatus: 'In Stock',
     stockQuantitySets: 2,
     technicalSpecSheet: 'PCD 5×112 · ET15/17 · CB66.6',
-    defaultFinish: 'silver',
+    defaultFinish: 'liquid-metal',
     geometry: 'y-spoke-forged',
     spokeCount: 10,
     swatchHex: '#E2E6EC',
@@ -664,8 +725,8 @@ export const TO_ORDER_LEAD_TIME = '3 months';
 export const TO_ORDER_NOTICE = `Colours not in stock are made to order. A lead time of ${TO_ORDER_LEAD_TIME} applies.`;
 
 /**
- * The colours of this wheel's design that are not in stock: every colour in WHEEL_FINISHES that
- * no in-stock listing of the same design has. They can be ordered, with TO_ORDER_LEAD_TIME.
+ * The colours of this wheel's design that are not in stock: every colour the design comes in
+ * (designPalette: Sixnine's published list for an FF design) that no in-stock listing of it has. They can be ordered, with TO_ORDER_LEAD_TIME.
  */
 export function getToOrderFinishes(
   wheel: BrandWheelItem,
@@ -675,7 +736,9 @@ export function getToOrderFinishes(
     wheel.defaultFinish,
     ...getSiblingListings(wheel, runtimeCustomWheels).map((w) => w.defaultFinish),
   ]);
-  return Object.values(WHEEL_FINISHES).filter((finish) => !inStock.has(finish.id));
+  return designPalette(wheel.modelCode)
+    .filter((id) => !inStock.has(id))
+    .map((id) => WHEEL_FINISHES[id]);
 }
 
 export function filterWheelsByMarque(
