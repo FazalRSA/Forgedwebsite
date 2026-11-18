@@ -6,6 +6,7 @@ import {
   detectImageType,
   handleCarPreview,
   isDailyLimitError,
+  isPhotoRejectedError,
   outputSize,
   type Env,
 } from './handler.ts';
@@ -385,6 +386,35 @@ test('daily allowance used up -> 429 daily_limit (several plausible error wordin
   }
   assert.equal(isDailyLimitError(new Error('Capacity temporarily exceeded, please try again.')), false);
   assert.equal(isDailyLimitError(new Error('InferenceError: boom')), false);
+});
+
+test('the model refusing the photo (error 3030) -> 422 photo_rejected, never a daily-limit or generic failure', async () => {
+  const silence = console.error;
+  console.error = () => undefined;
+  try {
+    for (const message of [
+      '3030: Your output has been flagged. Please choose another prompt / input image combination',
+      'AiError: output has been flagged',
+    ]) {
+      const { env } = makeEnv(() => {
+        throw new Error(message);
+      });
+      const res = await handleCarPreview(post(makeForm({ car: carFile(), wheel: 'ff-1-silver' }), { Origin: ORIGIN }), env, {
+        fetch: wheelFetch(),
+      });
+      assert.equal(res.status, 422, message);
+      const body = await json(res);
+      assert.equal(body.error, 'photo_rejected');
+      assert.match(String(body.message), /different photo/i);
+      assert.equal(res.headers.get('cache-control'), 'no-store');
+      assert.equal(res.headers.get('access-control-allow-origin'), ORIGIN);
+    }
+  } finally {
+    console.error = silence;
+  }
+  assert.equal(isPhotoRejectedError(new Error('InferenceError: boom')), false);
+  assert.equal(isPhotoRejectedError(new Error('3036: You have used up your daily free allocation')), false);
+  assert.equal(isDailyLimitError(new Error('3030: Your output has been flagged.')), false);
 });
 
 test('any other AI failure -> 502 model_failed; bad AI output shapes too', async () => {

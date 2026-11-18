@@ -71,6 +71,7 @@ for (const [status, code] of [
   [400, 'unknown_wheel'],
   [403, 'forbidden_origin'],
   [413, 'too_large'],
+  [422, 'photo_rejected'],
   [429, 'daily_limit'],
   [502, 'model_failed'],
   [504, 'timeout'],
@@ -207,7 +208,7 @@ test('the feature is on only for a non-empty https address', () => {
 });
 
 test('the WhatsApp fallback is offered for the failures a retry will not fix', () => {
-  for (const code of ['daily_limit', 'model_failed', 'timeout', 'network']) assert.equal(offersWhatsAppFallback(code), true, code);
+  for (const code of ['daily_limit', 'model_failed', 'photo_rejected', 'timeout', 'network']) assert.equal(offersWhatsAppFallback(code), true, code);
   for (const code of ['bad_request', 'too_large', 'unknown_wheel', 'unsupported_image', 'bad_response']) {
     assert.equal(offersWhatsAppFallback(code), false, code);
   }
