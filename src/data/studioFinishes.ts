@@ -54,6 +54,42 @@ export const STUDIO_FINISH_PBR: Record<WheelFinishId, StudioFinishPBR> = {
     clearcoatRoughness: 0.04,
     envMapIntensity: 1.35,
   },
+  // Liquid Metal: mirror-polished, chrome-like silver.
+  'liquid-metal': {
+    hex: '#eef0f3',
+    metalness: 1.0,
+    roughness: 0.05,
+    clearcoat: 1.0,
+    clearcoatRoughness: 0.03,
+    envMapIntensity: 1.5,
+  },
+  // Hyper Silver: bright metallic silver under a crisp clear coat (less mirror than Liquid Metal).
+  'hyper-silver': {
+    hex: '#d3d7dc',
+    metalness: 1.0,
+    roughness: 0.15,
+    clearcoat: 0.8,
+    clearcoatRoughness: 0.04,
+    envMapIntensity: 1.3,
+  },
+  // Glossy Black: deep black paint under a full gloss coat.
+  'glossy-black': {
+    hex: '#0a0a0c',
+    metalness: 0.35,
+    roughness: 0.3,
+    clearcoat: 1.0,
+    clearcoatRoughness: 0.03,
+    envMapIntensity: 1.3,
+  },
+  // Pure Bronze: warm metallic bronze.
+  'pure-bronze': {
+    hex: '#b98a52',
+    metalness: 1.0,
+    roughness: 0.3,
+    clearcoat: 0.3,
+    clearcoatRoughness: 0.06,
+    envMapIntensity: 1.1,
+  },
 };
 
 /** Settings for a finish id, falling back to silver for an unknown id. */
