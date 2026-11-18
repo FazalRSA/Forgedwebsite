@@ -14,7 +14,9 @@ meshes use assumed G80/G82 M3/M4 brake dimensions, not a measured caliper.
 
 `ff-3-sixnine.glb` is the Sixnine FF-3 (two-piece, bolt ring on the lip), shared by all FF-3 finishes. It was made from an owner-supplied AI-generated (Tripo) file in the same way as `fsa002-forked.glb`, with its width squashed to 0.27 m because the AI mesh came out about 14 inches deep; that width is an estimate, not a catalogue figure. It matches the FF-3 photos (spoke pattern, bolt ring, centre cap). The bolts take the finish colour, since the file is one mesh.
 
-`fsa003.glb`, `fsa004.glb`, `ff-1.glb` is one model per design, shared
+`fsa003-v2.glb` (the 15-spoke FSA003, shared by Gold, Silver and Hyper Black) and `ff-1-sixnine.glb` (the Sixnine FF-1, Y-spokes with a bolt ring, shared by its finishes) were made the same way as `fsa002-forked.glb`, from owner-supplied AI-generated (Tripo) files, and each matches its real photos (spoke pattern, rim, centre cap). Neither needed its width changed. They replace the older traced `fsa003.glb` and `ff-1.glb`, which were removed. As with the others, a few thin streaks from the AI mesh may show at some angles.
+
+`fsa004.glb` is one model per design, shared
 by every finish of that design (see `MODEL_URL_BY_CODE` in `src/data/catalogue.ts`). They were traced
 from face-on product photos and ship without baked textures, because the studio applies its own paint.
 On a wheel page the studio offers the listing's own finish and the design's to-order colours

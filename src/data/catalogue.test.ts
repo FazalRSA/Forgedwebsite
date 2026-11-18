@@ -293,7 +293,7 @@ test('FSA001 carries front and rear 3D models that exist in /public; every listi
   for (const slug of ['fsa002-hyper-black', 'fsa002-polished-face']) {
     assert.equal(all.find((w) => w.slug === slug)?.modelUrl, '/models/wheels/fsa002-forked.glb', slug);
   }
-  assert.equal(all.find((w) => w.slug === 'fsa003-gold')?.modelUrl, '/models/wheels/fsa003.glb');
+  assert.equal(all.find((w) => w.slug === 'fsa003-gold')?.modelUrl, '/models/wheels/fsa003-v2.glb');
 });
 
 test('a listing of a design with a traced model opens in 3D even when its own record names no model', () => {
@@ -351,4 +351,11 @@ test('Sixnine designs are offered in Sixnine\'s own published finishes, by their
   const toOrder = (slug: string) => getToOrderFinishes(getAllBrandWheels().find((w) => w.slug === slug)!).map((f) => f.name);
   assert.deepEqual(toOrder('ff-3-pure-bronze'), ['Hyper Silver']);
   assert.deepEqual(toOrder('ff-1-silver'), ['Glossy Black']);
+});
+
+test('the FSA003 and FF-1 listings share their design\'s model, and FF-1 shares the Sixnine model across finishes', () => {
+  const all = getAllBrandWheels();
+  const urls = (code: string) => new Set(all.filter((w) => w.modelCode === code).map((w) => w.modelUrl));
+  assert.deepEqual([...urls('FSA003')], ['/models/wheels/fsa003-v2.glb']);
+  assert.deepEqual([...urls('FF-1')], ['/models/wheels/ff-1-sixnine.glb']);
 });

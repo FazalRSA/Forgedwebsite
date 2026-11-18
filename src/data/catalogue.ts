@@ -265,9 +265,9 @@ interface RawInventorySeed {
  */
 export const MODEL_URL_BY_CODE: Partial<Record<RawInventorySeed['modelCode'], string>> = {
   FSA002: '/models/wheels/fsa002-forked.glb',
-  FSA003: '/models/wheels/fsa003.glb',
+  FSA003: '/models/wheels/fsa003-v2.glb',
   FSA004: '/models/wheels/fsa004.glb',
-  'FF-1': '/models/wheels/ff-1.glb',
+  'FF-1': '/models/wheels/ff-1-sixnine.glb',
   'FF-3': '/models/wheels/ff-3-sixnine.glb',
 };
 
