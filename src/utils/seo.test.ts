@@ -290,14 +290,14 @@ test('an address that is not a page is a noindex "not found", while home paths s
 
 test('renderPageHtml bakes a page\'s own title, description, canonical, image and structured data into the shell', () => {
   const shell = readFileSync(path.join(PUBLIC_DIR, '..', 'index.html'), 'utf8');
-  const wheel = WHEELS.find((w) => w.slug === 'fsa002-gold')!;
+  const wheel = WHEELS.find((w) => w.slug === 'fsa003-gold')!;
   const meta = metaForPath(`/wheels/${wheel.slug}`);
   const html = renderPageHtml(shell, meta, 'https://example.test');
 
   assert.ok(html.includes(`<title>${meta.title.replace(/&/g, '&amp;')}</title>`));
   assert.equal((html.match(/<title>/g) ?? []).length, 1);
-  assert.ok(html.includes('<link rel="canonical" href="https://example.test/wheels/fsa002-gold" />'));
-  assert.ok(html.includes('<meta property="og:url" content="https://example.test/wheels/fsa002-gold" />'));
+  assert.ok(html.includes('<link rel="canonical" href="https://example.test/wheels/fsa003-gold" />'));
+  assert.ok(html.includes('<meta property="og:url" content="https://example.test/wheels/fsa003-gold" />'));
   assert.ok(html.includes(`<meta property="og:image" content="https://example.test${meta.image}" />`));
   assert.ok(html.includes('"@type":"Product"'));
   assert.ok(html.includes('"@type":"BreadcrumbList"'));

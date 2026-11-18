@@ -47,7 +47,7 @@ export interface WheelEnquiryFacts {
   price: string;
 }
 
-/** "FSA002 in Gold (20\" / 21\"), R 75,000 per set of 4": what the enquiry is about. */
+/** "FSA003 in Gold (20\" / 21\"), R 75,000 per set of 4": what the enquiry is about. */
 export function describeWheelForEnquiry({ design, finish, sizes, price }: WheelEnquiryFacts): string {
   const formatted = formatSizes(sizes);
   const sizePart = formatted ? ` (${formatted})` : '';

@@ -9,10 +9,10 @@ import { WHEEL_IMAGE_WIDTHS, wheelImageSrcSet, wheelImageVariants } from './whee
 const publicDir = join(import.meta.dirname, '..', '..', 'public');
 
 test('a site photo gets a srcset of its smaller copies, smallest first, and the sizes it was given', () => {
-  assert.deepEqual(wheelImageSrcSet('/images/wheels/fsa002-gold/front.webp', '60vw'), {
-    src: '/images/wheels/fsa002-gold/front.webp',
+  assert.deepEqual(wheelImageSrcSet('/images/wheels/fsa003-gold/front.webp', '60vw'), {
+    src: '/images/wheels/fsa003-gold/front.webp',
     srcSet:
-      '/images/wheels/fsa002-gold/front-400.webp 400w, /images/wheels/fsa002-gold/front-800.webp 800w, /images/wheels/fsa002-gold/front.webp 1600w',
+      '/images/wheels/fsa003-gold/front-400.webp 400w, /images/wheels/fsa003-gold/front-800.webp 800w, /images/wheels/fsa003-gold/front.webp 1600w',
     sizes: '60vw',
   });
   for (const name of ['hero', 'profile']) {
@@ -25,9 +25,9 @@ test('a site photo gets a srcset of its smaller copies, smallest first, and the 
 });
 
 test('a cut-out keeps its own widths', () => {
-  assert.deepEqual(wheelImageSrcSet('/images/wheels/fsa002-gold/cutout.webp', '(min-width:1024px) 350px, 60vw'), {
-    src: '/images/wheels/fsa002-gold/cutout.webp',
-    srcSet: '/images/wheels/fsa002-gold/cutout-600.webp 600w, /images/wheels/fsa002-gold/cutout.webp 1000w',
+  assert.deepEqual(wheelImageSrcSet('/images/wheels/fsa003-gold/cutout.webp', '(min-width:1024px) 350px, 60vw'), {
+    src: '/images/wheels/fsa003-gold/cutout.webp',
+    srcSet: '/images/wheels/fsa003-gold/cutout-600.webp 600w, /images/wheels/fsa003-gold/cutout.webp 1000w',
     sizes: '(min-width:1024px) 350px, 60vw',
   });
 });
@@ -37,10 +37,10 @@ test('anything that is not a site photo gets only its src, with no srcset or siz
     '',
     'data:image/svg+xml,abc',
     'https://example.com/front.webp',
-    '/images/wheels/fsa002-gold/other.webp',
-    '/images/wheels/fsa002-gold/front.png',
-    '/images/wheels/fsa002-gold/front-800.webp',
-    '/images/wheels/fsa002-gold/nested/front.webp',
+    '/images/wheels/fsa003-gold/other.webp',
+    '/images/wheels/fsa003-gold/front.png',
+    '/images/wheels/fsa003-gold/front-800.webp',
+    '/images/wheels/fsa003-gold/nested/front.webp',
     '/images/partners/front.webp',
   ]) {
     assert.deepEqual(wheelImageSrcSet(src, '100vw'), { src });

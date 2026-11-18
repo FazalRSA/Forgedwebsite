@@ -10,12 +10,14 @@ camera views, exploded view, optional brake check and an optional Front / Rear s
 shown on `/wheels/fsa001-black-matte` and at the unlisted preview page `/studio/stf399`. Their brake
 meshes use assumed G80/G82 M3/M4 brake dimensions, not a measured caliper.
 
-`fsa002-forked.glb` is the forked-spoke FSA002 shown in the Hyper Black and Polished Face photos (those two listings set it as their own `modelUrl`; the Gold FSA002's photos show a different, 15-spoke wheel, which keeps `fsa002.glb`). It was made from an AI-generated (Tripo) 3D file supplied by the owner: the brake and stray fragments were removed, it was cut to 150k triangles, scaled to a 0.53 m rim, and its baked texture dropped so the studio paints it. It is one mesh, so the exploded view is off for it. Its shape is close to the photographed wheel, not CAD: replace it with the maker's file when one exists.
+`fsa002-forked.glb` is the forked-spoke FSA002, shared by its Hyper Black and Polished Face listings (it is the design's model in `MODEL_URL_BY_CODE`). The 15-spoke gold wheel that used to be listed as FSA002 is the FSA003 and uses `fsa003.glb`; the old `fsa002.glb` was removed. It was made from an AI-generated (Tripo) 3D file supplied by the owner: the brake and stray fragments were removed, it was cut to 150k triangles, scaled to a 0.53 m rim, and its baked texture dropped so the studio paints it. It is one mesh, so the exploded view is off for it. Its shape is close to the photographed wheel, not CAD: replace it with the maker's file when one exists.
 
 `ff-3-sixnine.glb` is the Sixnine FF-3 (two-piece, bolt ring on the lip), shared by all FF-3 finishes. It was made from an owner-supplied AI-generated (Tripo) file in the same way as `fsa002-forked.glb`, with its width squashed to 0.27 m because the AI mesh came out about 14 inches deep; that width is an estimate, not a catalogue figure. It matches the FF-3 photos (spoke pattern, bolt ring, centre cap). The bolts take the finish colour, since the file is one mesh.
 
-`fsa002.glb`, `fsa003.glb`, `fsa004.glb`, `ff-1.glb` is one model per design, shared
-by every finish of that design (see `MODEL_URL_BY_CODE` in `src/data/catalogue.ts`). They were traced
+`fsa003-v2.glb` (the 15-spoke FSA003, shared by Gold, Silver and Hyper Black) and `ff-1-sixnine.glb` (the Sixnine FF-1, Y-spokes with a bolt ring, shared by its finishes) were made the same way as `fsa002-forked.glb`, from owner-supplied AI-generated (Tripo) files, and each matches its real photos (spoke pattern, rim, centre cap). Neither needed its width changed. They replace the older traced `fsa003.glb` and `ff-1.glb`, which were removed. As with the others, a few thin streaks from the AI mesh may show at some angles.
+
+`fsa004.glb` is one model per design, shared
+by every finish of that design (see `MODEL_URL_BY_CODE` in `src/data/catalogue.ts`). It was traced
 from face-on product photos and ship without baked textures, because the studio applies its own paint.
 On a wheel page the studio offers the listing's own finish and the design's to-order colours
 (`getToOrderFinishes` in `src/data/catalogue.ts`); the page shows the 3-month lead-time notice while a

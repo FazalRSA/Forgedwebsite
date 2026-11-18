@@ -32,7 +32,7 @@ const EnquiryDialog: React.FC = () => {
   const { enquiryModal, closeEnquiryModal, submitEnquiryRecord } = useForgedStore();
 
   // Opened from a wheel page the subject is the message already typed ("Hi, I'd like to ask about
-  // the FSA002 in Gold ..."); from anywhere else it is a short topic, which still makes a fair start.
+  // the FSA003 in Gold ..."); from anywhere else it is a short topic, which still makes a fair start.
   const [message, setMessage] = useState(enquiryModal.subject);
   const [phone, setPhone] = useState('');
   const [car, setCar] = useState('');

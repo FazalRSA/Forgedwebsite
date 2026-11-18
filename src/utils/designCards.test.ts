@@ -66,8 +66,8 @@ test('the representative is the first listing of its design with a real photo', 
 });
 
 test('cut-out paths come only from the site photos', () => {
-  assert.equal(cutoutSrcFor('/images/wheels/fsa002-gold/hero.webp'), '/images/wheels/fsa002-gold/cutout.webp');
-  assert.equal(cutoutSrcFor('/images/wheels/fsa002-gold/front.webp'), undefined);
+  assert.equal(cutoutSrcFor('/images/wheels/fsa003-gold/hero.webp'), '/images/wheels/fsa003-gold/cutout.webp');
+  assert.equal(cutoutSrcFor('/images/wheels/fsa003-gold/front.webp'), undefined);
   assert.equal(cutoutSrcFor('https://example.com/hero.webp'), undefined);
   assert.equal(cutoutSrcFor('data:image/svg+xml,abc'), undefined);
   assert.equal(cutoutSrcFor(undefined), undefined);

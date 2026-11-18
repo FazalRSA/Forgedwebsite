@@ -23,4 +23,4 @@ Keeps the wheel and removes the brake and stray fragments the AI welds on; drops
 - AI models are close to the photos, not exact. Say so, and replace them when the maker's file exists.
 - One mesh means the exploded view is off for that wheel.
 - Files are 2 to 4 MB, loaded only when someone taps "View in 3D".
-- A design code can cover more than one wheel shape (FSA002 does), so a model is set per design or, where the photos differ, per listing.
+- If a design's photos show two different wheels, one is probably listed under the wrong design code (the FSA003 gold once was). Claude will ask you before giving a listing its own model.

@@ -70,11 +70,11 @@ test('loadAnalytics is safe to call twice', () => {
 test('trackEvent sends the name with the page address and the data given', () => {
   const calls: Array<[string, unknown]> = [];
   const win = {
-    location: { pathname: '/wheels/fsa002-gold' },
+    location: { pathname: '/wheels/fsa003-gold' },
     umami: { track: (name: string, data?: unknown) => calls.push([name, data]) },
   } as unknown as Window;
   trackEvent('enquiry_open', { channel: 'form' }, win);
-  assert.deepEqual(calls, [['enquiry_open', { page: '/wheels/fsa002-gold', channel: 'form' }]]);
+  assert.deepEqual(calls, [['enquiry_open', { page: '/wheels/fsa003-gold', channel: 'form' }]]);
 });
 
 test('trackEvent does nothing when the tracker is not running, and never throws', () => {

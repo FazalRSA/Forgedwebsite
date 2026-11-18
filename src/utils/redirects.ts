@@ -24,6 +24,9 @@ function isWithin(path: string, base: string): boolean {
 export function redirectFor(pathname: string): string | null {
   const path = normalizePath(pathname).toLowerCase();
 
+  // The gold wheel was listed as the FSA002 by mistake; it is the FSA003, so its page moved.
+  if (path === '/wheels/fsa002-gold') return '/wheels/fsa003-gold';
+
   // Past installations moved from /client-fitments to /installs.
   if (path === '/client-fitments' || path === '/store/client-fitments') return '/installs';
 
