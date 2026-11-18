@@ -109,8 +109,9 @@ export const GENERIC_PALETTE: WheelFinishId[] = ['silver', 'satin-black', 'champ
  * 2026-11-18 from sixnine-wheels.com (model pages, homepage alt text and image names) and the
  * reseller listing at rims4italy.com; the two agree. Sixnine's pages carry no hex values.
  *  - FF-3 (FF-THREE): Liquid Metal, Glossy Black, Hyper Silver, Pure Bronze.
- *  - FF-1 (FF-ONE): Hyper Silver, Liquid Metal and black. Sixnine's pages say "Black" for the FF-ONE
- *    and "Glossy Black" for its other wheels, so "Glossy Black" is the owner's to confirm.
+ *  - FF-1 (FF-ONE): Hyper Silver, Liquid Metal and Glossy Black. Sixnine's pages say "Black" for the
+ *    FF-ONE; the owner confirmed on 2026-11-18 that it is Glossy Black, and that the stocked FF-1
+ *    "Silver" is Hyper Silver.
  * Sixnine does not list Hyper Black, so it is never offered on an FF design.
  */
 export const SIXNINE_DESIGN_FINISHES: Record<string, WheelFinishId[]> = {
