@@ -28,9 +28,9 @@ const STOCK_SHEET: Array<[string, string, number, number]> = [
   ['FF-3', 'Glossy Black', 1, 80000],
   ['FF-3', 'Liquid Metal', 2, 95000],
   ['FSA001', 'Black Matte', 1, 90000],
-  ['FSA002', 'Gold', 1, 75000],
   ['FSA002', 'Hyper Black', 1, 75000],
   ['FSA002', 'Polished Face', 1, 85000],
+  ['FSA003', 'Gold', 1, 75000],
   ['FSA003', 'Silver', 1, 75000],
   ['FSA003', 'Hyper Black', 1, 75000],
   ['FSA004', 'Silver', 1, 70000],
@@ -131,11 +131,13 @@ test('sold-out and zero-set listings are hidden everywhere, never greyed out', (
 });
 
 test('getSiblingListings returns the other in-stock finishes of the same design', () => {
-  const gold = findWheelBySlug('fsa002-gold')!;
+  const gold = findWheelBySlug('fsa003-gold')!;
   assert.deepEqual(
     getSiblingListings(gold).map((w) => w.slug).sort(),
-    ['fsa002-hyper-black', 'fsa002-polished-face']
+    ['fsa003-hyper-black', 'fsa003-silver']
   );
+  const fsa002 = findWheelBySlug('fsa002-hyper-black')!;
+  assert.deepEqual(getSiblingListings(fsa002).map((w) => w.slug), ['fsa002-polished-face']);
 
   const ff3 = findWheelBySlug('ff-3-pure-bronze')!;
   assert.deepEqual(
@@ -153,13 +155,14 @@ test('getSiblingListings returns the other in-stock finishes of the same design'
   }
 
   // A sold-out sibling is not offered, and a wheel with no model code has no siblings.
-  assert.ok(!getSiblingListings(gold, [soldOut('fsa002-sold')].map((w) => ({ ...w, modelCode: 'FSA002' }))).some((w) => w.slug === 'fsa002-sold'));
+  assert.ok(!getSiblingListings(gold, [soldOut('fsa003-sold')].map((w) => ({ ...w, modelCode: 'FSA003' }))).some((w) => w.slug === 'fsa003-sold'));
   assert.deepEqual(getSiblingListings({ ...gold, modelCode: undefined }), []);
 });
 
 test('findWheelBySlug has no silent fallback, getWheelBySlug does, and both only see in-stock wheels', () => {
   assert.equal(findWheelBySlug('does-not-exist'), undefined);
-  assert.equal(findWheelBySlug('fsa002-gold')?.slug, 'fsa002-gold');
+  assert.equal(findWheelBySlug('fsa003-gold')?.slug, 'fsa003-gold');
+  assert.equal(findWheelBySlug('fsa002-gold'), undefined, 'the old gold address is a redirect, not a page');
   assert.equal(findWheelBySlug('FSA002')?.modelCode, 'FSA002');
   assert.equal(getWheelBySlug('does-not-exist').slug, getWheelBySlug('').slug);
   assert.ok(isInStock(getWheelBySlug('does-not-exist')));
@@ -279,22 +282,22 @@ test('FSA001 carries front and rear 3D models that exist in /public; every listi
     assert.ok(wheel.modelUrl, `${wheel.slug} has no 3D model`);
     assert.ok(existsSync(`public${wheel.modelUrl}`), `${wheel.slug}: ${wheel.modelUrl} missing`);
   }
-  // One model per design, except where a listing's photos show a different wheel under the same design code.
-  const OWN_MODEL = new Set(['fsa002-hyper-black', 'fsa002-polished-face']);
+  // One model per design: every finish of a design shares it.
   const byCode = new Map<string, Set<string>>();
-  for (const wheel of all.filter((w) => !OWN_MODEL.has(w.slug))) {
+  for (const wheel of all) {
     const code = wheel.modelCode ?? wheel.slug;
     byCode.set(code, (byCode.get(code) ?? new Set()).add(wheel.modelUrl!));
   }
   for (const [code, urls] of byCode) assert.equal(urls.size, 1, `${code} finishes disagree on the model`);
-  for (const slug of OWN_MODEL) {
-    assert.equal(all.find((w) => w.slug === slug)?.modelUrl, '/models/wheels/fsa002-forked.glb', `${slug} shows the forked FSA002`);
+  // FSA002 is the forked-spoke wheel in every finish; the gold 15-spoke wheel is the FSA003.
+  for (const slug of ['fsa002-hyper-black', 'fsa002-polished-face']) {
+    assert.equal(all.find((w) => w.slug === slug)?.modelUrl, '/models/wheels/fsa002-forked.glb', slug);
   }
-  assert.equal(all.find((w) => w.slug === 'fsa002-gold')?.modelUrl, '/models/wheels/fsa002.glb');
+  assert.equal(all.find((w) => w.slug === 'fsa003-gold')?.modelUrl, '/models/wheels/fsa003.glb');
 });
 
 test('a listing of a design with a traced model opens in 3D even when its own record names no model', () => {
-  assert.equal(catalogue.modelUrlForDesign('FSA002'), '/models/wheels/fsa002.glb');
+  assert.equal(catalogue.modelUrlForDesign('FSA002'), '/models/wheels/fsa002-forked.glb');
   assert.equal(catalogue.modelUrlForDesign('  ff-3 '), '/models/wheels/ff-3-sixnine.glb');
   assert.equal(catalogue.modelUrlForDesign('FSA001'), undefined, 'FSA001 sets its own front/rear pair on its record');
   assert.equal(catalogue.modelUrlForDesign(undefined), undefined);

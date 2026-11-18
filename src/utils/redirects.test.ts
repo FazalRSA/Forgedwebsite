@@ -48,6 +48,11 @@ test('a bare /wheels has no page and goes to the catalogue', () => {
   assert.equal(redirectFor('/wheels/'), '/#catalogue');
 });
 
+test('the old gold wheel address goes to the FSA003 page it really is', () => {
+  assert.equal(redirectFor('/wheels/fsa002-gold'), '/wheels/fsa003-gold');
+  assert.equal(redirectFor('/Wheels/FSA002-Gold/'), '/wheels/fsa003-gold');
+});
+
 test('matching ignores case, query strings and hashes', () => {
   assert.equal(redirectFor('/Store/Products/X'), '/#catalogue');
   assert.equal(redirectFor('/client-fitments?utm_source=x'), '/installs');
@@ -59,7 +64,7 @@ test('the pages that exist, and look-alike paths, are not redirected', () => {
     '/',
     '',
     '/index.html',
-    '/wheels/fsa002-gold',
+    '/wheels/fsa003-gold',
     '/installs',
     '/contact',
     '/sixnine-wheels',

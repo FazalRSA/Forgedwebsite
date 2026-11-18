@@ -164,7 +164,7 @@ export interface BrandWheelItem {
   technicalSpecSheet?: string;
   imageUrl?: string;
   galleryImages?: string[];
-  /** Photoreal .glb rim model served from /public, e.g. "/models/wheels/fsa002-gold.glb". */
+  /** Photoreal .glb rim model served from /public, e.g. "/models/wheels/fsa003-gold.glb". */
   modelUrl?: string;
   /** Second .glb for the rear axle of a staggered set; adds a Front / Rear switch in the 3D studio. */
   rearModelUrl?: string;
@@ -264,7 +264,7 @@ interface RawInventorySeed {
  * studio repaints it. FSA001 sets its own front/rear pair on the seed instead.
  */
 export const MODEL_URL_BY_CODE: Partial<Record<RawInventorySeed['modelCode'], string>> = {
-  FSA002: '/models/wheels/fsa002.glb',
+  FSA002: '/models/wheels/fsa002-forked.glb',
   FSA003: '/models/wheels/fsa003.glb',
   FSA004: '/models/wheels/fsa004.glb',
   'FF-1': '/models/wheels/ff-1.glb',
@@ -276,12 +276,6 @@ export function modelUrlForDesign(modelCode?: string): string | undefined {
   const code = (modelCode ?? '').trim().toUpperCase();
   return (MODEL_URL_BY_CODE as Record<string, string | undefined>)[code];
 }
-
-/**
- * The forked-spoke FSA002 (the wheel in the Hyper Black and Polished Face photos). The Gold FSA002's
- * photos show a different wheel, 15 thin spokes, which keeps the design's model in MODEL_URL_BY_CODE.
- */
-const FSA002_FORKED_MODEL_URL = '/models/wheels/fsa002-forked.glb';
 
 const INVENTORY_SEEDS: RawInventorySeed[] = [
   {
@@ -304,22 +298,6 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     swatchHex: '#484B52',
   },
   {
-    id: 'wheel-fsa002-gold',
-    slug: 'fsa002-gold',
-    modelCode: 'FSA002',
-    sizesAvailable: '20 inch / 21 inch',
-    finishName: 'Gold',
-    compatibleCars: 'M3 Competition Sedan (G80)',
-    priceZAR: 75000,
-    stockStatus: 'In Stock',
-    stockQuantitySets: 1,
-    technicalSpecSheet: 'PCD 5×112 · ET8/15 · CB66.6',
-    defaultFinish: 'champagne-bronze',
-    geometry: 'multi-spoke-gt',
-    spokeCount: 10,
-    swatchHex: '#D4AF37',
-  },
-  {
     id: 'wheel-fsa002-hyper-black',
     slug: 'fsa002-hyper-black',
     modelCode: 'FSA002',
@@ -330,8 +308,6 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     stockStatus: 'In Stock',
     stockQuantitySets: 1,
     technicalSpecSheet: 'PCD 5×112 · ET8/15 · CB66.6',
-    // The photos of this listing show the forked-spoke FSA002, so it has its own model.
-    modelUrl: FSA002_FORKED_MODEL_URL,
     defaultFinish: 'dark-gunmetal',
     geometry: 'multi-spoke-gt',
     spokeCount: 10,
@@ -348,12 +324,26 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     stockStatus: 'In Stock',
     stockQuantitySets: 1,
     technicalSpecSheet: 'PCD 5×112 · ET8/15 · CB66.6',
-    // The photos of this listing show the forked-spoke FSA002, so it has its own model.
-    modelUrl: FSA002_FORKED_MODEL_URL,
     defaultFinish: 'silver',
     geometry: 'multi-spoke-gt',
     spokeCount: 10,
     swatchHex: '#E8ECEF',
+  },
+  {
+    id: 'wheel-fsa003-gold',
+    slug: 'fsa003-gold',
+    modelCode: 'FSA003',
+    sizesAvailable: '20 inch / 21 inch',
+    finishName: 'Gold',
+    compatibleCars: 'M3 Competition Sedan (G80)',
+    priceZAR: 75000,
+    stockStatus: 'In Stock',
+    stockQuantitySets: 1,
+    technicalSpecSheet: 'PCD 5×112 · ET8/15 · CB66.6',
+    defaultFinish: 'champagne-bronze',
+    geometry: 'multi-spoke-gt',
+    spokeCount: 10,
+    swatchHex: '#D4AF37',
   },
   {
     id: 'wheel-fsa003-silver',

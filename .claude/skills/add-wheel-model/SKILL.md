@@ -41,7 +41,7 @@ Read the generator, triangle count, number of meshes/materials, and bounding box
 
 Put the real photos of the listing next to a render of the model: photos are in `public/images/wheels/<slug>/` (`front-800.webp`, `hero-800.webp`). Compare spoke count and shape, the rim face (windows or flat), and the centre. If the model is a different wheel (this happened: a "FSA004" file that was a forked-spoke wheel, and a text-prompt "five-spoke" that matched nothing), stop and tell the owner with the two pictures. Offer: generate again from the real photo, use the maker's file, or keep the current model.
 
-Also check which listings' photos show that wheel. Listings of one design code can show different wheels (FSA002 Gold is 15 thin spokes; Hyper Black and Polished Face are forked), so one design does not always mean one model.
+Also check which listings' photos show that wheel. Listings of one design code can show different wheels (this happened: the FSA003 gold was once listed as FSA002 next to the forked FSA002), so when photos disagree check the design code with the owner before giving a listing its own model.
 
 ### 4. Clean it
 

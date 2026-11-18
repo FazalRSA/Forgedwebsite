@@ -33,7 +33,7 @@ test("the owner's photo, whose shape varies, keeps only its src; so does anythin
     '/assets/fitments/f80-m3-yas-marina-blue/front34_800.webp',
     '/assets/fitments/f80-m3-yas-marina-blue/front34.png',
     '/assets/fitments/f80-m3-yas-marina-blue/nested/front34.webp',
-    '/images/wheels/fsa002-gold/front.webp',
+    '/images/wheels/fsa003-gold/front.webp',
   ]) {
     assert.deepEqual(fitmentImageSrcSet(src, '100vw'), { src });
     assert.equal(fitmentThumbnail(src), null);

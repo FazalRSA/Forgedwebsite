@@ -53,7 +53,7 @@ interface Photo {
 interface CarPreviewDialogProps {
   /** The catalogue slug of the wheel page, sent to the Worker. */
   wheelSlug: string;
-  /** For the alt text and the saved file, e.g. "FSA002 — Gold". */
+  /** For the alt text and the saved file, e.g. "FSA003 — Gold". */
   wheelName: string;
   onClose: () => void;
   /** Closes the dialog and opens the enquiry form for this wheel; `note` is one extra line for the message. */

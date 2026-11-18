@@ -1,11 +1,11 @@
 {
   "brandWheels": [
     {
-      "slug": "fsa002-gold",
+      "slug": "fsa003-gold",
       "images": [
-        "/images/wheels/fsa002-gold/front.webp",
-        "/images/wheels/fsa002-gold/hero.webp",
-        "/images/wheels/fsa002-gold/profile.webp"
+        "/images/wheels/fsa003-gold/front.webp",
+        "/images/wheels/fsa003-gold/hero.webp",
+        "/images/wheels/fsa003-gold/profile.webp"
       ],
       "imageLabels": [
         "Front face",
