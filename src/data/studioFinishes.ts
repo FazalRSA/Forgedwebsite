@@ -21,10 +21,10 @@ export const STUDIO_FINISH_PBR: Record<WheelFinishId, StudioFinishPBR> = {
   silver: {
     hex: '#e4e7ec',
     metalness: 1.0,
-    roughness: 0.13,
-    clearcoat: 0.8,
-    clearcoatRoughness: 0.04,
-    envMapIntensity: 1.35,
+    roughness: 0.24,
+    clearcoat: 1.0,
+    clearcoatRoughness: 0.05,
+    envMapIntensity: 1.2,
   },
   // Black Matte / Gloss Black: deep black paint under a full gloss coat. A matte listing name
   // ("Black Matte") flattens this in the viewer, so the one row serves both.
@@ -58,19 +58,19 @@ export const STUDIO_FINISH_PBR: Record<WheelFinishId, StudioFinishPBR> = {
   'liquid-metal': {
     hex: '#eef0f3',
     metalness: 1.0,
-    roughness: 0.05,
+    roughness: 0.11,
     clearcoat: 1.0,
-    clearcoatRoughness: 0.03,
-    envMapIntensity: 1.5,
+    clearcoatRoughness: 0.04,
+    envMapIntensity: 1.35,
   },
   // Hyper Silver: bright metallic silver under a crisp clear coat (less mirror than Liquid Metal).
   'hyper-silver': {
     hex: '#d3d7dc',
     metalness: 1.0,
-    roughness: 0.15,
-    clearcoat: 0.8,
-    clearcoatRoughness: 0.04,
-    envMapIntensity: 1.3,
+    roughness: 0.27,
+    clearcoat: 1.0,
+    clearcoatRoughness: 0.05,
+    envMapIntensity: 1.2,
   },
   // Glossy Black: deep black paint under a full gloss coat.
   'glossy-black': {

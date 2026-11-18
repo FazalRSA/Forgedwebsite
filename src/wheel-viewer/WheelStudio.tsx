@@ -60,6 +60,12 @@ export const DEFAULT_STUDIO_TOGGLES: StudioToggles = {
   brakes: false,
 };
 
+export interface CapLogo {
+  /** Served path to the picture (SVG, PNG or WebP). */
+  url: string;
+  badge?: boolean;
+}
+
 export interface WheelStudioProps {
   wheelModel: string;
   /** Shown under the name on the advanced stage only. */
@@ -77,6 +83,12 @@ export interface WheelStudioProps {
   rearModelUrl?: string | null;
   /** Only read when the file does not say which side is the face (unnamed meshes). */
   modelFlip?: boolean;
+  /**
+   * A logo drawn on the centre of the wheel, where the cap is (the AI-generated rim files have a blank cap).
+   * `badge` is a picture that is already a finished round badge (drawn as it is); otherwise the picture
+   * is a bare mark, drawn in its own colours on dark finishes and in dark ink on light ones.
+   */
+  capLogo?: CapLogo | null;
   /** One-line spec shown in the badge on the advanced stage, e.g. "19 × 9.5 · ET 17 · 5×112". */
   specFront?: string;
   specRear?: string;
@@ -113,6 +125,7 @@ interface LoadedModelInfo {
 interface StudioEngine {
   load: (url: string, flip: boolean) => void;
   setFinish: (finish: StudioFinish) => void;
+  setCapLogo: (logo: CapLogo | null) => void;
   setToggles: (toggles: StudioToggles) => void;
   goView: (view: StudioViewId, instant?: boolean) => void;
   /** Height in CSS pixels of the control panel covering the bottom of the stage. */
@@ -224,6 +237,16 @@ function createStudioEngine(mount: HTMLDivElement, callbacks: EngineCallbacks, o
     axis: THREE.Vector3;
     centre: THREE.Vector3;
     diameter: number;
+    capDecal: CapDecal | null;
+  }
+
+  interface CapDecal {
+    mesh: THREE.Mesh;
+    /** A cap made to fill an open centre bore, when the rim file has no cap of its own. */
+    plug: THREE.Mesh | null;
+    part: StudioPart;
+    image: HTMLImageElement;
+    logo: CapLogo;
   }
 
   // The same decoders as the car engine, so every rim file the car accepts opens here too.
@@ -269,10 +292,209 @@ function createStudioEngine(mount: HTMLDivElement, callbacks: EngineCallbacks, o
     caliper: []
   });
 
+  // ---- Centre-cap logo -------------------------------------------------------------------------
+  let capLogo: CapLogo | null = null;
+  let capLogoToken = 0;
+  const logoImages = new Map<string, Promise<HTMLImageElement>>();
+  const loadLogo = (url: string) => {
+    let hit = logoImages.get(url);
+    if (!hit) {
+      hit = new Promise<HTMLImageElement>((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => reject(new Error(`logo ${url} did not load`));
+        img.src = url;
+      });
+      logoImages.set(url, hit);
+      hit.catch(() => logoImages.delete(url));
+    }
+    return hit;
+  };
+
+  const removeCapDecal = () => {
+    const decal = rig?.capDecal;
+    if (!rig || !decal) return;
+    decal.mesh.parent?.remove(decal.mesh);
+    decal.mesh.geometry.dispose();
+    const material = decal.mesh.material as THREE.MeshStandardMaterial;
+    material.map?.dispose();
+    material.dispose();
+    rig.parts[decal.part] = rig.parts[decal.part].filter((m) => m !== decal.mesh && m !== decal.plug);
+    rig.homes.delete(decal.mesh);
+    if (decal.plug) {
+      decal.plug.parent?.remove(decal.plug);
+      decal.plug.geometry.dispose();
+      const plugMaterial = decal.plug.material as THREE.MeshPhysicalMaterial;
+      rig.finishMaterials = rig.finishMaterials.filter((f) => f.material !== plugMaterial);
+      plugMaterial.dispose();
+      rig.homes.delete(decal.plug);
+    }
+    rig.capDecal = null;
+  };
+
+  /** The logo's picture for the finish under it: a badge as it is, a bare mark in its colours on dark paint and in dark ink on light paint. */
+  const drawLogoTexture = (decal: CapDecal, finish: StudioFinish) => {
+    const size = 512;
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = size;
+    const g = canvas.getContext('2d');
+    if (!g) return null;
+    const { image, logo } = decal;
+    if (logo.badge) {
+      g.drawImage(image, 0, 0, size, size);
+    } else {
+      const lum = new THREE.Color(finish.paint.hex).getHSL({ h: 0, s: 0, l: 0 }).l;
+      g.drawImage(image, 0, 0, size, size);
+      if (lum >= 0.35) {
+        g.globalCompositeOperation = 'source-in';
+        g.fillStyle = '#1b1b1d';
+        g.fillRect(0, 0, size, size);
+      }
+    }
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    return texture;
+  };
+
+  /**
+   * Finds the cap by looking down the axle at the middle of the wheel, and lays the logo on it: a disc
+   * a little smaller than the flat top of the cap, a hair above the surface, turning with the wheel.
+   */
+  const placeCapLogo = () => {
+    if (!rig) return;
+    removeCapDecal();
+    if (!capLogo) {
+      dirty = true;
+      return;
+    }
+    const token = ++capLogoToken;
+    const logo = capLogo;
+    const target = rig;
+    loadLogo(logo.url)
+      .then((image) => {
+        if (token !== capLogoToken || rig !== target || target.capDecal) return;
+        const hitMeshes = [...target.parts.face, ...target.parts.cap];
+        if (!hitMeshes.length) return;
+        const axis = target.axis;
+        // Rays in world space: look at the wheel's middle from outboard, along the axle.
+        target.spinGroup.updateMatrixWorld(true);
+        const middle = target.centre.clone();
+        const reach = target.diameter;
+        const ray = new THREE.Raycaster();
+        const depthAt = (offset: THREE.Vector3) => {
+          const origin = middle.clone().add(offset).addScaledVector(axis, reach);
+          ray.set(origin, axis.clone().negate());
+          const hit = ray.intersectObjects(hitMeshes, false)[0];
+          return hit ? reach - hit.distance : null; // height of the surface above the middle plane
+        };
+        const side = new THREE.Vector3(1, 0, 0);
+        if (Math.abs(axis.dot(side)) > 0.9) side.set(0, 1, 0);
+        side.addScaledVector(axis, -side.dot(axis)).normalize();
+        const up = new THREE.Vector3().crossVectors(axis, side).normalize();
+        const direction = (k: number) => {
+          const angle = (k / 8) * Math.PI * 2;
+          return side.clone().multiplyScalar(Math.cos(angle)).addScaledVector(up, Math.sin(angle));
+        };
+        let top = depthAt(new THREE.Vector3());
+        let radius: number;
+        let plug: THREE.Mesh | null = null;
+        if (top === null) {
+          // An open centre bore: the file has no cap. Find the bore's size and the hub face around it,
+          // and fill it with a cap in the wheel's own paint.
+          let bore = 0.09;
+          let hubTop = 0;
+          for (let k = 0; k < 8; k++) {
+            for (let step = 1; step <= 22; step++) {
+              const h = depthAt(direction(k).multiplyScalar(step * 0.004));
+              if (h !== null) {
+                bore = Math.min(bore, step * 0.004);
+                hubTop = Math.max(hubTop, h);
+                break;
+              }
+            }
+          }
+          if (bore >= 0.09) return;
+          const capRadius = Math.min(0.06, bore + 0.004);
+          const thickness = 0.008;
+          top = hubTop + 0.001;
+          const plugMaterial = paint.create(THREE.FrontSide, 1, currentFinish);
+          plug = new THREE.Mesh(new THREE.CylinderGeometry(capRadius, capRadius, thickness, 64), plugMaterial);
+          plug.name = 'Cap_Fill';
+          plug.castShadow = true;
+          plug.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), axis);
+          plug.position.copy(target.spinGroup.worldToLocal(middle.clone().addScaledVector(axis, top - thickness / 2)));
+          target.spinGroup.add(plug);
+          target.finishMaterials.push({ material: plugMaterial, part: 'face' });
+          radius = Math.min(0.03, capRadius * 0.62);
+        } else {
+          // How wide is the flat top? Walk outward in 8 directions until the surface drops away.
+          let flat = 0.04;
+          for (let k = 0; k < 8; k++) {
+            let r = 0;
+            for (let step = 1; step <= 8; step++) {
+              const h = depthAt(direction(k).multiplyScalar(step * 0.004));
+              if (h === null || Math.abs(h - top) > 0.003) break;
+              r = step * 0.004;
+            }
+            flat = Math.min(flat, r);
+          }
+          radius = Math.min(0.03, Math.max(0.012, flat * 0.92));
+        }
+        const decal: CapDecal = { mesh: null as unknown as THREE.Mesh, plug, part: target.parts.cap.length ? 'cap' : 'face', image, logo };
+        const texture = drawLogoTexture(decal, currentFinish);
+        if (!texture) return;
+        const geometry = logo.badge ? new THREE.CircleGeometry(radius, 64) : new THREE.PlaneGeometry(radius * 1.7, radius * 1.7);
+        const material = new THREE.MeshStandardMaterial({
+          map: texture,
+          transparent: true,
+          alphaTest: 0.02,
+          roughness: 0.45,
+          metalness: 0.15,
+          envMapIntensity: 0.7,
+          polygonOffset: true,
+          polygonOffsetFactor: -2,
+          polygonOffsetUnits: -2,
+        });
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.name = 'Cap_Logo';
+        mesh.renderOrder = 2;
+        // Plane normal is +Z; turn it to the axle, then sit it on the cap.
+        mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), axis);
+        const worldPoint = middle.clone().addScaledVector(axis, top + 0.0006);
+        mesh.position.copy(target.spinGroup.worldToLocal(worldPoint));
+        target.spinGroup.add(mesh);
+        decal.mesh = mesh;
+        target.capDecal = decal;
+        target.parts[decal.part].push(mesh);
+        target.homes.set(mesh, mesh.position.clone());
+        if (plug) {
+          target.parts[decal.part].push(plug);
+          target.homes.set(plug, plug.position.clone());
+        }
+        applyExplode();
+        applyToggles();
+        dirty = true;
+      })
+      .catch((err) => console.warn('WheelStudio: cap logo not shown', err));
+  };
+
+  const restyleCapDecal = () => {
+    const decal = rig?.capDecal;
+    if (!decal) return;
+    const material = decal.mesh.material as THREE.MeshStandardMaterial;
+    const texture = drawLogoTexture(decal, currentFinish);
+    if (!texture) return;
+    material.map?.dispose();
+    material.map = texture;
+    material.needsUpdate = true;
+  };
+
   const removeRig = () => {
     if (!rig) return;
     scene.remove(rig.spinGroup);
     scene.remove(rig.staticGroup);
+    removeCapDecal();
     rig.finishMaterials.forEach(({ material }) => material.dispose());
     rig = null;
     dirty = true;
@@ -465,11 +687,12 @@ function createStudioEngine(mount: HTMLDivElement, callbacks: EngineCallbacks, o
 
     removeRig();
     const diameter = Math.max(size.x, size.y);
-    rig = { spinGroup, staticGroup, parts, homes, finishMaterials, ownMaterials, axis, centre, diameter };
+    rig = { spinGroup, staticGroup, parts, homes, finishMaterials, ownMaterials, axis, centre, diameter, capDecal: null };
     applyToggles();
     explodeNow = toggles.explode ? 1 : 0;
     applyExplode();
     goView(currentView, true);
+    placeCapLogo();
     const kinds = (Object.keys(parts) as StudioPart[]).filter((p) => !BRAKE_PARTS.includes(p) && parts[p].length > 0).length;
     callbacks.onLoaded({
       diameterMm: inMetres ? Math.round(diameter * 1000) : null,
@@ -592,7 +815,13 @@ function createStudioEngine(mount: HTMLDivElement, callbacks: EngineCallbacks, o
     setFinish: (finish) => {
       currentFinish = finish;
       rig?.finishMaterials.forEach(({ material }) => paint.apply(material, finish));
+      restyleCapDecal();
       dirty = true;
+    },
+    setCapLogo: (logo) => {
+      if (capLogo?.url === logo?.url && capLogo?.badge === logo?.badge) return;
+      capLogo = logo;
+      placeCapLogo();
     },
     setToggles: (next) => {
       toggles = { ...next };
@@ -659,6 +888,7 @@ export const WheelStudio = ({
   onClose,
   onEnquire,
   advanced = false,
+  capLogo = null,
   paint = defaultPaintRenderer,
   dracoDecoderPath = '/draco/',
   className = 'h-[76vh] min-h-[540px] max-h-[860px]',
@@ -747,6 +977,13 @@ export const WheelStudio = ({
     // by value: a catalogue reload hands over new objects with the same numbers
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paintKey]);
+
+  // The cap logo is set before the model, so a model is built with it.
+  const logoUrl = capLogo?.url ?? null;
+  const logoBadge = !!capLogo?.badge;
+  useEffect(() => {
+    engineRef.current?.setCapLogo(logoUrl ? { url: logoUrl, badge: logoBadge } : null);
+  }, [logoUrl, logoBadge]);
 
   // Load (or switch) the model.
   useEffect(() => {
