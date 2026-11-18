@@ -10,6 +10,8 @@ camera views, exploded view, optional brake check and an optional Front / Rear s
 shown on `/wheels/fsa001-black-matte` and at the unlisted preview page `/studio/stf399`. Their brake
 meshes use assumed G80/G82 M3/M4 brake dimensions, not a measured caliper.
 
+`fsa002-forked.glb` is the forked-spoke FSA002 shown in the Hyper Black and Polished Face photos (those two listings set it as their own `modelUrl`; the Gold FSA002's photos show a different, 15-spoke wheel, which keeps `fsa002.glb`). It was made from an AI-generated (Tripo) 3D file supplied by the owner: the brake and stray fragments were removed, it was cut to 150k triangles, scaled to a 0.53 m rim, and its baked texture dropped so the studio paints it. It is one mesh, so the exploded view is off for it. Its shape is close to the photographed wheel, not CAD: replace it with the maker's file when one exists.
+
 `fsa002.glb`, `fsa003.glb`, `fsa004.glb`, `ff-1.glb` and `ff-3.glb` are one model per design, shared
 by every finish of that design (see `MODEL_URL_BY_CODE` in `src/data/catalogue.ts`). They were traced
 from face-on product photos and ship without baked textures, because the studio applies its own paint.
