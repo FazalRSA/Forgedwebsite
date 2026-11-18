@@ -34,6 +34,11 @@ const ContactPage = lazy(() =>
     default: m.ContactPage,
   }))
 );
+const ForgedSaPage = lazy(() =>
+  import('./components/brand/ForgedSaPage').then((m) => ({
+    default: m.ForgedSaPage,
+  }))
+);
 const SixnineDealerPage = lazy(() =>
   import('./components/brand/SixnineDealerPage').then((m) => ({
     default: m.SixnineDealerPage,
@@ -145,6 +150,9 @@ function AppRoutes() {
 
   // /installs: real customer cars on the wheels
   if (path === '/installs') return <ClientFitmentsPage />;
+
+  // /forged-sa-wheels: the shop's own brand, every FSA design in stock
+  if (path === '/forged-sa-wheels') return <ForgedSaPage />;
 
   // /sixnine-wheels: the shop's page as an official Sixnine Wheels dealer
   if (path === '/sixnine-wheels') return <SixnineDealerPage />;

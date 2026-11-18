@@ -112,6 +112,9 @@ services:
         source: /installs
         destination: /installs.html
       - type: rewrite
+        source: /forged-sa-wheels
+        destination: /forged-sa-wheels.html
+      - type: rewrite
         source: /sixnine-wheels
         destination: /sixnine-wheels.html
       - type: rewrite

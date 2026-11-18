@@ -373,3 +373,36 @@ test('centre caps carry the FORGED logo on FSA designs and the SIXNINE badge on 
   }
   assert.equal(catalogue.capLogoForDesign(undefined), undefined);
 });
+
+test('every listing belongs to a brand: FSA designs to Forged SA, FF designs to Sixnine', () => {
+  // Every listing on the stock sheet and in customWheels.json, sold or not, so a new design code
+  // fails here until it is given a brand.
+  const listings = [...BRAND_WHEELS, ...getAllBrandWheels()];
+  for (const w of listings) {
+    const brand = catalogue.brandOfWheel(w);
+    assert.ok(brand, `${w.slug} (${w.modelCode}) belongs to no brand; extend brandOfWheel`);
+    if (/^FSA/i.test(w.modelCode ?? '')) assert.equal(brand, 'forged-sa', w.slug);
+    if (/^FF/i.test(w.modelCode ?? '')) assert.equal(brand, 'sixnine', w.slug);
+  }
+  // Both brands have stock today, and FF is never mistaken for FSA or the other way round.
+  const brands = new Set(getAllBrandWheels().map(catalogue.brandOfWheel));
+  assert.deepEqual([...brands].sort(), ['forged-sa', 'sixnine']);
+  assert.equal(catalogue.brandOfWheel({ modelCode: 'FSA001' }), 'forged-sa');
+  assert.equal(catalogue.brandOfWheel({ modelCode: ' ff-3 ' }), 'sixnine');
+  assert.equal(catalogue.brandOfWheel({ modelCode: 'STF399' }), undefined);
+  assert.equal(catalogue.brandOfWheel({ modelCode: undefined }), undefined);
+});
+
+test('each brand has a page path, a short name and a logo on disk, and the shop\'s own brand comes first', () => {
+  assert.deepEqual(catalogue.WHEEL_BRAND_ORDER, ['forged-sa', 'sixnine']);
+  for (const id of catalogue.WHEEL_BRAND_ORDER) {
+    const brand = catalogue.WHEEL_BRANDS[id];
+    assert.equal(brand.id, id);
+    assert.match(brand.path, /^\/[a-z-]+-wheels$/);
+    assert.ok(brand.name && brand.shortName && brand.relation, id);
+    assert.ok(existsSync(`public${brand.logo.url}`), `${brand.logo.url} is missing`);
+    // The cap logo on a brand's 3D wheels is the same mark.
+    const code = id === 'forged-sa' ? 'FSA001' : 'FF-1';
+    assert.equal(catalogue.capLogoForDesign(code)?.url, brand.logo.url);
+  }
+});

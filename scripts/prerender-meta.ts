@@ -14,10 +14,10 @@
  * the fallback served for every unmatched path. Two things are added to it: the Google Search
  * Console ownership tag, when SITE.searchConsoleToken is set (Google reads it from the home page's
  * raw HTML; every page file below carries it too, since they are made from the same shell), and a
- * preload for the home page's hero wheel (the first in-stock design's cut-out, which HeroSection shows on wide screens),
- * so the largest picture on the first screen is requested before the app has even loaded. It is
- * computed from the catalogue with the same helper the hero uses, so the preloaded file is exactly
- * the one the <img> asks for. No cut-out, no preload.
+ * preload for the home page hero's poster (the brand film's first frame, which HeroSection shows
+ * under the film), so the largest picture on the first screen is requested before the app has even
+ * loaded. Its srcset and sizes come from src/utils/heroVideo.ts, the same constants the hero's <img>
+ * uses, so the preloaded file is exactly the one the <img> asks for.
  *
  * Every page (index.html included) also gets the Google Tag Manager snippet when
  * SITE.googleTagManagerId is set: see src/utils/googleTagManager.ts.
@@ -25,8 +25,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { getAllBrandWheels } from '../src/data/catalogue';
-import { HERO_WHEEL_MEDIA, heroWheelImage } from '../src/utils/designCards';
+import { HERO_POSTER_SIZES, HERO_POSTER_SRCSET, HERO_VIDEO } from '../src/utils/heroVideo';
 import { isHomePath, metaForPath, renderPageHtml, sitemapPaths, withSearchConsoleTag } from '../src/utils/seo';
 import { blogStaticHtml } from '../src/components/blog/blogStatic';
 import { withGoogleTagManager } from '../src/utils/googleTagManager';
@@ -39,19 +38,16 @@ const ROOT_MARKER = '<div id="root"></div>';
 const escapeAttribute = (value: string): string =>
   value.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 
-/** The <link rel="preload"> for the home page's hero wheel, or '' when no in-stock design has a cut-out. */
-export function heroWheelPreload(): string {
-  const image = heroWheelImage(getAllBrandWheels());
-  if (!image) return '';
+/** The <link rel="preload"> for the home page hero's poster, the first frame of the brand film. */
+export function heroPosterPreload(): string {
   const attrs = [
     'rel="preload"',
     'as="image"',
-    `href="${escapeAttribute(image.src)}"`,
-    image.srcSet ? `imagesrcset="${escapeAttribute(image.srcSet)}"` : '',
-    image.sizes ? `imagesizes="${escapeAttribute(image.sizes)}"` : '',
-    `media="${escapeAttribute(HERO_WHEEL_MEDIA)}"`,
+    `href="${escapeAttribute(HERO_VIDEO.large.poster)}"`,
+    `imagesrcset="${escapeAttribute(HERO_POSTER_SRCSET)}"`,
+    `imagesizes="${escapeAttribute(HERO_POSTER_SIZES)}"`,
     'fetchpriority="high"',
-  ].filter(Boolean);
+  ];
   return `<link ${attrs.join(' ')} />`;
 }
 
@@ -89,12 +85,12 @@ try {
     }
   }
   // Written last, so the per-page files above do not inherit the preload.
-  const preload = heroWheelPreload();
+  const preload = heroPosterPreload();
   const homeHtml = preload && !shell.includes(preload) ? shell.replace('</head>', `    ${preload}\n  </head>`) : shell;
   if (homeHtml !== rawShell) writeFileSync(shellPath, homeHtml);
   console.log(
     `prerender: wrote page metadata into ${written} HTML files in ${distDir}` +
-      (preload ? ' and the hero wheel preload into index.html' : '') +
+      (preload ? ' and the hero poster preload into index.html' : '') +
       (verification ? ' and the Search Console ownership tag into every page' : '') +
       (tagManager ? ' and the Google Tag Manager snippet into every page' : '')
   );
