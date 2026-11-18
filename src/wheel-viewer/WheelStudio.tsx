@@ -333,7 +333,7 @@ function createStudioEngine(mount: HTMLDivElement, callbacks: EngineCallbacks, o
   };
 
   /** The logo's picture for the finish under it: a badge as it is, a bare mark in its colours on dark paint and in dark ink on light paint. */
-  const drawLogoTexture = (decal: CapDecal, finish: StudioFinish) => {
+  const drawLogoTexture = (decal: Pick<CapDecal, 'image' | 'logo'>, finish: StudioFinish) => {
     const size = 512;
     const canvas = document.createElement('canvas');
     canvas.width = canvas.height = size;
@@ -396,6 +396,9 @@ function createStudioEngine(mount: HTMLDivElement, callbacks: EngineCallbacks, o
           const angle = (k / 8) * Math.PI * 2;
           return side.clone().multiplyScalar(Math.cos(angle)).addScaledVector(up, Math.sin(angle));
         };
+        // Draw the logo first: if there is no 2D canvas, nothing has been added to the scene yet.
+        const texture = drawLogoTexture({ image, logo }, currentFinish);
+        if (!texture) return;
         let top = depthAt(new THREE.Vector3());
         let radius: number;
         let plug: THREE.Mesh | null = null;
@@ -442,8 +445,6 @@ function createStudioEngine(mount: HTMLDivElement, callbacks: EngineCallbacks, o
           radius = Math.min(0.03, Math.max(0.012, flat * 0.92));
         }
         const decal: CapDecal = { mesh: null as unknown as THREE.Mesh, plug, part: target.parts.cap.length ? 'cap' : 'face', image, logo };
-        const texture = drawLogoTexture(decal, currentFinish);
-        if (!texture) return;
         const geometry = logo.badge ? new THREE.CircleGeometry(radius, 64) : new THREE.PlaneGeometry(radius * 1.7, radius * 1.7);
         const material = new THREE.MeshStandardMaterial({
           map: texture,
