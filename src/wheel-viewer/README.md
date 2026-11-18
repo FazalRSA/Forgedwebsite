@@ -37,6 +37,7 @@ import { WheelStudio, type StudioFinish } from '../wheel-viewer'; // './shared/w
   onSelectFinish={setFinish}
   modelUrl="/models/rims/forged_fsa002.glb"
   rearModelUrl={null}              // a second file adds a Front / Rear switch
+  capLogo={{ url: '/brand/logo.svg' }} // optional: a logo on the centre cap ({ badge: true } for a ready-made round badge)
   onEnquire={...}                  // optional accent button
   onClose={...}                    // optional "Close 3D" button
   paint={myPaintRenderer}          // optional: default is plain PBR paint

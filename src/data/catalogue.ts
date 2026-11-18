@@ -264,17 +264,33 @@ interface RawInventorySeed {
  * studio repaints it. FSA001 sets its own front/rear pair on the seed instead.
  */
 export const MODEL_URL_BY_CODE: Partial<Record<RawInventorySeed['modelCode'], string>> = {
-  FSA002: '/models/wheels/fsa002-forked-v2.glb',
-  FSA003: '/models/wheels/fsa003-v3.glb',
-  FSA004: '/models/wheels/fsa004-v3.glb',
-  'FF-1': '/models/wheels/ff-1-sixnine-v2.glb',
-  'FF-3': '/models/wheels/ff-3-sixnine-v2.glb',
+  FSA002: '/models/wheels/fsa002-forked-v3.glb',
+  FSA003: '/models/wheels/fsa003-v4.glb',
+  FSA004: '/models/wheels/fsa004-v4.glb',
+  'FF-1': '/models/wheels/ff-1-sixnine-v3.glb',
+  'FF-3': '/models/wheels/ff-3-sixnine-v3.glb',
 };
 
 /** The traced model of a design, by its code ("FSA002"); undefined for a design with no model yet. */
 export function modelUrlForDesign(modelCode?: string): string | undefined {
   const code = (modelCode ?? '').trim().toUpperCase();
   return (MODEL_URL_BY_CODE as Record<string, string | undefined>)[code];
+}
+
+/**
+ * The logo on the centre cap of a design's 3D wheel: the FORGED monogram on FORGED designs (FSA…) and
+ * the SIXNINE badge on Sixnine designs (FF-…). `badge` marks a picture that is already a round badge.
+ */
+export interface CapLogoSpec {
+  url: string;
+  badge?: boolean;
+}
+
+export function capLogoForDesign(modelCode?: string): CapLogoSpec | undefined {
+  const code = (modelCode ?? '').trim().toUpperCase();
+  if (code.startsWith('FSA')) return { url: '/brand/forged-monogram.svg' };
+  if (code.startsWith('FF-')) return { url: '/images/partners/sixnine.webp', badge: true };
+  return undefined;
 }
 
 const INVENTORY_SEEDS: RawInventorySeed[] = [

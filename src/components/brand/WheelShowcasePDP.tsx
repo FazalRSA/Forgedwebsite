@@ -14,6 +14,7 @@ import {
   TO_ORDER_NOTICE,
   getWheelImages,
   isSixnineWheel,
+  capLogoForDesign,
 } from '../../data/catalogue';
 import { whatsappLink } from '../../config/site';
 import { carPreviewEnabled } from '../../utils/carPreview';
@@ -256,6 +257,7 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
                   finishNames={stageFinishNames}
                   modelUrl={wheel.modelUrl}
                   rearModelUrl={wheel.rearModelUrl}
+                  capLogo={capLogoForDesign(wheel.modelCode)}
                   onClose={closeStudio}
                 />
                 <p className="mt-2 text-xs text-neutral-400">

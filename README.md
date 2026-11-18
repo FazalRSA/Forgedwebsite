@@ -66,7 +66,7 @@ Five pages, plus the privacy notice:
 - **Search-ready pages.** Per-route titles, descriptions, canonical URLs, link-preview tags, structured data and a generated sitemap.
 - **AI-ready.** `/llms.txt` gives AI assistants the stock list, prices and contact details as plain text (see [For AI assistants and coding agents](#for-ai-assistants-and-coding-agents)).
 
-The 3D viewer is a Three.js studio with physically based paint finishes, fixed camera views (face, 3/4, side, back, top), an exploded view and, for staggered sets with two models, a Front / Rear switch.
+The 3D viewer is a Three.js studio with physically based paint finishes, fixed camera views (face, 3/4, side, back, top), an exploded view and, for staggered sets with two models, a Front / Rear switch. The centre cap shows the FORGED monogram on FSA designs and the SIXNINE badge on FF designs (`capLogoForDesign` in `catalogue.ts`): the viewer finds the cap by looking down the axle, lays the logo on it and, when a model has an open centre bore, fills it with a cap in the wheel's paint first.
 
 Removed in the simplification: the store and its fitment finder, collections and product pages, dealer applications, and client accounts with a garage. Their old addresses redirect (see [Routes](#routes)).
 
@@ -259,11 +259,11 @@ The catalogue mirrors the stock sheet. All prices are South African Rand for a c
 | Design | Finishes | Sizes | Price (R) | 3D model |
 | --- | --- | --- | --- | --- |
 | FSA001 (2-piece) | Black Matte | 19 / 20 inch | 90,000 | `stf399-front.glb`, `stf399-rear.glb` |
-| FSA002 | Hyper Black · Polished Face | 20 / 21 inch | 75,000 · 85,000 | `fsa002-forked-v2.glb` |
-| FSA003 | Gold · Silver · Hyper Black | 20 / 21 inch | 75,000 | `fsa003-v3.glb` |
-| FSA004 | Silver · Hyper Black · Gloss Black | 20 / 21 inch | 70,000 | `fsa004-v3.glb` |
-| FF-1 | Silver (Hyper Silver) · Liquid Metal | 20 / 21 inch | 80,000 · 95,000 | `ff-1-sixnine-v2.glb` |
-| FF-3 | Pure Bronze · Glossy Black · Liquid Metal | 20 / 21 inch | 80,000 · 80,000 · 95,000 | `ff-3-sixnine-v2.glb` |
+| FSA002 | Hyper Black · Polished Face | 20 / 21 inch | 75,000 · 85,000 | `fsa002-forked-v3.glb` |
+| FSA003 | Gold · Silver · Hyper Black | 20 / 21 inch | 75,000 | `fsa003-v4.glb` |
+| FSA004 | Silver · Hyper Black · Gloss Black | 20 / 21 inch | 70,000 | `fsa004-v4.glb` |
+| FF-1 | Silver (Hyper Silver) · Liquid Metal | 20 / 21 inch | 80,000 · 95,000 | `ff-1-sixnine-v3.glb` |
+| FF-3 | Pure Bronze · Glossy Black · Liquid Metal | 20 / 21 inch | 80,000 · 80,000 · 95,000 | `ff-3-sixnine-v3.glb` |
 
 All fitments are BMW M3 (G80), 5×112, centre bore 66.6. Stock counts live in the data, not in this file.
 
@@ -347,7 +347,7 @@ A wheel with a `modelUrl` opens in the studio (`src/components/visuals/WheelStud
 
 **How models are assigned**
 
-- One model per wheel **design**. FSA002 is the forked-spoke wheel (`fsa002-forked-v2.glb`) in every finish. The gold 15-spoke wheel was listed as FSA002 by mistake and is the FSA003 (the owner confirmed it); its old address `/wheels/fsa002-gold` redirects to `/wheels/fsa003-gold`. If a listing's photos ever show a different wheel from the rest of its design, check the design code before giving it a model of its own. `MODEL_URL_BY_CODE` in `catalogue.ts` maps a model code to its `.glb`; every finish of that design shares the file and the studio repaints it. Photo-backed entries in `customWheels.json` carry the same `modelUrl`.
+- One model per wheel **design**. FSA002 is the forked-spoke wheel (`fsa002-forked-v3.glb`) in every finish. The gold 15-spoke wheel was listed as FSA002 by mistake and is the FSA003 (the owner confirmed it); its old address `/wheels/fsa002-gold` redirects to `/wheels/fsa003-gold`. If a listing's photos ever show a different wheel from the rest of its design, check the design code before giving it a model of its own. `MODEL_URL_BY_CODE` in `catalogue.ts` maps a model code to its `.glb`; every finish of that design shares the file and the studio repaints it. Photo-backed entries in `customWheels.json` carry the same `modelUrl`.
 - FSA001 sets its own front and rear pair on its seed (`modelUrl` and `rearModelUrl`), which enables the Front / Rear switch.
 - Paint settings per finish live in `src/data/studioFinishes.ts`. The colour swatches on wheel pages and in the viewer are drawn from the same numbers (`src/wheel-viewer/swatch.ts`), so a finish and its swatch cannot disagree.
 - **Adding a model:** put the rim photo into Tripo3D, generate multi-view then 3D, export the `.glb`, upload it to Google Drive and give Claude the link. The `add-wheel-model` skill (`.claude/skills/add-wheel-model/`) cleans it and opens the pull request; the owner's steps, the limits of AI models and the better source (the maker's CAD) are in [docs/adding-3d-models.md](docs/adding-3d-models.md).

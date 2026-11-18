@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import type { WheelFinishId } from '../../data/catalogue';
+import type { CapLogoSpec, WheelFinishId } from '../../data/catalogue';
 import { Wheel3DSceneSkeleton } from './Wheel3DSceneSkeleton';
 import { Wheel3DSceneErrorBoundary } from './Wheel3DSceneErrorBoundary';
 import { lazyWithRetry } from '../../utils/lazyWithRetry';
@@ -26,6 +26,8 @@ export interface WheelStageProps {
   /** The wheel's .glb. Without one there is no 3D stage and the page shows photography instead. */
   modelUrl?: string | null;
   rearModelUrl?: string | null;
+  /** The logo drawn on the centre cap (FORGED on FSA designs, SIXNINE on FF designs). */
+  capLogo?: CapLogoSpec | null;
   /** Leaves 3D: shown as a visible "Close 3D" button in every state (loading, error, ready). */
   onClose: () => void;
 }

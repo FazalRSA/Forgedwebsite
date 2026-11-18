@@ -23,7 +23,10 @@ What it does, in order (each step exists because skipping it broke something):
  9. (--normal-smooth) bakes smoother shading normals into the file: they come from a heavily smoothed copy of
     the wheel and are blended with the real ones, so a polished finish reflects calmly instead of showing every
     bump of the AI surface, while the silhouette and edges stay exactly as they are;
-10. writes one mesh named Rim_Face_Spokes.
+10. (--barrel-smooth) straightens the barrel: a real barrel is a smooth shape of revolution, an AI barrel is
+    rippled. Each barrel vertex is pulled toward the median radius of its height along the axle, by at most a
+    few millimetres, so ripples go and real steps, grooves, bolts and spokes stay;
+11. writes one mesh named Rim_Face_Spokes.
 """
 import argparse
 import sys
@@ -69,6 +72,52 @@ def remove_fins(mesh: trimesh.Trimesh, fold_deg: float, max_faces: int) -> trime
     return mesh
 
 
+def straighten_barrel(mesh: trimesh.Trimesh, max_mm: float) -> None:
+    """Pull barrel vertices toward the median radius of their height along the axle (the axle is Z).
+    Works in place. Vertices on the face-side lip (bolts), on spokes and on real steps are not moved:
+    only mostly-radial surfaces in the rear part of the wheel, and never by more than max_mm."""
+    v = mesh.vertices
+    centre = (v[:, :2].min(axis=0) + v[:, :2].max(axis=0)) / 2
+    d = v[:, :2] - centre
+    r = np.linalg.norm(d, axis=1)
+    rmax = r.max()
+    unit_mm = rmax / 265.0  # a 0.53 m wheel is 265 mm in radius, whatever unit the file is in
+    z = v[:, 2]
+    zlo, zhi = z.min(), z.max()
+    rhat = d / (r[:, None] + 1e-12)
+    n = mesh.vertex_normals
+    n_r = (n[:, :2] * rhat).sum(axis=1)
+    # the face side is where the spokes are; find it as the side with the larger share of small-radius vertices
+    face_up = (z[r < 0.5 * rmax].mean() > (zlo + zhi) / 2) if (r < 0.5 * rmax).any() else True
+    depth = (z - zlo) / (zhi - zlo) if face_up else (zhi - z) / (zhi - zlo)   # 0 = back, 1 = face
+    zone = (depth < 0.82) & (r > 0.7 * rmax)
+    radial = np.abs(n_r) > 0.7
+    weight = np.clip((np.abs(n_r) - 0.7) / 0.22, 0, 1) * np.clip((0.82 - depth) / 0.08, 0, 1)
+    new_r = r.copy()
+    bins = np.linspace(0, 0.82, 120)
+    for sign in (1, -1):  # outer wall, inner wall
+        sel = zone & radial & (np.sign(n_r) == sign)
+        if sel.sum() < 200:
+            continue
+        which = np.digitize(depth[sel], bins)
+        prof = {}
+        for b in np.unique(which):
+            prof[b] = np.median(r[sel][which == b])
+        keys = sorted(prof)
+        vals = np.array([prof[k] for k in keys])
+        k = 2  # light moving average along the profile
+        sm = np.array([vals[max(0, i - k): i + k + 1].mean() for i in range(len(vals))])
+        target = np.interp(which, keys, sm)
+        shift = np.clip(target - r[sel], -max_mm * unit_mm, max_mm * unit_mm)
+        new_r[np.where(sel)[0]] = r[sel] + shift * weight[sel]
+    moved = np.abs(new_r - r) > 1e-9
+    scale = new_r / (r + 1e-12)
+    v[:, 0] = centre[0] + d[:, 0] * scale
+    v[:, 1] = centre[1] + d[:, 1] * scale
+    mesh.vertices = v
+    print(f'barrel straightened: {int(moved.sum())} vertices moved by at most {max_mm:g} mm')
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument('src')
@@ -93,6 +142,8 @@ def main() -> int:
                     help='0..1, how much of the smoothed normal to use')
     ap.add_argument('--cache', default=None,
                     help='file to keep the decimated mesh in (.npz); a later run with the same file skips the slow first half, so several clean-up settings can be tried quickly')
+    ap.add_argument('--barrel-smooth', type=float, default=0.0,
+                    help='mm; straighten ripples in the barrel by at most this far (0 = off, 3 to 5 is typical)')
     ap.add_argument('--flip', action='store_true', help='turn the wheel 180 degrees if the face points to -Z')
     a = ap.parse_args()
     # a negative or zero size would mirror or flatten the wheel without any error, so refuse it up front
@@ -106,6 +157,9 @@ def main() -> int:
         return 1
     if a.fold_angle < 0 or a.fold_angle >= 180 or a.fold_max_faces < 1:
         print('ERROR: --fold-angle must be 0 (off) up to 180, and --fold-max-faces at least 1', file=sys.stderr)
+        return 1
+    if a.barrel_smooth < 0 or a.barrel_smooth > 15:
+        print('ERROR: --barrel-smooth must be 0 (off) up to 15 mm', file=sys.stderr)
         return 1
     if a.normal_smooth < 0 or not 0 <= a.normal_blend <= 1:
         print('ERROR: --normal-smooth must be 0 or more and --normal-blend between 0 and 1', file=sys.stderr)
@@ -185,6 +239,9 @@ def main() -> int:
 
     if a.fold_angle > 0:
         dec = remove_fins(dec, a.fold_angle, a.fold_max_faces)
+
+    if a.barrel_smooth > 0:
+        straighten_barrel(dec, a.barrel_smooth)
 
     smoothing.filter_taubin(dec, lamb=0.5, nu=-0.53, iterations=a.smooth)
 
