@@ -295,7 +295,7 @@ test('FSA001 carries front and rear 3D models that exist in /public; every listi
 
 test('a listing of a design with a traced model opens in 3D even when its own record names no model', () => {
   assert.equal(catalogue.modelUrlForDesign('FSA002'), '/models/wheels/fsa002.glb');
-  assert.equal(catalogue.modelUrlForDesign('  ff-3 '), '/models/wheels/ff-3.glb');
+  assert.equal(catalogue.modelUrlForDesign('  ff-3 '), '/models/wheels/ff-3-sixnine.glb');
   assert.equal(catalogue.modelUrlForDesign('FSA001'), undefined, 'FSA001 sets its own front/rear pair on its record');
   assert.equal(catalogue.modelUrlForDesign(undefined), undefined);
   const withoutModel = { ...BRAND_WHEELS.find((w) => w.slug === 'fsa004-silver')!, slug: 'fsa004-test-fallback', modelUrl: undefined };

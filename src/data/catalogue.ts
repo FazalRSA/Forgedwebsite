@@ -207,7 +207,7 @@ export const MODEL_URL_BY_CODE: Partial<Record<RawInventorySeed['modelCode'], st
   FSA003: '/models/wheels/fsa003.glb',
   FSA004: '/models/wheels/fsa004.glb',
   'FF-1': '/models/wheels/ff-1.glb',
-  'FF-3': '/models/wheels/ff-3.glb',
+  'FF-3': '/models/wheels/ff-3-sixnine.glb',
 };
 
 /** The traced model of a design, by its code ("FSA002"); undefined for a design with no model yet. */

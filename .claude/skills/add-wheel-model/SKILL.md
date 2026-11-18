@@ -50,7 +50,7 @@ pip install -q trimesh fast-simplification scipy networkx numpy
 python3 -I .claude/skills/add-wheel-model/scripts/build_wheel_model.py IN.glb public/models/wheels/<name>.glb
 ```
 
-It keeps the wheel and drops the brake and fragments, drops the baked texture (the studio paints finishes itself), puts the axle on Z, decimates to about 150k triangles, removes decimation "web" spikes, smooths, and scales to a 0.53 m rim. Add `--flip` if the face points away from the camera in the preview. If the preview shows hairlike spikes between spokes, raise `--target` or lower `--agg`; if it shows holes, the web filter is too aggressive, so keep the thresholds as shipped. Name files `<design>[-variant].glb`.
+It keeps the wheel and drops the brake and fragments, drops the baked texture (the studio paints finishes itself), puts the axle on Z, decimates to about 150k triangles, removes decimation "web" spikes, smooths, and scales to a 0.53 m rim. If the model comes out far deeper than the real wheel (Tripo's FF-3 was 14 inches wide), add `--width <metres>` and say in the README that the width is an estimate. Add `--flip` if the face points away from the camera in the preview. If the preview shows hairlike spikes between spokes, raise `--target` or lower `--agg`; if it shows holes, the web filter is too aggressive, so keep the thresholds as shipped. Name files `<design>[-variant].glb`.
 
 If `npx @gltf-transform/cli meshopt` is allowed in the environment, run it to shrink the file (the others are about 0.5 to 0.8 MB). It was blocked once; the uncompressed file works fine, only larger.
 
