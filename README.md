@@ -267,8 +267,8 @@ The catalogue mirrors the stock sheet. All prices are South African Rand for a c
 | --- | --- | --- | --- | --- |
 | FSA001 (2-piece) | Black Matte | 19 / 20 inch | 90,000 | `stf399-front.glb`, `stf399-rear.glb` |
 | FSA002 | Hyper Black · Polished Face | 20 / 21 inch | 75,000 · 85,000 | `fsa002-forked-v3.glb` |
-| FSA003 | Gold · Silver · Hyper Black | 20 / 21 inch | 75,000 | `fsa003-v4.glb` |
-| FSA004 | Silver · Hyper Black · Gloss Black | 20 / 21 inch | 70,000 | `fsa004-v4.glb` |
+| FSA003 | Gold · Silver · Hyper Black | 20 / 21 inch | 75,000 | `fsa003-v5.glb` |
+| FSA004 | Silver · Hyper Black · Gloss Black | 20 / 21 inch | 70,000 | `fsa004-v5.glb` |
 | FF-1 | Silver (Hyper Silver) · Liquid Metal | 20 / 21 inch | 80,000 · 95,000 | `ff-1-sixnine-v3.glb` |
 | FF-3 | Pure Bronze · Glossy Black · Liquid Metal | 20 / 21 inch | 80,000 · 80,000 · 95,000 | `ff-3-sixnine-v3.glb` |
 
