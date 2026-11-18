@@ -184,6 +184,7 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
 │  ├─ legacy-shells.ts            Writes a redirect page for each address in legacy-pages.json
 │  ├─ legacy-pages.json           The removed addresses that still get a redirect page
 │  ├─ generate-llms.ts            Writes dist/llms.txt
+│  ├─ add-blog-rules.sh           Adds the blog's rewrite rules to a Render service whose routes are set by hand (needs a Render API key; previews first)
 │  ├─ make-wheel-cutouts.py       Makes the transparent wheel cut-outs for the home page's design cards (run by hand)
 │  ├─ make-wheel-sizes.py         Makes the 800, 400 and 600 px copies of the wheel photos that the srcsets list (run by hand)
 │  └─ fitment-reshoot/            Pipeline for the install studio re-shoots (jobs.json, Python scripts, README.md)
@@ -480,7 +481,7 @@ firebase deploy --only firestore:rules
 
 ## Testing
 
-`bun run test` runs eighteen test files (192 tests) with `node:test`. The files are listed by name in the `test` script in `package.json`, so a new test file does not run until it is added there.
+`bun run test` runs eighteen test files (200 tests) with `node:test`. The files are listed by name in the `test` script in `package.json`, so a new test file does not run until it is added there.
 
 | Suite | Covers |
 | --- | --- |
@@ -528,7 +529,7 @@ Two Render static sites build this repository's `main` (found on 17 November 202
 | **Forged Wheels** | `forged-custom-wheels-gu3l.onrender.com` | Its routes appear to have been set by hand in the dashboard, because it ignores the blog rules in `render.yaml`. Its behaviour matches `www.forgedsa.co.za`, so the custom domain appears to be attached to it |
 | **forged-custom-wheels-gu3l** | `forged-custom-wheels-gu3l-lfgl.onrender.com` | Follows `render.yaml`: every page in the sitemap, including the blog, is served from its own prerendered file |
 
-Because of this, **a new page is correct on the second service and wrong on the live domain until its rewrite rule is added to the first**. Today that affects the blog: its 17 addresses (`/blog`, four pillars, twelve articles) return the generic home-page title and no structured data to crawlers and link previews on the live domain; visitors still get the right page, because the app sets the title itself. The fix is either to move the custom domain to the second service (so everything follows `render.yaml` from then on) or to paste the rules in [docs/render-blog-rewrites.md](docs/render-blog-rewrites.md) into the first under Redirects/Rewrites. The Render MCP tools cannot edit routes or domains, so this is done in the dashboard. To check, `curl -s https://www.forgedsa.co.za/blog/wheel-care | grep '<title>'` should show "Forged wheel care", not "Forged wheels for BMW M cars in stock".
+Because of this, **a new page is correct on the second service and wrong on the live domain until its rewrite rule is added to the first**. Today that affects the blog: its 17 addresses (`/blog`, four pillars, twelve articles) return the generic home-page title and no structured data to crawlers and link previews on the live domain; visitors still get the right page, because the app sets the title itself. The fix is either to move the custom domain to the second service (so everything follows `render.yaml` from then on) or to add the rules to the first: paste those in [docs/render-blog-rewrites.md](docs/render-blog-rewrites.md) under Redirects/Rewrites, or run `scripts/add-blog-rules.sh` with a Render API key (it previews first, skips rules that already exist and reads the rules from `render.yaml`; see the comments at its top). The Render MCP tools cannot edit routes or domains, so this is done in the dashboard or with that script. To check, `curl -s https://www.forgedsa.co.za/blog/wheel-care | grep '<title>'` should show "Forged wheel care", not "Forged wheels for BMW M cars in stock".
 
 **Checking a deploy.** Render's CDN caches each page's HTML for up to five minutes, so a visitor can see the previous version briefly after a deploy goes live. To check a new deploy straight away, add any query string to the URL, for example `/installs?check=1`.
 
@@ -566,7 +567,7 @@ Build chunks are split per vendor (`react`, `motion`, `three`, `firebase`, `luci
 | **Install details** | Each car's make, model and paint were read from its photo, not confirmed | Shop to confirm, then correct `jobs.json` |
 | **Leftovers from the starter** | `package.json` still lists `@google/genai`, `express` and `dotenv`, which no file imports. `.env.example`, `metadata.json` and a tracked `.aistudio/` folder (6 MB of screenshots) come from the same starter | Remove in one clean-up pull request |
 | **Render routes** | Two Render services build `main`; the one that appears to carry the live domain ignores `render.yaml`, so the blog's addresses are not served from their prerendered files there (see [Two Render services](#two-render-services)) | Move the domain to the service that follows `render.yaml`, or add the rules in `docs/render-blog-rewrites.md` |
-| **Automated checks** | Type check, 192 tests in 18 files and the build, all run by hand. No CI, no browser tests, and ESLint is not wired to a script | Run the three checks on every pull request with a CI workflow |
+| **Automated checks** | Type check, 200 tests in 18 files and the build, all run by hand. No CI, no browser tests, and ESLint is not wired to a script | Run the three checks on every pull request with a CI workflow |
 
 ## Contributing
 
