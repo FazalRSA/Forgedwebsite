@@ -1,4 +1,5 @@
 import React from 'react';
+import { WHEEL_BRANDS } from '../../data/catalogue';
 import { ArrowUpRight } from 'lucide-react';
 import { SITE, socialLinks, telLink, whatsappLink } from '../../config/site';
 import { Link } from '../../utils/router';
@@ -12,7 +13,9 @@ import { openCookieSettings } from '../../utils/consent';
 const COOKIE_SETTINGS = googleTagManagerId() !== null;
 
 const FOOTER_LINKS = [
-  { label: 'Wheels', to: '/#catalogue' },
+  { label: 'Wheels in stock', to: '/#catalogue' },
+  { label: `${WHEEL_BRANDS['forged-sa'].name} wheels`, to: WHEEL_BRANDS['forged-sa'].path },
+  { label: WHEEL_BRANDS.sixnine.name, to: WHEEL_BRANDS.sixnine.path },
   { label: 'Installs', to: '/installs' },
   { label: 'Blog', to: '/blog' },
   { label: 'Contact', to: '/contact' },

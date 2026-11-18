@@ -3,12 +3,15 @@ import {
   formatZAR,
   getAllBrandWheels,
   getWheelImages,
-  isSixnineWheel,
+  brandOfWheel,
+  isForgedSaWheel,
+  WHEEL_BRANDS,
   type BrandWheelItem,
 } from '../data/catalogue';
 import { SITE, socialLinks } from '../config/site';
 import { normalizePath } from './redirects';
 import { blogLastmod, blogMetaForPath, blogSitemapPaths } from './blogSeo';
+import { designCodes, joinList } from './brandFitment';
 
 /**
  * Per-page metadata for search engines and link previews.
@@ -33,11 +36,12 @@ const MAX_TITLE_LENGTH = 60;
 export const CATALOGUE_PATH = '/#catalogue';
 
 /**
- * The manufacturer of a wheel, when the stock sheet says who it is. Only Sixnine designs (codes
- * starting with FF) are attributed to a maker; other wheels return undefined rather than a guess.
+ * The brand of a wheel, as the owner confirmed it: Forged SA for FSA designs, Sixnine for FF designs
+ * (see brandOfWheel). A design code that is neither returns undefined rather than a guess.
  */
 export function wheelBrand(wheel: BrandWheelItem): string | undefined {
-  return isSixnineWheel(wheel) ? 'Sixnine' : undefined;
+  const brand = brandOfWheel(wheel);
+  return brand ? WHEEL_BRANDS[brand].shortName : undefined;
 }
 
 /**
@@ -106,7 +110,7 @@ function page(title: string, description: string, canonicalPath: string, noindex
 }
 
 /**
- * Structured data for the site's plain pages (installs, the Sixnine dealer page, contact, privacy):
+ * Structured data for the site's plain pages (installs, the two brand pages, contact, privacy):
  * the kind of page it is, and where it sits (Home, then this page), so search results can show the path.
  */
 function innerPageJsonLd(
@@ -139,6 +143,22 @@ function plainPage(
   path: string
 ): PageMeta {
   return { ...page(title, description, path), jsonLd: innerPageJsonLd(type, crumb, description, path) };
+}
+
+/** The breadcrumb trail of a wheel page, as schema.org ListItems. */
+function wheelCrumbs(wheel: BrandWheelItem, path: string): Record<string, unknown>[] {
+  const brandId = brandOfWheel(wheel);
+  const trail = brandId
+    ? [
+        { name: 'Home', item: '/' },
+        { name: WHEEL_BRANDS[brandId].name, item: WHEEL_BRANDS[brandId].path },
+        { name: wheel.model, item: path },
+      ]
+    : [
+        { name: 'Wheels in stock', item: CATALOGUE_PATH },
+        { name: wheel.model, item: path },
+      ];
+  return trail.map((crumb, index) => ({ '@type': 'ListItem', position: index + 1, ...crumb }));
 }
 
 function wheelMeta(wheel: BrandWheelItem): PageMeta {
@@ -184,14 +204,9 @@ function wheelMeta(wheel: BrandWheelItem): PageMeta {
             url: path,
           },
         },
-        // Where the page sits: the wheels in stock on the home page, then this wheel.
-        {
-          '@type': 'BreadcrumbList',
-          itemListElement: [
-            { '@type': 'ListItem', position: 1, name: 'Wheels in stock', item: CATALOGUE_PATH },
-            { '@type': 'ListItem', position: 2, name: wheel.model, item: path },
-          ],
-        },
+        // Where the page sits: home, the wheel's brand page, then this wheel. A wheel with no brand
+        // (none today; a test checks) sits under the wheels in stock on the home page instead.
+        { '@type': 'BreadcrumbList', itemListElement: wheelCrumbs(wheel, path) },
       ],
     },
   };
@@ -222,6 +237,17 @@ export function metaForPath(rawPath: string): PageMeta {
         'Customer cars on forged wheel sets, shown as studio re-shoots of each customer’s own photo.',
         path
       );
+    case '/forged-sa-wheels': {
+      // "FSA001, FSA002, FSA003 and FSA004": the Forged SA designs in stock, read from the catalogue.
+      const list = joinList(designCodes(getAllBrandWheels().filter(isForgedSaWheel)));
+      return plainPage(
+        'CollectionPage',
+        WHEEL_BRANDS['forged-sa'].name,
+        'Forged SA wheels for BMW M cars',
+        `Forged SA is our own range of forged wheels for BMW M cars. See every${list ? ` ${list}` : ''} set in stock in ${SITE.country}, with sizes and Rand prices.`,
+        path
+      );
+    }
     case '/sixnine-wheels':
       return plainPage(
         'WebPage',
@@ -384,13 +410,14 @@ export function applyPageMeta(meta: PageMeta, origin: string = SITE_ORIGIN): voi
   if (!existing) document.head.appendChild(script);
 }
 
-/** Every indexable page path: the home page, one page per in-stock wheel, the blog (hub, pillars, articles), installs, the Sixnine dealer page, contact and the privacy notice. */
+/** Every indexable page path: the home page, one page per in-stock wheel, the blog (hub, pillars, articles), installs, the two brand pages, contact and the privacy notice. */
 export function sitemapPaths(): string[] {
   const candidates = [
     '/',
     ...getAllBrandWheels().map((w) => `/wheels/${w.slug}`),
     ...blogSitemapPaths(),
     '/installs',
+    '/forged-sa-wheels',
     '/sixnine-wheels',
     '/contact',
     '/privacy-policy',

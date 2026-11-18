@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { getAllBrandWheels, formatZAR } from '../data/catalogue';
+import { brandOfWheel, getAllBrandWheels, formatZAR, WHEEL_BRANDS } from '../data/catalogue';
 import { SITE } from '../config/site';
 import { ASK_AI_SERVICES, askAiLinks, askAiPrompt } from './askAi';
 import { buildLlmsTxt } from './llms';
@@ -25,6 +25,18 @@ test('llms.txt lists every in-stock wheel with its price and an absolute link, a
   }
   const wheelLinks = txt.match(/\/wheels\/[a-z0-9-]+\)/g) ?? [];
   assert.equal(wheelLinks.length, wheels.length);
+});
+
+test('llms.txt names each wheel\'s brand and links both brand pages', () => {
+  const txt = buildLlmsTxt(ORIGIN);
+  for (const w of getAllBrandWheels()) {
+    const line = txt.split('\n').find((l) => l.includes(`(${ORIGIN}/wheels/${w.slug})`))!;
+    const brand = brandOfWheel(w);
+    assert.ok(brand, w.slug);
+    assert.ok(line.includes(`: ${WHEEL_BRANDS[brand].name};`), `${w.slug}: ${line}`);
+  }
+  assert.ok(txt.includes(`(${ORIGIN}/forged-sa-wheels)`));
+  assert.ok(txt.includes(`(${ORIGIN}/sixnine-wheels)`));
 });
 
 test('llms.txt gives the contact details from SITE and no email on another domain', () => {

@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import { Link, useRouter } from '../../utils/router';
+import { brandOfWheel, findWheelBySlug, WHEEL_BRANDS } from '../../data/catalogue';
+import { useForgedStore } from '../../store/useForgedStore';
 import { BrandLogo } from '../shared/BrandLogo';
 import { ContactCta } from './ContactCta';
 
@@ -9,9 +11,10 @@ interface BrandHeaderProps {
   forceLight?: boolean;
 }
 
+/** The two brands lead: each opens its own page, and stays marked on that brand's wheel pages. */
 const NAV_ITEMS = [
-  { label: 'Wheels', to: '/#catalogue' },
-  { label: 'Sixnine', to: '/sixnine-wheels' },
+  { label: WHEEL_BRANDS['forged-sa'].shortName, to: WHEEL_BRANDS['forged-sa'].path },
+  { label: WHEEL_BRANDS.sixnine.shortName, to: WHEEL_BRANDS.sixnine.path },
   { label: 'Installs', to: '/installs' },
   { label: 'Blog', to: '/blog' },
   { label: 'Contact', to: '/contact' },
@@ -24,6 +27,7 @@ const HEADER_CTA_CLASS =
 
 export const BrandHeader: React.FC<BrandHeaderProps> = () => {
   const { pathname } = useRouter();
+  const customBrandWheels = useForgedStore((state) => state.customBrandWheels);
   const [menuOpen, setMenuOpen] = useState(false);
   const toggleRef = useRef<HTMLButtonElement | null>(null);
   const menuRef = useRef<HTMLElement | null>(null);
@@ -48,11 +52,12 @@ export const BrandHeader: React.FC<BrandHeaderProps> = () => {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [menuOpen]);
 
-  // Wheels is the current section on the home page and on every wheel page.
-  const isCurrent = (to: string) => {
-    if (to === '/#catalogue') return pathname === '/' || pathname.startsWith('/wheels/');
-    return pathname === to || pathname.startsWith(`${to}/`);
-  };
+  // On a wheel page, the wheel's brand is the current section.
+  const wheelSlug = pathname.startsWith('/wheels/') ? pathname.slice('/wheels/'.length).split('/')[0] : '';
+  const wheel = wheelSlug ? findWheelBySlug(wheelSlug, customBrandWheels) : undefined;
+  const wheelBrandId = wheel ? brandOfWheel(wheel) : undefined;
+  const wheelBrandPath = wheelBrandId ? WHEEL_BRANDS[wheelBrandId].path : undefined;
+  const isCurrent = (to: string) => pathname === to || pathname.startsWith(`${to}/`) || to === wheelBrandPath;
 
   const closeMenu = () => setMenuOpen(false);
 
@@ -74,8 +79,8 @@ export const BrandHeader: React.FC<BrandHeaderProps> = () => {
         </Link>
 
         <div className="flex items-center gap-1 sm:gap-2">
-          {/* Desktop links */}
-          <nav aria-label="Main" className="hidden md:flex items-center gap-1 mr-3">
+          {/* Desktop links, from 1024 px: below that the five links and the button do not fit beside the logo */}
+          <nav aria-label="Main" className="hidden lg:flex items-center gap-1 mr-3">
             {NAV_ITEMS.map((item) => (
               <Link
                 key={item.to}
@@ -97,7 +102,7 @@ export const BrandHeader: React.FC<BrandHeaderProps> = () => {
             className={HEADER_CTA_CLASS}
           />
 
-          {/* Phone menu button: three links live behind it, nothing else */}
+          {/* Phone and tablet menu button: the same five links live behind it, nothing else */}
           <button
             ref={toggleRef}
             type="button"
@@ -105,7 +110,7 @@ export const BrandHeader: React.FC<BrandHeaderProps> = () => {
             aria-label={menuOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={menuOpen}
             aria-controls="mobile-menu"
-            className="md:hidden inline-flex items-center justify-center w-11 h-11 rounded-full text-[#EDEBE4] hover:text-white cursor-pointer"
+            className="lg:hidden inline-flex items-center justify-center w-11 h-11 rounded-full text-[#EDEBE4] hover:text-white cursor-pointer"
           >
             {menuOpen ? <X aria-hidden="true" className="w-5 h-5" /> : <Menu aria-hidden="true" className="w-5 h-5" />}
           </button>
@@ -116,7 +121,7 @@ export const BrandHeader: React.FC<BrandHeaderProps> = () => {
             ref={menuRef}
             id="mobile-menu"
             aria-label="Main"
-            className="md:hidden absolute top-full inset-x-0 bg-[#111111] border-b border-[#26262E] px-4 sm:px-6 pb-2"
+            className="lg:hidden absolute top-full inset-x-0 bg-[#111111] border-b border-[#26262E] px-4 sm:px-6 pb-2"
           >
             {NAV_ITEMS.map((item) => (
               <Link
@@ -140,7 +145,7 @@ export const BrandHeader: React.FC<BrandHeaderProps> = () => {
         <div
           aria-hidden="true"
           onClick={closeMenu}
-          className="md:hidden fixed inset-0 top-16 z-40 bg-black/60"
+          className="lg:hidden fixed inset-0 top-16 z-40 bg-black/60"
         />
       )}
     </>
