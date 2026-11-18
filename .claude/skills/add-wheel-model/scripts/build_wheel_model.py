@@ -37,7 +37,14 @@ def main() -> int:
     ap.add_argument('--flip', action='store_true', help='turn the wheel 180 degrees if the face points to -Z')
     a = ap.parse_args()
 
-    m = trimesh.load(a.src, force='mesh', process=False)
+    try:
+        m = trimesh.load(a.src, force='mesh', process=False)
+    except Exception as err:  # unreadable, truncated (a failed download) or not a 3D file
+        print(f'ERROR: could not read {a.src}: {err}', file=sys.stderr)
+        return 1
+    if len(getattr(m, 'faces', [])) == 0:
+        print(f'ERROR: {a.src} has no triangles. Was the download complete?', file=sys.stderr)
+        return 1
     print(f'loaded {len(m.faces):,} triangles')
     m.merge_vertices(merge_tex=True, merge_norm=True)
     parts = sorted(m.split(only_watertight=False), key=lambda p: -len(p.faces))
@@ -84,7 +91,11 @@ def main() -> int:
 
     scene = trimesh.Scene()
     scene.add_geometry(dec, node_name='Rim_Face_Spokes', geom_name='Rim_Face_Spokes')
-    scene.export(a.dst)
+    try:
+        scene.export(a.dst)
+    except OSError as err:
+        print(f'ERROR: could not write {a.dst}: {err}', file=sys.stderr)
+        return 1
     w = dec.extents
     print(f'wrote {a.dst}: {len(dec.faces):,} triangles, {w[0]:.3f} x {w[1]:.3f} m across, {w[2]:.3f} m wide')
     return 0

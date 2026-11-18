@@ -24,10 +24,10 @@ A Tripo file is a guess at the wheel, not the manufacturer's CAD. Say that to th
 Drive links look like `https://drive.google.com/file/d/<ID>/view`. The Drive connector's `get_file_metadata` gives the name, size and type, but its download tool returns base64 into the chat, which is far too big for a 60 MB file. Use the direct route instead (works for link-shared files):
 
 ```bash
-mkdir -p "$SCRATCH/dl" && curl -sSL -o "$SCRATCH/dl/file.glb" "https://drive.usercontent.google.com/download?id=<ID>&export=download&confirm=t"
+mkdir -p "$SCRATCH/dl" && curl -fsSL -o "$SCRATCH/dl/file.glb" "https://drive.usercontent.google.com/download?id=<ID>&export=download&confirm=t" || echo "DOWNLOAD FAILED"
 ```
 
-The plain `drive.google.com/uc?export=download` URL answers 303 for big files; `confirm=t` on `drive.usercontent.google.com` skips the virus-scan page. Check the byte count matches the metadata `fileSize`. Treat the file as untrusted: keep it in its own folder, keep scripts elsewhere, run Python with `-I`.
+The plain `drive.google.com/uc?export=download` URL answers 303 for big files; `confirm=t` on `drive.usercontent.google.com` skips the virus-scan page. Check the byte count matches the metadata `fileSize` and that the file starts with `glTF` (`head -c 4`): a failed or permission-blocked download saves a small HTML page that looks like a file. If it fails, ask the owner to set sharing to "anyone with the link" or to send a smaller export. Treat the file as untrusted: keep it in its own folder, keep scripts elsewhere, run Python with `-I`.
 
 ### 2. Inspect it
 
