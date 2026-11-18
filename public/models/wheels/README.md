@@ -12,7 +12,9 @@ meshes use assumed G80/G82 M3/M4 brake dimensions, not a measured caliper.
 
 `fsa002-forked.glb` is the forked-spoke FSA002 shown in the Hyper Black and Polished Face photos (those two listings set it as their own `modelUrl`; the Gold FSA002's photos show a different, 15-spoke wheel, which keeps `fsa002.glb`). It was made from an AI-generated (Tripo) 3D file supplied by the owner: the brake and stray fragments were removed, it was cut to 150k triangles, scaled to a 0.53 m rim, and its baked texture dropped so the studio paints it. It is one mesh, so the exploded view is off for it. Its shape is close to the photographed wheel, not CAD: replace it with the maker's file when one exists.
 
-`fsa002.glb`, `fsa003.glb`, `fsa004.glb`, `ff-1.glb` and `ff-3.glb` are one model per design, shared
+`ff-3-sixnine.glb` is the Sixnine FF-3 (two-piece, bolt ring on the lip), shared by all FF-3 finishes. It was made from an owner-supplied AI-generated (Tripo) file in the same way as `fsa002-forked.glb`, with its width squashed to 0.27 m because the AI mesh came out about 14 inches deep; that width is an estimate, not a catalogue figure. It matches the FF-3 photos (spoke pattern, bolt ring, centre cap). The bolts take the finish colour, since the file is one mesh.
+
+`fsa002.glb`, `fsa003.glb`, `fsa004.glb`, `ff-1.glb` is one model per design, shared
 by every finish of that design (see `MODEL_URL_BY_CODE` in `src/data/catalogue.ts`). They were traced
 from face-on product photos and ship without baked textures, because the studio applies its own paint.
 On a wheel page the studio offers the listing's own finish and the design's to-order colours

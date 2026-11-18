@@ -255,7 +255,7 @@ The catalogue mirrors the stock sheet. All prices are South African Rand for a c
 | FSA003 | Silver · Hyper Black | 20 / 21 inch | 75,000 | `fsa003.glb` |
 | FSA004 | Silver · Hyper Black · Gloss Black | 20 / 21 inch | 70,000 | `fsa004.glb` |
 | FF-1 | Silver · Liquid Metal | 20 / 21 inch | 80,000 · 95,000 | `ff-1.glb` |
-| FF-3 | Pure Bronze · Glossy Black · Liquid Metal | 20 / 21 inch | 80,000 · 80,000 · 95,000 | `ff-3.glb` |
+| FF-3 | Pure Bronze · Glossy Black · Liquid Metal | 20 / 21 inch | 80,000 · 80,000 · 95,000 | `ff-3-sixnine.glb` |
 
 All fitments are BMW M3 (G80), 5×112, centre bore 66.6. Stock counts live in the data, not in this file.
 

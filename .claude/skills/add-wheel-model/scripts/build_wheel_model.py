@@ -34,6 +34,8 @@ def main() -> int:
     ap.add_argument('--agg', type=int, default=2, help='decimation aggression, lower is gentler')
     ap.add_argument('--smooth', type=int, default=4, help='Taubin smoothing iterations')
     ap.add_argument('--diameter', type=float, default=0.53, help='rim diameter in metres')
+    ap.add_argument('--width', type=float, default=None,
+                    help='squash the wheel to this width in metres (AI meshes often come out too deep); default keeps the file\'s proportions')
     ap.add_argument('--flip', action='store_true', help='turn the wheel 180 degrees if the face points to -Z')
     a = ap.parse_args()
 
@@ -87,6 +89,10 @@ def main() -> int:
     dia = max(b[1][0] - b[0][0], b[1][1] - b[0][1])
     dec.apply_translation([-(b[0][0] + b[1][0]) / 2, -(b[0][1] + b[1][1]) / 2, 0])
     dec.apply_scale(a.diameter / dia)
+    if a.width:
+        z = dec.extents[2]
+        dec.apply_scale([1, 1, a.width / z])
+        print(f'squashed the width from {z:.3f} m to {a.width:.3f} m')
     dec.vertex_normals  # smooth normals, computed once
 
     scene = trimesh.Scene()
