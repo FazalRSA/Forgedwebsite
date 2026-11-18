@@ -671,6 +671,65 @@ export function isSixnineWheel(wheel: Pick<BrandWheelItem, 'modelCode'>): boolea
 }
 
 /**
+ * The two wheel brands the shop sells, as the owner confirmed them: every FSA design is Forged SA's
+ * own, and every FF design is Sixnine Wheels' (the shop is its official dealer). The site groups the
+ * catalogue, the navigation, each wheel page's brand line, its breadcrumb and its Product structured
+ * data by these.
+ */
+export type WheelBrandId = 'forged-sa' | 'sixnine';
+
+export interface WheelBrand {
+  id: WheelBrandId;
+  /** The brand's full name, for headings and running text. */
+  name: string;
+  /** The short name: the navigation label, and the brand in each wheel's Product structured data. */
+  shortName: string;
+  /** The brand's page on this site. */
+  path: string;
+  /** The brand's mark, as shown beside its name. `badge` marks a picture that is already a round badge. */
+  logo: { url: string; alt: string; badge?: boolean };
+  /** How the shop stands to the brand, said in a few words. */
+  relation: string;
+}
+
+export const WHEEL_BRANDS: Record<WheelBrandId, WheelBrand> = {
+  'forged-sa': {
+    id: 'forged-sa',
+    name: 'Forged SA',
+    shortName: 'Forged SA',
+    path: '/forged-sa-wheels',
+    logo: { url: '/brand/forged-monogram.svg', alt: 'FORGED SA monogram' },
+    relation: 'Our own brand',
+  },
+  sixnine: {
+    id: 'sixnine',
+    name: 'Sixnine Wheels',
+    shortName: 'Sixnine',
+    path: '/sixnine-wheels',
+    logo: { url: '/images/partners/sixnine.webp', alt: 'SIXNINE Wheels logo', badge: true },
+    relation: 'Official dealer',
+  },
+};
+
+/** The order the brands are shown in: the shop's own first. */
+export const WHEEL_BRAND_ORDER: readonly WheelBrandId[] = ['forged-sa', 'sixnine'];
+
+/** Forged SA designs: every design code that starts with "FSA" (FSA001 to FSA004, and any added later). */
+export function isForgedSaWheel(wheel: Pick<BrandWheelItem, 'modelCode'>): boolean {
+  return /^FSA/i.test((wheel.modelCode ?? '').trim());
+}
+
+/**
+ * Which brand a listing is, from its design code, or undefined for a code that is neither FSA nor FF.
+ * A test fails if any listing in the catalogue has no brand, so a new code is never left unassigned.
+ */
+export function brandOfWheel(wheel: Pick<BrandWheelItem, 'modelCode'>): WheelBrandId | undefined {
+  if (isForgedSaWheel(wheel)) return 'forged-sa';
+  if (isSixnineWheel(wheel)) return 'sixnine';
+  return undefined;
+}
+
+/**
  * Entries in customWheels.json. One whose slug matches a stock-sheet listing only adds to it
  * (today: the photography), so the stock sheet stays the single source for names, sizes and prices.
  * Any other entry is a complete listing, as written by `npm run add-wheel`.

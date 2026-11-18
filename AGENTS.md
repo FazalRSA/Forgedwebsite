@@ -49,7 +49,9 @@ Run the type check, the tests and the build before you open a pull request. All 
 ## Where things are
 
 - `src/config/site.ts`: business details.
-- `src/data/catalogue.ts`: wheel listings and stock. `src/data/clientFitments.ts`: installs.
+- `src/data/catalogue.ts`: wheel listings and stock, and the two brands (`WHEEL_BRANDS`, `brandOfWheel`): FSA designs are
+  Forged SA (the shop's own), FF designs are Sixnine Wheels (official dealer). Group, label and link wheels by brand
+  through these; never decide a brand any other way. `src/data/clientFitments.ts`: installs.
   `src/data/partners.ts`: partner logos.
 - `worker/car-preview/`: the Cloudflare Worker behind "See it on my car" (deployed by the owner, not by Render). The feature stays off while `SITE.carPreviewUrl` is empty; never commit a local address there. `src/utils/carPreview.ts` and `CarPreviewDialog.tsx` are the website side.
 - `src/utils/seo.ts`: page titles, descriptions, sitemap paths. `src/utils/redirects.ts`: old

@@ -2,9 +2,13 @@ import React, { useMemo } from 'react';
 import { ArrowRight } from 'lucide-react';
 import {
   BrandWheelItem,
+  brandOfWheel,
   getAllBrandWheels,
   getWheelImages,
   formatZAR,
+  WHEEL_BRAND_ORDER,
+  WHEEL_BRANDS,
+  type WheelBrand,
 } from '../../data/catalogue';
 import { useForgedStore } from '../../store/useForgedStore';
 import { Link } from '../../utils/router';
@@ -237,9 +241,9 @@ const DesignCard: React.FC<{
 
         <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 sm:p-6 lg:p-7">
           <div className="min-w-0">
-            <h3 className="font-[family-name:var(--font-display)] font-black uppercase text-3xl sm:text-4xl leading-none tracking-[-0.03em] text-white">
+            <h4 className="font-[family-name:var(--font-display)] font-black uppercase text-3xl sm:text-4xl leading-none tracking-[-0.03em] text-white">
               {card.design}
-            </h3>
+            </h4>
             <p className="mt-2 text-sm font-medium text-neutral-200 tabular-nums">{card.priceLine}</p>
             {card.swatches.length > 0 && (
               // decorative: the finish names are in the text below; the swatches are the viewer's own paint
@@ -274,13 +278,93 @@ const DesignCard: React.FC<{
   );
 };
 
+/** "1 set", "9 sets"; "1 design", "4 designs". */
+const count = (n: number, one: string) => `${n} ${one}${n === 1 ? '' : 's'}`;
+
+/**
+ * One brand's designs: its mark, name and what the shop is to it, how much is in stock, a link to the
+ * brand's own page, and its design cards. With no brand (a design code that is neither FSA nor FF, which
+ * a test rules out today) the cards are still listed, under no heading, so stock is never hidden.
+ */
+const BrandGroup: React.FC<{
+  brand?: WheelBrand;
+  wheels: BrandWheelItem[];
+  /** Cards before this group, so only the very first card on the page loads eagerly. */
+  firstIndex: number;
+}> = ({ brand, wheels, firstIndex }) => {
+  const cards = buildDesignCards(wheels);
+  const widths = designCardWidths(cards.length);
+  const sets = wheels.reduce((sum, wheel) => sum + (wheel.stockQuantitySets ?? 0), 0);
+  const headingId = brand ? `catalogue-${brand.id}-heading` : undefined;
+
+  return (
+    <section id={brand ? `catalogue-${brand.id}` : undefined} aria-labelledby={headingId} className="scroll-mt-20 mt-10 first:mt-8">
+      {brand && (
+        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
+          <div className="flex items-center gap-4">
+            <img
+              src={brand.logo.url}
+              alt=""
+              aria-hidden="true"
+              width={48}
+              height={48}
+              className="h-11 w-11 sm:h-12 sm:w-12 shrink-0 object-contain"
+            />
+            <div>
+              <h3 id={headingId} className="text-2xl sm:text-3xl font-light tracking-[-0.02em] leading-tight text-white">
+                {brand.name}
+              </h3>
+              <p className="mt-0.5 text-sm text-neutral-400">
+                {brand.relation} · {count(cards.length, 'design')}, {count(sets, 'set')} in stock
+              </p>
+            </div>
+          </div>
+          <Link
+            to={brand.path}
+            className="group/link inline-flex min-h-11 items-center gap-2 text-sm font-medium text-neutral-200 hover:text-white"
+          >
+            All {brand.shortName} sets
+            <ArrowRight aria-hidden="true" className="h-4 w-4 transition-transform group-hover/link:translate-x-0.5" />
+          </Link>
+        </div>
+      )}
+      <ul
+        data-testid={`brand-wheel-catalogue-grid${brand ? `-${brand.id}` : ''}`}
+        className="mt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 lg:gap-5"
+      >
+        {cards.map((card, index) => (
+          <DesignCard
+            key={card.design}
+            card={card}
+            width={widths[index]}
+            fillTabletRow={cards.length % 2 === 1 && index === cards.length - 1}
+            index={firstIndex + index}
+          />
+        ))}
+      </ul>
+    </section>
+  );
+};
+
 export const WheelCatalogue: React.FC = () => {
   const customBrandWheels = useForgedStore((state) => state.customBrandWheels);
 
   // getAllBrandWheels returns only wheels that are in stock.
   const wheels = useMemo(() => getAllBrandWheels(customBrandWheels), [customBrandWheels]);
-  const cards = useMemo(() => buildDesignCards(wheels), [wheels]);
-  const widths = designCardWidths(cards.length);
+  // Grouped by brand, the shop's own first; a group with nothing in stock is left out.
+  const groups = useMemo(() => {
+    const byBrand = WHEEL_BRAND_ORDER.map((id) => ({
+      brand: WHEEL_BRANDS[id] as WheelBrand | undefined,
+      wheels: wheels.filter((wheel) => brandOfWheel(wheel) === id),
+    }));
+    const unbranded = wheels.filter((wheel) => !brandOfWheel(wheel));
+    return [...byBrand, { brand: undefined, wheels: unbranded }].filter((group) => group.wheels.length > 0);
+  }, [wheels]);
+  // Where each group's cards start, counted in design cards.
+  const firstIndexes = groups.reduce<number[]>(
+    (starts, group, i) => [...starts, i === 0 ? 0 : starts[i - 1] + buildDesignCards(groups[i - 1].wheels).length],
+    []
+  );
 
   return (
     <section
@@ -295,7 +379,7 @@ export const WheelCatalogue: React.FC = () => {
         Wheels in stock
       </h2>
 
-      {cards.length === 0 ? (
+      {groups.length === 0 ? (
         <div className="mt-8 space-y-5">
           <p className="text-neutral-300">No wheels are listed in stock right now.</p>
           <ContactCta
@@ -307,20 +391,9 @@ export const WheelCatalogue: React.FC = () => {
           />
         </div>
       ) : (
-        <ul
-          data-testid="brand-wheel-catalogue-grid"
-          className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 lg:gap-5"
-        >
-          {cards.map((card, index) => (
-            <DesignCard
-              key={card.design}
-              card={card}
-              width={widths[index]}
-              fillTabletRow={cards.length % 2 === 1 && index === cards.length - 1}
-              index={index}
-            />
-          ))}
-        </ul>
+        groups.map((group, i) => (
+          <BrandGroup key={group.brand?.id ?? 'other'} brand={group.brand} wheels={group.wheels} firstIndex={firstIndexes[i]} />
+        ))
       )}
     </section>
   );

@@ -1,10 +1,9 @@
 import React, { useMemo } from 'react';
 import { BrandHeader } from './BrandHeader';
-import { ContactCta, CTA_PRIMARY_CLASS, CTA_SECONDARY_CLASS } from './ContactCta';
-import { WheelCard } from './WheelCatalogue';
-import { getAllBrandWheels, isSixnineWheel } from '../../data/catalogue';
+import { BrandEnquirySection, BrandFitmentSection, BrandPageHero, BrandStockSection } from './BrandSections';
+import { getAllBrandWheels, isSixnineWheel, WHEEL_BRANDS } from '../../data/catalogue';
 import { useForgedStore } from '../../store/useForgedStore';
-import { Link } from '../../utils/router';
+import { designCodes, fitmentAtAGlance, joinList } from '../../utils/brandFitment';
 
 /** Where the facts about the brand below come from. */
 const SIXNINE_SOURCE_URL = 'https://www.sixnine-wheels.com/pages/about';
@@ -22,26 +21,6 @@ const SIXNINE_RANGE: readonly { name: string; code: string; summary: string }[] 
   { name: 'OEM+ONE', code: 'OEM+1', summary: 'A classic design, reimagined.' },
 ];
 
-/** "FF-1", "FF-1 and FF-3", "FF-1, FF-2 and FF-3". */
-function joinList(items: string[]): string {
-  return items.length > 1 ? `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}` : items[0] ?? '';
-}
-
-/** The one value every row agrees on, or null when the rows differ or have none. */
-function sharedValue(values: (string | undefined)[]): string | null {
-  const unique = Array.from(new Set(values.filter((value): value is string => Boolean(value))));
-  return unique.length === 1 ? unique[0] : null;
-}
-
-/** Picks one part out of "PCD 5×112 · ET15/20 · CB66.6", e.g. the part that starts with "PCD". */
-function specPart(spec: string | undefined, prefix: string): string | undefined {
-  return spec?.split('·').map((part) => part.trim()).find((part) => part.startsWith(prefix));
-}
-
-/** "20 inch / 21 inch" becomes 20" / 21". */
-const formatSizes = (sizes?: string): string | undefined =>
-  sizes ? sizes.replace(/\s*inch(?:es)?/gi, '"').trim() : undefined;
-
 /**
  * /sixnine-wheels. The shop's page as an official Sixnine Wheels dealer. Everything about stock, sizes
  * and prices is read from the live catalogue, so it cannot drift from the wheels page.
@@ -56,65 +35,30 @@ export const SixnineDealerPage: React.FC = () => {
     [customBrandWheels]
   );
 
-  const designs = useMemo(
-    () => Array.from(new Set(wheels.map((wheel) => wheel.modelCode).filter((code): code is string => Boolean(code)))),
-    [wheels]
-  );
+  const designs = useMemo(() => designCodes(wheels), [wheels]);
   const designList = joinList(designs);
   const enquiryMessage = `Hi, I'd like to ask about the Sixnine wheels${designList ? ` (${designs.join(' / ')})` : ''}.`;
-
   // Fitment facts are shown only where every listed set agrees, so a mixed row is never papered over.
-  const fitment = useMemo(() => {
-    const rows: { label: string; value: string }[] = [];
-    const cars = Array.from(new Set(wheels.map((wheel) => wheel.compatibleCars).filter(Boolean)));
-    if (cars.length > 0) rows.push({ label: 'Fits', value: cars.join(', ') });
-    const sizes = sharedValue(wheels.map((wheel) => formatSizes(wheel.sizesAvailable)));
-    if (sizes) rows.push({ label: 'Wheel sizes', value: sizes });
-    const pcd = sharedValue(wheels.map((wheel) => specPart(wheel.technicalSpecSheet, 'PCD')));
-    if (pcd) rows.push({ label: 'Bolt pattern', value: pcd.replace(/^PCD\s*/, '') });
-    const bore = sharedValue(wheels.map((wheel) => specPart(wheel.technicalSpecSheet, 'CB')));
-    if (bore) rows.push({ label: 'Centre bore', value: `${bore.replace(/^CB\s*/, '')} mm` });
-    return rows;
-  }, [wheels]);
+  const fitment = useMemo(() => fitmentAtAGlance(wheels), [wheels]);
 
   return (
     <div className="min-h-screen bg-[#111111] text-[#EDEBE4]">
       <BrandHeader />
 
       <main>
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 py-12 sm:py-16">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-6 sm:gap-10">
-            <img
-              src="/images/partners/sixnine.webp"
-              alt="SIXNINE Wheels logo"
-              width={144}
-              height={144}
-              className="w-28 h-28 sm:w-36 sm:h-36 shrink-0 object-contain"
-            />
-            <div className="max-w-2xl">
-              <p className="text-sm uppercase tracking-[0.14em] text-[#F43F5E]">Official dealer</p>
-              <h1 className="mt-2 text-4xl sm:text-5xl font-light tracking-[-0.03em] leading-tight text-white">
-                Official Sixnine Wheels dealer
-              </h1>
-              <p className="mt-4 text-lg text-neutral-300">
-                We supply forged Sixnine wheels for BMW M cars.
-                {designList ? ` The ${designList} sets below are in stock now.` : ''}
-              </p>
-              <div className="mt-6 flex flex-col sm:flex-row gap-3">
-                <ContactCta
-                  message={enquiryMessage}
-                  enquirySubject="Sixnine wheels enquiry"
-                  label="Enquire on WhatsApp"
-                  fallbackLabel="Send an enquiry"
-                  className={CTA_PRIMARY_CLASS}
-                />
-                <a href="#sixnine-stock" className={CTA_SECONDARY_CLASS}>
-                  See the sets in stock
-                </a>
-              </div>
-            </div>
-          </div>
-        </section>
+        <BrandPageHero
+          brand={WHEEL_BRANDS.sixnine}
+          heading="Official Sixnine Wheels dealer"
+          enquiryMessage={enquiryMessage}
+          enquirySubject="Sixnine wheels enquiry"
+          stockAnchor="sixnine-stock"
+          eyebrowClassName="text-[#F43F5E]"
+        >
+          <p>
+            We supply forged Sixnine wheels for BMW M cars.
+            {designList ? ` The ${designList} sets below are in stock now.` : ''}
+          </p>
+        </BrandPageHero>
 
         <section
           aria-labelledby="sixnine-about-heading"
@@ -183,67 +127,20 @@ export const SixnineDealerPage: React.FC = () => {
           </div>
         </section>
 
-        <section
+        <BrandStockSection
           id="sixnine-stock"
-          aria-labelledby="sixnine-stock-heading"
-          className="scroll-mt-20 max-w-7xl mx-auto px-4 sm:px-6 md:px-10 py-12 sm:py-16 border-t border-[#26262E]"
-        >
-          <h2
-            id="sixnine-stock-heading"
-            className="text-3xl sm:text-4xl font-light tracking-[-0.03em] leading-tight text-white"
-          >
-            Sixnine sets in stock
-          </h2>
-          {wheels.length === 0 ? (
-            <p className="mt-6 text-neutral-300">
-              No Sixnine sets are listed in stock right now. Message us to ask about availability.
-            </p>
-          ) : (
-            <ul className="mt-8 grid grid-cols-2 lg:grid-cols-3 gap-x-3 sm:gap-x-6 gap-y-9">
-              {wheels.map((wheel, index) => (
-                <WheelCard key={wheel.id} wheel={wheel} index={index} />
-              ))}
-            </ul>
-          )}
-        </section>
+          heading="Sixnine sets in stock"
+          wheels={wheels}
+          emptyText="No Sixnine sets are listed in stock right now. Message us to ask about availability."
+        />
 
-        {fitment.length > 0 && (
-          <section
-            aria-labelledby="sixnine-fitment-heading"
-            className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 py-12 sm:py-16 border-t border-[#26262E]"
-          >
-            <h2 id="sixnine-fitment-heading" className="text-2xl font-light tracking-[-0.02em] text-white">
-              Fitment at a glance
-            </h2>
-            <dl className="mt-6 max-w-2xl divide-y divide-[#26262E] border-y border-[#26262E]">
-              {fitment.map((row) => (
-                <div key={row.label} className="py-3 sm:flex sm:gap-6">
-                  <dt className="text-sm text-neutral-400 sm:w-40 sm:shrink-0">{row.label}</dt>
-                  <dd className="mt-0.5 sm:mt-0 text-white">{row.value}</dd>
-                </div>
-              ))}
-            </dl>
-            <p className="mt-4 max-w-2xl text-sm text-neutral-400">
-              Offsets differ by set and are on each wheel page. Message us with your car and we will confirm the fit.
-            </p>
-          </section>
-        )}
+        <BrandFitmentSection id="sixnine-fitment" rows={fitment} />
 
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 py-12 sm:py-16 border-t border-[#26262E]">
-          <h2 className="text-2xl font-light tracking-[-0.02em] text-white">Ask us about Sixnine wheels</h2>
-          <div className="mt-6 flex flex-col sm:flex-row gap-3">
-            <ContactCta
-              message={enquiryMessage}
-              enquirySubject="Sixnine wheels enquiry"
-              label="Enquire on WhatsApp"
-              fallbackLabel="Send an enquiry"
-              className={CTA_PRIMARY_CLASS}
-            />
-            <Link to="/installs" className={CTA_SECONDARY_CLASS}>
-              See cars we have fitted
-            </Link>
-          </div>
-        </section>
+        <BrandEnquirySection
+          heading="Ask us about Sixnine wheels"
+          enquiryMessage={enquiryMessage}
+          enquirySubject="Sixnine wheels enquiry"
+        />
       </main>
     </div>
   );

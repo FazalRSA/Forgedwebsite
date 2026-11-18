@@ -13,7 +13,8 @@ import {
   TO_ORDER_LEAD_TIME,
   TO_ORDER_NOTICE,
   getWheelImages,
-  isSixnineWheel,
+  brandOfWheel,
+  WHEEL_BRANDS,
   capLogoForDesign,
 } from '../../data/catalogue';
 import { whatsappLink } from '../../config/site';
@@ -122,6 +123,9 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
   const finishLabel = wheel.finishName ?? WHEEL_FINISHES[wheel.defaultFinish]?.name ?? 'Standard';
   const stageFinishNames = useMemo(() => ({ [wheel.defaultFinish]: finishLabel }), [wheel.defaultFinish, finishLabel]);
   const priceText = formatZAR(wheel.priceZAR);
+  // The wheel's brand: the line under its name, and where the back link returns to.
+  const brandId = brandOfWheel(wheel);
+  const brand = brandId ? WHEEL_BRANDS[brandId] : undefined;
   const stock = stockLabel(wheel.stockQuantitySets);
   const specs = parseTechnicalSpecSheet(wheel.technicalSpecSheet);
   const construction = /piece/i.test(wheel.otherFinishes ?? '') ? wheel.otherFinishes : undefined;
@@ -235,12 +239,13 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
       <BrandHeader forceLight={false} />
 
       <main className="mx-auto max-w-6xl px-4 sm:px-6 pt-3 pb-12 lg:pb-16">
+        {/* Back to the wheel's brand page, the same step its breadcrumb names. */}
         <Link
-          to="/#catalogue"
+          to={brand?.path ?? '/#catalogue'}
           className="inline-flex min-h-11 items-center gap-1.5 text-sm text-neutral-300 hover:text-white"
         >
           <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-          Wheels in stock
+          {brand ? brand.name : 'Wheels in stock'}
         </Link>
 
         <div className="mt-1 lg:grid lg:grid-cols-2 lg:gap-10 lg:items-start">
@@ -290,10 +295,11 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
             <h1 className="text-3xl sm:text-4xl font-semibold tracking-[-0.02em] text-white">
               {wheel.model}
             </h1>
-            {isSixnineWheel(wheel) && (
+            {/* The brand, linked to its page: "Forged SA · our own designs", "Sixnine Wheels · official dealer". */}
+            {brand && (
               <p className="mt-1 text-sm text-neutral-300">
-                <Link to="/sixnine-wheels" className="underline underline-offset-4 hover:text-white">
-                  Sixnine Wheels · official dealer
+                <Link to={brand.path} className="underline underline-offset-4 hover:text-white">
+                  {brand.name} · {brand.relation.toLowerCase()}
                 </Link>
               </p>
             )}

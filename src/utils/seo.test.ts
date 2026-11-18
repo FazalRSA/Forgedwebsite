@@ -22,7 +22,7 @@ import {
   withRenderPageRoutes,
   wheelBrand,
 } from './seo';
-import { findWheelBySlug, getAllBrandWheels, isInStock } from '../data/catalogue';
+import { brandOfWheel, findWheelBySlug, getAllBrandWheels, isInStock, WHEEL_BRANDS } from '../data/catalogue';
 import { SITE } from '../config/site';
 import { blogSitemapPaths } from './blogSeo';
 
@@ -80,8 +80,8 @@ test('home page metadata matches what people search for and stays indexable', ()
   assert.ok(shell.includes(`content="${m.description}"`), 'index.html description matches the home page');
 });
 
-test('installs, contact and the Sixnine dealer page are indexable pages with their own title and canonical URL', () => {
-  for (const p of ['/installs', '/contact', '/sixnine-wheels', '/privacy-policy']) {
+test('installs, contact and the two brand pages are indexable pages with their own title and canonical URL', () => {
+  for (const p of ['/installs', '/contact', '/forged-sa-wheels', '/sixnine-wheels', '/privacy-policy']) {
     for (const variant of [p, `${p}/`, `${p}?x=1#top`]) {
       const m = metaForPath(variant);
       assert.equal(m.canonicalPath, p, variant);
@@ -96,6 +96,15 @@ test('installs, contact and the Sixnine dealer page are indexable pages with the
   }
   assert.notEqual(metaForPath('/installs').title, metaForPath('/contact').title);
   assert.notEqual(metaForPath('/sixnine-wheels').title, metaForPath('/contact').title);
+  assert.notEqual(metaForPath('/forged-sa-wheels').title, metaForPath('/sixnine-wheels').title);
+});
+
+test('the Forged SA page names the FSA designs in stock, read from the catalogue', () => {
+  const m = metaForPath('/forged-sa-wheels');
+  assert.ok(m.title.length <= 60, m.title);
+  assert.ok(m.description.length >= 50 && m.description.length <= 170, m.description);
+  for (const w of WHEELS.filter((x) => brandOfWheel(x) === 'forged-sa')) assert.ok(m.description.includes(w.modelCode!), w.modelCode);
+  assert.doesNotMatch(m.description, /FF-|Sixnine/);
 });
 
 test('every catalogue wheel gets a unique title, a Rand price and Product structured data', () => {
@@ -119,22 +128,25 @@ test('every catalogue wheel gets a unique title, a Rand price and Product struct
   assert.equal(titles.size, WHEELS.length);
 });
 
-test('every wheel page carries a two-step breadcrumb: the wheels in stock, then the wheel', () => {
+test('every wheel page carries a breadcrumb through its brand page: home, the brand, then the wheel', () => {
   assert.equal(CATALOGUE_PATH, '/#catalogue');
   for (const wheel of WHEELS) {
     const path = `/wheels/${wheel.slug}`;
+    const brand = WHEEL_BRANDS[brandOfWheel(wheel)!];
     const crumbs = breadcrumbsOf(metaForPath(path).jsonLd);
     assert.deepEqual(crumbs, {
       '@type': 'BreadcrumbList',
       itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'Wheels in stock', item: CATALOGUE_PATH },
-        { '@type': 'ListItem', position: 2, name: wheel.model, item: path },
+        { '@type': 'ListItem', position: 1, name: 'Home', item: '/' },
+        { '@type': 'ListItem', position: 2, name: brand.name, item: brand.path },
+        { '@type': 'ListItem', position: 3, name: wheel.model, item: path },
       ],
     });
     // Crumb addresses are made absolute with the rest of the structured data.
     const absolute = breadcrumbsOf(absolutiseJsonLd(metaForPath(path).jsonLd!, 'https://example.test'));
-    assert.equal(absolute.itemListElement[0].item, 'https://example.test/#catalogue');
-    assert.equal(absolute.itemListElement[1].item, `https://example.test${path}`);
+    assert.equal(absolute.itemListElement[0].item, 'https://example.test/');
+    assert.equal(absolute.itemListElement[1].item, `https://example.test${brand.path}`);
+    assert.equal(absolute.itemListElement[2].item, `https://example.test${path}`);
   }
 });
 
@@ -197,16 +209,13 @@ test('home page structured data describes the organisation and website from site
   assert.doesNotMatch(JSON.stringify(ld), /:""|:null|\[\]/);
 });
 
-test('Sixnine wheels name their brand; other wheels do not guess one', () => {
+test('every wheel names its brand: Forged SA on FSA designs, Sixnine on FF designs', () => {
   for (const wheel of WHEELS) {
     const ld = productOf(metaForPath(`/wheels/${wheel.slug}`).jsonLd);
-    if (wheel.modelCode === 'FF-1' || wheel.modelCode === 'FF-3') {
-      assert.equal(wheelBrand(wheel), 'Sixnine');
-      assert.deepEqual(ld.brand, { '@type': 'Brand', name: 'Sixnine' });
-    } else {
-      assert.equal(wheelBrand(wheel), undefined);
-      assert.equal('brand' in ld, false, wheel.slug);
-    }
+    const expected = /^FSA/.test(wheel.modelCode ?? '') ? 'Forged SA' : /^FF/.test(wheel.modelCode ?? '') ? 'Sixnine' : undefined;
+    assert.ok(expected, `${wheel.slug}: neither FSA nor FF`);
+    assert.equal(wheelBrand(wheel), expected, wheel.slug);
+    assert.deepEqual(ld.brand, { '@type': 'Brand', name: expected }, wheel.slug);
     assert.equal('aggregateRating' in ld, false);
     assert.equal('review' in ld, false);
   }
@@ -236,7 +245,7 @@ test('link-preview images are real files in public/', () => {
   }
 });
 
-test('the sitemap lists the home page, every in-stock wheel once, the blog, installs, the Sixnine dealer page, contact and the privacy policy, and nothing else', () => {
+test('the sitemap lists the home page, every in-stock wheel once, the blog, installs, the two brand pages, contact and the privacy policy, and nothing else', () => {
   const paths = sitemapPaths();
   assert.equal(new Set(paths).size, paths.length);
   assert.deepEqual(
@@ -244,6 +253,7 @@ test('the sitemap lists the home page, every in-stock wheel once, the blog, inst
     [
       '/',
       '/contact',
+      '/forged-sa-wheels',
       '/installs',
       '/privacy-policy',
       '/sixnine-wheels',
@@ -251,7 +261,7 @@ test('the sitemap lists the home page, every in-stock wheel once, the blog, inst
       ...BLOG_PATHS,
     ].sort()
   );
-  assert.equal(paths.length, 5 + WHEELS.length + BLOG_PATHS.length);
+  assert.equal(paths.length, 6 + WHEELS.length + BLOG_PATHS.length);
   for (const p of paths.filter((x) => x.startsWith('/wheels/'))) {
     const wheel = findWheelBySlug(p.slice('/wheels/'.length));
     assert.ok(wheel && isInStock(wheel), `${p} must be an in-stock wheel`);
@@ -271,6 +281,7 @@ test('the sitemap lists the home page, every in-stock wheel once, the blog, inst
   assert.ok(xml.includes('<loc>https://example.test/installs</loc>'));
   assert.ok(xml.includes('<loc>https://example.test/contact</loc>'));
   assert.ok(xml.includes('<loc>https://example.test/sixnine-wheels</loc>'));
+  assert.ok(xml.includes('<loc>https://example.test/forged-sa-wheels</loc>'));
   for (const removed of REMOVED_ROUTES) assert.ok(!xml.includes(`example.test${removed}<`), removed);
   const onDisk = readFileSync(path.join(PUBLIC_DIR, 'sitemap.xml'), 'utf8');
   assert.equal(onDisk, buildSitemapXml(), 'run `npm run build` to regenerate public/sitemap.xml');
