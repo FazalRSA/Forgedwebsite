@@ -69,6 +69,7 @@ const FALLBACK_MESSAGES: Record<string, string> = {
   unknown_wheel: 'We could not find this wheel for the preview. Please reload the page and try again.',
   forbidden_origin: 'The preview is not available from this address.',
   too_large: 'That photo is too large. Please try a smaller one.',
+  photo_rejected: 'We could not use that photo. Please try a different photo of the car, a plain side-on photo in daylight works best.',
   daily_limit: 'We have reached the number of previews we can make today. Please try again tomorrow.',
   model_failed: GENERIC_MESSAGE,
   timeout: TIMEOUT_MESSAGE,
@@ -82,7 +83,9 @@ export function carPreviewTimeoutError(): CarPreviewError {
 
 /** Errors for which the dialog also offers to take the photo on WhatsApp through the enquiry form. */
 export function offersWhatsAppFallback(code: string): boolean {
-  return code === 'daily_limit' || code === 'model_failed' || code === 'timeout' || code === 'network';
+  return (
+    code === 'daily_limit' || code === 'model_failed' || code === 'photo_rejected' || code === 'timeout' || code === 'network'
+  );
 }
 
 /** The size to draw a photo at: the longest side is at most `max`, the shape is kept, a small photo is never enlarged. */

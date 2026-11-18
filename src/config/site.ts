@@ -94,11 +94,11 @@ export const SITE: SiteConfig = {
   searchConsoleToken: '',
 
   /**
-   * Address of the car-preview Worker, e.g. 'https://forged-car-preview.<account>.workers.dev/'.
-   * Leave empty until the Worker is deployed: the "See it on my car" button and the matching
-   * privacy-notice text stay off until this is set (see worker/car-preview/README.md).
+   * Address of the car-preview Worker (worker/car-preview, deployed to the owner's Cloudflare account).
+   * Setting this switches on the "See it on my car" button and the matching privacy-notice text; an
+   * empty value switches both off again (see worker/car-preview/README.md).
    */
-  carPreviewUrl: '',
+  carPreviewUrl: 'https://forged-car-preview.fuzz-241095.workers.dev/',
 };
 
 /** wa.me deep link with an optional prefilled message, or null when no number is configured. */

@@ -56,7 +56,8 @@ so nobody can use it as a general-purpose image editor.
 
 Answers are JSON. Success is `{"image":"...","mime":"image/jpeg"}`. A problem is
 `{"error":"<code>","message":"..."}` with `bad_request` or `unknown_wheel` (400), `forbidden_origin`
-(403), `method_not_allowed` (405), `too_large` (413), `daily_limit` (429), `model_failed` (502) or
+(403), `method_not_allowed` (405), `too_large` (413), `photo_rejected` (422, the model's own safety
+filter refused the picture: Cloudflare error 3030), `daily_limit` (429), `model_failed` (502) or
 `timeout` (504, after 90 seconds).
 
 Only the origins in `ALLOWED_ORIGINS` (default `https://www.forgedsa.co.za`) can call it from a

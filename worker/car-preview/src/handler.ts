@@ -61,6 +61,7 @@ export type ErrorCode =
   | 'forbidden_origin'
   | 'daily_limit'
   | 'model_failed'
+  | 'photo_rejected'
   | 'timeout';
 
 const ERROR_MESSAGES: Record<ErrorCode, string> = {
@@ -72,6 +73,8 @@ const ERROR_MESSAGES: Record<ErrorCode, string> = {
   daily_limit:
     'The free previews for today are used up. Please try again tomorrow, or send us your photo on WhatsApp.',
   model_failed: 'We could not make the preview this time. Please try again, or send us your photo on WhatsApp.',
+  photo_rejected:
+    'We could not use that photo. Please try a different photo of the car (a plain side-on photo in daylight works best), or send us your photo on WhatsApp.',
   timeout: 'The preview took too long. Please try again, or send us your photo on WhatsApp.',
 };
 
@@ -83,6 +86,7 @@ const ERROR_STATUS: Record<ErrorCode, number> = {
   forbidden_origin: 403,
   daily_limit: 429,
   model_failed: 502,
+  photo_rejected: 422,
   timeout: 504,
 };
 
@@ -185,6 +189,20 @@ export function isDailyLimitError(err: unknown): boolean {
   return /3036|neurons|daily|quota|allocation|account limited|usage limit|free limit/.test(text);
 }
 
+/**
+ * True when the model's own safety check refused the picture. Cloudflare reports this as error 3030,
+ * "Your output has been flagged. Please choose another prompt / input image combination". Seen in
+ * testing with a studio re-shoot of a car, while ordinary customer photos passed. It is the photo
+ * that has to change, so the visitor is told that, not just "try again".
+ */
+export function isPhotoRejectedError(err: unknown): boolean {
+  const e = err as { message?: unknown; code?: unknown } | null;
+  const text = `${e && typeof e === 'object' ? String(e.message ?? '') : String(err ?? '')} ${
+    e && typeof e === 'object' ? String(e.code ?? '') : ''
+  }`.toLowerCase();
+  return /\b3030\b|has been flagged/.test(text);
+}
+
 /** The only things an error log line may contain: a name and a number, never content. */
 function logAiFailure(err: unknown): void {
   const e = err as { name?: unknown; status?: unknown; code?: unknown } | null;
@@ -240,7 +258,8 @@ async function runModel(env: Env, form: FormData, timeoutMs: number): Promise<Ai
     return { kind: 'ok', image };
   } catch (err) {
     logAiFailure(err);
-    return { kind: 'error', code: isDailyLimitError(err) ? 'daily_limit' : 'model_failed' };
+    if (isDailyLimitError(err)) return { kind: 'error', code: 'daily_limit' };
+    return { kind: 'error', code: isPhotoRejectedError(err) ? 'photo_rejected' : 'model_failed' };
   } finally {
     clearTimeout(timer);
   }
