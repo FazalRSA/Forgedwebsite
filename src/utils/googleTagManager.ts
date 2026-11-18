@@ -11,10 +11,15 @@
  * the Render address never reaches the container, and `npm run dev` serves the raw index.html,
  * which has no snippet at all.
  *
+ * Consent (src/utils/consent.ts): before the container loads, the snippet sets every Google
+ * Consent Mode type to "denied", then grants analytics_storage only if this browser accepted the
+ * cookie banner earlier. Google Analytics therefore sets no cookie until the visitor says yes.
+ *
  * What the container loads (Google Analytics today) is chosen in Google Tag Manager, not here. When a
  * new tag is published there, update the privacy notice to match.
  */
 import { SITE, type SiteConfig } from '../config/site';
+import { CONSENT_STORAGE_KEY } from './consent';
 
 type TagManagerConfig = Pick<SiteConfig, 'googleTagManagerId' | 'host'>;
 
@@ -32,8 +37,9 @@ function safeHost(host: string): string | null {
 }
 
 /**
- * Google's container snippet for <head>, with one change: it runs only when the page is served from
- * the production host. '' when no container is set up.
+ * Google's container snippet for <head>, with two changes: it runs only when the page is served from
+ * the production host, and it sets the Consent Mode defaults (everything denied, analytics granted
+ * only after an earlier "Accept") before the container loads. '' when no container is set up.
  */
 export function googleTagManagerHead(config: TagManagerConfig = SITE): string {
   const id = googleTagManagerId(config);
@@ -41,7 +47,11 @@ export function googleTagManagerHead(config: TagManagerConfig = SITE): string {
   if (!id || !host) return '';
   return [
     '<!-- Google Tag Manager (production host only; see src/utils/googleTagManager.ts) -->',
-    `<script>if(location.hostname==='${host}'){(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':`,
+    `<script>if(location.hostname==='${host}'){`,
+    `(function(w){w.dataLayer=w.dataLayer||[];w.gtag=w.gtag||function(){w.dataLayer.push(arguments);};`,
+    `w.gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied'});`,
+    `try{if(w.localStorage.getItem('${CONSENT_STORAGE_KEY}')==='granted')w.gtag('consent','update',{analytics_storage:'granted'});}catch(e){}})(window);`,
+    `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':`,
     `new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],`,
     `j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=`,
     `'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);`,

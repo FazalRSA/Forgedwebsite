@@ -12,6 +12,7 @@ import { WheelCatalogue } from './components/brand/WheelCatalogue';
 import { IndustryPartnersSection } from './components/brand/IndustryPartnersSection';
 import { GoogleReviewsSection } from './components/brand/GoogleReviewsSection';
 import { FloatingWhatsApp } from './components/shared/FloatingWhatsApp';
+import { ConsentBanner } from './components/shared/ConsentBanner';
 import { AskAiSection } from './components/brand/AskAiSection';
 import { BlogTeaser } from './components/blog/BlogTeaser';
 import { GlobalOverlays } from './components/shared/GlobalOverlays';
@@ -187,6 +188,7 @@ export default function App() {
     <RouterProvider>
       <MainLayout />
       <FloatingWhatsApp />
+      <ConsentBanner />
       <GlobalOverlays />
     </RouterProvider>
   );

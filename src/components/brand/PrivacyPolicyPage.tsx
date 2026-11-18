@@ -6,6 +6,7 @@ import { useRouter } from '../../utils/router';
 import { SITE, telLink, whatsappLink } from '../../config/site';
 import { analyticsScript } from '../../utils/analytics';
 import { googleTagManagerId } from '../../utils/googleTagManager';
+import { openCookieSettings } from '../../utils/consent';
 import { CAR_PREVIEW_PROVIDER, carPreviewEnabled } from '../../utils/carPreview';
 
 /**
@@ -285,8 +286,12 @@ export const PrivacyPolicyPage: React.FC = () => {
                         Google Analytics does not log or store IP addresses). It also records how you use the
                         page, such as how far you scroll, clicks on links that lead off this website, file
                         downloads, video plays, and when you start or send a form (not what you type into
-                        it). It tells your visits apart with a random identifier kept in cookies (see section
-                        06). We also tell it, without any personal details, when the enquiry form is opened
+                        it). Its cookies, which let it tell your visits apart with a random identifier, are set
+                        only if you accept them in the cookie banner (see section 06). Until you choose, or if
+                        you decline, Google Analytics sets and reads no cookies; Google then receives only
+                        cookieless signals for each page and action, which Google describes as containing
+                        coarse details that cannot directly identify you, and uses for basic measurement and to
+                        estimate figures. We also tell it, without any personal details, when the enquiry form is opened
                         and sent and when the car preview is used. We use these statistics to see which pages
                         are used and how visitors find us, not to identify you. Google explains how it uses
                         information from websites that use its services at{' '}
@@ -340,8 +345,10 @@ export const PrivacyPolicyPage: React.FC = () => {
                       <>
                         <Strong>To understand how the website is used and improve it</Strong>, through
                         the visit statistics described in section 02, which is in our legitimate interest
-                        (s11(1)(f)). You may object to this (section 09)
-                        {GOOGLE_ANALYTICS ? ', and section 06 explains how to stop the Google Analytics cookies' : ''}.
+                        (s11(1)(f)). You may object to this (section 09).
+                        {GOOGLE_ANALYTICS
+                          ? ' Google Analytics cookies are used only with your consent (s11(1)(a)), which you give or refuse in the cookie banner and can withdraw at any time (section 06).'
+                          : ''}
                       </>,
                     ]
                   : []),
@@ -425,14 +432,20 @@ export const PrivacyPolicyPage: React.FC = () => {
           <Section index="06" title="Cookies and local storage">
             {GOOGLE_ANALYTICS ? (
               <p>
-                Google Analytics, which this website loads through Google Tag Manager, sets two cookies
-                on this website: <code className="font-tech-mono text-white">_ga</code>, which tells visits from the same browser apart, and{' '}
+                If you accept them in the cookie banner, Google Analytics, which this website loads
+                through Google Tag Manager, sets two cookies on this website:{' '}
+                <code className="font-tech-mono text-white">_ga</code>, which tells visits from the same browser apart, and{' '}
                 <code className="font-tech-mono text-white">_ga_&lt;ID&gt;</code>, which keeps track of the current visit. They hold random
                 identifiers, not your name or contact details, and by default Google sets them to last
-                up to two years. We do not use advertising cookies, and this website sets no other
-                cookies.{STATISTICS ? ' The Umami visit statistics described in section 02 work without cookies.' : ''}{' '}
-                You can block or delete cookies in your browser&apos;s settings, or stop Google
-                Analytics on every website with Google&apos;s opt-out add-on at{' '}
+                up to two years. Until you accept, and if you decline, they are not set, and any left
+                from an earlier visit are deleted. We do not use advertising cookies, and this website
+                sets no other cookies.{STATISTICS ? ' The Umami visit statistics described in section 02 work without cookies.' : ''}{' '}
+                You can change your choice at any time with{' '}
+                <button type="button" onClick={() => openCookieSettings()} className={`${LINK_CLASS} cursor-pointer`}>
+                  Cookie settings
+                </button>{' '}
+                (also at the foot of every page), block or delete cookies in your browser&apos;s
+                settings, or stop Google Analytics on every website with Google&apos;s opt-out add-on at{' '}
                 <a href={GOOGLE_LINKS.optOut} target="_blank" rel="noopener noreferrer" className={`${LINK_CLASS} break-all`}>
                   tools.google.com/dlpage/gaoptout
                 </a>
@@ -445,9 +458,9 @@ export const PrivacyPolicyPage: React.FC = () => {
               </p>
             )}
             <p>
-              This website keeps one small entry in your browser&apos;s local storage. It
-              holds only a copy of an enquiry that could not be sent to us, so that it is not lost, and
-              is empty otherwise; it stays on your device and is never read by us. When you open WhatsApp from this website, WhatsApp applies its own
+              {GOOGLE_ANALYTICS
+                ? 'This website keeps two small entries in your browser\'s local storage: your cookie choice, so that the banner does not ask again on every page, and a copy of an enquiry that could not be sent to us, so that it is not lost (empty otherwise). Both stay on your device and are never read by us.'
+                : 'This website keeps one small entry in your browser\'s local storage. It holds only a copy of an enquiry that could not be sent to us, so that it is not lost, and is empty otherwise; it stays on your device and is never read by us.'} When you open WhatsApp from this website, WhatsApp applies its own
               cookie and privacy practices.
             </p>
           </Section>

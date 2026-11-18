@@ -5,6 +5,11 @@ import { Link } from '../../utils/router';
 import { WORDMARK_HEIGHT, WORDMARK_WIDTH } from '../shared/BrandLogo';
 import { ContactCta } from './ContactCta';
 import { SocialButtons } from '../shared/SocialIcon';
+import { googleTagManagerId } from '../../utils/googleTagManager';
+import { openCookieSettings } from '../../utils/consent';
+
+/** "Cookie settings" is offered only while there are Google Analytics cookies to choose about. */
+const COOKIE_SETTINGS = googleTagManagerId() !== null;
 
 const FOOTER_LINKS = [
   { label: 'Wheels', to: '/#catalogue' },
@@ -149,6 +154,17 @@ export const SiteFooter: React.FC = () => {
                   </Link>
                 </li>
               ))}
+              {COOKIE_SETTINGS ? (
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => openCookieSettings()}
+                    className="inline-flex items-center min-h-11 text-sm text-neutral-400 hover:text-white transition-colors cursor-pointer"
+                  >
+                    Cookie settings
+                  </button>
+                </li>
+              ) : null}
             </ul>
           </nav>
           <p className="flex items-center gap-2.5 text-xs text-neutral-400">

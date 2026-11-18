@@ -38,6 +38,7 @@ It shows the wheels that are in stock, each in photography and an interactive 3D
     - [See it on my car (AI preview)](#see-it-on-my-car-ai-preview)
 12. [Google Tag Manager and Google Analytics](#google-tag-manager-and-google-analytics)
     - [How it works](#how-it-works)
+    - [Cookie consent (opt-in)](#cookie-consent-opt-in)
     - [What is measured](#what-is-measured)
     - [How often the data arrives](#how-often-the-data-arrives)
     - [Setting up and checking](#setting-up-and-checking)
@@ -62,7 +63,7 @@ Five pages, plus the privacy notice:
 - **Sixnine dealer page (`/sixnine-wheels`, "Sixnine" in the menu).** FORGED as an official Sixnine Wheels dealer: what Sixnine Wheels is and its range (from sixnine-wheels.com, with a source link), every Sixnine set in stock, and a fitment summary. A wheel is Sixnine when its design code starts with `FF` (`isSixnineWheel` in `src/data/catalogue.ts`), so a new FF design appears on the page by itself. Every number on it is worked out from the catalogue; the brand text and range list are in `SixnineDealerPage.tsx`.
 - **Blog (`/blog`).** Twelve guides in four content pillars (forged wheel basics, BMW M wheel fitment, buying in South Africa, wheel care), at `/blog`, `/blog/:pillar` and `/blog/:pillar/:post`. Every price, size, offset, bolt pattern, lead time and stock count in an article is read from the catalogue, never typed (see [The blog](#the-blog)).
 - **Contact (`/contact`).** WhatsApp, phone, address and areas served; any channel not set in `src/config/site.ts` is hidden.
-- **Privacy notice (`/privacy-policy`).** Describes what the site does today: no accounts, contact by WhatsApp or phone, one local-storage entry for an unsent enquiry, and Google Analytics (loaded through Google Tag Manager) with its two cookies. The Google Analytics, cookie and recipient text appears only while `googleTagManagerId` is set in `src/config/site.ts`.
+- **Privacy notice (`/privacy-policy`).** Describes what the site does today: no accounts, contact by WhatsApp or phone, local storage for an unsent enquiry and the cookie choice, and Google Analytics (loaded through Google Tag Manager), whose two cookies are set only after a visitor accepts the cookie banner. The Google Analytics, cookie and recipient text appears only while `googleTagManagerId` is set in `src/config/site.ts`.
 - **Search-ready pages.** Per-route titles, descriptions, canonical URLs, link-preview tags, structured data and a generated sitemap.
 - **AI-ready.** `/llms.txt` gives AI assistants the stock list, prices and contact details as plain text (see [For AI assistants and coding agents](#for-ai-assistants-and-coding-agents)).
 
@@ -469,14 +470,15 @@ build (prerender-meta.ts)        every HTML file gets Google's container snippet
 visitor opens a page ──► on www.forgedsa.co.za? ──no──► nothing loads, no cookies
         │ yes
         ▼
-snippet creates window.dataLayer, pushes the gtm.js start event,
+snippet sets Consent Mode: everything denied, analytics granted only if this
+browser accepted the banner before; then pushes the gtm.js start event and
 downloads the container from googletagmanager.com (async: the page does not wait)
         │
         ▼
 container runs the tags published in GTM (today: the GA4 Google tag)
         │
-        ▼
-GA4 sets _ga and _ga_H2TR6RVSK0 cookies and sends events to google-analytics.com
+        ├─ accepted ──► GA4 sets _ga and _ga_H2TR6RVSK0 and sends full events
+        └─ not yet / declined ──► no cookies; GA4 sends cookieless pings only
         │
         ▼
 Reports in analytics.google.com (Realtime at once, the rest after processing)
@@ -486,6 +488,22 @@ Reports in analytics.google.com (Realtime at once, the rest after processing)
 2. **Only the live site counts.** The snippet runs only when the page is served from `SITE.host` (`www.forgedsa.co.za`). A Render preview address loads nothing, so test visits never reach GA4. For the same reason, GTM's *Preview* mode and Tag Assistant work only on the live site.
 3. **Page changes inside the site are counted by GA4.** The app moves between pages with the browser's history (`pushState` in `src/utils/router.tsx`) instead of reloading. GA4's enhanced-measurement setting *Page changes based on browser history events* (on by default) sends a `page_view` for each one. Do not also add a GTM *History Change* page-view tag: every page would be counted twice.
 4. **The site's own events go to the data layer.** `trackEvent` (`src/utils/analytics.ts`) pushes `{ event, page, ...data }` for the events below. GA4 ignores them until a GTM tag forwards them (see [Setting up and checking](#setting-up-and-checking)). Events carry only the page address and anonymous values; never put a name, phone number, email or message in one.
+
+### Cookie consent (opt-in)
+
+Google Analytics cookies are **off until the visitor taps Accept** in the cookie banner (`src/components/shared/ConsentBanner.tsx`, logic in `src/utils/consent.ts`). It uses [Google Consent Mode v2](https://developers.google.com/tag-platform/security/concepts/consent-mode):
+
+| Visitor | Banner | Cookies | What GA4 receives |
+| --- | --- | --- | --- |
+| Has not chosen | Shown at the bottom of every page until they choose | None; any `_ga` cookie left from an earlier visit is deleted | Cookieless pings only (`gcs=G100` on the request) |
+| Tapped **Accept** | Hidden | `_ga`, `_ga_H2TR6RVSK0` | Full events (`gcs=G101`) |
+| Tapped **Decline** | Hidden | None; existing ones deleted | Cookieless pings only |
+
+- **Before the container loads**, the snippet sets `ad_storage`, `ad_user_data`, `ad_personalization` and `analytics_storage` to `denied`, then grants `analytics_storage` at once if `localStorage['forged-analytics-consent']` is `granted`. The three advertising types are never granted: the site has no advertising tags.
+- **Accept and Decline** save the choice in `localStorage['forged-analytics-consent']` and push a `consent` `update` to the data layer (as an `Arguments` object, which is the only form GTM accepts). Decline also deletes the `_ga` cookies on the host and its parent domains.
+- **Changing your mind**: *Cookie settings* at the foot of every page, and a button in section 06 of the privacy notice, reopen the banner.
+- **Cookieless pings** ("advanced" consent mode): while consent is denied the GA4 tag still sends a ping for each page and event without cookies. Google describes them as containing coarse details that cannot directly identify a person, used for basic measurement and modelling. Reports therefore show fewer users and sessions than real visits; the gap is the visitors who did not accept. GA4's behavioural modelling fills it only on properties with enough daily consented traffic, which a site this size may not reach.
+- **GTM tags**: the GA4 tags check consent themselves (built-in consent checks), so nothing extra is needed in GTM. A tag of another kind added later needs its consent settings set in GTM (*Advanced settings → Consent settings*).
 
 ### What is measured
 
@@ -519,13 +537,13 @@ A practical rhythm: look at *Realtime* after any change, and read the weekly num
 
 ### Setting up and checking
 
-1. **Check it works.** Open the live site, then GA4 *Reports → Realtime*: your visit should show within a minute. In the browser's developer tools, the page should load `gtm.js?id=GTM-P554MVX4` and set the `_ga` cookies; on the Render address it should load neither.
+1. **Check it works.** Open the live site and tap **Accept**, then GA4 *Reports → Realtime*: your visit should show within a minute. In the browser's developer tools, the page should load `gtm.js?id=GTM-P554MVX4`, set no `_ga` cookie before Accept and set both after; on the Render address it should load neither.
 2. **Count enquiries as leads.** In GTM: *Variables → New → Data Layer Variable* named `delivered`, and another named `channel`. *Triggers → New → Custom Event*, event name `enquiry_sent`. *Tags → New → Google Analytics: GA4 Event*, measurement ID `G-H2TR6RVSK0`, event name `enquiry_sent`, event parameters `delivered` = `{{delivered}}` and `channel` = `{{channel}}`, fired by that trigger. Preview it on the live site, then *Submit* to publish. In GA4, mark `enquiry_sent` as a key event under *Admin → Data display → Events* once it has arrived (allow a day). Repeat for `enquiry_open` or the car-preview events if they are wanted.
 3. **Set data retention to 14 months** (see above).
 
 ### Keeping the privacy notice in step
 
-The privacy notice (`PrivacyPolicyPage.tsx`) describes Google Tag Manager, Google Analytics, the two `_ga` cookies, Google as a recipient and the retention limit while `googleTagManagerId` is set, and none of it when the ID is `''`; both read `googleTagManagerId()`, so they cannot disagree. The notice cannot see what is published inside GTM. Publishing a new kind of tag there (an advertising pixel, Google Ads conversions, a chat widget, another analytics tool) changes what the site collects without any code change, so update the notice at the same time. Clearing `googleTagManagerId` to `''` removes the snippet and the matching notice text together.
+The privacy notice (`PrivacyPolicyPage.tsx`) describes Google Tag Manager, Google Analytics, the cookie banner and consent, the two `_ga` cookies, the cookieless pings, Google as a recipient and the retention limit while `googleTagManagerId` is set, and none of it when the ID is `''`; both read `googleTagManagerId()`, so they cannot disagree. The notice cannot see what is published inside GTM. Publishing a new kind of tag there (an advertising pixel, Google Ads conversions, a chat widget, another analytics tool) changes what the site collects without any code change, so update the notice at the same time. Clearing `googleTagManagerId` to `''` removes the snippet and the matching notice text together.
 
 ## Business details and contact channels
 
@@ -579,7 +597,8 @@ firebase deploy --only firestore:rules
 | `src/utils/wheelStudioParts.test.ts` | Viewer part classification, exploded-view offsets, camera distance |
 | `src/utils/seo.test.ts` | Per-route metadata, canonical URLs, structured data, share images, sitemap (no removed route), `render.yaml`; that the sitemap, `robots.txt` and `index.html` all use the same host; the Search Console tag (added once, never from an unsafe token) |
 | `src/utils/analytics.test.ts` | Visit statistics are off until both values are set, refuse a non-https address or a malformed ID, add one tracker that counts only the production host and respects Do Not Track, push each event to Google Tag Manager's data layer too, and never let a tracker failure reach the page |
-| `src/utils/googleTagManager.test.ts` | Google Tag Manager is off without a well-formed container ID; the snippet loads the container (with the `gtm.js` start event) only on the production host, goes straight after `<meta charset>` with the `<noscript>` straight after `<body>`, is added once, and is never typed into `index.html` |
+| `src/utils/consent.test.ts` | The cookie choice is read and saved safely (blocked storage never throws), consent updates reach the data layer as gtag-style `Arguments` objects and only where GTM runs, Decline deletes only the `_ga` cookies on every parent domain, Accept keeps them, and Cookie settings reopens the banner |
+| `src/utils/googleTagManager.test.ts` | Google Tag Manager is off without a well-formed container ID; the snippet sets every Consent Mode type to denied before the container starts and grants analytics only after an earlier Accept; it loads the container (with the `gtm.js` start event) only on the production host, goes straight after `<meta charset>` with the `<noscript>` straight after `<body>`, is added once, and is never typed into `index.html` |
 | `src/utils/redirects.test.ts` | Old address to new address, `replaceState`, no loops, and every address in `scripts/legacy-pages.json` has a redirect |
 | `src/config/site.test.ts` | Published emails are empty or on the business domain; the host is the domain or `www.<domain>`; the statistics and Search Console values are well formed and set together; the car-preview address is empty or https; the privacy notice does not describe removed features |
 | `src/utils/carPreview.test.ts` | "See it on my car": off unless the address is https, shrinking keeps the shape and never enlarges, the request carries only the photo, wheel name and size and no cookies, every Worker error and malformed reply becomes a message fit to show |
