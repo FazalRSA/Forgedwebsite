@@ -261,7 +261,7 @@ The catalogue mirrors the stock sheet. All prices are South African Rand for a c
 | FSA001 (2-piece) | Black Matte | 19 / 20 inch | 90,000 | `stf399-front.glb`, `stf399-rear.glb` |
 | FSA002 | Hyper Black · Polished Face | 20 / 21 inch | 75,000 · 85,000 | `fsa002-forked.glb` |
 | FSA003 | Gold · Silver · Hyper Black | 20 / 21 inch | 75,000 | `fsa003-v2.glb` |
-| FSA004 | Silver · Hyper Black · Gloss Black | 20 / 21 inch | 70,000 | `fsa004.glb` |
+| FSA004 | Silver · Hyper Black · Gloss Black | 20 / 21 inch | 70,000 | `fsa004-v2.glb` |
 | FF-1 | Silver (Hyper Silver) · Liquid Metal | 20 / 21 inch | 80,000 · 95,000 | `ff-1-sixnine.glb` |
 | FF-3 | Pure Bronze · Glossy Black · Liquid Metal | 20 / 21 inch | 80,000 · 80,000 · 95,000 | `ff-3-sixnine.glb` |
 
@@ -362,7 +362,7 @@ A wheel with a `modelUrl` opens in the studio (`src/components/visuals/WheelStud
 - Baked textures are not needed: the studio applies its own paint, so models ship without them to keep downloads small (0.4 to 0.8 MB each today).
 - Keep under roughly 150k triangles for mobile.
 
-**Accuracy of the current models.** The FSA002, FSA003, FSA004, FF-1 and FF-3 models were traced from face-on product photos. Spoke layout, window shapes, bolt positions and hubs follow the photos; spoke sculpting, cap logos and engraving are simplified, and depth is estimated except on FSA002. Replacing them with 3D scans of the physical wheels is the planned upgrade. The FSA001 brake meshes use assumed G80 brake dimensions, not a measured caliper.
+**Accuracy of the current models.** The FSA002, FSA003, FSA004, FF-1 and FF-3 models were generated with Tripo3D from the real wheel photos and cleaned (see [docs/adding-3d-models.md](docs/adding-3d-models.md)); each was checked against its photos (spoke pattern, rim, hub, centre cap). They are close to the real wheels, not CAD: fine surface detail is the AI's, and a few thin streaks from the AI mesh may show at some angles. The maker's CAD or 3D scans are the better source if they become available. The FSA001 brake meshes use assumed G80 brake dimensions, not a measured caliper.
 
 ## Search and sharing
 
