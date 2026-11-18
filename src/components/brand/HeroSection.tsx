@@ -45,13 +45,14 @@ export const HeroSection: React.FC = () => {
   const customBrandWheels = useForgedStore((state) => state.customBrandWheels);
   // getAllBrandWheels returns only wheels that are in stock.
   const wheels = useMemo(() => getAllBrandWheels(customBrandWheels), [customBrandWheels]);
-  // "14 sets in stock in South Africa, from R 65,000 per set of four": counted from the live catalogue.
-  // The headline already says "in stock in South Africa", so this line gives the count and the price.
+  // "Forged wheels for BMW M cars. 14 sets in stock in South Africa, from R 65,000 per set of four.",
+  // counted from the live catalogue. The headline speaks for the brand; this line says what is for sale
+  // and carries the words the page is found by (the home <title> says the same).
   const stockLine = useMemo(() => {
     if (wheels.length === 0) return STATIC_LINE;
     const sets = wheels.reduce((sum, wheel) => sum + (wheel.stockQuantitySets ?? 0), 0);
     const minPrice = Math.min(...wheels.map((wheel) => wheel.priceZAR));
-    return `${sets} sets available now, from ${formatZAR(minPrice)} per set of four.`;
+    return `Forged wheels for BMW M cars. ${sets} sets in stock in ${SITE.country}, from ${formatZAR(minPrice)} per set of four.`;
   }, [wheels]);
 
   const small = useMediaMatches(HERO_VIDEO_SMALL_MEDIA);
@@ -165,19 +166,15 @@ export const HeroSection: React.FC = () => {
       </div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 md:px-10 flex items-end lg:items-center min-h-[32rem] sm:min-h-[36rem] lg:min-h-[min(78svh,46rem)] pt-24 pb-12 sm:pb-16 lg:py-20">
-        <div className="max-w-4xl">
+        <div className="max-w-5xl">
           <h1
             id="home-heading"
             className="text-balance text-4xl sm:text-6xl lg:text-7xl font-light tracking-[-0.035em] leading-[1.04] text-white"
           >
-            Forged wheels for BMW&nbsp;M.
-            {/* Said only while the catalogue has stock: the second line is a claim, not a slogan. */}
-            {wheels.length > 0 && (
-              <>
-                {' '}
-                <span className="block text-neutral-300">In stock in {SITE.country}.</span>
-              </>
-            )}
+            {/* How every wheel here is made, in the words of the forged-vs-cast guide on the blog: a cast
+                wheel is poured into a mould; a forged one is pressed from a solid block, then machined. */}
+            Forged, not cast.{' '}
+            <span className="block text-neutral-300">Pressed from solid aluminium.</span>
           </h1>
           <p className="mt-5 max-w-xl text-pretty text-base sm:text-lg leading-relaxed text-neutral-200 [text-shadow:0_1px_12px_rgba(0,0,0,0.7)]">{stockLine}</p>
           <a
