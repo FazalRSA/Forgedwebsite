@@ -38,6 +38,14 @@ def main() -> int:
                     help='squash the wheel to this width in metres (AI meshes often come out too deep); default keeps the file\'s proportions')
     ap.add_argument('--flip', action='store_true', help='turn the wheel 180 degrees if the face points to -Z')
     a = ap.parse_args()
+    # a negative or zero size would mirror or flatten the wheel without any error, so refuse it up front
+    for name, value in (('--target', a.target), ('--diameter', a.diameter), ('--width', a.width if a.width is not None else 1)):
+        if value <= 0:
+            print(f'ERROR: {name} must be greater than 0 (got {value})', file=sys.stderr)
+            return 1
+    if a.smooth < 0 or a.agg < 0:
+        print('ERROR: --smooth and --agg must be 0 or more', file=sys.stderr)
+        return 1
 
     try:
         m = trimesh.load(a.src, force='mesh', process=False)
@@ -89,8 +97,11 @@ def main() -> int:
     dia = max(b[1][0] - b[0][0], b[1][1] - b[0][1])
     dec.apply_translation([-(b[0][0] + b[1][0]) / 2, -(b[0][1] + b[1][1]) / 2, 0])
     dec.apply_scale(a.diameter / dia)
-    if a.width:
+    if a.width is not None:
         z = dec.extents[2]
+        if z <= 0:
+            print('ERROR: the wheel has no depth, cannot squash it', file=sys.stderr)
+            return 1
         dec.apply_scale([1, 1, a.width / z])
         print(f'squashed the width from {z:.3f} m to {a.width:.3f} m')
     dec.vertex_normals  # smooth normals, computed once
