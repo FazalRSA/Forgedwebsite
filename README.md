@@ -36,13 +36,19 @@ It shows the wheels that are in stock, each in photography and an interactive 3D
     - [Search Console and visit statistics](#search-console-and-visit-statistics)
     - [For AI assistants and coding agents](#for-ai-assistants-and-coding-agents)
     - [See it on my car (AI preview)](#see-it-on-my-car-ai-preview)
-12. [Business details and contact channels](#business-details-and-contact-channels)
-13. [Firebase](#firebase)
-14. [Testing](#testing)
-15. [Deployment](#deployment)
-16. [Known limitations and roadmap](#known-limitations-and-roadmap)
-17. [Contributing](#contributing)
-18. [Licence](#licence)
+12. [Google Tag Manager and Google Analytics](#google-tag-manager-and-google-analytics)
+    - [How it works](#how-it-works)
+    - [What is measured](#what-is-measured)
+    - [How often the data arrives](#how-often-the-data-arrives)
+    - [Setting up and checking](#setting-up-and-checking)
+    - [Keeping the privacy notice in step](#keeping-the-privacy-notice-in-step)
+13. [Business details and contact channels](#business-details-and-contact-channels)
+14. [Firebase](#firebase)
+15. [Testing](#testing)
+16. [Deployment](#deployment)
+17. [Known limitations and roadmap](#known-limitations-and-roadmap)
+18. [Contributing](#contributing)
+19. [Licence](#licence)
 
 ---
 
@@ -78,6 +84,7 @@ Every change below is a file edit, then a pull request. Merging to `main` publis
 | Change the to-order lead time | `TO_ORDER_LEAD_TIME` in `catalogue.ts` | Nothing else; pages and `llms.txt` read it |
 | Change the phone, WhatsApp, address or social links | `src/config/site.ts` | Nothing else; empty values are hidden |
 | Switch on "See it on my car" | Deploy `worker/car-preview/`, then set `carPreviewUrl` in `src/config/site.ts` | See [See it on my car](#see-it-on-my-car-ai-preview); the privacy notice updates itself |
+| Add a tag, or send an event to Google Analytics | In Google Tag Manager, not in code | See [Google Tag Manager and Google Analytics](#google-tag-manager-and-google-analytics); a new kind of tag also needs the privacy notice updated |
 | Add or correct a customer install | `scripts/fitment-reshoot/jobs.json`, then the re-shoot scripts | See [Adding or correcting a customer install](#adding-or-correcting-a-customer-install) |
 | Add or remove a partner logo | `src/data/partners.ts` and `public/images/partners/` | Owner's confirmation first |
 | Add or edit a blog article | `src/data/blogPosts.ts` | See [The blog](#the-blog); `src/data/blog.test.ts` checks it |
@@ -363,7 +370,7 @@ All search metadata is produced by `src/utils/seo.ts` and applied on every route
 
 - **Titles and descriptions** per route, with titles capped at 60 characters. The home title is "Forged wheels for BMW M cars in stock | FORGED Custom Wheels".
 - **Canonical URLs** always on `SITE.host` in `src/config/site.ts`, the address the site is served from (`www.forgedsa.co.za`). The bare domain redirects to it, and a canonical or sitemap entry that redirects back to its own page confuses search engines, so a test checks the sitemap, `robots.txt` and `index.html` all use the same host.
-- **Link previews**: Open Graph and Twitter tags on every route. Link-preview bots and crawlers that do not run JavaScript read the same tags from each page's own HTML file, written by `scripts/prerender-meta.ts`. `index.html` keeps generic tags because it is also the fallback for unknown paths; the build adds only a preload for the hero wheel image (the first design card's cut-out, from the catalogue), so wide screens start fetching it before the JavaScript runs, and the Google Tag Manager snippet that every page carries (see [Search Console and visit statistics](#search-console-and-visit-statistics)).
+- **Link previews**: Open Graph and Twitter tags on every route. Link-preview bots and crawlers that do not run JavaScript read the same tags from each page's own HTML file, written by `scripts/prerender-meta.ts`. `index.html` keeps generic tags because it is also the fallback for unknown paths; the build adds only a preload for the hero wheel image (the first design card's cut-out, from the catalogue), so wide screens start fetching it before the JavaScript runs, and the Google Tag Manager snippet that every page carries (see [Google Tag Manager and Google Analytics](#google-tag-manager-and-google-analytics)).
 - **Structured data**: `Organization` and `WebSite` on the home page; `Product` with the Rand price, in stock, on wheel pages; `CollectionPage`, `ContactPage` or `WebPage` with a `BreadcrumbList` on installs, the Sixnine dealer page, contact and the privacy notice; `Blog` and `ItemList` on the blog hub, `CollectionPage` on pillar pages, and `BlogPosting`, `BreadcrumbList` and `FAQPage` on articles.
 - **Sitemap**: `public/sitemap.xml` is regenerated from the catalogue and the blog on every build. It lists `/`, one page per in-stock wheel, the blog hub, its four pillar pages and every article (these carry a `lastmod` that is the article's own date), `/installs`, `/sixnine-wheels`, `/contact` and `/privacy-policy`, and nothing else.
 - **Noindex**: admin, preview, sold or unknown wheels, and unknown addresses. `public/robots.txt` (generated by `scripts/generate-sitemap.ts`, so its `Sitemap:` line cannot drift from the host) keeps crawlers out of `/admin` and `/studio/`.
@@ -411,16 +418,7 @@ Each is off until the site is given the values it needs. Nothing is loaded or ad
 
 How it behaves (`src/utils/analytics.ts`): the tracker is added once, after the page has loaded; it counts only `SITE.host` (not the Render address or a developer's localhost); it respects a browser's Do Not Track setting. Two events are counted, `enquiry_open` and `enquiry_sent` (with `delivered` yes or no, and the channel), each with the page address only. Never put a name, phone number, email or message in an event. The privacy notice describes the statistics and lists Umami as a recipient only while they are set up, and says there are none otherwise; both read the same check, so they cannot disagree.
 
-**Google Tag Manager** (container `GTM-P554MVX4`, in `googleTagManagerId` in `src/config/site.ts`) is **on**. Today the container publishes one Google Analytics 4 property (`G-H2TR6RVSK0`) with enhanced measurement: page views (including the app's own page changes, which use the browser history), scrolls, clicks on links off the site, file downloads, video plays, site search and form starts and sends. GA4 sets two cookies, `_ga` and `_ga_H2TR6RVSK0`.
-
-How it behaves (`src/utils/googleTagManager.ts`):
-
-- `scripts/prerender-meta.ts` writes Google's standard container snippet into every built HTML file: the script straight after `<meta charset>` and the `<noscript>` iframe straight after `<body>`. The source `index.html` has no snippet, so `npm run dev` never loads the container. A test fails if someone pastes it there.
-- The script runs only when the page is served from `SITE.host` (`www.forgedsa.co.za`). A preview on the Render address loads nothing, so test data never reaches the property. For the same reason, GTM's *Preview* mode and Tag Assistant work only on the live site.
-- `trackEvent` (`src/utils/analytics.ts`) also pushes every event to the data layer as `{ event, page, ...data }`: `enquiry_open`, `enquiry_sent` (`delivered`, `channel`), `car_preview_open` and `car_preview_result` (`outcome`). GA4 does not see them until a tag is added in GTM. Add a *Custom Event* trigger with event name `enquiry_sent`, and a *Google Analytics: GA4 Event* tag on it with event name `enquiry_sent` and parameters from *Data Layer Variables* `delivered` and `channel`. Then mark `enquiry_sent` as a key event in GA4. Do the same for the others as needed.
-- Do not turn on GA4's *Page changes based on browser history events* twice. It is on by default in enhanced measurement and is what counts the app's page changes; adding a GTM *History Change* page-view tag as well would count every page twice.
-
-**The privacy notice follows the container.** It describes Google Tag Manager, Google Analytics, their cookies and Google as a recipient while `googleTagManagerId` is set. It does not know what is published in GTM. Publishing a new kind of tag there (an advertising pixel, Google Ads conversions, a chat widget, another analytics tool) changes what the site collects without any code change, so update `PrivacyPolicyPage.tsx` in the same week. Clearing `googleTagManagerId` to `''` removes the snippet and the matching notice text together.
+**Google Analytics** is loaded through Google Tag Manager and has its own section: [Google Tag Manager and Google Analytics](#google-tag-manager-and-google-analytics).
 
 ### See it on my car (AI preview)
 
@@ -451,6 +449,83 @@ Things to know before relying on it:
 - **Social buttons** (`SocialButtons`, in the footer and on `/contact`) come from `instagramUrl`, `facebookUrl`, `tiktokUrl` and `youtubeUrl` in `src/config/site.ts`. An empty value hides its button; filled ones also go into the home page's `sameAs` structured data.
 - **Google reviews** (`GoogleReviewsSection`, home page, after the installs) shows the rating and count from `SITE.googleRating` and `SITE.googleReviewCount`, review text copied from Google into `src/data/googleReviews.ts`, and the "Read all reviews" and "Leave a review" links from `SITE`. It is hidden until something is filled in. It adds no review structured data on purpose: Google does not show stars for a business's own reviews of itself.
 - **`AGENTS.md`** at the repository root gives AI coding agents the commands and the rules that are easy to break. Keep it in step with this file.
+
+## Google Tag Manager and Google Analytics
+
+The site measures visits with **Google Analytics 4 (GA4)**, loaded through **Google Tag Manager (GTM)**.
+
+| | ID | Where to sign in |
+| --- | --- | --- |
+| GTM container | `GTM-P554MVX4` (`googleTagManagerId` in `src/config/site.ts`) | [tagmanager.google.com](https://tagmanager.google.com) |
+| GA4 property (measurement ID) | `G-H2TR6RVSK0` (set inside the GTM container, not in this repository) | [analytics.google.com](https://analytics.google.com) |
+
+The code only installs GTM. Everything GTM loads, GA4 included, is configured and published in GTM itself, so a new tag or a change of GA4 property needs no code change and no deploy. The privacy notice is the exception (see [Keeping the privacy notice in step](#keeping-the-privacy-notice-in-step)).
+
+### How it works
+
+```
+build (prerender-meta.ts)        every HTML file gets Google's container snippet
+        │
+visitor opens a page ──► on www.forgedsa.co.za? ──no──► nothing loads, no cookies
+        │ yes
+        ▼
+snippet creates window.dataLayer, pushes the gtm.js start event,
+downloads the container from googletagmanager.com (async: the page does not wait)
+        │
+        ▼
+container runs the tags published in GTM (today: the GA4 Google tag)
+        │
+        ▼
+GA4 sets _ga and _ga_H2TR6RVSK0 cookies and sends events to google-analytics.com
+        │
+        ▼
+Reports in analytics.google.com (Realtime at once, the rest after processing)
+```
+
+1. **The build adds the snippet.** `scripts/prerender-meta.ts` calls `withGoogleTagManager` (`src/utils/googleTagManager.ts`) on the built `index.html` before every page file and redirect page is made from it. The script goes straight after `<meta charset>` and the `<noscript>` iframe straight after `<body>`, where Google's install instructions put them. The source `index.html` has no snippet (a test fails if someone pastes it there), so `npm run dev` never loads the container.
+2. **Only the live site counts.** The snippet runs only when the page is served from `SITE.host` (`www.forgedsa.co.za`). A Render preview address loads nothing, so test visits never reach GA4. For the same reason, GTM's *Preview* mode and Tag Assistant work only on the live site.
+3. **Page changes inside the site are counted by GA4.** The app moves between pages with the browser's history (`pushState` in `src/utils/router.tsx`) instead of reloading. GA4's enhanced-measurement setting *Page changes based on browser history events* (on by default) sends a `page_view` for each one. Do not also add a GTM *History Change* page-view tag: every page would be counted twice.
+4. **The site's own events go to the data layer.** `trackEvent` (`src/utils/analytics.ts`) pushes `{ event, page, ...data }` for the events below. GA4 ignores them until a GTM tag forwards them (see [Setting up and checking](#setting-up-and-checking)). Events carry only the page address and anonymous values; never put a name, phone number, email or message in one.
+
+### What is measured
+
+| Event | When it fires | Comes from | In GA4 today? |
+| --- | --- | --- | --- |
+| `page_view` | A page opens, and each move to another page inside the site | GA4 enhanced measurement | Yes |
+| `scroll` | A visitor scrolls to 90% of a page | GA4 enhanced measurement | Yes |
+| `click` (outbound) | A visitor taps a link that leaves the site (WhatsApp, Instagram) | GA4 enhanced measurement | Yes |
+| `form_start`, `form_submit` | A visitor starts or sends a form (never what is typed) | GA4 enhanced measurement | Yes |
+| `file_download`, `video_*`, `view_search_results` | A file link, an embedded YouTube video, a search address | GA4 enhanced measurement | Yes, when the page has one |
+| `enquiry_open` | The enquiry form is opened | `src/store/useForgedStore.ts` | Only after the GTM tag below |
+| `enquiry_sent` (`delivered`, `channel`) | The enquiry form is sent; whether n8n received it, and by form or WhatsApp | `src/components/shared/GlobalOverlays.tsx` | Only after the GTM tag below |
+| `car_preview_open`, `car_preview_result` (`outcome`) | "See it on my car" is opened, and how it ended | `src/components/brand/CarPreviewDialog.tsx` | Only after a GTM tag |
+
+### How often the data arrives
+
+GA4 does not send reports anywhere; you read them in [analytics.google.com](https://analytics.google.com). How fresh they are depends on where you look (Google's [data freshness](https://support.google.com/analytics/answer/11198161) page; checked 18 November 2026):
+
+| Where you look | How fresh | Use it for |
+| --- | --- | --- |
+| **Reports → Realtime** | Within about a minute; shows the last 30 minutes | Checking that tracking works after a deploy or a GTM change |
+| **Standard reports and Explore** | Processed through the day (Google lists about 12 hours for daily processing); a day's numbers can still change for **24 to 48 hours** | Weekly and monthly reading. Treat a day as final two days later |
+| **GTM Preview / Tag Assistant** | Immediate, only in your own browser | Debugging tags before you publish them; live site only |
+
+Two more limits from Google's documentation:
+
+- An event that reaches Google more than **72 hours** after it happened (a phone that was offline) is dropped.
+- Detailed, event-level data (Explore reports) is kept for the property's **data retention** setting: 2 months by default, 14 months at most on a free property. Set it to 14 months in GA4 under *Admin → Data collection and modification → Data retention*. The privacy notice says "at most 14 months".
+
+A practical rhythm: look at *Realtime* after any change, and read the weekly numbers (*Reports → Engagement → Pages and screens*, *Reports → Acquisition → Traffic acquisition*, and the `enquiry_sent` key event once it exists) on a Wednesday for the week that ended on Sunday, by which time all of that week's figures have settled.
+
+### Setting up and checking
+
+1. **Check it works.** Open the live site, then GA4 *Reports → Realtime*: your visit should show within a minute. In the browser's developer tools, the page should load `gtm.js?id=GTM-P554MVX4` and set the `_ga` cookies; on the Render address it should load neither.
+2. **Count enquiries as leads.** In GTM: *Variables → New → Data Layer Variable* named `delivered`, and another named `channel`. *Triggers → New → Custom Event*, event name `enquiry_sent`. *Tags → New → Google Analytics: GA4 Event*, measurement ID `G-H2TR6RVSK0`, event name `enquiry_sent`, event parameters `delivered` = `{{delivered}}` and `channel` = `{{channel}}`, fired by that trigger. Preview it on the live site, then *Submit* to publish. In GA4, mark `enquiry_sent` as a key event under *Admin → Data display → Events* once it has arrived (allow a day). Repeat for `enquiry_open` or the car-preview events if they are wanted.
+3. **Set data retention to 14 months** (see above).
+
+### Keeping the privacy notice in step
+
+The privacy notice (`PrivacyPolicyPage.tsx`) describes Google Tag Manager, Google Analytics, the two `_ga` cookies, Google as a recipient and the retention limit while `googleTagManagerId` is set, and none of it when the ID is `''`; both read `googleTagManagerId()`, so they cannot disagree. The notice cannot see what is published inside GTM. Publishing a new kind of tag there (an advertising pixel, Google Ads conversions, a chat widget, another analytics tool) changes what the site collects without any code change, so update the notice at the same time. Clearing `googleTagManagerId` to `''` removes the snippet and the matching notice text together.
 
 ## Business details and contact channels
 
