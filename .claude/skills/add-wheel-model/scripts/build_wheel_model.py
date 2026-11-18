@@ -47,6 +47,10 @@ def main() -> int:
         if value <= 0:
             print(f'ERROR: {name} must be greater than 0 (got {value})', file=sys.stderr)
             return 1
+    if not 0 <= a.sliver_ratio <= 1 or a.sliver_len < 0:
+        print('ERROR: --sliver-ratio must be between 0 and 1 and --sliver-len 0 or more '
+              '(a negative length would delete every thin triangle and leave holes)', file=sys.stderr)
+        return 1
     if a.smooth < 0 or a.agg < 0:
         print('ERROR: --smooth and --agg must be 0 or more', file=sys.stderr)
         return 1
