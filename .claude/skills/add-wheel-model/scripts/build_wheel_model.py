@@ -115,11 +115,24 @@ def main() -> int:
         return 1
 
     import os as _os
+    # The cache is only valid for the same input file and the same decimation settings, so it carries a
+    # signature of both. A cache from another wheel (or an unreadable one) is ignored, never silently used.
+    try:
+        signature = f'{_os.path.getsize(a.src)}|{int(_os.path.getmtime(a.src))}|{a.target}|{a.agg}|{a.sliver_ratio}|{a.sliver_len}|{a.flip}'
+    except OSError:
+        signature = ''
+    dec = None
     if a.cache and _os.path.isfile(a.cache):
-        z = np.load(a.cache)
-        dec = trimesh.Trimesh(vertices=z['v'], faces=z['f'], process=False)
-        print(f'loaded the decimated mesh from {a.cache}: {len(dec.faces):,} triangles')
-    else:
+        try:
+            z = np.load(a.cache, allow_pickle=False)
+            if str(z['sig']) == signature and signature:
+                dec = trimesh.Trimesh(vertices=z['v'], faces=z['f'], process=False)
+                print(f'loaded the decimated mesh from {a.cache}: {len(dec.faces):,} triangles')
+            else:
+                print(f'WARNING: {a.cache} was made from a different file or settings, so it is ignored', file=sys.stderr)
+        except (OSError, ValueError, KeyError) as err:
+            print(f'WARNING: could not read the cache {a.cache} ({err}); starting from the source file', file=sys.stderr)
+    if dec is None:
         try:
             m = trimesh.load(a.src, force='mesh', process=False)
         except Exception as err:  # unreadable, truncated (a failed download) or not a 3D file
@@ -165,7 +178,10 @@ def main() -> int:
         dec = trimesh.util.concatenate([p for p in pieces if len(p.faces) >= 0.01 * len(pieces[0].faces)])
 
         if a.cache:
-            np.savez(a.cache, v=dec.vertices, f=dec.faces)
+            try:
+                np.savez(a.cache, v=dec.vertices, f=dec.faces, sig=signature)
+            except OSError as err:
+                print(f'WARNING: could not write the cache {a.cache}: {err}', file=sys.stderr)
 
     if a.fold_angle > 0:
         dec = remove_fins(dec, a.fold_angle, a.fold_max_faces)
