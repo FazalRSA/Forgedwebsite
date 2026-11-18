@@ -5,6 +5,7 @@ import { CTA_SECONDARY_CLASS } from './ContactCta';
 import { useRouter } from '../../utils/router';
 import { SITE, telLink, whatsappLink } from '../../config/site';
 import { analyticsScript } from '../../utils/analytics';
+import { googleTagManagerId } from '../../utils/googleTagManager';
 import { CAR_PREVIEW_PROVIDER, carPreviewEnabled } from '../../utils/carPreview';
 
 /**
@@ -20,13 +21,27 @@ const RESPONSIBLE_PARTY = {
   informationOfficerName: '',
 };
 
-const LAST_REVISED = '17 November 2026';
+const LAST_REVISED = '18 November 2026';
 
 /**
  * Whether this site runs visit statistics (Umami). The notice describes them only when they are
  * set up in config/site.ts, so it always matches what the site actually does.
  */
 const STATISTICS = analyticsScript() !== null;
+
+/**
+ * Whether the site loads Google Tag Manager (SITE.googleTagManagerId), and through it Google
+ * Analytics. The notice describes both, and their cookies, only while it does. If a new kind of tag
+ * is published in the container (advertising, a chat widget, another analytics tool), this text no
+ * longer covers it and must be updated.
+ */
+const GOOGLE_ANALYTICS = googleTagManagerId() !== null;
+
+/** Google's own pages that the notice points to when Google Analytics runs. */
+const GOOGLE_LINKS = {
+  partnerSites: 'https://policies.google.com/technologies/partner-sites',
+  optOut: 'https://tools.google.com/dlpage/gaoptout',
+};
 
 /**
  * Whether the "See it on my car" preview is switched on (SITE.carPreviewUrl). The notice describes
@@ -259,6 +274,29 @@ export const PrivacyPolicyPage: React.FC = () => {
                       </>,
                     ]
                   : []),
+                ...(GOOGLE_ANALYTICS
+                  ? [
+                      <>
+                        <Strong>Google Analytics</Strong>: this website uses Google Tag Manager, a Google
+                        service that loads the measurement tools we choose; at present that is Google
+                        Analytics. For each page you open it records the page address and title, the website
+                        you came from, your browser, operating system and device type, screen size, language
+                        and your approximate location (worked out from your IP address; Google states that
+                        Google Analytics does not log or store IP addresses). It also records how you use the
+                        page, such as how far you scroll, clicks on links that lead off this website, file
+                        downloads, video plays, and when you start or send a form (not what you type into
+                        it). It tells your visits apart with a random identifier kept in cookies (see section
+                        06). We also tell it, without any personal details, when the enquiry form is opened
+                        and sent and when the car preview is used. We use these statistics to see which pages
+                        are used and how visitors find us, not to identify you. Google explains how it uses
+                        information from websites that use its services at{' '}
+                        <a href={GOOGLE_LINKS.partnerSites} target="_blank" rel="noopener noreferrer" className={`${LINK_CLASS} break-all`}>
+                          policies.google.com/technologies/partner-sites
+                        </a>
+                        .
+                      </>,
+                    ]
+                  : []),
                 ...(CAR_PREVIEW
                   ? [
                       <>
@@ -275,7 +313,7 @@ export const PrivacyPolicyPage: React.FC = () => {
             />
             <p className="pt-1">
               We do not run accounts, sign-in or mailing lists, and we do not use advertising
-              {STATISTICS ? ' trackers; the only statistics we keep are the visit counts described above' : ' or analytics trackers'}. We do not collect special personal information (such as health,
+              {STATISTICS || GOOGLE_ANALYTICS ? ' trackers; the only statistics we keep are the visit statistics described above' : ' or analytics trackers'}. We do not collect special personal information (such as health,
               religious or biometric data) or information about children. No law requires you to
               contact us; if you choose not to, we simply cannot answer your question.
             </p>
@@ -297,6 +335,16 @@ export const PrivacyPolicyPage: React.FC = () => {
                   <Strong>To keep the website secure and prevent abuse</Strong>, which is in our
                   legitimate interest (s11(1)(f)).
                 </>,
+                ...(STATISTICS || GOOGLE_ANALYTICS
+                  ? [
+                      <>
+                        <Strong>To understand how the website is used and improve it</Strong>, through
+                        the visit statistics described in section 02, which is in our legitimate interest
+                        (s11(1)(f)). You may object to this (section 09)
+                        {GOOGLE_ANALYTICS ? ', and section 06 explains how to stop the Google Analytics cookies' : ''}.
+                      </>,
+                    ]
+                  : []),
               ]}
             />
             <p className="pt-1">
@@ -334,6 +382,15 @@ export const PrivacyPolicyPage: React.FC = () => {
                       </>,
                     ]
                   : []),
+                ...(GOOGLE_ANALYTICS
+                  ? [
+                      <>
+                        <Strong>Google (Google Tag Manager and Google Analytics)</Strong>: receives the
+                        visit information described in section 02 when a page loads, and uses it to give us
+                        statistics about how the website is used.
+                      </>,
+                    ]
+                  : []),
                 ...(CAR_PREVIEW
                   ? [
                       <>
@@ -366,9 +423,29 @@ export const PrivacyPolicyPage: React.FC = () => {
           </Section>
 
           <Section index="06" title="Cookies and local storage">
+            {GOOGLE_ANALYTICS ? (
+              <p>
+                Google Analytics, which this website loads through Google Tag Manager, sets two cookies
+                on this website: <code className="font-tech-mono text-white">_ga</code>, which tells visits from the same browser apart, and{' '}
+                <code className="font-tech-mono text-white">_ga_&lt;ID&gt;</code>, which keeps track of the current visit. They hold random
+                identifiers, not your name or contact details, and by default Google sets them to last
+                up to two years. We do not use advertising cookies, and this website sets no other
+                cookies.{STATISTICS ? ' The Umami visit statistics described in section 02 work without cookies.' : ''}{' '}
+                You can block or delete cookies in your browser&apos;s settings, or stop Google
+                Analytics on every website with Google&apos;s opt-out add-on at{' '}
+                <a href={GOOGLE_LINKS.optOut} target="_blank" rel="noopener noreferrer" className={`${LINK_CLASS} break-all`}>
+                  tools.google.com/dlpage/gaoptout
+                </a>
+                .
+              </p>
+            ) : (
+              <p>
+                This website does not set cookies. We do not use advertising, analytics or third-party
+                tracking cookies.{STATISTICS ? ' The visit statistics described in section 02 work without cookies.' : ''}
+              </p>
+            )}
             <p>
-              This website does not set cookies. We do not use advertising, analytics or third-party
-              tracking cookies.{STATISTICS ? ' The visit statistics described in section 02 work without cookies.' : ''} This website keeps one small entry in your browser&apos;s local storage. It
+              This website keeps one small entry in your browser&apos;s local storage. It
               holds only a copy of an enquiry that could not be sent to us, so that it is not lost, and
               is empty otherwise; it stays on your device and is never read by us. When you open WhatsApp from this website, WhatsApp applies its own
               cookie and privacy practices.
@@ -392,6 +469,15 @@ export const PrivacyPolicyPage: React.FC = () => {
                   <Strong>Server logs</Strong>: retained by our hosting providers for their standard
                   security retention periods.
                 </>,
+                ...(GOOGLE_ANALYTICS
+                  ? [
+                      <>
+                        <Strong>Google Analytics</Strong>: the detailed visit records are kept for the
+                        retention period set in our Google Analytics property, which Google limits to at
+                        most 14 months.
+                      </>,
+                    ]
+                  : []),
               ]}
             />
           </Section>

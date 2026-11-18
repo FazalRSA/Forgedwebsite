@@ -56,7 +56,7 @@ Five pages, plus the privacy notice:
 - **Sixnine dealer page (`/sixnine-wheels`, "Sixnine" in the menu).** FORGED as an official Sixnine Wheels dealer: what Sixnine Wheels is and its range (from sixnine-wheels.com, with a source link), every Sixnine set in stock, and a fitment summary. A wheel is Sixnine when its design code starts with `FF` (`isSixnineWheel` in `src/data/catalogue.ts`), so a new FF design appears on the page by itself. Every number on it is worked out from the catalogue; the brand text and range list are in `SixnineDealerPage.tsx`.
 - **Blog (`/blog`).** Twelve guides in four content pillars (forged wheel basics, BMW M wheel fitment, buying in South Africa, wheel care), at `/blog`, `/blog/:pillar` and `/blog/:pillar/:post`. Every price, size, offset, bolt pattern, lead time and stock count in an article is read from the catalogue, never typed (see [The blog](#the-blog)).
 - **Contact (`/contact`).** WhatsApp, phone, address and areas served; any channel not set in `src/config/site.ts` is hidden.
-- **Privacy notice (`/privacy-policy`).** Describes what the site does today: no accounts, no cookies, nothing stored in the browser, contact by WhatsApp or phone.
+- **Privacy notice (`/privacy-policy`).** Describes what the site does today: no accounts, contact by WhatsApp or phone, one local-storage entry for an unsent enquiry, and Google Analytics (loaded through Google Tag Manager) with its two cookies. The Google Analytics, cookie and recipient text appears only while `googleTagManagerId` is set in `src/config/site.ts`.
 - **Search-ready pages.** Per-route titles, descriptions, canonical URLs, link-preview tags, structured data and a generated sitemap.
 - **AI-ready.** `/llms.txt` gives AI assistants the stock list, prices and contact details as plain text (see [For AI assistants and coding agents](#for-ai-assistants-and-coding-agents)).
 
@@ -115,7 +115,7 @@ Two things look like setup and are not:
 | Script | What it does |
 | --- | --- |
 | `bun run dev` | Vite dev server on port 3000 |
-| `bun run build` | Five steps, in order: regenerate `public/sitemap.xml`, `public/robots.txt`, the blog's RSS feed (`public/blog/feed.xml`) and the page rules in `render.yaml` from the catalogue and `SITE.host`; build to `dist/`; write each page's own HTML file with its title and share image, plus the full text of each blog page for crawlers (`prerender-meta.ts`); write a redirect page for every removed address (`legacy-shells.ts`); write `dist/llms.txt` (`generate-llms.ts`) |
+| `bun run build` | Five steps, in order: regenerate `public/sitemap.xml`, `public/robots.txt`, the blog's RSS feed (`public/blog/feed.xml`) and the page rules in `render.yaml` from the catalogue and `SITE.host`; build to `dist/`; write each page's own HTML file with its title and share image, plus the full text of each blog page for crawlers, and add the Google Tag Manager snippet to every page (`prerender-meta.ts`); write a redirect page for every removed address (`legacy-shells.ts`); write `dist/llms.txt` (`generate-llms.ts`) |
 | `bun run preview` | Serves the production build locally |
 | `bun run lint` | Type-check with `tsc --noEmit` |
 | `bun run test` | Data, home-page design-card, SEO, redirect, business-details, `llms.txt`, 3D-studio and security-rules tests (`node:test` via `tsx`) |
@@ -363,7 +363,7 @@ All search metadata is produced by `src/utils/seo.ts` and applied on every route
 
 - **Titles and descriptions** per route, with titles capped at 60 characters. The home title is "Forged wheels for BMW M cars in stock | FORGED Custom Wheels".
 - **Canonical URLs** always on `SITE.host` in `src/config/site.ts`, the address the site is served from (`www.forgedsa.co.za`). The bare domain redirects to it, and a canonical or sitemap entry that redirects back to its own page confuses search engines, so a test checks the sitemap, `robots.txt` and `index.html` all use the same host.
-- **Link previews**: Open Graph and Twitter tags on every route. Link-preview bots and crawlers that do not run JavaScript read the same tags from each page's own HTML file, written by `scripts/prerender-meta.ts`. `index.html` keeps generic tags because it is also the fallback for unknown paths; the only thing the build adds to it is a preload for the hero wheel image (the first design card's cut-out, from the catalogue), so wide screens start fetching it before the JavaScript runs.
+- **Link previews**: Open Graph and Twitter tags on every route. Link-preview bots and crawlers that do not run JavaScript read the same tags from each page's own HTML file, written by `scripts/prerender-meta.ts`. `index.html` keeps generic tags because it is also the fallback for unknown paths; the build adds only a preload for the hero wheel image (the first design card's cut-out, from the catalogue), so wide screens start fetching it before the JavaScript runs, and the Google Tag Manager snippet that every page carries (see [Search Console and visit statistics](#search-console-and-visit-statistics)).
 - **Structured data**: `Organization` and `WebSite` on the home page; `Product` with the Rand price, in stock, on wheel pages; `CollectionPage`, `ContactPage` or `WebPage` with a `BreadcrumbList` on installs, the Sixnine dealer page, contact and the privacy notice; `Blog` and `ItemList` on the blog hub, `CollectionPage` on pillar pages, and `BlogPosting`, `BreadcrumbList` and `FAQPage` on articles.
 - **Sitemap**: `public/sitemap.xml` is regenerated from the catalogue and the blog on every build. It lists `/`, one page per in-stock wheel, the blog hub, its four pillar pages and every article (these carry a `lastmod` that is the article's own date), `/installs`, `/sixnine-wheels`, `/contact` and `/privacy-policy`, and nothing else.
 - **Noindex**: admin, preview, sold or unknown wheels, and unknown addresses. `public/robots.txt` (generated by `scripts/generate-sitemap.ts`, so its `Sitemap:` line cannot drift from the host) keeps crawlers out of `/admin` and `/studio/`.
@@ -395,7 +395,7 @@ The blog is built to rank for what owners of BMW M cars in South Africa search f
 
 ### Search Console and visit statistics
 
-Both are off until the site is given the values they need. Nothing is loaded or added to a page without them.
+Each is off until the site is given the values it needs. Nothing is loaded or added to a page without them.
 
 **Google Search Console** shows how Google crawls and indexes the site.
 
@@ -410,6 +410,17 @@ Both are off until the site is given the values they need. Nothing is loaded or 
 3. Put them in `analyticsScriptUrl` and `analyticsWebsiteId` in `src/config/site.ts` and deploy. A test fails if only one is set, if the address is not `https`, or if the ID is not a UUID.
 
 How it behaves (`src/utils/analytics.ts`): the tracker is added once, after the page has loaded; it counts only `SITE.host` (not the Render address or a developer's localhost); it respects a browser's Do Not Track setting. Two events are counted, `enquiry_open` and `enquiry_sent` (with `delivered` yes or no, and the channel), each with the page address only. Never put a name, phone number, email or message in an event. The privacy notice describes the statistics and lists Umami as a recipient only while they are set up, and says there are none otherwise; both read the same check, so they cannot disagree.
+
+**Google Tag Manager** (container `GTM-P554MVX4`, in `googleTagManagerId` in `src/config/site.ts`) is **on**. Today the container publishes one Google Analytics 4 property (`G-H2TR6RVSK0`) with enhanced measurement: page views (including the app's own page changes, which use the browser history), scrolls, clicks on links off the site, file downloads, video plays, site search and form starts and sends. GA4 sets two cookies, `_ga` and `_ga_H2TR6RVSK0`.
+
+How it behaves (`src/utils/googleTagManager.ts`):
+
+- `scripts/prerender-meta.ts` writes Google's standard container snippet into every built HTML file: the script straight after `<meta charset>` and the `<noscript>` iframe straight after `<body>`. The source `index.html` has no snippet, so `npm run dev` never loads the container. A test fails if someone pastes it there.
+- The script runs only when the page is served from `SITE.host` (`www.forgedsa.co.za`). A preview on the Render address loads nothing, so test data never reaches the property. For the same reason, GTM's *Preview* mode and Tag Assistant work only on the live site.
+- `trackEvent` (`src/utils/analytics.ts`) also pushes every event to the data layer as `{ event, page, ...data }`: `enquiry_open`, `enquiry_sent` (`delivered`, `channel`), `car_preview_open` and `car_preview_result` (`outcome`). GA4 does not see them until a tag is added in GTM. Add a *Custom Event* trigger with event name `enquiry_sent`, and a *Google Analytics: GA4 Event* tag on it with event name `enquiry_sent` and parameters from *Data Layer Variables* `delivered` and `channel`. Then mark `enquiry_sent` as a key event in GA4. Do the same for the others as needed.
+- Do not turn on GA4's *Page changes based on browser history events* twice. It is on by default in enhanced measurement and is what counts the app's page changes; adding a GTM *History Change* page-view tag as well would count every page twice.
+
+**The privacy notice follows the container.** It describes Google Tag Manager, Google Analytics, their cookies and Google as a recipient while `googleTagManagerId` is set. It does not know what is published in GTM. Publishing a new kind of tag there (an advertising pixel, Google Ads conversions, a chat widget, another analytics tool) changes what the site collects without any code change, so update `PrivacyPolicyPage.tsx` in the same week. Clearing `googleTagManagerId` to `''` removes the snippet and the matching notice text together.
 
 ### See it on my car (AI preview)
 
@@ -492,7 +503,8 @@ firebase deploy --only firestore:rules
 | `src/utils/fitmentImageSrcSet.test.ts` | The `srcset` for the install thumbnails (800 px copy, then the original) and that every install photo has its 800 px copy on disk |
 | `src/utils/wheelStudioParts.test.ts` | Viewer part classification, exploded-view offsets, camera distance |
 | `src/utils/seo.test.ts` | Per-route metadata, canonical URLs, structured data, share images, sitemap (no removed route), `render.yaml`; that the sitemap, `robots.txt` and `index.html` all use the same host; the Search Console tag (added once, never from an unsafe token) |
-| `src/utils/analytics.test.ts` | Visit statistics are off until both values are set, refuse a non-https address or a malformed ID, add one tracker that counts only the production host and respects Do Not Track, and never let a tracker failure reach the page |
+| `src/utils/analytics.test.ts` | Visit statistics are off until both values are set, refuse a non-https address or a malformed ID, add one tracker that counts only the production host and respects Do Not Track, push each event to Google Tag Manager's data layer too, and never let a tracker failure reach the page |
+| `src/utils/googleTagManager.test.ts` | Google Tag Manager is off without a well-formed container ID; the snippet loads the container (with the `gtm.js` start event) only on the production host, goes straight after `<meta charset>` with the `<noscript>` straight after `<body>`, is added once, and is never typed into `index.html` |
 | `src/utils/redirects.test.ts` | Old address to new address, `replaceState`, no loops, and every address in `scripts/legacy-pages.json` has a redirect |
 | `src/config/site.test.ts` | Published emails are empty or on the business domain; the host is the domain or `www.<domain>`; the statistics and Search Console values are well formed and set together; the car-preview address is empty or https; the privacy notice does not describe removed features |
 | `src/utils/carPreview.test.ts` | "See it on my car": off unless the address is https, shrinking keeps the shape and never enlarges, the request carries only the photo, wheel name and size and no cookies, every Worker error and malformed reply becomes a message fit to show |

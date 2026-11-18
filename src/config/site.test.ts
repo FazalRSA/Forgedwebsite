@@ -37,6 +37,11 @@ test('visit statistics are either fully set up or fully off, and the values are 
   if (searchConsoleToken) assert.match(searchConsoleToken, /^[A-Za-z0-9_-]{16,128}$/);
 });
 
+// A mistyped container ID would silently load nothing (src/utils/googleTagManager.ts refuses it).
+test('the Google Tag Manager container ID is empty or well formed', () => {
+  if (SITE.googleTagManagerId) assert.match(SITE.googleTagManagerId, /^GTM-[A-Z0-9]{4,12}$/);
+});
+
 // The car preview is off while this is empty. A set value must be an https address: the visitor's
 // photo is sent to it, so it must never go over plain http.
 test('the car-preview address is empty or an https address', () => {

@@ -77,6 +77,37 @@ test('trackEvent sends the name with the page address and the data given', () =>
   assert.deepEqual(calls, [['enquiry_open', { page: '/wheels/fsa003-gold', channel: 'form' }]]);
 });
 
+test("trackEvent also pushes the event to Google Tag Manager's data layer when the container runs", () => {
+  const dataLayer: unknown[] = [];
+  const win = { location: { pathname: '/wheels/fsa003-gold' }, dataLayer } as unknown as Window;
+  trackEvent('enquiry_sent', { delivered: 'yes', channel: 'form' }, win);
+  assert.deepEqual(dataLayer, [{ event: 'enquiry_sent', page: '/wheels/fsa003-gold', delivered: 'yes', channel: 'form' }]);
+});
+
+test('a failing Umami tracker does not stop the data-layer event, and a broken data layer never throws', () => {
+  const dataLayer: unknown[] = [];
+  const win = {
+    location: { pathname: '/' },
+    umami: {
+      track: () => {
+        throw new Error('blocked');
+      },
+    },
+    dataLayer,
+  } as unknown as Window;
+  trackEvent('enquiry_open', {}, win);
+  assert.equal(dataLayer.length, 1);
+  const broken = {
+    location: { pathname: '/' },
+    dataLayer: Object.assign([], {
+      push: () => {
+        throw new Error('blocked');
+      },
+    }),
+  } as unknown as Window;
+  assert.doesNotThrow(() => trackEvent('enquiry_open', {}, broken));
+});
+
 test('trackEvent does nothing when the tracker is not running, and never throws', () => {
   trackEvent('enquiry_open', {}, undefined);
   trackEvent('enquiry_open', {}, { location: { pathname: '/' } } as unknown as Window);

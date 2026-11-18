@@ -69,6 +69,9 @@ Use the `add-wheel-model` skill (`.claude/skills/add-wheel-model/`); the owner's
   stores or sends visitor data, update the notice in the same pull request.
 - `README.md` describes the routes, the build steps, the tests and the stock rule. Update it when
   you change any of them.
+- Google Tag Manager (`SITE.googleTagManagerId`, `src/utils/googleTagManager.ts`) loads whatever the owner
+  publishes in the container. The privacy notice describes Google Analytics only. If a tag of another kind is
+  added there, or the container ID changes, update the notice.
 - The lead time for to-order colours is `TO_ORDER_LEAD_TIME` in `src/data/catalogue.ts`. Pages and
   `llms.txt` read it from there.
 
