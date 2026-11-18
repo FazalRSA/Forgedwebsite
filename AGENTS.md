@@ -59,6 +59,10 @@ Run the type check, the tests and the build before you open a pull request. All 
 - `src/components/brand/`: pages and sections. `scripts/`: build steps, in the order in the
   `build` script.
 
+## Adding a 3D model
+
+Use the `add-wheel-model` skill (`.claude/skills/add-wheel-model/`); the owner's steps are in `docs/adding-3d-models.md`. Check a model against the real photos of the listing before wiring it, and never wire an AI model of a wheel the shop does not sell.
+
 ## Things that must stay in step
 
 - The privacy notice (`PrivacyPolicyPage.tsx`) describes what the site does. If a change collects,
