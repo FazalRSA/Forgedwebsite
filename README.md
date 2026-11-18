@@ -73,7 +73,7 @@ Every change below is a file edit, then a pull request. Merging to `main` publis
 | Mark a set as sold, or change a price, size or stock count | The listing's seed in `INVENTORY_SEEDS`, `src/data/catalogue.ts` | Nothing else. The grid, wheel page, sitemap, `llms.txt` and Sixnine page all read the catalogue |
 | Add photos to a listing | Three WebPs in `public/images/wheels/<slug>/` and an entry in `src/data/customWheels.json` | See [Adding or changing a wheel](#adding-or-changing-a-wheel) |
 | Add a new listing | `bun run add-wheel` | Same section |
-| Add or replace a 3D model | A `.glb` in `public/models/wheels/` and `MODEL_URL_BY_CODE` in `catalogue.ts` | See [3D wheel studio](#3d-wheel-studio) |
+| Add or replace a 3D model | A `.glb` in `public/models/wheels/` and `MODEL_URL_BY_CODE` (or the listing's `modelUrl`) in `catalogue.ts` | [docs/adding-3d-models.md](docs/adding-3d-models.md) and the `add-wheel-model` skill |
 | Change how a finish looks in 3D | `src/data/studioFinishes.ts` | Check the wheel page in the viewer. Its swatches are drawn from the same numbers, so they follow |
 | Change the to-order lead time | `TO_ORDER_LEAD_TIME` in `catalogue.ts` | Nothing else; pages and `llms.txt` read it |
 | Change the phone, WhatsApp, address or social links | `src/config/site.ts` | Nothing else; empty values are hidden |
@@ -339,9 +339,10 @@ A wheel with a `modelUrl` opens in the studio (`src/components/visuals/WheelStud
 
 **How models are assigned**
 
-- One model per wheel **design**. `MODEL_URL_BY_CODE` in `catalogue.ts` maps a model code to its `.glb`; every finish of that design shares the file and the studio repaints it. Photo-backed entries in `customWheels.json` carry the same `modelUrl`.
+- One model per wheel **design**, with one exception today: where a listing's photos show a different wheel from the rest of its design, that listing sets its own `modelUrl` (FSA002 Hyper Black and Polished Face use `fsa002-forked.glb`; Gold keeps the design's 15-spoke model). `MODEL_URL_BY_CODE` in `catalogue.ts` maps a model code to its `.glb`; every finish of that design shares the file and the studio repaints it. Photo-backed entries in `customWheels.json` carry the same `modelUrl`.
 - FSA001 sets its own front and rear pair on its seed (`modelUrl` and `rearModelUrl`), which enables the Front / Rear switch.
-- Paint settings per finish live in `src/data/studioFinishes.ts`.
+- Paint settings per finish live in `src/data/studioFinishes.ts`. The colour swatches on wheel pages and in the viewer are drawn from the same numbers (`src/wheel-viewer/swatch.ts`), so a finish and its swatch cannot disagree.
+- **Adding a model:** put the rim photo into Tripo3D, generate multi-view then 3D, export the `.glb`, upload it to Google Drive and give Claude the link. The `add-wheel-model` skill (`.claude/skills/add-wheel-model/`) cleans it and opens the pull request; the owner's steps, the limits of AI models and the better source (the maker's CAD) are in [docs/adding-3d-models.md](docs/adding-3d-models.md).
 - On a wheel page the studio offers the listing's own finish plus the design's to-order colours. While a to-order colour is selected, the page shows the lead-time notice under the viewer.
 
 **Model requirements** (full detail in `public/models/wheels/README.md`)
