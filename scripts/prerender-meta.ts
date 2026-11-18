@@ -18,6 +18,9 @@
  * under the film), so the largest picture on the first screen is requested before the app has even
  * loaded. Its srcset and sizes come from src/utils/heroVideo.ts, the same constants the hero's <img>
  * uses, so the preloaded file is exactly the one the <img> asks for.
+ *
+ * Every page (index.html included) also gets the Google Tag Manager snippet when
+ * SITE.googleTagManagerId is set: see src/utils/googleTagManager.ts.
  */
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -25,6 +28,7 @@ import path from 'node:path';
 import { HERO_POSTER_SIZES, HERO_POSTER_SRCSET, HERO_VIDEO } from '../src/utils/heroVideo';
 import { isHomePath, metaForPath, renderPageHtml, sitemapPaths, withSearchConsoleTag } from '../src/utils/seo';
 import { blogStaticHtml } from '../src/components/blog/blogStatic';
+import { withGoogleTagManager } from '../src/utils/googleTagManager';
 
 const distDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'dist');
 const shellPath = path.join(distDir, 'index.html');
@@ -50,9 +54,12 @@ export function heroPosterPreload(): string {
 try {
   const rawShell = readFileSync(shellPath, 'utf8');
   if (!rawShell.includes('</head>')) throw new Error(`${shellPath} has no </head> to add tags to`);
-  // The ownership tag goes into the shell first, so the home page and every page file made from it carry it.
-  const shell = withSearchConsoleTag(rawShell);
-  const verification = shell !== rawShell;
+  // The ownership tag and the Google Tag Manager snippet go into the shell first, so the home page,
+  // every page file made from it and the legacy redirect pages (made from index.html) all carry them.
+  const verifiedShell = withSearchConsoleTag(rawShell);
+  const verification = verifiedShell !== rawShell;
+  const shell = withGoogleTagManager(verifiedShell);
+  const tagManager = shell !== verifiedShell;
   let written = 0;
   for (const pagePath of sitemapPaths()) {
     if (isHomePath(pagePath)) continue;
@@ -84,7 +91,8 @@ try {
   console.log(
     `prerender: wrote page metadata into ${written} HTML files in ${distDir}` +
       (preload ? ' and the hero poster preload into index.html' : '') +
-      (verification ? ' and the Search Console ownership tag into every page' : '')
+      (verification ? ' and the Search Console ownership tag into every page' : '') +
+      (tagManager ? ' and the Google Tag Manager snippet into every page' : '')
   );
 } catch (err) {
   console.error(`prerender: could not write page HTML from ${shellPath}:`, err);

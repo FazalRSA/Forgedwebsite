@@ -11,7 +11,7 @@
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
     "add-wheel": "tsx scripts/add-wheel.ts",
-    "test": "node scripts/wheel-viewer-sync.mjs verify && tsx --test src/data/catalogue.test.ts src/data/clientFitments.test.ts src/utils/wheelStudioParts.test.ts src/utils/finishSwatch.test.ts src/utils/designCards.test.ts src/utils/heroVideo.test.ts src/utils/wheelImageSrcSet.test.ts src/utils/fitmentImageSrcSet.test.ts src/utils/seo.test.ts src/utils/analytics.test.ts src/utils/redirects.test.ts src/config/site.test.ts src/utils/llms.test.ts src/utils/leads.test.ts src/utils/carPreview.test.ts worker/car-preview/src/handler.test.ts src/data/blog.test.ts src/utils/blogSeo.test.ts firestore.rules.test.ts",
+    "test": "node scripts/wheel-viewer-sync.mjs verify && tsx --test src/data/catalogue.test.ts src/data/clientFitments.test.ts src/utils/wheelStudioParts.test.ts src/utils/finishSwatch.test.ts src/utils/designCards.test.ts src/utils/heroVideo.test.ts src/utils/wheelImageSrcSet.test.ts src/utils/fitmentImageSrcSet.test.ts src/utils/seo.test.ts src/utils/analytics.test.ts src/utils/googleTagManager.test.ts src/utils/consent.test.ts src/utils/redirects.test.ts src/config/site.test.ts src/utils/llms.test.ts src/utils/leads.test.ts src/utils/carPreview.test.ts worker/car-preview/src/handler.test.ts src/data/blog.test.ts src/utils/blogSeo.test.ts firestore.rules.test.ts",
     "wheel-viewer:stamp": "node scripts/wheel-viewer-sync.mjs stamp",
     "wheel-viewer:verify": "node scripts/wheel-viewer-sync.mjs verify"
   },

@@ -36,6 +36,11 @@ export interface SiteConfig {
   analyticsScriptUrl: string;
   /** Visit statistics: the website ID (a UUID) from Umami's tracking-code page. Empty means no statistics. */
   analyticsWebsiteId: string;
+  /**
+   * Google Tag Manager container ID (GTM-XXXXXXX). Empty means no Google tags load. The privacy notice
+   * describes Google Tag Manager and Google Analytics only while this is set (src/utils/googleTagManager.ts).
+   */
+  googleTagManagerId: string;
   /** Google Search Console ownership tag: the `content` of the HTML-tag verification. Empty adds no tag. */
   searchConsoleToken: string;
   /**
@@ -89,6 +94,13 @@ export const SITE: SiteConfig = {
   /** Umami Cloud tracker, from its tracking-code page. Leave both empty until the Umami website exists (see README → Search and visit statistics). */
   analyticsScriptUrl: '',
   analyticsWebsiteId: '',
+
+  /**
+   * Google Tag Manager container, from the "Install Google Tag Manager" dialog in GTM. It loads the
+   * tags published in that container (today one Google Analytics 4 property). Publishing a new kind
+   * of tag there changes what the site collects: update the privacy notice to match.
+   */
+  googleTagManagerId: 'GTM-P554MVX4',
 
   /** Google Search Console HTML-tag token (not needed when the domain is verified with a DNS record). */
   searchConsoleToken: '',

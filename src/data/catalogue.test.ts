@@ -303,7 +303,7 @@ test('a listing of a design with a traced model opens in 3D even when its own re
   assert.equal(catalogue.modelUrlForDesign(undefined), undefined);
   const withoutModel = { ...BRAND_WHEELS.find((w) => w.slug === 'fsa004-silver')!, slug: 'fsa004-test-fallback', modelUrl: undefined };
   const resolved = getAllBrandWheels([withoutModel as BrandWheelItem]).find((w) => w.slug === 'fsa004-test-fallback');
-  assert.equal(resolved?.modelUrl, '/models/wheels/fsa004.glb');
+  assert.equal(resolved?.modelUrl, '/models/wheels/fsa004-v2.glb');
 });
 
 test('to-order colours are exactly the colours a design comes in that it has no stock of', async () => {
@@ -353,9 +353,10 @@ test('Sixnine designs are offered in Sixnine\'s own published finishes, by their
   assert.deepEqual(toOrder('ff-1-silver'), ['Glossy Black']);
 });
 
-test('the FSA003 and FF-1 listings share their design\'s model, and FF-1 shares the Sixnine model across finishes', () => {
+test('the FSA003, FSA004 and FF-1 listings share their design\'s model across finishes', () => {
   const all = getAllBrandWheels();
   const urls = (code: string) => new Set(all.filter((w) => w.modelCode === code).map((w) => w.modelUrl));
   assert.deepEqual([...urls('FSA003')], ['/models/wheels/fsa003-v2.glb']);
   assert.deepEqual([...urls('FF-1')], ['/models/wheels/ff-1-sixnine.glb']);
+  assert.deepEqual([...urls('FSA004')], ['/models/wheels/fsa004-v2.glb']);
 });
