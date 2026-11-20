@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import customWheels from './customWheels.json';
 import * as catalogue from './catalogue';
 import {
@@ -293,7 +293,7 @@ test('FSA001 carries front and rear 3D models that exist in /public; every listi
   for (const slug of ['fsa002-hyper-black', 'fsa002-polished-face']) {
     assert.equal(all.find((w) => w.slug === slug)?.modelUrl, '/models/wheels/fsa002-forked-v3.glb', slug);
   }
-  assert.equal(all.find((w) => w.slug === 'fsa003-gold')?.modelUrl, '/models/wheels/fsa003-v4.glb');
+  assert.equal(all.find((w) => w.slug === 'fsa003-gold')?.modelUrl, '/models/wheels/fsa003-v5.glb');
 });
 
 test('a listing of a design with a traced model opens in 3D even when its own record names no model', () => {
@@ -303,7 +303,7 @@ test('a listing of a design with a traced model opens in 3D even when its own re
   assert.equal(catalogue.modelUrlForDesign(undefined), undefined);
   const withoutModel = { ...BRAND_WHEELS.find((w) => w.slug === 'fsa004-silver')!, slug: 'fsa004-test-fallback', modelUrl: undefined };
   const resolved = getAllBrandWheels([withoutModel as BrandWheelItem]).find((w) => w.slug === 'fsa004-test-fallback');
-  assert.equal(resolved?.modelUrl, '/models/wheels/fsa004-v4.glb');
+  assert.equal(resolved?.modelUrl, '/models/wheels/fsa004-v5.glb');
 });
 
 test('to-order colours are exactly the colours a design comes in that it has no stock of', async () => {
@@ -356,9 +356,9 @@ test('Sixnine designs are offered in Sixnine\'s own published finishes, by their
 test('the FSA003, FSA004 and FF-1 listings share their design\'s model across finishes', () => {
   const all = getAllBrandWheels();
   const urls = (code: string) => new Set(all.filter((w) => w.modelCode === code).map((w) => w.modelUrl));
-  assert.deepEqual([...urls('FSA003')], ['/models/wheels/fsa003-v4.glb']);
+  assert.deepEqual([...urls('FSA003')], ['/models/wheels/fsa003-v5.glb']);
   assert.deepEqual([...urls('FF-1')], ['/models/wheels/ff-1-sixnine-v3.glb']);
-  assert.deepEqual([...urls('FSA004')], ['/models/wheels/fsa004-v4.glb']);
+  assert.deepEqual([...urls('FSA004')], ['/models/wheels/fsa004-v5.glb']);
 });
 
 test('centre caps carry the FORGED logo on FSA designs and the SIXNINE badge on FF designs', () => {
@@ -404,5 +404,14 @@ test('each brand has a page path, a short name and a logo on disk, and the shop\
     // The cap logo on a brand's 3D wheels is the same mark.
     const code = id === 'forged-sa' ? 'FSA001' : 'FF-1';
     assert.equal(catalogue.capLogoForDesign(code)?.url, brand.logo.url);
+  }
+});
+
+test('scripts/wheel-models.json names the model file each design actually uses', () => {
+  const manifest = JSON.parse(readFileSync('scripts/wheel-models.json', 'utf8')) as { models: { design: string; out: string }[] };
+  assert.ok(manifest.models.length > 0);
+  for (const m of manifest.models) {
+    assert.equal(catalogue.modelUrlForDesign(m.design), `/models/wheels/${m.out}`, `${m.design} is wired to a different file`);
+    assert.ok(existsSync(`public/models/wheels/${m.out}`), `${m.out} is missing`);
   }
 });

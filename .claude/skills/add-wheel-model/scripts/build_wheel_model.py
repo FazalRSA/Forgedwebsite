@@ -72,6 +72,93 @@ def remove_fins(mesh: trimesh.Trimesh, fold_deg: float, max_faces: int) -> trime
     return mesh
 
 
+def rebuild_barrel(mesh: trimesh.Trimesh, wall_mm: float) -> trimesh.Trimesh:
+    """Replace the barrel walls with a clean shape of revolution and return the new mesh (axle is Z).
+
+    Some AI meshes model the barrel as a thick double skin (an outer wall and an inner wall about 30 mm
+    apart) where a real forged barrel is one thin wall. Faces of the barrel zone (between the back lip
+    and the face side) are removed and rebuilt from the median outer radius at each height, with an inner
+    wall `wall_mm` inside it, blended to the old inner wall where the zone meets the lip and the face."""
+    v = mesh.vertices
+    centre = (v[:, :2].min(axis=0) + v[:, :2].max(axis=0)) / 2
+    d = v[:, :2] - centre
+    r = np.linalg.norm(d, axis=1)
+    rmax = r.max()
+    mm = rmax / 265.0
+    z = v[:, 2]
+    zlo, zhi = z.min(), z.max()
+    face_up = (z[r < 0.5 * rmax].mean() > (zlo + zhi) / 2) if (r < 0.5 * rmax).any() else True
+    depth = (z - zlo) / (zhi - zlo) if face_up else (zhi - z) / (zhi - zlo)  # 0 = back, 1 = face
+    rhat = d / (r[:, None] + 1e-12)
+    n_r = (mesh.vertex_normals[:, :2] * rhat).sum(axis=1)
+
+    D0, D1 = 0.13, 0.78  # the zone that is rebuilt
+    edges = np.linspace(D0 - 0.02, D1 + 0.02, 90)
+    which = np.digitize(depth, edges)
+
+    def profile(sel):
+        vals, keys = [], []
+        for b in range(1, len(edges)):
+            m = sel & (which == b)
+            if m.sum() >= 5:
+                keys.append((edges[b - 1] + edges[b]) / 2)
+                vals.append(np.median(r[m]))
+        if len(keys) < 10:
+            raise ValueError('could not read the barrel profile (is the axle Z?)')
+        vals = np.array(vals)
+        sm = np.array([vals[max(0, i - 3): i + 4].mean() for i in range(len(vals))])
+        return np.array(keys), sm
+
+    outer_sel = (n_r > 0.7) & (r > 0.8 * rmax)
+    inner_sel = (n_r < -0.7) & (r > 0.7 * rmax) & (r < 0.97 * rmax)
+    ko, vo = profile(outer_sel)
+    ki, vi = profile(inner_sel)
+
+    OVER = 0.05  # the new walls run this far into the lips, so no seam shows
+    ds = np.linspace(D0 - OVER, D1 + OVER, 90)
+    r_out = np.interp(ds, ko, vo)
+    r_old_in = np.interp(ds, ki, vi)
+    # inner wall: wall_mm inside the outer, blended to the old inner wall within 0.08 of each end
+    r_thin = r_out - wall_mm * mm
+    k = np.clip(np.minimum(ds - (D0 - OVER), (D1 + OVER) - ds) / 0.08, 0, 1)
+    k = 0.5 - 0.5 * np.cos(np.pi * k)
+    r_in = (1 - k) * np.minimum(r_old_in, r_thin) + k * r_thin
+
+    # drop the old barrel faces
+    f = mesh.faces
+    cen_depth = depth[f].mean(axis=1)
+    cen_r = r[f].mean(axis=1)
+    drop = (cen_depth > D0) & (cen_depth < D1) & (cen_r > 0.7 * rmax)
+    kept = trimesh.Trimesh(vertices=v.copy(), faces=f[~drop], process=False)
+    kept.remove_unreferenced_vertices()
+
+    steps = 192
+    th = np.linspace(0, 2 * np.pi, steps, endpoint=False)
+    zs = zlo + ds * (zhi - zlo) if face_up else zhi - ds * (zhi - zlo)
+    new_parts = []
+    for radius, outward in ((r_out, True), (r_in, False)):
+        X = centre[0] + radius[:, None] * np.cos(th)[None, :]
+        Y = centre[1] + radius[:, None] * np.sin(th)[None, :]
+        Z = np.repeat(zs[:, None], steps, axis=1)
+        verts = np.stack([X, Y, Z], axis=-1).reshape(-1, 3)
+        idx = np.arange(len(ds) * steps).reshape(len(ds), steps)
+        a, b = idx[:-1], idx[1:]
+        a2, b2 = np.roll(a, -1, axis=1), np.roll(b, -1, axis=1)
+        faces = np.concatenate([np.stack([a, b, a2], -1).reshape(-1, 3), np.stack([a2, b, b2], -1).reshape(-1, 3)])
+        part = trimesh.Trimesh(vertices=verts, faces=faces, process=False)
+        # face the walls outward (outer) or toward the axle (inner)
+        cen = part.triangles_center
+        radial = np.zeros_like(cen)
+        radial[:, :2] = cen[:, :2] - centre
+        sign = np.sign((part.face_normals * radial).sum(axis=1)) * (1 if outward else -1)
+        flip = sign < 0
+        part.faces[flip] = part.faces[flip][:, ::-1]
+        new_parts.append(part)
+    out = trimesh.util.concatenate([kept] + new_parts)
+    print(f'barrel rebuilt: {int(drop.sum())} faces replaced by a {wall_mm:g} mm wall (outer r {r_out.min() / mm:.0f} to {r_out.max() / mm:.0f} mm)')
+    return out
+
+
 def straighten_barrel(mesh: trimesh.Trimesh, max_mm: float) -> None:
     """Pull barrel vertices toward the median radius of their height along the axle (the axle is Z).
     Works in place. Vertices on the face-side lip (bolts), on spokes and on real steps are not moved:
@@ -142,6 +229,8 @@ def main() -> int:
                     help='0..1, how much of the smoothed normal to use')
     ap.add_argument('--cache', default=None,
                     help='file to keep the decimated mesh in (.npz); a later run with the same file skips the slow first half, so several clean-up settings can be tried quickly')
+    ap.add_argument('--rebuild-barrel', type=float, default=0.0,
+                    help='mm; replace the barrel with a clean shape of revolution with this wall thickness (0 = off, 6 is typical)')
     ap.add_argument('--barrel-smooth', type=float, default=0.0,
                     help='mm; straighten ripples in the barrel by at most this far (0 = off, 3 to 5 is typical)')
     ap.add_argument('--flip', action='store_true', help='turn the wheel 180 degrees if the face points to -Z')
@@ -157,6 +246,9 @@ def main() -> int:
         return 1
     if a.fold_angle < 0 or a.fold_angle >= 180 or a.fold_max_faces < 1:
         print('ERROR: --fold-angle must be 0 (off) up to 180, and --fold-max-faces at least 1', file=sys.stderr)
+        return 1
+    if a.rebuild_barrel < 0 or a.rebuild_barrel > 20:
+        print('ERROR: --rebuild-barrel must be 0 (off) up to 20 mm', file=sys.stderr)
         return 1
     if a.barrel_smooth < 0 or a.barrel_smooth > 15:
         print('ERROR: --barrel-smooth must be 0 (off) up to 15 mm', file=sys.stderr)
@@ -217,7 +309,10 @@ def main() -> int:
         if a.flip:
             mesh.apply_transform(trimesh.transformations.rotation_matrix(np.pi, [0, 1, 0]))
 
-        dec = mesh.simplify_quadric_decimation(face_count=a.target, aggression=a.agg)
+        if len(mesh.faces) > a.target:
+            dec = mesh.simplify_quadric_decimation(face_count=a.target, aggression=a.agg)
+        else:
+            dec = mesh  # already within budget: nothing to decimate
         print(f'decimated to {len(dec.faces):,} triangles')
 
         v, f = dec.vertices, dec.faces
@@ -240,7 +335,13 @@ def main() -> int:
     if a.fold_angle > 0:
         dec = remove_fins(dec, a.fold_angle, a.fold_max_faces)
 
-    if a.barrel_smooth > 0:
+    if a.rebuild_barrel > 0:
+        try:
+            dec = rebuild_barrel(dec, a.rebuild_barrel)
+        except ValueError as err:
+            print(f'ERROR: --rebuild-barrel could not read the barrel: {err}. Try --barrel-smooth instead, or leave both off.', file=sys.stderr)
+            return 1
+    elif a.barrel_smooth > 0:
         straighten_barrel(dec, a.barrel_smooth)
 
     smoothing.filter_taubin(dec, lamb=0.5, nu=-0.53, iterations=a.smooth)
