@@ -78,7 +78,13 @@ def main() -> int:
             print(f"   ERROR: {src} not found", file=sys.stderr)
             failed.append(m["design"])
             continue
-        cache_dir.mkdir(parents=True, exist_ok=True)
+        try:
+            cache_dir.mkdir(parents=True, exist_ok=True)
+            OUT_DIR.mkdir(parents=True, exist_ok=True)
+        except OSError as err:
+            print(f"   ERROR: cannot create {err.filename or cache_dir}: {err.strerror}", file=sys.stderr)
+            failed.append(m["design"])
+            continue
         if subprocess.run(cmd).returncode != 0:
             failed.append(m["design"])
 

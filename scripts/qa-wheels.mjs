@@ -40,7 +40,12 @@ if (!chromium) {
   process.exit(1);
 }
 
-await mkdir(out, { recursive: true });
+try {
+  await mkdir(out, { recursive: true });
+} catch (err) {
+  console.error(`ERROR: cannot create ${out}: ${err.message}`);
+  process.exit(1);
+}
 const browser = await chromium.launch({
   args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'],
 });
@@ -81,7 +86,7 @@ try {
     console.log(`${problems.length ? 'FAIL' : 'ok  '} ${slug}${note ? ` (${note})` : ''}${problems.length ? `: ${problems.join('; ')}` : ''}`);
   }
 } catch (err) {
-  console.error(`ERROR: ${err.message}`);
+  console.error(`ERROR: ${err.message}${err.cause ? ` (${err.cause.code || err.cause.message})` : ''}. Is the dev server running at ${base}?`);
   await browser.close();
   process.exit(1);
 }
@@ -93,7 +98,12 @@ const html = `<!doctype html><meta charset="utf-8"><title>Wheel QA</title>
 <h1>Wheel QA, 390 px</h1>${results.map((r) => `<h2>${r.slug}${r.problems.length ? ' <span class="bad">FAIL</span>' : ''}</h2>
 ${r.problems.map((p) => `<div class="bad">${p.replace(/</g, '&lt;')}</div>`).join('')}
 <div class="row">${r.shots.map((s) => `<img src="${s}" alt="${r.slug} ${s}">`).join('')}</div>`).join('')}`;
-await writeFile(join(out, 'index.html'), html);
+try {
+  await writeFile(join(out, 'index.html'), html);
+} catch (err) {
+  console.error(`ERROR: cannot write the contact sheet: ${err.message}`);
+  process.exit(1);
+}
 const failed = results.filter((r) => r.problems.length);
 console.log(`\n${results.length} listings, ${failed.length} with problems. Contact sheet: ${join(out, 'index.html')}`);
 process.exit(failed.length ? 1 : 0);
