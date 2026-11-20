@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import customWheels from './customWheels.json';
 import * as catalogue from './catalogue';
 import {
@@ -404,5 +404,14 @@ test('each brand has a page path, a short name and a logo on disk, and the shop\
     // The cap logo on a brand's 3D wheels is the same mark.
     const code = id === 'forged-sa' ? 'FSA001' : 'FF-1';
     assert.equal(catalogue.capLogoForDesign(code)?.url, brand.logo.url);
+  }
+});
+
+test('scripts/wheel-models.json names the model file each design actually uses', () => {
+  const manifest = JSON.parse(readFileSync('scripts/wheel-models.json', 'utf8')) as { models: { design: string; out: string }[] };
+  assert.ok(manifest.models.length > 0);
+  for (const m of manifest.models) {
+    assert.equal(catalogue.modelUrlForDesign(m.design), `/models/wheels/${m.out}`, `${m.design} is wired to a different file`);
+    assert.ok(existsSync(`public/models/wheels/${m.out}`), `${m.out} is missing`);
   }
 });
