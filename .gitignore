@@ -17,3 +17,4 @@ scripts/fitment-reshoot/logs/
 .cto-toolkit/
 .venv-cutouts/
 qa-wheels/
+__pycache__/
