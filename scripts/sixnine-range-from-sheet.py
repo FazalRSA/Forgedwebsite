@@ -48,11 +48,36 @@ def construction(value):
     return None
 
 
-def main(path):
-    sheet = openpyxl.load_workbook(path, data_only=True, read_only=True)['Wheel sizes']
-    rows = [r for r in sheet.iter_rows(values_only=True) if any(c not in (None, '') for c in r)]
+NEEDED_COLUMNS = [
+    'Series', 'Size', 'Diameter (inch)', 'Width (J)', 'Offset (ET)', 'Bolt pattern (PCD)',
+    'Edition or fitment note', 'Colours offered', 'Sold as', 'Pre-order', 'Load rating (kg)',
+    'Centre bore (mm)', 'Concavity or deep lip (mm)', 'Concavity note', 'Weight (kg, approx.)',
+    'Construction', 'Data flag',
+]
+
+
+def read_sizes(path):
+    """The rows of the "Wheel sizes" tab and their column positions, or a plain message on failure."""
+    try:
+        workbook = openpyxl.load_workbook(path, data_only=True, read_only=True)
+    except FileNotFoundError:
+        raise SystemExit(f'No file at {path}. Download the sheet as .xlsx first.')
+    except Exception as error:  # openpyxl raises several types for a file that is not a workbook
+        raise SystemExit(f'Could not read {path} as an Excel workbook: {error}')
+    if 'Wheel sizes' not in workbook.sheetnames:
+        raise SystemExit(f'{path} has no "Wheel sizes" tab (tabs: {", ".join(workbook.sheetnames)})')
+    rows = [r for r in workbook['Wheel sizes'].iter_rows(values_only=True) if any(c not in (None, '') for c in r)]
+    if not rows:
+        raise SystemExit('The "Wheel sizes" tab is empty')
     head = rows[0]
-    col = {name: head.index(name) for name in head if name}
+    missing = [name for name in NEEDED_COLUMNS if name not in head]
+    if missing:
+        raise SystemExit(f'The "Wheel sizes" tab is missing columns: {", ".join(missing)}')
+    return rows, {name: head.index(name) for name in head if name}
+
+
+def main(path):
+    rows, col = read_sizes(path)
 
     by_series = {code: [] for code in SERIES_ORDER}
     for r in rows[1:]:
@@ -105,9 +130,12 @@ def main(path):
         },
         'series': series,
     }
-    with open(OUT, 'w', encoding='utf-8') as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
-        f.write('\n')
+    try:
+        with open(OUT, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+            f.write('\n')
+    except OSError as error:
+        raise SystemExit(f'Could not write {os.path.relpath(OUT)}: {error}')
     print(f'Wrote {sum(len(s["sizes"]) for s in series)} sizes in {len(series)} series to {os.path.relpath(OUT)}')
 
 
