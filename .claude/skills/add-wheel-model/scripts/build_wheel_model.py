@@ -333,7 +333,11 @@ def main() -> int:
         dec = remove_fins(dec, a.fold_angle, a.fold_max_faces)
 
     if a.rebuild_barrel > 0:
-        dec = rebuild_barrel(dec, a.rebuild_barrel)
+        try:
+            dec = rebuild_barrel(dec, a.rebuild_barrel)
+        except ValueError as err:
+            print(f'ERROR: --rebuild-barrel could not read the barrel: {err}. Try --barrel-smooth instead, or leave both off.', file=sys.stderr)
+            return 1
     elif a.barrel_smooth > 0:
         straighten_barrel(dec, a.barrel_smooth)
 
