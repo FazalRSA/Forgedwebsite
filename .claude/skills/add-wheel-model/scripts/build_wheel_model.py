@@ -309,7 +309,10 @@ def main() -> int:
         if a.flip:
             mesh.apply_transform(trimesh.transformations.rotation_matrix(np.pi, [0, 1, 0]))
 
-        dec = mesh.simplify_quadric_decimation(face_count=a.target, aggression=a.agg)
+        if len(mesh.faces) > a.target:
+            dec = mesh.simplify_quadric_decimation(face_count=a.target, aggression=a.agg)
+        else:
+            dec = mesh  # already within budget: nothing to decimate
         print(f'decimated to {len(dec.faces):,} triangles')
 
         v, f = dec.vertices, dec.faces
