@@ -9,7 +9,6 @@ import { BrandHeader } from './components/brand/BrandHeader';
 import { HeroSection } from './components/brand/HeroSection';
 import { EditorialFlow } from './components/brand/EditorialFlow';
 import { WheelCatalogue } from './components/brand/WheelCatalogue';
-import { IndustryPartnersSection } from './components/brand/IndustryPartnersSection';
 import { GoogleReviewsSection } from './components/brand/GoogleReviewsSection';
 import { FloatingWhatsApp } from './components/shared/FloatingWhatsApp';
 import { ConsentBanner } from './components/shared/ConsentBanner';
@@ -108,7 +107,6 @@ function BrandHomePage() {
         <EditorialFlow />
         <GoogleReviewsSection />
         <BlogTeaser />
-        <IndustryPartnersSection />
         <AskAiSection />
       </main>
     </div>

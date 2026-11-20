@@ -51,10 +51,20 @@ export const ContactCta: React.FC<ContactCtaProps> = ({
   );
 };
 
-/** Shared look for the main blue button so every page's call to action matches. */
-export const CTA_PRIMARY_CLASS =
-  'inline-flex items-center justify-center gap-2 min-h-11 px-5 rounded-full bg-[#1D4ED8] text-white text-sm font-medium hover:bg-[#2563EB] transition-colors cursor-pointer whitespace-nowrap';
+/*
+ * The site's buttons, in the SIXNINE build language: every control is a pill, primary actions are
+ * solid white with dark text, secondary ones are glass, and they shrink a touch when pressed. FORGED
+ * blue is the one accent: the header's Enquire button (CTA_ACCENT_CLASS). Use it once per view.
+ */
 
-/** Shared look for the quiet outlined button. */
+/** The main button on a page: white, dark text. */
+export const CTA_PRIMARY_CLASS =
+  'press inline-flex items-center justify-center gap-2 min-h-12 px-6 rounded-full bg-white text-[#111111] text-[15px] font-semibold hover:bg-white/90 cursor-pointer whitespace-nowrap';
+
+/** The quieter button beside it: glass with a hairline. */
 export const CTA_SECONDARY_CLASS =
-  'inline-flex items-center justify-center gap-2 min-h-11 px-5 rounded-full border border-[#33333E] text-[#EDEBE4] text-sm font-medium hover:border-[#1D4ED8] hover:text-white transition-colors cursor-pointer whitespace-nowrap';
+  'press glass inline-flex items-center justify-center gap-2 min-h-12 px-6 rounded-full border-white/[0.18] text-[#EDEBE4] text-[15px] font-semibold hover:bg-white/10 hover:text-white cursor-pointer whitespace-nowrap';
+
+/** FORGED blue: the one promoted action in a view (the header's Enquire button). */
+export const CTA_ACCENT_CLASS =
+  'press inline-flex items-center justify-center gap-2 min-h-11 px-5 rounded-full bg-[#1D4ED8] text-white text-sm font-semibold hover:bg-[#2563EB] cursor-pointer whitespace-nowrap';

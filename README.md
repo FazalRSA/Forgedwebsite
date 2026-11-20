@@ -57,7 +57,7 @@ It shows the wheels that are in stock, each in photography and an interactive 3D
 
 Six pages, plus the privacy notice. The shop sells two brands, and the site is organised by them: **Forged SA** (the shop's own designs, every design code starting `FSA`) and **Sixnine Wheels** (sold as an official dealer, every code starting `FF`). `brandOfWheel` and `WHEEL_BRANDS` in `src/data/catalogue.ts` hold that rule and each brand's name, page and logo; a test fails if a listing's code is neither, so a new design is never left without a brand.
 
-- **Home (`/`).** What is in stock, grouped by brand (Forged SA first, then Sixnine). Each group opens with the brand's logo and name, what the shop is to it ("Our own brand", "Official dealer"), how many designs and sets are in stock, and a link to the brand's page. Under it, one large dark card per wheel design (rows of three and two on wide screens, a lone last design full width; two columns on tablets, one on phones). Each card shows the design's wheel cut out on the dark card, its name, how many finishes are in stock, the lowest price per set of four, the finishes and sizes, all worked out from the catalogue (`src/utils/designCards.ts`); it links to the design's first photographed listing, whose page offers the other finishes. Then customer installs, the industry partners strip (Sixnine Wheels and BMW) and "Ask AI about us".
+- **Home (`/`).** Opens with the hero over the brand film: the headline "Forged Custom Wheels. Turning dreams into reality.", the owner's installs figure as a pill ("Over 80 successful wheels installed this year.", from `SITE.installsThisYear`, shown only during the year it counts), the stock line (counts and lowest price from the catalogue), a white "See wheels in stock" button and a glass "See our installs" button, then "Our Industry Partners": the Sixnine Wheels (official dealer, linked to its page) and BMW logos as glass chips (`#partners`, from `src/data/partners.ts`). Then what is in stock, grouped by brand (Forged SA first, then Sixnine). Each group opens with the brand's logo and name, what the shop is to it ("Our own brand", "Official dealer"), how many designs and sets are in stock, and a link to the brand's page. Under it, one large dark card per wheel design (rows of three and two on wide screens, a lone last design full width; two columns on tablets, one on phones). Each card shows the design's wheel cut out on the dark card, its name, how many finishes are in stock, the lowest price per set of four, the finishes and sizes, all worked out from the catalogue (`src/utils/designCards.ts`); it links to the design's first photographed listing, whose page offers the other finishes. Then customer installs, Google reviews, the blog teaser and "Ask AI about us". Each section opens with an eyebrow label over its heading.
 - **Wheel page (`/wheels/:slug`).** One in-stock listing: photos, price per set of four, sizes and specification. Colours are **photoreal swatches** (`ColourSwatches.tsx`: a ball in the finish's own paint under the 3D studio's reflections, drawn once and cached; a drawn ball stands in until it is ready or without WebGL). They come in two groups: the design's finishes that are **in stock** (the one on this page shows on the 3D wheel when tapped; the others open their own listing), and its **other colours, to order**, always shown with the notice that a lead time of 3 months applies. Tapping a to-order swatch opens the 3D view in that colour and offers an "Ask about" button. The 3D viewer loads only when the visitor taps "View in 3D" (or a colour swatch). Once the preview Worker is set up, a "See it on my car" button lets a visitor choose a photo of their car and see an AI-made impression of the wheel on it (see [See it on my car](#see-it-on-my-car-ai-preview)). The enquiry button opens the enquiry form with the design, finish and sizes filled in; a to-order colour prefills the colour and the lead time. The form logs the enquiry through n8n and then opens WhatsApp (see [Lead delivery](#lead-delivery-n8n)).
 - **Installs (`/installs`).** Customer cars the shop has fitted (BMW M cars and one Audi RS3; no install is linked to a catalogue wheel). Each install opens to three photos: two studio re-shoots made from the customer's own photo, then that photo itself with the number plate pixelated.
 - **Forged SA page (`/forged-sa-wheels`, "Forged SA" in the menu).** The shop's own brand: every FSA set in stock, and a fitment summary. It says only what the owner has confirmed: the FSA designs are Forged SA's own, and they are forged. Every number on it is worked out from the catalogue.
@@ -142,7 +142,7 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
 
 | Route | Component | Purpose |
 | --- | --- | --- |
-| `/` | `BrandHomePage` | Hero with the brand film, wheels in stock (`#catalogue`), customer installs, partners strip (`#partners`), Ask AI (`#ask-ai`) |
+| `/` | `BrandHomePage` | Hero with the brand film, installs figure and industry partners (`#partners`), wheels in stock (`#catalogue`), customer installs, reviews, blog teaser, Ask AI (`#ask-ai`) |
 | `/wheels/:slug` | `WheelShowcasePDP` | Wheel page: photos, 3D viewer, price, sizes, in-stock and to-order colours, enquire. A sold or unknown slug shows the 404 page |
 | `/blog` | `BlogIndexPage` | The blog hub: every content pillar and the latest guides |
 | `/blog/:pillar` | `BlogTopicPage` | One content pillar: the topic explained and every guide in it. An unknown pillar shows the 404 page |
@@ -247,7 +247,18 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
 
 The look is dark, restrained and technical. Keep new work inside it.
 
-- **Colour tokens** live in `src/index.css`: the brand palette of off-white text (`#EDEBE4`), black background (`#111111`), blue (`#1D4ED8`) for button fills and selected states, and rose (`#F43F5E`) for accent text and keyboard focus, plus onyx surfaces (`#121215`, `#18181D`), borders (`#26262E`) and text greys. Blue text on the black background is too faint to read, so accent text is always rose. Do not add new colours; WhatsApp green and Instagram pink appear only on those channels' own buttons.
+Since November 2026 the site is built the way the SIXNINE Wheels storefront is (the `sixnine-website` skill in `.claude/skills/`), in FORGED's own palette and type:
+
+- **Pills everywhere.** Buttons, chips, nav links and the header are fully rounded. Card tiles are 24 px (`rounded-3xl`).
+- **Glass, not solid.** Floating and secondary surfaces use `.glass` (`src/index.css`): a translucent white fill, a 1px hairline, a 1px inner top highlight and a backdrop blur. The header is a floating glass pill bar; the page scrolls behind it.
+- **White is the primary action; FORGED blue is the one accent.** `CTA_PRIMARY_CLASS` (white, dark text) for a page's main button, `CTA_SECONDARY_CLASS` (glass) beside it, and `CTA_ACCENT_CLASS` (blue) only for the header's Enquire button and the enquiry form's submit. One blue control per view.
+- **Selected means lighter, not blue.** The current nav link sits on a lighter pill; the active photo dot is white.
+- **Calm motion.** `.press` shrinks a control to 97 % while pressed, `.press-card` a card to 98.5 %; cards lift their hairline on hover. Both are off under reduced motion.
+- **Sections open with an eyebrow** (`EYEBROW_CLASS`, `src/components/brand/sectionStyles.ts`): one or two uppercase words over the heading.
+
+What stays FORGED's own: the gold logo, Satoshi Black headlines, the palette below, rose for accent text and the focus ring, the brand film, the 3D studio and the photoreal swatches.
+
+- **Colour tokens** live in `src/index.css`: the brand palette of off-white text (`#EDEBE4`), black background (`#111111`), blue (`#1D4ED8`) for the one accent button (see above), and rose (`#F43F5E`) for accent text and keyboard focus, plus onyx surfaces (`#121215`, `#18181D`), borders (`#26262E`) and text greys. Blue text on the black background is too faint to read, so accent text is always rose. Do not add new colours; WhatsApp green and Instagram pink appear only on those channels' own buttons.
 - **Logo.** `public/brand/forged-monogram.svg` (gold) and `public/brand/forged-wordmark.svg` (FORGED SA, in the same gold) were traced from the logo files on the business's WordPress site. Their gold belongs to the logo only; do not use them as interface colours. Use `BrandLogo` (`src/components/shared/`) for the monogram and wordmark together. The browser icons in `public/` are the monogram on an onyx tile.
 - **Footer.** `SiteFooter` (`src/components/brand/`) is on every page: the wordmark across the full width, then one column per contact channel set in `src/config/site.ts`, then the page links. An empty channel has no column.
 - **Three typefaces**, each with one job:
@@ -558,7 +569,9 @@ The privacy notice (`PrivacyPolicyPage.tsx`) describes Google Tag Manager, Googl
 
 A value left empty is never shown: the related button falls back to the enquiry form and the icon or address line is hidden. Fill a value in only once it is confirmed. Email addresses must be on the business's own domain (`SITE.domain`); a test fails otherwise. `privacyEmail` and `tradeEmail` are empty today, so the privacy notice gives WhatsApp and phone as the contact.
 
-**Partners.** The home page strip reads `src/data/partners.ts` and shows nothing when the list is empty. Add a partner only with the owner's confirmation that the logo may be shown.
+**Partners.** The "Our Industry Partners" row in the home page hero reads `src/data/partners.ts` and is left out when the list is empty.
+
+**Installs figure.** `SITE.installsThisYear` (`{ wheels, year }`) is the owner's count of wheels installed in a calendar year. The hero shows "Over {wheels} successful wheels installed this year." only during that year (`installsThisYearLine`), so the claim never outlives its year; update both numbers with the owner's new figure, or set it to `null` to hide the line. Add a partner only with the owner's confirmation that the logo may be shown.
 
 **Privacy notice.** `PrivacyPolicyPage` must describe the site as it is. If you add anything that collects, stores or sends visitor data (a form backend, analytics, cookies, a new third party), update the notice in the same pull request (the visit statistics are described only while they are set up in `src/config/site.ts`). A test fails if the notice mentions features the site no longer has.
 
@@ -592,7 +605,7 @@ firebase deploy --only firestore:rules
 
 ## Testing
 
-`bun run test` runs twenty-two test files (236 tests) with `node:test`. The files are listed by name in the `test` script in `package.json`, so a new test file does not run until it is added there.
+`bun run test` runs twenty-two test files (237 tests) with `node:test`. The files are listed by name in the `test` script in `package.json`, so a new test file does not run until it is added there.
 
 | Suite | Covers |
 | --- | --- |
@@ -680,7 +693,7 @@ Build chunks are split per vendor (`react`, `motion`, `three`, `firebase`, `luci
 | **Install details** | Each car's make, model and paint were read from its photo, not confirmed | Shop to confirm, then correct `jobs.json` |
 | **Leftovers from the starter** | `package.json` still lists `@google/genai`, `express` and `dotenv`, which no file imports. `.env.example`, `metadata.json` and a tracked `.aistudio/` folder (6 MB of screenshots) come from the same starter | Remove in one clean-up pull request |
 | **Render routes** | Two Render services build `main`; the one that appears to carry the live domain ignores `render.yaml`, so the blog's addresses are not served from their prerendered files there (see [Two Render services](#two-render-services)) | Move the domain to the service that follows `render.yaml`, or add the rules in `docs/render-blog-rewrites.md` |
-| **Automated checks** | Type check, 236 tests in 22 files and the build, all run by hand. No CI, no browser tests, and ESLint is not wired to a script | Run the three checks on every pull request with a CI workflow |
+| **Automated checks** | Type check, 237 tests in 22 files and the build, all run by hand. No CI, no browser tests, and ESLint is not wired to a script | Run the three checks on every pull request with a CI workflow |
 
 ## Contributing
 

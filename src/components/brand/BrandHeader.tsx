@@ -4,7 +4,7 @@ import { Link, useRouter } from '../../utils/router';
 import { brandOfWheel, findWheelBySlug, WHEEL_BRANDS } from '../../data/catalogue';
 import { useForgedStore } from '../../store/useForgedStore';
 import { BrandLogo } from '../shared/BrandLogo';
-import { ContactCta } from './ContactCta';
+import { ContactCta, CTA_ACCENT_CLASS } from './ContactCta';
 
 interface BrandHeaderProps {
   /** Kept so existing callers still compile; the header has one look. */
@@ -22,8 +22,8 @@ const NAV_ITEMS = [
 
 const HEADER_MESSAGE = "Hi, I'd like to ask about your wheels.";
 
-const HEADER_CTA_CLASS =
-  'inline-flex items-center justify-center gap-2 min-h-11 px-4 sm:px-5 rounded-full bg-[#1D4ED8] text-white text-sm font-medium hover:bg-[#2563EB] transition-colors cursor-pointer whitespace-nowrap';
+/** The header's Enquire button: FORGED blue, the one accent on every page. */
+const HEADER_CTA_CLASS = `${CTA_ACCENT_CLASS} !px-4 sm:!px-5`;
 
 export const BrandHeader: React.FC<BrandHeaderProps> = () => {
   const { pathname } = useRouter();
@@ -61,14 +61,18 @@ export const BrandHeader: React.FC<BrandHeaderProps> = () => {
 
   const closeMenu = () => setMenuOpen(false);
 
+  // Pill links: the current section sits on a lighter pill, the others light up on hover.
   const linkClass = (to: string) =>
-    `inline-flex items-center min-h-11 px-3 text-sm font-medium transition-colors ${
-      isCurrent(to) ? 'text-white' : 'text-[#C2C2CC] hover:text-white'
+    `press inline-flex items-center h-10 px-4 rounded-full text-[15px] ${
+      isCurrent(to) ? 'bg-white/10 text-white font-semibold' : 'font-medium text-[#C2C2CC] hover:bg-white/[0.06] hover:text-white'
     }`;
 
   return (
     <>
-      <header className="sticky top-0 z-50 h-16 px-4 sm:px-6 md:px-10 flex items-center justify-between gap-3 bg-[#111111] text-[#EDEBE4] border-b border-[#26262E]">
+      {/* A floating glass pill (the SIXNINE header): the sticky band itself is see-through, so the page
+          scrolls behind the bar. 72 px tall in all: 8 px above and below a 56 px bar. */}
+      <header className="sticky top-0 z-50 px-2 sm:px-4 md:px-6 py-2 text-[#EDEBE4]">
+        <div className="relative mx-auto flex h-14 max-w-7xl items-center justify-between gap-3 rounded-full border border-white/[0.09] bg-[#141418]/70 pl-4 pr-1.5 sm:pl-5 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.55),0_2px_8px_rgba(0,0,0,0.25),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-md backdrop-saturate-150">
         <Link
           to="/"
           onClick={closeMenu}
@@ -80,7 +84,7 @@ export const BrandHeader: React.FC<BrandHeaderProps> = () => {
 
         <div className="flex items-center gap-1 sm:gap-2">
           {/* Desktop links, from 1024 px: below that the five links and the button do not fit beside the logo */}
-          <nav aria-label="Main" className="hidden lg:flex items-center gap-1 mr-3">
+          <nav aria-label="Main" className="hidden lg:flex items-center gap-0.5 mr-2">
             {NAV_ITEMS.map((item) => (
               <Link
                 key={item.to}
@@ -110,10 +114,11 @@ export const BrandHeader: React.FC<BrandHeaderProps> = () => {
             aria-label={menuOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={menuOpen}
             aria-controls="mobile-menu"
-            className="lg:hidden inline-flex items-center justify-center w-11 h-11 rounded-full text-[#EDEBE4] hover:text-white cursor-pointer"
+            className="press lg:hidden inline-flex items-center justify-center w-11 h-11 rounded-full text-[#EDEBE4] hover:bg-white/10 hover:text-white cursor-pointer"
           >
             {menuOpen ? <X aria-hidden="true" className="w-5 h-5" /> : <Menu aria-hidden="true" className="w-5 h-5" />}
           </button>
+        </div>
         </div>
 
         {menuOpen && (
@@ -121,7 +126,7 @@ export const BrandHeader: React.FC<BrandHeaderProps> = () => {
             ref={menuRef}
             id="mobile-menu"
             aria-label="Main"
-            className="lg:hidden absolute top-full inset-x-0 bg-[#111111] border-b border-[#26262E] px-4 sm:px-6 pb-2"
+            className="lg:hidden absolute top-full inset-x-2 sm:inset-x-4 md:inset-x-6 mt-1 rounded-3xl border border-white/[0.09] bg-[#141418]/95 px-2 py-2 shadow-[0_24px_64px_-24px_rgba(0,0,0,0.75),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-md"
           >
             {NAV_ITEMS.map((item) => (
               <Link
@@ -129,8 +134,8 @@ export const BrandHeader: React.FC<BrandHeaderProps> = () => {
                 to={item.to}
                 onClick={closeMenu}
                 aria-current={isCurrent(item.to) ? 'page' : undefined}
-                className={`flex items-center min-h-14 text-xl font-light tracking-tight border-t border-[#1E1E26] first:border-t-0 ${
-                  isCurrent(item.to) ? 'text-white' : 'text-[#C2C2CC]'
+                className={`flex items-center min-h-13 px-4 rounded-2xl text-xl tracking-tight ${
+                  isCurrent(item.to) ? 'bg-white/10 text-white font-medium' : 'font-light text-[#C2C2CC] hover:bg-white/[0.06]'
                 }`}
               >
                 {item.label}
@@ -145,7 +150,7 @@ export const BrandHeader: React.FC<BrandHeaderProps> = () => {
         <div
           aria-hidden="true"
           onClick={closeMenu}
-          className="lg:hidden fixed inset-0 top-16 z-40 bg-black/60"
+          className="lg:hidden fixed inset-0 z-40 bg-black/60"
         />
       )}
     </>

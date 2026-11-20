@@ -69,12 +69,14 @@ Use the `add-wheel-model` skill (`.claude/skills/add-wheel-model/`); the owner's
 
 `.claude/skills/sixnine-website`, `sixnine-product-listing`, `sixnine-marketing-pages` and `sixnine-blog-writing`
 describe the sixnine-wheels.com storefront (measured 19 November 2026; source: the owner's "forged sixnine skills"
-Drive folder). They are reference material, kept exactly as the owner supplied them. Their descriptions say "use for
-any wheel listing / landing page / blog post", but in this repository they apply only when the owner asks for
-SIXNINE-style work, and even then this file wins:
+Drive folder). They are reference material, kept exactly as the owner supplied them. On 20 November 2026 the owner
+asked for the site to follow SIXNINE's build ideology while keeping FORGED's own touches; README → Design system says
+what was taken (pills, glass, white primary buttons, one accent, eyebrow heads, press feedback) and what stays. Their
+descriptions say "use for any wheel listing / landing page / blog post", but here they guide structure only, and this
+file wins:
 
-- The design system in README → Design system stays: `#111111`, blue `#1D4ED8` buttons, rose accent text, the three
-  typefaces. Do not bring in the skills' violet, `#08080A`, Albert Sans or Montserrat unless the owner asks for it.
+- FORGED's palette and type stay: `#111111`, blue `#1D4ED8` as the one accent, rose accent text and focus ring, the
+  three typefaces. Do not bring in the skills' violet, `#08080A`, Albert Sans or Montserrat unless the owner asks.
 - There is no checkout: no cart, "Add to cart", quantity stepper, VAT or shipping lines. Every call to action opens
   the enquiry form.
 - Prices are Rand per set of four from the catalogue (rules 4 and 5), never the skills' euro example prices,

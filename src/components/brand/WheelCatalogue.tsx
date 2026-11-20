@@ -26,6 +26,7 @@ import {
 import { wheelImageSrcSet } from '../../utils/wheelImageSrcSet';
 import { ContactCta, CTA_SECONDARY_CLASS } from './ContactCta';
 import { CatalogueSwatch } from './ColourSwatches';
+import { EYEBROW_CLASS } from './sectionStyles';
 
 export { designOf };
 
@@ -71,7 +72,7 @@ export const WheelCard: React.FC<{ wheel: BrandWheelItem; index: number }> = ({ 
       <Link
         to={`/wheels/${wheel.slug}`}
         // No aria-label: the link is named by its own text, in reading order (badge, design, finish, price).
-        className="group relative block overflow-hidden rounded-3xl border border-[#26262E] bg-[#18181D] aspect-[4/5]"
+        className="press-card group relative block overflow-hidden rounded-3xl border border-[#26262E] hover:border-white/[0.18] bg-[#18181D] aspect-[4/5]"
       >
         {/* A soft lighter glow behind the wheel. */}
         <div
@@ -187,7 +188,7 @@ const DesignCard: React.FC<{
       <Link
         to={`/wheels/${card.representative.slug}`}
         // No aria-label: the link is named by its own text, in reading order (badge, design, price, finishes).
-        className={`group relative block overflow-hidden rounded-3xl border border-[#26262E] bg-[#18181D] aspect-square ${fillTabletRow ? 'sm:aspect-[16/10]' : 'sm:aspect-[4/5]'} ${SHAPE_CLASSES[width]}`}
+        className={`press-card group relative block overflow-hidden rounded-3xl border border-[#26262E] hover:border-white/[0.18] bg-[#18181D] aspect-square ${fillTabletRow ? 'sm:aspect-[16/10]' : 'sm:aspect-[4/5]'} ${SHAPE_CLASSES[width]}`}
       >
         {/* A soft lighter glow behind the wheel. */}
         <div
@@ -372,9 +373,10 @@ export const WheelCatalogue: React.FC = () => {
       aria-labelledby="catalogue-heading"
       className="scroll-mt-20 max-w-7xl mx-auto px-4 sm:px-6 md:px-10 py-12 sm:py-16 border-t border-[#26262E]"
     >
+      <span className={EYEBROW_CLASS}>Catalogue</span>
       <h2
         id="catalogue-heading"
-        className="text-3xl sm:text-4xl font-light tracking-[-0.03em] leading-tight text-white"
+        className="mt-2 text-3xl sm:text-4xl font-light tracking-[-0.03em] leading-tight text-white"
       >
         Wheels in stock
       </h2>
