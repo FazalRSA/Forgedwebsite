@@ -65,6 +65,23 @@ Run the type check, the tests and the build before you open a pull request. All 
 
 Use the `add-wheel-model` skill (`.claude/skills/add-wheel-model/`); the owner's steps are in `docs/adding-3d-models.md`. Check a model against the real photos of the listing before wiring it, and never wire an AI model of a wheel the shop does not sell.
 
+## The SIXNINE style skills
+
+`.claude/skills/sixnine-website`, `sixnine-product-listing`, `sixnine-marketing-pages` and `sixnine-blog-writing`
+describe the sixnine-wheels.com storefront (measured 19 November 2026; source: the owner's "forged sixnine skills"
+Drive folder). They are reference material, kept exactly as the owner supplied them. Their descriptions say "use for
+any wheel listing / landing page / blog post", but in this repository they apply only when the owner asks for
+SIXNINE-style work, and even then this file wins:
+
+- The design system in README → Design system stays: `#111111`, blue `#1D4ED8` buttons, rose accent text, the three
+  typefaces. Do not bring in the skills' violet, `#08080A`, Albert Sans or Montserrat unless the owner asks for it.
+- There is no checkout: no cart, "Add to cart", quantity stepper, VAT or shipping lines. Every call to action opens
+  the enquiry form.
+- Prices are Rand per set of four from the catalogue (rules 4 and 5), never the skills' euro example prices,
+  surcharges or sale lines. Finish names stay as the catalogue spells them.
+- Blog posts follow `src/data/blog.ts` and its tests, not the skills' article format.
+- The skills' own brand rule holds: no SIXNINE renders, photos or wording without the owner confirming permission.
+
 ## Things that must stay in step
 
 - The privacy notice (`PrivacyPolicyPage.tsx`) describes what the site does. If a change collects,

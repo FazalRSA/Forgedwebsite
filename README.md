@@ -456,6 +456,7 @@ Things to know before relying on it:
 - **Social buttons** (`SocialButtons`, in the footer and on `/contact`) come from `instagramUrl`, `facebookUrl`, `tiktokUrl` and `youtubeUrl` in `src/config/site.ts`. An empty value hides its button; filled ones also go into the home page's `sameAs` structured data.
 - **Google reviews** (`GoogleReviewsSection`, home page, after the installs) shows the rating and count from `SITE.googleRating` and `SITE.googleReviewCount`, review text copied from Google into `src/data/googleReviews.ts`, and the "Read all reviews" and "Leave a review" links from `SITE`. It is hidden until something is filled in. It adds no review structured data on purpose: Google does not show stars for a business's own reviews of itself.
 - **`AGENTS.md`** at the repository root gives AI coding agents the commands and the rules that are easy to break. Keep it in step with this file.
+- **Agent skills** live in `.claude/skills/`: `add-wheel-model` (adding a 3D model), and four SIXNINE style skills (`sixnine-website`, `sixnine-product-listing`, `sixnine-marketing-pages`, `sixnine-blog-writing`) that describe the sixnine-wheels.com storefront, as supplied by the owner. `AGENTS.md` says when the SIXNINE skills apply and which of this repository's rules they never override.
 
 ## Google Tag Manager and Google Analytics
 
