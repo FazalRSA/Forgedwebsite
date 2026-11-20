@@ -37,6 +37,11 @@ test('llms.txt names each wheel\'s brand and links both brand pages', () => {
   }
   assert.ok(txt.includes(`(${ORIGIN}/forged-sa-wheels)`));
   assert.ok(txt.includes(`(${ORIGIN}/sixnine-wheels)`));
+  for (const slug of ['ff-one', 'ff-two', 'ff-three', 'evo-one', 'evo-two', 'oem-plus-one']) {
+    assert.ok(txt.includes(`(${ORIGIN}/sixnine-wheels/${slug})`), slug);
+  }
+  // Sixnine's own prices are never repeated: every price in the file is in Rand.
+  assert.doesNotMatch(txt, /€|EUR\b/);
 });
 
 test('llms.txt gives the contact details from SITE and no email on another domain', () => {

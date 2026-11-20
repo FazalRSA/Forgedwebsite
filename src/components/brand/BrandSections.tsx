@@ -3,7 +3,7 @@ import type { BrandWheelItem, WheelBrand } from '../../data/catalogue';
 import type { FitmentRow } from '../../utils/brandFitment';
 import { Link } from '../../utils/router';
 import { ContactCta, CTA_PRIMARY_CLASS, CTA_SECONDARY_CLASS } from './ContactCta';
-import { WheelCard } from './WheelCatalogue';
+import { PRODUCT_GRID_CLASS, ProductCard } from './ProductCard';
 
 /**
  * The sections the two brand pages (/forged-sa-wheels and /sixnine-wheels) share, so the pages stay
@@ -67,9 +67,9 @@ export const BrandStockSection: React.FC<{
     {wheels.length === 0 ? (
       <p className="mt-6 text-neutral-300">{emptyText}</p>
     ) : (
-      <ul className="mt-8 grid grid-cols-2 lg:grid-cols-3 gap-x-3 sm:gap-x-6 gap-y-9">
+      <ul className={`mt-8 ${PRODUCT_GRID_CLASS}`}>
         {wheels.map((wheel, index) => (
-          <WheelCard key={wheel.id} wheel={wheel} index={index} />
+          <ProductCard key={wheel.id} wheel={wheel} index={index} />
         ))}
       </ul>
     )}

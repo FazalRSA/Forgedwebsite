@@ -23,6 +23,7 @@ import {
   wheelBrand,
 } from './seo';
 import { brandOfWheel, findWheelBySlug, getAllBrandWheels, isInStock, WHEEL_BRANDS } from '../data/catalogue';
+import { seriesPath, SIXNINE_SERIES } from '../data/sixnineSeries';
 import { SITE } from '../config/site';
 import { blogSitemapPaths } from './blogSeo';
 
@@ -97,6 +98,30 @@ test('installs, contact and the two brand pages are indexable pages with their o
   assert.notEqual(metaForPath('/installs').title, metaForPath('/contact').title);
   assert.notEqual(metaForPath('/sixnine-wheels').title, metaForPath('/contact').title);
   assert.notEqual(metaForPath('/forged-sa-wheels').title, metaForPath('/sixnine-wheels').title);
+});
+
+test('each Sixnine series has its own page: title, facts in the description, and Home › Sixnine Wheels › series', () => {
+  assert.equal(SIXNINE_SERIES.length, 6);
+  const titles = new Set<string>();
+  for (const series of SIXNINE_SERIES) {
+    const p = seriesPath(series);
+    for (const variant of [p, `${p}/`, `${p}?x=1`]) {
+      const m = metaForPath(variant);
+      assert.equal(m.canonicalPath, p, variant);
+      assert.equal(m.noindex, false, variant);
+    }
+    const m = metaForPath(p);
+    assert.ok(m.title.startsWith(`Sixnine ${series.code} wheels`) && m.title.length <= 60, m.title);
+    assert.ok(m.description.length >= 50 && m.description.length <= 170, `${series.code}: ${m.description.length}`);
+    assert.ok(m.description.includes(`${series.sizes.length} size`), m.description);
+    assert.doesNotMatch(m.description, /€|EUR\b|\b1 finishes\b/);
+    const crumbs = breadcrumbsOf(m.jsonLd);
+    assert.deepEqual(crumbs.itemListElement.map((i: Record<string, any>) => i.item), ['/', '/sixnine-wheels', p]);
+    titles.add(m.title);
+  }
+  assert.equal(titles.size, SIXNINE_SERIES.length);
+  // An unknown series is not a page.
+  assert.equal(metaForPath('/sixnine-wheels/not-a-series').noindex, true);
 });
 
 test('the Forged SA page names the FSA designs in stock, read from the catalogue', () => {
@@ -257,11 +282,12 @@ test('the sitemap lists the home page, every in-stock wheel once, the blog, inst
       '/installs',
       '/privacy-policy',
       '/sixnine-wheels',
+      ...SIXNINE_SERIES.map(seriesPath),
       ...WHEELS.map((w) => `/wheels/${w.slug}`),
       ...BLOG_PATHS,
     ].sort()
   );
-  assert.equal(paths.length, 6 + WHEELS.length + BLOG_PATHS.length);
+  assert.equal(paths.length, 6 + SIXNINE_SERIES.length + WHEELS.length + BLOG_PATHS.length);
   for (const p of paths.filter((x) => x.startsWith('/wheels/'))) {
     const wheel = findWheelBySlug(p.slice('/wheels/'.length));
     assert.ok(wheel && isInStock(wheel), `${p} must be an in-stock wheel`);

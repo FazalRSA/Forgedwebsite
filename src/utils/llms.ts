@@ -5,6 +5,7 @@
  */
 import { brandOfWheel, formatZAR, getAllBrandWheels, isForgedSaWheel, isSixnineWheel, TO_ORDER_LEAD_TIME, WHEEL_BRAND_ORDER, WHEEL_BRANDS } from '../data/catalogue';
 import { designCodes, joinList } from './brandFitment';
+import { diameterRange, seriesFacts, seriesPath, SIXNINE_SERIES } from '../data/sixnineSeries';
 import { CLIENT_FITMENTS } from '../data/clientFitments';
 import { SITE, whatsappLink } from '../config/site';
 import { SITE_ORIGIN } from './seo';
@@ -81,6 +82,11 @@ export function buildLlmsTxt(origin: string = SITE_ORIGIN): string {
     `- [Installs](${origin}/installs): ${CLIENT_FITMENTS.length} customer cars we have fitted`,
     `- [Forged SA wheels](${origin}/forged-sa-wheels): the shop's own brand, and the forged ${forgedSaDesigns} sets in stock`,
     `- [Sixnine Wheels dealer](${origin}/sixnine-wheels): what Sixnine Wheels is, and the forged Sixnine ${sixnineDesigns} sets in stock`,
+    // One line per Sixnine series page: the sizes Sixnine lists, from src/data/sixnineRange.json.
+    ...SIXNINE_SERIES.map((series) => {
+      const facts = seriesFacts(series);
+      return `  - [Sixnine ${series.code}](${origin}${seriesPath(series)}): ${facts.sizeCount} ${facts.sizeCount === 1 ? 'size' : 'sizes'} as Sixnine lists them, ${diameterRange(facts)}, ${facts.boltPatterns.join(', ')}`;
+    }),
     `- [Contact](${origin}/contact): WhatsApp, phone and address`,
     '',
     '## Guides',

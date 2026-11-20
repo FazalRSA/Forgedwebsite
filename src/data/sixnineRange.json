@@ -1,0 +1,1837 @@
+{
+  "source": {
+    "title": "SIXNINE Wheels Catalogue (owner's Google Sheet, \"Wheel sizes\" tab)",
+    "scrapedFrom": "https://sixnine-wheels.com",
+    "scrapedOn": "2026-11-19"
+  },
+  "series": [
+    {
+      "code": "FF-ONE",
+      "construction": "Flow forged",
+      "sizes": [
+        {
+          "size": "8.5x19",
+          "diameter": 19,
+          "width": 8.5,
+          "offset": 45,
+          "boltPatterns": [
+            "5x112"
+          ],
+          "note": null,
+          "finishes": [
+            "GlossyBlack",
+            "HyperSilver",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 650,
+          "centreBoreMm": 66.6,
+          "concavityMm": 45,
+          "concavityNote": "Concavity",
+          "weightKg": 10,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "8.5x19",
+          "diameter": 19,
+          "width": 8.5,
+          "offset": 45,
+          "boltPatterns": [
+            "5x114.3"
+          ],
+          "note": null,
+          "finishes": [
+            "GlossyBlack",
+            "HyperSilver",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 650,
+          "centreBoreMm": 67.1,
+          "concavityMm": 45,
+          "concavityNote": "Concavity",
+          "weightKg": 10,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "8.5x20",
+          "diameter": 20,
+          "width": 8.5,
+          "offset": 28,
+          "boltPatterns": [
+            "5x112"
+          ],
+          "note": "SDC",
+          "finishes": [
+            "GlossyBlack",
+            "HyperSilver",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 865,
+          "centreBoreMm": 66.6,
+          "concavityMm": 56,
+          "concavityNote": "Concavity",
+          "weightKg": 11,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "8.5x20",
+          "diameter": 20,
+          "width": 8.5,
+          "offset": 28,
+          "boltPatterns": [
+            "5x112"
+          ],
+          "note": null,
+          "finishes": [
+            "GlossyBlack",
+            "HyperSilver",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 650,
+          "centreBoreMm": 66.6,
+          "concavityMm": 40,
+          "concavityNote": "Concavity",
+          "weightKg": 11,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "8.5x20",
+          "diameter": 20,
+          "width": 8.5,
+          "offset": 35,
+          "boltPatterns": [
+            "5x120"
+          ],
+          "note": null,
+          "finishes": [
+            "GlossyBlack",
+            "HyperSilver",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 865,
+          "centreBoreMm": 72.6,
+          "concavityMm": 56,
+          "concavityNote": "Concavity",
+          "weightKg": 10.9,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "8.5x20",
+          "diameter": 20,
+          "width": 8.5,
+          "offset": 45,
+          "boltPatterns": [
+            "5x112"
+          ],
+          "note": null,
+          "finishes": [
+            "GlossyBlack",
+            "HyperSilver",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 650,
+          "centreBoreMm": 66.6,
+          "concavityMm": 40,
+          "concavityNote": "Concavity",
+          "weightKg": 11.5,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "9x20",
+          "diameter": 20,
+          "width": 9,
+          "offset": 30,
+          "boltPatterns": [
+            "5x114.3"
+          ],
+          "note": null,
+          "finishes": [
+            "GlossyBlack",
+            "HyperSilver",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 865,
+          "centreBoreMm": 73.1,
+          "concavityMm": 65,
+          "concavityNote": "Concavity",
+          "weightKg": 11.5,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "9x20",
+          "diameter": 20,
+          "width": 9,
+          "offset": 42,
+          "boltPatterns": [
+            "5x120"
+          ],
+          "note": null,
+          "finishes": [
+            "GlossyBlack",
+            "HyperSilver"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 865,
+          "centreBoreMm": 72.6,
+          "concavityMm": 56,
+          "concavityNote": "Concavity",
+          "weightKg": 11,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "9.5x20",
+          "diameter": 20,
+          "width": 9.5,
+          "offset": 20,
+          "boltPatterns": [
+            "5x120"
+          ],
+          "note": null,
+          "finishes": [
+            "GlossyBlack",
+            "HyperSilver",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 815,
+          "centreBoreMm": 72.6,
+          "concavityMm": 87,
+          "concavityNote": "Concavity",
+          "weightKg": 10.9,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "10x20",
+          "diameter": 20,
+          "width": 10,
+          "offset": 33,
+          "boltPatterns": [
+            "5x112"
+          ],
+          "note": null,
+          "finishes": [
+            "GlossyBlack",
+            "HyperSilver"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 780,
+          "centreBoreMm": 66.6,
+          "concavityMm": 65,
+          "concavityNote": "Concavity",
+          "weightKg": 12,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "10x20",
+          "diameter": 20,
+          "width": 10,
+          "offset": 40,
+          "boltPatterns": [
+            "5x112"
+          ],
+          "note": null,
+          "finishes": [
+            "GlossyBlack",
+            "HyperSilver",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 865,
+          "centreBoreMm": 66.6,
+          "concavityMm": 75,
+          "concavityNote": "Concavity",
+          "weightKg": 11.8,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "10x20",
+          "diameter": 20,
+          "width": 10,
+          "offset": 40,
+          "boltPatterns": [
+            "5x120"
+          ],
+          "note": null,
+          "finishes": [
+            "GlossyBlack",
+            "HyperSilver",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 865,
+          "centreBoreMm": 72.6,
+          "concavityMm": 75,
+          "concavityNote": "Concavity",
+          "weightKg": 11.8,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "10x20",
+          "diameter": 20,
+          "width": 10,
+          "offset": 45,
+          "boltPatterns": [
+            "5x112"
+          ],
+          "note": null,
+          "finishes": [
+            "GlossyBlack",
+            "HyperSilver",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 780,
+          "centreBoreMm": 66.6,
+          "concavityMm": 65,
+          "concavityNote": "Concavity",
+          "weightKg": 11.8,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "10.5x20",
+          "diameter": 20,
+          "width": 10.5,
+          "offset": 15,
+          "boltPatterns": [
+            "5x112"
+          ],
+          "note": null,
+          "finishes": [
+            "GlossyBlack",
+            "HyperSilver",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 650,
+          "centreBoreMm": 66.6,
+          "concavityMm": 105,
+          "concavityNote": "Concavity",
+          "weightKg": 11.1,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "10.5x20",
+          "diameter": 20,
+          "width": 10.5,
+          "offset": 35,
+          "boltPatterns": [
+            "5x120"
+          ],
+          "note": null,
+          "finishes": [
+            "GlossyBlack",
+            "HyperSilver",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 815,
+          "centreBoreMm": 72.6,
+          "concavityMm": 87,
+          "concavityNote": "Concavity",
+          "weightKg": 11.2,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "9x21",
+          "diameter": 21,
+          "width": 9,
+          "offset": 24,
+          "boltPatterns": [
+            "5x112"
+          ],
+          "note": null,
+          "finishes": [
+            "GlossyBlack",
+            "HyperSilver",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 850,
+          "centreBoreMm": 66.6,
+          "concavityMm": 75,
+          "concavityNote": "Concavity",
+          "weightKg": 11.9,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "10x21",
+          "diameter": 21,
+          "width": 10,
+          "offset": 35,
+          "boltPatterns": [
+            "5x112"
+          ],
+          "note": null,
+          "finishes": [
+            "GlossyBlack",
+            "HyperSilver"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 850,
+          "centreBoreMm": 66.6,
+          "concavityMm": 75,
+          "concavityNote": "Concavity",
+          "weightKg": 12.4,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "10x21",
+          "diameter": 21,
+          "width": 10,
+          "offset": 37,
+          "boltPatterns": [
+            "5x114.3"
+          ],
+          "note": null,
+          "finishes": [
+            "GlossyBlack",
+            "HyperSilver",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 850,
+          "centreBoreMm": 73.1,
+          "concavityMm": 75,
+          "concavityNote": "Concavity",
+          "weightKg": 12.4,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "10.5x21",
+          "diameter": 21,
+          "width": 10.5,
+          "offset": 20,
+          "boltPatterns": [
+            "5x112"
+          ],
+          "note": null,
+          "finishes": [
+            "GlossyBlack",
+            "HyperSilver",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 850,
+          "centreBoreMm": 66.6,
+          "concavityMm": 95,
+          "concavityNote": "Concavity",
+          "weightKg": 12.4,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "11x21 front + 11.5x22 rear",
+          "diameter": null,
+          "width": null,
+          "offset": null,
+          "boltPatterns": [
+            "5x132"
+          ],
+          "note": "BMW M5 G90/G99 Special Edition, forged 2-piece",
+          "finishes": [],
+          "finishesText": "GlossyBlack / GlossyBlack, GlossyBlack / Polished, HyperSilver / HyperSilver, Brushed / Brushed",
+          "soldAs": "set",
+          "preOrder": false,
+          "loadKg": 900,
+          "centreBoreMm": 66.6,
+          "concavityMm": 110,
+          "concavityNote": "Super Deep Concave front and rear (approx.)",
+          "weightKg": null,
+          "construction": "Forged, 2-piece",
+          "flag": "No spec table on the page, specs read from the description text"
+        },
+        {
+          "size": "11.5x21",
+          "diameter": 21,
+          "width": 11.5,
+          "offset": 17,
+          "boltPatterns": [
+            "5x112"
+          ],
+          "note": null,
+          "finishes": [
+            "GlossyBlack",
+            "HyperSilver",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 650,
+          "centreBoreMm": 66.6,
+          "concavityMm": 120,
+          "concavityNote": "Concavity",
+          "weightKg": 12.2,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "11x22",
+          "diameter": 22,
+          "width": 11,
+          "offset": 13,
+          "boltPatterns": [
+            "5x112"
+          ],
+          "note": null,
+          "finishes": [
+            "GlossyBlack",
+            "HyperSilver"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 910,
+          "centreBoreMm": 66.6,
+          "concavityMm": 110,
+          "concavityNote": "Concavity",
+          "weightKg": null,
+          "construction": "Flow forged",
+          "flag": null
+        }
+      ]
+    },
+    {
+      "code": "FF-TWO",
+      "construction": "Flow forged",
+      "sizes": [
+        {
+          "size": "10x21",
+          "diameter": 21,
+          "width": 10,
+          "offset": 35,
+          "boltPatterns": [
+            "5x112"
+          ],
+          "note": null,
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 725,
+          "centreBoreMm": 66.6,
+          "concavityMm": null,
+          "concavityNote": "Deep Concave",
+          "weightKg": 11.8,
+          "construction": "Flow forged",
+          "flag": "No spec table on the page, specs read from the description text"
+        },
+        {
+          "size": "10.5x21",
+          "diameter": 21,
+          "width": 10.5,
+          "offset": 25,
+          "boltPatterns": [
+            "5x112"
+          ],
+          "note": "Forged Series, Audi RS4/RS5 B9, made to order",
+          "finishes": [],
+          "finishesText": "Standard colours included, special finishes on request",
+          "soldAs": "set",
+          "preOrder": false,
+          "loadKg": 620,
+          "centreBoreMm": 66.6,
+          "concavityMm": null,
+          "concavityNote": "Super Deep Concave",
+          "weightKg": 11.6,
+          "construction": "Forged, 1-piece",
+          "flag": "No spec table on the page, specs read from the description text"
+        }
+      ]
+    },
+    {
+      "code": "FF-THREE",
+      "construction": "Flow forged",
+      "sizes": [
+        {
+          "size": "8.5x20",
+          "diameter": 20,
+          "width": 8.5,
+          "offset": 28,
+          "boltPatterns": [
+            "5x112"
+          ],
+          "note": null,
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack",
+            "PureBronze",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 650,
+          "centreBoreMm": 66.6,
+          "concavityMm": 45,
+          "concavityNote": "Concavity",
+          "weightKg": 11.4,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "8.5x20",
+          "diameter": 20,
+          "width": 8.5,
+          "offset": 45,
+          "boltPatterns": [
+            "5x112"
+          ],
+          "note": null,
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack",
+            "PureBronze",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 650,
+          "centreBoreMm": 66.6,
+          "concavityMm": 45,
+          "concavityNote": "Concavity",
+          "weightKg": 11.2,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "9x20",
+          "diameter": 20,
+          "width": 9,
+          "offset": 28,
+          "boltPatterns": [
+            "5x112"
+          ],
+          "note": null,
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack",
+            "PureBronze",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 865,
+          "centreBoreMm": 66.6,
+          "concavityMm": 63,
+          "concavityNote": "Concavity",
+          "weightKg": 11.7,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "9x20",
+          "diameter": 20,
+          "width": 9,
+          "offset": 30,
+          "boltPatterns": [
+            "5x114.3"
+          ],
+          "note": null,
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack",
+            "PureBronze"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 865,
+          "centreBoreMm": 73.1,
+          "concavityMm": 63,
+          "concavityNote": "Concavity",
+          "weightKg": 11.7,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "9x20",
+          "diameter": 20,
+          "width": 9,
+          "offset": 32,
+          "boltPatterns": [
+            "5x120"
+          ],
+          "note": null,
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack",
+            "PureBronze",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 865,
+          "centreBoreMm": 72.6,
+          "concavityMm": 63,
+          "concavityNote": "Concavity",
+          "weightKg": 11.7,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "9x20",
+          "diameter": 20,
+          "width": 9,
+          "offset": 42,
+          "boltPatterns": [
+            "5x120"
+          ],
+          "note": null,
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack",
+            "PureBronze"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 865,
+          "centreBoreMm": 72.6,
+          "concavityMm": 63,
+          "concavityNote": "Concavity",
+          "weightKg": 11.7,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "9.5x20",
+          "diameter": 20,
+          "width": 9.5,
+          "offset": 18,
+          "boltPatterns": [
+            "5x120"
+          ],
+          "note": null,
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack",
+            "PureBronze",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 650,
+          "centreBoreMm": 72.6,
+          "concavityMm": 90,
+          "concavityNote": "Concavity",
+          "weightKg": 11.1,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "10x20",
+          "diameter": 20,
+          "width": 10,
+          "offset": 40,
+          "boltPatterns": [
+            "5x112"
+          ],
+          "note": "XDC",
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack",
+            "PureBronze",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 865,
+          "centreBoreMm": 66.6,
+          "concavityMm": 76,
+          "concavityNote": "Concavity",
+          "weightKg": 11.8,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "10x20",
+          "diameter": 20,
+          "width": 10,
+          "offset": 40,
+          "boltPatterns": [
+            "5x120"
+          ],
+          "note": "XDC",
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack",
+            "PureBronze",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 885,
+          "centreBoreMm": 72.6,
+          "concavityMm": 76,
+          "concavityNote": "Concavity",
+          "weightKg": 11.8,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "10x20",
+          "diameter": 20,
+          "width": 10,
+          "offset": 45,
+          "boltPatterns": [
+            "5x112"
+          ],
+          "note": null,
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack",
+            "PureBronze",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 865,
+          "centreBoreMm": 66.6,
+          "concavityMm": 63,
+          "concavityNote": "Concavity",
+          "weightKg": 12.1,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "10.5x20",
+          "diameter": 20,
+          "width": 10.5,
+          "offset": 15,
+          "boltPatterns": [
+            "5x112"
+          ],
+          "note": null,
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack",
+            "PureBronze",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 650,
+          "centreBoreMm": 66.6,
+          "concavityMm": 105,
+          "concavityNote": "Concavity",
+          "weightKg": 11.8,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "11x20",
+          "diameter": 20,
+          "width": 11,
+          "offset": 33,
+          "boltPatterns": [
+            "5x120"
+          ],
+          "note": null,
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack",
+            "PureBronze",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 650,
+          "centreBoreMm": 72.6,
+          "concavityMm": 90,
+          "concavityNote": "Concavity",
+          "weightKg": 11.7,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "9x21",
+          "diameter": 21,
+          "width": 9,
+          "offset": 22,
+          "boltPatterns": [
+            "5x112"
+          ],
+          "note": null,
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack",
+            "PureBronze",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 850,
+          "centreBoreMm": 66.6,
+          "concavityMm": 78,
+          "concavityNote": "Concavity",
+          "weightKg": 12.6,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "9x21",
+          "diameter": 21,
+          "width": 9,
+          "offset": 38,
+          "boltPatterns": [
+            "5x112"
+          ],
+          "note": null,
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack",
+            "PureBronze",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 850,
+          "centreBoreMm": 66.6,
+          "concavityMm": 55,
+          "concavityNote": "Concavity",
+          "weightKg": 13.1,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "10x21",
+          "diameter": 21,
+          "width": 10,
+          "offset": 23,
+          "boltPatterns": [
+            "5x112"
+          ],
+          "note": null,
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack",
+            "PureBronze",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 850,
+          "centreBoreMm": 66.6,
+          "concavityMm": 78,
+          "concavityNote": "Concavity",
+          "weightKg": 13.3,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "10x21",
+          "diameter": 21,
+          "width": 10,
+          "offset": 33,
+          "boltPatterns": [
+            "5x112"
+          ],
+          "note": null,
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack",
+            "PureBronze",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 850,
+          "centreBoreMm": 66.6,
+          "concavityMm": 78,
+          "concavityNote": "Concavity",
+          "weightKg": 13.1,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "10x21",
+          "diameter": 21,
+          "width": 10,
+          "offset": 35,
+          "boltPatterns": [
+            "5x114.3"
+          ],
+          "note": null,
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack",
+            "PureBronze"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 850,
+          "centreBoreMm": 73.1,
+          "concavityMm": 78,
+          "concavityNote": "Concavity",
+          "weightKg": 13.1,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "10.5x21",
+          "diameter": 21,
+          "width": 10.5,
+          "offset": 20,
+          "boltPatterns": [
+            "5x112"
+          ],
+          "note": null,
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack",
+            "PureBronze",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 850,
+          "centreBoreMm": 66.6,
+          "concavityMm": 96,
+          "concavityNote": "Concavity",
+          "weightKg": 13.3,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "10.5x21",
+          "diameter": 21,
+          "width": 10.5,
+          "offset": null,
+          "boltPatterns": [
+            "5x112"
+          ],
+          "note": "Audi RS5 B10",
+          "finishes": [
+            "GlossyBlack",
+            "HyperSilver",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": true,
+          "loadKg": 850,
+          "centreBoreMm": 66.6,
+          "concavityMm": 110,
+          "concavityNote": "Concavity",
+          "weightKg": null,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "11.5x21",
+          "diameter": 21,
+          "width": 11.5,
+          "offset": 17,
+          "boltPatterns": [
+            "5x112"
+          ],
+          "note": null,
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack",
+            "PureBronze",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 650,
+          "centreBoreMm": 66.6,
+          "concavityMm": 120,
+          "concavityNote": "Concavity",
+          "weightKg": 13.2,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "10x22",
+          "diameter": 22,
+          "width": 10,
+          "offset": 30,
+          "boltPatterns": [
+            "5x112"
+          ],
+          "note": null,
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack",
+            "PureBronze",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 850,
+          "centreBoreMm": 66.6,
+          "concavityMm": 78,
+          "concavityNote": "Concavity",
+          "weightKg": 14.6,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "11x22",
+          "diameter": 22,
+          "width": 11,
+          "offset": 10,
+          "boltPatterns": [
+            "5x112"
+          ],
+          "note": null,
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack",
+            "PureBronze",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 910,
+          "centreBoreMm": 66.6,
+          "concavityMm": 113,
+          "concavityNote": "Concavity",
+          "weightKg": 14.1,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "11x22",
+          "diameter": 22,
+          "width": 11,
+          "offset": 20,
+          "boltPatterns": [
+            "5x132"
+          ],
+          "note": null,
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack",
+            "PureBronze",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 960,
+          "centreBoreMm": 66.6,
+          "concavityMm": 96,
+          "concavityNote": "Concavity",
+          "weightKg": 14.8,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "11x22",
+          "diameter": 22,
+          "width": 11,
+          "offset": 27,
+          "boltPatterns": [
+            "5x112"
+          ],
+          "note": null,
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack",
+            "PureBronze",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 960,
+          "centreBoreMm": 66.6,
+          "concavityMm": 96,
+          "concavityNote": "Concavity",
+          "weightKg": 14.8,
+          "construction": "Flow forged",
+          "flag": null
+        },
+        {
+          "size": "11.5x22",
+          "diameter": 22,
+          "width": 11.5,
+          "offset": 20,
+          "boltPatterns": [
+            "5x132"
+          ],
+          "note": null,
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack",
+            "PureBronze",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 910,
+          "centreBoreMm": 66.6,
+          "concavityMm": 109,
+          "concavityNote": "Concavity",
+          "weightKg": 14.6,
+          "construction": "Flow forged",
+          "flag": null
+        }
+      ]
+    },
+    {
+      "code": "EVO-ONE",
+      "construction": null,
+      "sizes": [
+        {
+          "size": "9x18",
+          "diameter": 18,
+          "width": 9,
+          "offset": 35,
+          "boltPatterns": [
+            "5x100",
+            "5x114.3"
+          ],
+          "note": null,
+          "finishes": [
+            "GlossyBlack",
+            "HyperSilver",
+            "PureWhite",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 545,
+          "centreBoreMm": 73.1,
+          "concavityMm": 70,
+          "concavityNote": "Concavity (approx.)",
+          "weightKg": 8.7,
+          "construction": "Flow forged",
+          "flag": "No spec table on the page, specs read from the description text"
+        },
+        {
+          "size": "8.5x19",
+          "diameter": 19,
+          "width": 8.5,
+          "offset": 35,
+          "boltPatterns": [
+            "5x112",
+            "5x120"
+          ],
+          "note": null,
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack",
+            "PureWhite",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 650,
+          "centreBoreMm": 72.6,
+          "concavityMm": 63,
+          "concavityNote": "Concavity",
+          "weightKg": 10.2,
+          "construction": null,
+          "flag": null
+        },
+        {
+          "size": "9x19",
+          "diameter": 19,
+          "width": 9,
+          "offset": 28,
+          "boltPatterns": [
+            "5x110",
+            "5x114.3"
+          ],
+          "note": null,
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack",
+            "PureWhite",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 650,
+          "centreBoreMm": 73.1,
+          "concavityMm": 63,
+          "concavityNote": "Concavity",
+          "weightKg": 10.4,
+          "construction": null,
+          "flag": null
+        },
+        {
+          "size": "9x19",
+          "diameter": 19,
+          "width": 9,
+          "offset": 28,
+          "boltPatterns": [
+            "5x112",
+            "5x120"
+          ],
+          "note": null,
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack",
+            "PureWhite",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 650,
+          "centreBoreMm": 72.6,
+          "concavityMm": 63,
+          "concavityNote": "Concavity",
+          "weightKg": 10.4,
+          "construction": null,
+          "flag": null
+        },
+        {
+          "size": "9x19",
+          "diameter": 19,
+          "width": 9,
+          "offset": 40,
+          "boltPatterns": [
+            "5x112",
+            "5x120"
+          ],
+          "note": null,
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack",
+            "PureWhite",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 650,
+          "centreBoreMm": 72.6,
+          "concavityMm": 63,
+          "concavityNote": "Concavity",
+          "weightKg": 10.4,
+          "construction": null,
+          "flag": null
+        },
+        {
+          "size": "9.5x19",
+          "diameter": 19,
+          "width": 9.5,
+          "offset": 20,
+          "boltPatterns": [
+            "5x112",
+            "5x120"
+          ],
+          "note": null,
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack",
+            "PureWhite",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 650,
+          "centreBoreMm": 72.6,
+          "concavityMm": 92,
+          "concavityNote": "Concavity",
+          "weightKg": 10.3,
+          "construction": null,
+          "flag": null
+        },
+        {
+          "size": "10x19",
+          "diameter": 19,
+          "width": 10,
+          "offset": 40,
+          "boltPatterns": [
+            "5x110",
+            "5x114.3"
+          ],
+          "note": null,
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack",
+            "PureWhite",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 690,
+          "centreBoreMm": 73.1,
+          "concavityMm": 75,
+          "concavityNote": "Concavity",
+          "weightKg": 10.7,
+          "construction": null,
+          "flag": null
+        },
+        {
+          "size": "10x19",
+          "diameter": 19,
+          "width": 10,
+          "offset": 40,
+          "boltPatterns": [
+            "5x112",
+            "5x120"
+          ],
+          "note": null,
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack",
+            "PureWhite",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 690,
+          "centreBoreMm": 72.6,
+          "concavityMm": 75,
+          "concavityNote": "Concavity",
+          "weightKg": 10.7,
+          "construction": null,
+          "flag": null
+        },
+        {
+          "size": "11x19",
+          "diameter": 19,
+          "width": 11,
+          "offset": 33,
+          "boltPatterns": [
+            "5x112",
+            "5x120"
+          ],
+          "note": null,
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack",
+            "PureWhite",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 650,
+          "centreBoreMm": 72.6,
+          "concavityMm": 92,
+          "concavityNote": "Concavity",
+          "weightKg": 10.9,
+          "construction": null,
+          "flag": null
+        },
+        {
+          "size": "10.5x20",
+          "diameter": 20,
+          "width": 10.5,
+          "offset": 15,
+          "boltPatterns": [
+            "5x112",
+            "5x114.3"
+          ],
+          "note": null,
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack",
+            "PureWhite",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 650,
+          "centreBoreMm": 73.1,
+          "concavityMm": 105,
+          "concavityNote": "Concavity",
+          "weightKg": 12.2,
+          "construction": null,
+          "flag": null
+        },
+        {
+          "size": "11x20",
+          "diameter": 20,
+          "width": 11,
+          "offset": 12,
+          "boltPatterns": [
+            "5x112",
+            "5x114.3"
+          ],
+          "note": null,
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack",
+            "PureWhite",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 650,
+          "centreBoreMm": 73.1,
+          "concavityMm": 105,
+          "concavityNote": "Concavity",
+          "weightKg": 12.7,
+          "construction": null,
+          "flag": null
+        }
+      ]
+    },
+    {
+      "code": "EVO-TWO",
+      "construction": "Flow formed",
+      "sizes": [
+        {
+          "size": "9x20",
+          "diameter": 20,
+          "width": 9,
+          "offset": 28,
+          "boltPatterns": [
+            "5x112",
+            "5x120"
+          ],
+          "note": null,
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack",
+            "ChampagneGold",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": true,
+          "loadKg": 800,
+          "centreBoreMm": 72.6,
+          "concavityMm": 50,
+          "concavityNote": "Deep lip",
+          "weightKg": null,
+          "construction": "Flow formed",
+          "flag": null
+        },
+        {
+          "size": "9x20",
+          "diameter": 20,
+          "width": 9,
+          "offset": 32,
+          "boltPatterns": [
+            "5x112",
+            "5x120"
+          ],
+          "note": null,
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack",
+            "ChampagneGold",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": true,
+          "loadKg": 800,
+          "centreBoreMm": 72.6,
+          "concavityMm": 50,
+          "concavityNote": "Deep lip",
+          "weightKg": null,
+          "construction": "Flow formed",
+          "flag": null
+        },
+        {
+          "size": "9.5x20",
+          "diameter": 20,
+          "width": 9.5,
+          "offset": 18,
+          "boltPatterns": [
+            "5x112",
+            "5x120"
+          ],
+          "note": null,
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack",
+            "ChampagneGold",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": true,
+          "loadKg": 650,
+          "centreBoreMm": 72.6,
+          "concavityMm": 63,
+          "concavityNote": "Deep lip",
+          "weightKg": null,
+          "construction": "Flow formed",
+          "flag": null
+        },
+        {
+          "size": "10x20",
+          "diameter": 20,
+          "width": 10,
+          "offset": 40,
+          "boltPatterns": [
+            "5x112",
+            "5x120"
+          ],
+          "note": null,
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack",
+            "ChampagneGold",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": true,
+          "loadKg": 865,
+          "centreBoreMm": 72.6,
+          "concavityMm": 63,
+          "concavityNote": "Deep lip",
+          "weightKg": null,
+          "construction": "Flow formed",
+          "flag": null
+        },
+        {
+          "size": "10.5x20",
+          "diameter": 20,
+          "width": 10.5,
+          "offset": 15,
+          "boltPatterns": [
+            "5x112",
+            "5x120"
+          ],
+          "note": null,
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack",
+            "ChampagneGold",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": true,
+          "loadKg": 650,
+          "centreBoreMm": 72.6,
+          "concavityMm": 83,
+          "concavityNote": "Deep lip",
+          "weightKg": null,
+          "construction": "Flow formed",
+          "flag": null
+        },
+        {
+          "size": "11x20",
+          "diameter": 20,
+          "width": 11,
+          "offset": 33,
+          "boltPatterns": [
+            "5x112",
+            "5x120"
+          ],
+          "note": null,
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack",
+            "ChampagneGold",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": true,
+          "loadKg": 650,
+          "centreBoreMm": 72.6,
+          "concavityMm": 83,
+          "concavityNote": "Deep lip",
+          "weightKg": null,
+          "construction": "Flow formed",
+          "flag": null
+        },
+        {
+          "size": "10.5x21",
+          "diameter": 21,
+          "width": 10.5,
+          "offset": 20,
+          "boltPatterns": [
+            "5x112",
+            "5x120"
+          ],
+          "note": null,
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack",
+            "ChampagneGold",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": true,
+          "loadKg": 850,
+          "centreBoreMm": 72.6,
+          "concavityMm": 65,
+          "concavityNote": "Deep lip",
+          "weightKg": null,
+          "construction": "Flow formed",
+          "flag": null
+        },
+        {
+          "size": "11.5x21",
+          "diameter": 21,
+          "width": 11.5,
+          "offset": 17,
+          "boltPatterns": [
+            "5x112",
+            "5x120"
+          ],
+          "note": null,
+          "finishes": [
+            "HyperSilver",
+            "GlossyBlack",
+            "ChampagneGold",
+            "LiquidMetal"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": true,
+          "loadKg": 650,
+          "centreBoreMm": 72.6,
+          "concavityMm": 90,
+          "concavityNote": "Deep lip",
+          "weightKg": null,
+          "construction": "Flow formed",
+          "flag": null
+        }
+      ]
+    },
+    {
+      "code": "OEM+ONE",
+      "construction": "Flow formed",
+      "sizes": [
+        {
+          "size": "8.5x19",
+          "diameter": 19,
+          "width": 8.5,
+          "offset": 35,
+          "boltPatterns": [
+            "5x100"
+          ],
+          "note": null,
+          "finishes": [
+            "OEM-Silver"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 600,
+          "centreBoreMm": 57.1,
+          "concavityMm": 43,
+          "concavityNote": "Concavity, with over 50mm brake clearance",
+          "weightKg": 11.4,
+          "construction": "Flow formed",
+          "flag": null
+        },
+        {
+          "size": "8.5x19",
+          "diameter": 19,
+          "width": 8.5,
+          "offset": 40,
+          "boltPatterns": [
+            "5x112"
+          ],
+          "note": null,
+          "finishes": [
+            "OEM-Silver"
+          ],
+          "finishesText": null,
+          "soldAs": "wheel",
+          "preOrder": false,
+          "loadKg": 600,
+          "centreBoreMm": 66.6,
+          "concavityMm": 43,
+          "concavityNote": "Concavity, with over 50 mm brake clearance",
+          "weightKg": 11.4,
+          "construction": "Flow formed",
+          "flag": "Site inconsistency: product name says ET40, spec table on the page says 35 mm"
+        }
+      ]
+    }
+  ]
+}

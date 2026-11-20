@@ -35,7 +35,9 @@ Run the type check, the tests and the build before you open a pull request. All 
 3. **One source for business details.** Phone, WhatsApp, address and domain come from
    `src/config/site.ts`. Do not hardcode them anywhere else. Emails must be on `SITE.domain`.
 4. **Numbers come from data.** Prices, set counts, sizes and fitment on any page or in
-   `llms.txt` are derived from `src/data/catalogue.ts`. Do not type them into components.
+   `llms.txt` are derived from `src/data/catalogue.ts`. Do not type them into components. The sizes
+   and specifications Sixnine publishes for its whole range are in `src/data/sixnineRange.json`, written
+   by `scripts/sixnine-range-from-sheet.py`; stock and prices still come only from the catalogue.
 5. **Prices are South African Rand per set of four.** Format with `formatZAR`.
 6. **Tests are listed by name.** `npm test` runs the files named in `package.json`. A new
    `*.test.ts` file does not run until you add it to that list.
@@ -83,6 +85,7 @@ file wins:
   surcharges or sale lines. Finish names stay as the catalogue spells them.
 - Blog posts follow `src/data/blog.ts` and its tests, not the skills' article format.
 - The skills' own brand rule holds: no SIXNINE renders, photos or wording without the owner confirming permission.
+  The series pages and mega menu show the shop's own photos, or the series name when there is none.
 
 ## Things that must stay in step
 

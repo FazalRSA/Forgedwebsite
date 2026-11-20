@@ -12,6 +12,16 @@ import { SITE, socialLinks } from '../config/site';
 import { normalizePath } from './redirects';
 import { blogLastmod, blogMetaForPath, blogSitemapPaths } from './blogSeo';
 import { designCodes, joinList } from './brandFitment';
+import {
+  diameterRange,
+  findSixnineSeries,
+  seriesFacts,
+  seriesPath,
+  SIXNINE_PATH,
+  SIXNINE_SERIES,
+  sixnineSeriesOfWheel,
+  type SixnineSeries,
+} from '../data/sixnineSeries';
 
 /**
  * Per-page metadata for search engines and link previews.
@@ -213,6 +223,40 @@ function wheelMeta(wheel: BrandWheelItem): PageMeta {
 }
 
 /**
+ * A Sixnine series page: the facts in the description (sizes, diameters, bolt patterns, finishes, and
+ * the sets the shop has in stock), and a breadcrumb Home › Sixnine Wheels › the series.
+ */
+function seriesMeta(series: SixnineSeries): PageMeta {
+  const path = seriesPath(series);
+  const facts = seriesFacts(series);
+  const sets = getAllBrandWheels()
+    .filter((wheel) => sixnineSeriesOfWheel(wheel)?.code === series.code)
+    .reduce((sum, wheel) => sum + (wheel.stockQuantitySets ?? 0), 0);
+  const description = [
+    `Sixnine ${series.code}: ${facts.sizeCount} ${facts.sizeCount === 1 ? 'size' : 'sizes'}, ${diameterRange(facts)}, in ${facts.boltPatterns.join(', ')}, with ${facts.finishes.length} ${facts.finishes.length === 1 ? 'finish' : 'finishes'}.`,
+    `Official Sixnine Wheels dealer in ${SITE.country}${sets > 0 ? `, ${sets} ${series.code} ${sets === 1 ? 'set' : 'sets'} in stock` : ''}.`,
+  ].join(' ');
+  const name = `Sixnine ${series.code}`;
+  return {
+    ...page(`${name} wheels in ${SITE.country}`, description, path),
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@graph': [
+        { '@type': 'CollectionPage', name, description, url: path, inLanguage: 'en-ZA', isPartOf: { '@type': 'WebSite', name: SITE_NAME, url: '/' } },
+        {
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Home', item: '/' },
+            { '@type': 'ListItem', position: 2, name: WHEEL_BRANDS.sixnine.name, item: SIXNINE_PATH },
+            { '@type': 'ListItem', position: 3, name: series.code, item: path },
+          ],
+        },
+      ],
+    },
+  };
+}
+
+/**
  * Metadata for a site path. Unknown or sold wheels, removed pages and the unlisted admin and
  * preview pages are kept out of search results.
  */
@@ -226,6 +270,12 @@ export function metaForPath(rawPath: string): PageMeta {
     const wheel = findWheelBySlug(slug);
     // A sold or unknown wheel has no page; do not let the address be indexed.
     return wheel ? wheelMeta(wheel) : hidden(path);
+  }
+
+  // A Sixnine series page; an unknown series falls through to "not found".
+  if (path.startsWith(`${SIXNINE_PATH}/`)) {
+    const series = findSixnineSeries(path.slice(SIXNINE_PATH.length + 1).split('/')[0]);
+    if (series) return seriesMeta(series);
   }
 
   switch (path) {
@@ -410,7 +460,7 @@ export function applyPageMeta(meta: PageMeta, origin: string = SITE_ORIGIN): voi
   if (!existing) document.head.appendChild(script);
 }
 
-/** Every indexable page path: the home page, one page per in-stock wheel, the blog (hub, pillars, articles), installs, the two brand pages, contact and the privacy notice. */
+/** Every indexable page path: the home page, one page per in-stock wheel, the blog (hub, pillars, articles), installs, the two brand pages, one page per Sixnine series, contact and the privacy notice. */
 export function sitemapPaths(): string[] {
   const candidates = [
     '/',
@@ -419,6 +469,7 @@ export function sitemapPaths(): string[] {
     '/installs',
     '/forged-sa-wheels',
     '/sixnine-wheels',
+    ...SIXNINE_SERIES.map(seriesPath),
     '/contact',
     '/privacy-policy',
   ];
