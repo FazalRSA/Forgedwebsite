@@ -1,6 +1,6 @@
 /**
- * The industry partners shown on the home page. To add or remove one, edit this list: the section
- * reads it and shows nothing when it is empty. Logos live in public/images/partners/ and should be
+ * The industry partners shown in the home page hero, under "Our Industry Partners". To add or remove
+ * one, edit this list: the hero reads it and shows no partners row when it is empty. Logos live in public/images/partners/ and should be
  * transparent, square and about 480 px wide.
  */
 export interface Partner {

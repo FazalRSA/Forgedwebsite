@@ -28,6 +28,12 @@ export interface SiteConfig {
   googleRating: number | null;
   /** The number of Google reviews, exactly as Google shows it. Null hides the rating. */
   googleReviewCount: number | null;
+  /**
+   * The owner's count of wheels installed in one calendar year, for the line under the home page
+   * headline ("Over 80 successful wheels installed this year."). It is shown only during `year`, so
+   * "this year" never becomes untrue on 1 January; update both numbers to bring it back. Null hides it.
+   */
+  installsThisYear: { wheels: number; year: number } | null;
   addressLine: string;
   serviceAreas: readonly string[];
   /** n8n webhook that receives every website enquiry (see README → Lead delivery). */
@@ -83,6 +89,9 @@ export const SITE: SiteConfig = {
   googleRating: 5,
   googleReviewCount: 8,
 
+  /** The owner's figure, given on 20 November 2026: over 80 wheels installed in 2026. */
+  installsThisYear: { wheels: 80, year: 2026 },
+
   /** One-line street address for the header/footer, e.g. 'UNIT 4 · 12 EXAMPLE ROAD · SANDTON · JOHANNESBURG'. */
   addressLine: "11 SAINT MARY'S AVENUE · WINDERMERE · BEREA · DURBAN · 4001",
   /** Cities used in copy and placeholders. */
@@ -125,6 +134,15 @@ export function telLink(): string | null {
   if (!SITE.phoneDisplay) return null;
   const digits = SITE.phoneDisplay.replace(/[^\d+]/g, '');
   return `tel:${digits.startsWith('+') ? digits : `+${digits}`}`;
+}
+
+/**
+ * "Over 80 successful wheels installed this year.", from SITE.installsThisYear, or null when it is
+ * not set or `now` is outside the year it counts (so the claim never outlives its year).
+ */
+export function installsThisYearLine(now: Date = new Date(), installs = SITE.installsThisYear): string | null {
+  if (!installs || installs.wheels <= 0 || now.getFullYear() !== installs.year) return null;
+  return `Over ${installs.wheels} successful wheels installed this year.`;
 }
 
 /** The address shown in header/footer: the street line if set, else the country. */

@@ -31,6 +31,20 @@
     --font-heading: 'Nunito', 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     --font-display: 'Satoshi', 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, monospace;
+
+    /*
+     * Build language taken from the SIXNINE Wheels storefront (see the sixnine-website skill), in
+     * FORGED's palette: glass surfaces instead of solid ones, 1px hairlines, a 1px inner top highlight,
+     * soft radial tiles behind wheels, one long shadow for floating things, and one calm easing.
+     */
+    --surface-glass: rgba(255, 255, 255, 0.055);
+    --surface-glass-raised: rgba(255, 255, 255, 0.1);
+    --hairline: rgba(255, 255, 255, 0.09);
+    --hairline-strong: rgba(255, 255, 255, 0.18);
+    --inner-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    --shadow-float: 0 10px 30px -10px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.25);
+    --tile: radial-gradient(90% 90% at 50% 35%, rgba(255, 255, 255, 0.075) 0%, rgba(255, 255, 255, 0.02) 70%);
+    --ease-calm: cubic-bezier(0.23, 1, 0.32, 1);
   }
 
   body {
@@ -87,6 +101,41 @@
 /* Outside the layers on purpose: a weight utility on an h1 must not thin out Satoshi Black. */
 h1 {
   font-weight: 900;
+}
+
+/* In the components layer, so a utility on the same element (a border colour, a hover fill) still wins. */
+@layer components {
+  /*
+   * Glass: a translucent fill, a hairline, the inner top highlight and a blur of what lies behind.
+   * Used for the floating header bar, secondary buttons and chips over the hero film.
+   */
+  .glass {
+    background: var(--surface-glass);
+    border: 1px solid var(--hairline);
+    box-shadow: var(--inner-highlight);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+  }
+
+  /* Press feedback: controls shrink a touch while pressed (cards use .press-card). Off under reduced motion. */
+  .press,
+  .press-card {
+    transition-property: transform, background-color, border-color, color, opacity;
+    transition-duration: 0.18s;
+    transition-timing-function: var(--ease-calm);
+  }
+  .press:active {
+    transform: scale(0.97);
+  }
+  .press-card:active {
+    transform: scale(0.985);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .press:active,
+    .press-card:active {
+      transform: none;
+    }
+  }
 }
 
 /* Emphasis words inside headings. Was an italic serif; now the heading face, italic. */

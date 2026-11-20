@@ -1,8 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Pause, Play } from 'lucide-react';
-import { SITE } from '../../config/site';
+import { BadgeCheck, Pause, Play } from 'lucide-react';
+import { installsThisYearLine, SITE } from '../../config/site';
 import { formatZAR, getAllBrandWheels } from '../../data/catalogue';
+import { PARTNERS, type Partner } from '../../data/partners';
 import { useForgedStore } from '../../store/useForgedStore';
+import { Link } from '../../utils/router';
+import { CTA_PRIMARY_CLASS, CTA_SECONDARY_CLASS } from './ContactCta';
 import {
   HERO_POSTER_SIZES,
   HERO_POSTER_SRCSET,
@@ -36,10 +39,45 @@ function prefersSavingData(): boolean {
   return (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true;
 }
 
+/** One partner as a glass chip: its logo, its name and, when there is one, what the shop is to it. */
+const PartnerChip: React.FC<{ partner: Partner }> = ({ partner }) => {
+  const body = (
+    <>
+      <img
+        src={partner.logo}
+        alt=""
+        width={40}
+        height={40}
+        loading="lazy"
+        decoding="async"
+        className="h-10 w-10 shrink-0 rounded-full object-contain"
+      />
+      <span className="flex flex-col leading-tight">
+        <span className="text-sm font-semibold text-white">{partner.name}</span>
+        {partner.caption && <span className="text-xs text-neutral-300">{partner.caption}</span>}
+      </span>
+    </>
+  );
+  const chip = 'glass inline-flex min-h-14 items-center gap-3 rounded-full py-2 pl-2 pr-5';
+  return (
+    <li>
+      {partner.href ? (
+        <Link to={partner.href} className={`press ${chip} hover:bg-white/10`}>
+          {body}
+        </Link>
+      ) : (
+        <span className={chip}>{body}</span>
+      )}
+    </li>
+  );
+};
+
 /**
- * One headline, one sentence, one button, over the brand film. The film is muted, loops, plays only
- * while the hero is on screen, and has a pause button (WCAG 2.2.2). Visitors who ask for reduced
- * motion or a data saver get its first frame as a still and download no video.
+ * The home page's opening, built like a SIXNINE hero over FORGED's brand film: the headline, the
+ * owner's installs figure as a credibility pill, what is in stock, a white main button and a glass
+ * one, then the industry partners. The film is muted, loops, plays only while the hero is on screen,
+ * and has a pause button (WCAG 2.2.2). Visitors who ask for reduced motion or a data saver get its
+ * first frame as a still and download no video.
  */
 export const HeroSection: React.FC = () => {
   const customBrandWheels = useForgedStore((state) => state.customBrandWheels);
@@ -54,6 +92,9 @@ export const HeroSection: React.FC = () => {
     const minPrice = Math.min(...wheels.map((wheel) => wheel.priceZAR));
     return `Forged wheels for BMW M cars. ${sets} sets in stock in ${SITE.country}, from ${formatZAR(minPrice)} per set of four.`;
   }, [wheels]);
+
+  // "Over 80 successful wheels installed this year.", only during the year the figure counts.
+  const installsLine = installsThisYearLine();
 
   const small = useMediaMatches(HERO_VIDEO_SMALL_MEDIA);
   const reducedMotion = useMediaMatches('(prefers-reduced-motion: reduce)');
@@ -165,25 +206,48 @@ export const HeroSection: React.FC = () => {
         <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#111111] to-transparent" />
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 md:px-10 flex items-end lg:items-center min-h-[32rem] sm:min-h-[36rem] lg:min-h-[min(78svh,46rem)] pt-24 pb-12 sm:pb-16 lg:py-20">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 md:px-10 flex items-end lg:items-center min-h-[36rem] sm:min-h-[40rem] lg:min-h-[min(84svh,50rem)] pt-20 pb-10 sm:pb-14 lg:py-20">
         <div className="max-w-5xl">
           <h1
             id="home-heading"
-            className="text-balance text-4xl sm:text-6xl lg:text-7xl font-light tracking-[-0.035em] leading-[1.04] text-white"
+            className="text-balance text-[2.6rem] sm:text-6xl lg:text-7xl tracking-[-0.04em] leading-[0.98] text-white"
           >
-            {/* How every wheel here is made, in the words of the forged-vs-cast guide on the blog: a cast
-                wheel is poured into a mould; a forged one is pressed from a solid block, then machined. */}
-            Forged, not cast.{' '}
-            <span className="block text-neutral-300">Pressed from solid aluminium.</span>
+            {/* The owner's headline. Each line ends in a full stop, the SIXNINE hero pattern, so the two
+                read as two statements to screen readers too. */}
+            Forged Custom Wheels.{' '}
+            <span className="block text-neutral-300">Turning dreams into reality.</span>
           </h1>
+
+          {installsLine && (
+            <p className="glass mt-6 inline-flex items-center gap-2 rounded-full py-2 pl-3 pr-4 text-sm sm:text-base font-semibold text-white">
+              <BadgeCheck aria-hidden="true" className="h-5 w-5 shrink-0 text-white" />
+              {installsLine}
+            </p>
+          )}
+
           <p className="mt-5 max-w-xl text-pretty text-base sm:text-lg leading-relaxed text-neutral-200 [text-shadow:0_1px_12px_rgba(0,0,0,0.7)]">{stockLine}</p>
-          <a
-            href="#catalogue"
-            onClick={jumpToCatalogue}
-            className="mt-8 inline-flex items-center justify-center min-h-12 px-7 rounded-full bg-[#1D4ED8] hover:bg-[#2563EB] text-white text-base font-medium transition-colors"
-          >
-            See wheels in stock
-          </a>
+
+          <div className="mt-7 flex flex-wrap gap-3">
+            <a href="#catalogue" onClick={jumpToCatalogue} className={CTA_PRIMARY_CLASS}>
+              See wheels in stock
+            </a>
+            <Link to="/installs" className={CTA_SECONDARY_CLASS}>
+              See our installs
+            </Link>
+          </div>
+
+          {PARTNERS.length > 0 && (
+            <section id="partners" aria-labelledby="partners-heading" className="mt-10 scroll-mt-24">
+              <h2 id="partners-heading" className="text-xs font-bold uppercase tracking-[0.14em] text-neutral-300">
+                Our Industry Partners
+              </h2>
+              <ul className="mt-3 flex flex-wrap gap-2.5">
+                {PARTNERS.map((partner) => (
+                  <PartnerChip key={partner.id} partner={partner} />
+                ))}
+              </ul>
+            </section>
+          )}
         </div>
       </div>
 
@@ -192,7 +256,8 @@ export const HeroSection: React.FC = () => {
           type="button"
           onClick={toggleFilm}
           aria-label={playing ? 'Pause the background film' : 'Play the background film'}
-          className="absolute bottom-12 right-4 sm:bottom-16 sm:right-6 md:right-10 lg:bottom-8 z-10 inline-flex h-11 w-11 items-center justify-center rounded-full bg-black/45 text-white ring-1 ring-white/25 backdrop-blur-sm transition-colors hover:bg-black/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+          // Top right on phones and tablets, where the partner chips take the bottom; bottom right on wide screens.
+          className="press glass absolute top-4 right-4 sm:right-6 md:right-10 lg:top-auto lg:bottom-8 z-10 inline-flex h-11 w-11 items-center justify-center rounded-full text-white hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
         >
           {playing ? <Pause className="h-4 w-4" aria-hidden="true" /> : <Play className="h-4 w-4 translate-x-px" aria-hidden="true" />}
         </button>

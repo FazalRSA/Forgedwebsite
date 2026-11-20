@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { CalendarDays, Clock } from 'lucide-react';
 import { BrandHeader } from '../brand/BrandHeader';
 import { ContactCta, CTA_PRIMARY_CLASS } from '../brand/ContactCta';
-import { WheelCard } from '../brand/WheelCatalogue';
+import { ProductCard } from '../brand/ProductCard';
 import { Badge } from '../ui/badge';
 import { Breadcrumb } from '../ui/breadcrumb';
 import { Link } from '../../utils/router';
@@ -34,9 +34,9 @@ export const BlogPostPage: React.FC<{ post: BlogPost }> = ({ post }) => {
   const next = morePosts(post);
 
   const renderStock = (picks: BrandWheelItem[]) => (
-    <ul className="grid grid-cols-2 gap-3 sm:gap-4 not-prose">
+    <ul className="grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-5 not-prose">
       {picks.map((wheel, index) => (
-        <WheelCard key={wheel.slug} wheel={wheel} index={index + 2} />
+        <ProductCard key={wheel.slug} wheel={wheel} index={index + 2} />
       ))}
     </ul>
   );

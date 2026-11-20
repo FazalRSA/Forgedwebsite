@@ -86,7 +86,7 @@ export const ContactPage: React.FC = () => {
           enquirySubject="Wheel enquiry"
           label="Enquire on WhatsApp"
           fallbackLabel="Send an enquiry"
-          className="mt-8 inline-flex w-full sm:w-auto items-center justify-center gap-3 min-h-14 px-8 rounded-full bg-[#1D4ED8] text-white text-lg font-medium hover:bg-[#2563EB] transition-colors cursor-pointer"
+          className="mt-8 inline-flex w-full sm:w-auto items-center justify-center gap-3 min-h-14 px-8 rounded-full bg-white text-[#111111] text-lg font-semibold hover:bg-white/90 press transition-colors cursor-pointer"
         />
 
         {rows.length > 0 && (

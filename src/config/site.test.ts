@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
-import { SITE } from './site';
+import { installsThisYearLine, SITE } from './site';
 
 // A published email must sit on the business's own domain. An address on a domain the business
 // does not own sends real privacy requests to a stranger.
@@ -63,5 +63,19 @@ test('social and Google review links are empty or https, and the rating is real'
   if (SITE.googleRating !== null) {
     assert.ok(SITE.googleRating >= 1 && SITE.googleRating <= 5);
     assert.ok(Number.isInteger(SITE.googleReviewCount) && (SITE.googleReviewCount as number) > 0);
+  }
+});
+
+test('the installs line reads as the owner wrote it, and only during the year it counts', () => {
+  const installs = { wheels: 80, year: 2026 };
+  assert.equal(installsThisYearLine(new Date('2026-11-20T10:00:00Z'), installs), 'Over 80 successful wheels installed this year.');
+  assert.equal(installsThisYearLine(new Date('2026-01-01T10:00:00Z'), installs), 'Over 80 successful wheels installed this year.');
+  assert.equal(installsThisYearLine(new Date('2027-01-01T10:00:00Z'), installs), null, 'gone once the year is over');
+  assert.equal(installsThisYearLine(new Date('2025-12-31T10:00:00Z'), installs), null);
+  assert.equal(installsThisYearLine(new Date('2026-06-01T10:00:00Z'), null), null);
+  assert.equal(installsThisYearLine(new Date('2026-06-01T10:00:00Z'), { wheels: 0, year: 2026 }), null);
+  if (SITE.installsThisYear) {
+    assert.ok(Number.isInteger(SITE.installsThisYear.wheels) && SITE.installsThisYear.wheels > 0);
+    assert.ok(Number.isInteger(SITE.installsThisYear.year) && SITE.installsThisYear.year >= 2026);
   }
 });

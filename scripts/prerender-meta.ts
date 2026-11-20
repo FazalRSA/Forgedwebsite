@@ -61,7 +61,11 @@ try {
   const shell = withGoogleTagManager(verifiedShell);
   const tagManager = shell !== verifiedShell;
   let written = 0;
-  for (const pagePath of sitemapPaths()) {
+  const pagePaths = sitemapPaths();
+  // Pages that share their name with a folder of other pages: /blog and each /blog/<pillar>, and
+  // /sixnine-wheels (its series pages are /sixnine-wheels/<series>).
+  const folderPages = new Set(pagePaths.filter((p) => pagePaths.some((other) => other.startsWith(`${p}/`))));
+  for (const pagePath of pagePaths) {
     if (isHomePath(pagePath)) continue;
     let html = renderPageHtml(shell, metaForPath(pagePath));
     // Blog pages also get their full text in the HTML, for crawlers that read it before running any
@@ -75,10 +79,9 @@ try {
     mkdirSync(path.dirname(target), { recursive: true });
     writeFileSync(target, html);
     written += 1;
-    // The blog hub and each pillar share their name with a folder (/blog and /blog/<pillar> also hold
-    // pages). Hosts disagree on whether /blog means blog.html or blog/index.html, so write both and
-    // either way the visitor gets this page, never an empty one.
-    if (blogHtml && (pagePath === '/blog' || pagePath.split('/').length === 3)) {
+    // Hosts disagree on whether /blog means blog.html or blog/index.html, so a page that is also a
+    // folder is written both ways and either way the visitor gets this page, never an empty one.
+    if (folderPages.has(pagePath)) {
       const folderIndex = path.join(distDir, pagePath.replace(/^\//, ''), 'index.html');
       mkdirSync(path.dirname(folderIndex), { recursive: true });
       writeFileSync(folderIndex, html);

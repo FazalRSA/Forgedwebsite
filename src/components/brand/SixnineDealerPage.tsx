@@ -4,6 +4,8 @@ import { BrandEnquirySection, BrandFitmentSection, BrandPageHero, BrandStockSect
 import { getAllBrandWheels, isSixnineWheel, WHEEL_BRANDS } from '../../data/catalogue';
 import { useForgedStore } from '../../store/useForgedStore';
 import { designCodes, fitmentAtAGlance, joinList } from '../../utils/brandFitment';
+import { findSixnineSeries, seriesPath, seriesSlug } from '../../data/sixnineSeries';
+import { Link } from '../../utils/router';
 
 /** Where the facts about the brand below come from. */
 const SIXNINE_SOURCE_URL = 'https://www.sixnine-wheels.com/pages/about';
@@ -104,9 +106,17 @@ export const SixnineDealerPage: React.FC = () => {
               <ul className="mt-3 divide-y divide-[#26262E] border-y border-[#26262E]">
                 {SIXNINE_RANGE.map((design) => {
                   const stocked = designs.includes(design.code);
+                  // Each series has its own page with every size Sixnine lists.
+                  const series = findSixnineSeries(seriesSlug(design.name));
                   return (
                     <li key={design.name} className="py-3 flex items-start gap-4">
-                      <span className="w-24 shrink-0 font-semibold text-white">{design.name}</span>
+                      {series ? (
+                        <Link to={seriesPath(series)} className="w-24 shrink-0 font-semibold text-white underline underline-offset-4 decoration-white/30 hover:decoration-white">
+                          {design.name}
+                        </Link>
+                      ) : (
+                        <span className="w-24 shrink-0 font-semibold text-white">{design.name}</span>
+                      )}
                       <span className="flex-1 text-sm text-neutral-300">{design.summary}</span>
                       {stocked && (
                         <a
