@@ -86,7 +86,8 @@ try {
     console.log(`${problems.length ? 'FAIL' : 'ok  '} ${slug}${note ? ` (${note})` : ''}${problems.length ? `: ${problems.join('; ')}` : ''}`);
   }
 } catch (err) {
-  console.error(`ERROR: ${err.message}${err.cause ? ` (${err.cause.code || err.cause.message})` : ''}. Is the dev server running at ${base}?`);
+  const network = err.cause || /fetch failed|no wheel listings/.test(err.message);
+  console.error(`ERROR: ${err.message}${err.cause ? ` (${err.cause.code || err.cause.message})` : ''}${network ? `. Is the dev server running at ${base}?` : ''}`);
   await browser.close();
   process.exit(1);
 }
