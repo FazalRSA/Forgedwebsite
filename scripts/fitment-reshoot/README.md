@@ -12,6 +12,10 @@ Pipeline (Gemini 3 Pro Image via OpenRouter, ~US$0.14 per image at 2K):
    description `car`, the `sources` file names and any job-specific `extra` instruction).
    Fill in `wheelModel`, `wheelSlug`, `staggeredSpec`, `finishName`, `clientCity` when known;
    the site shows those rows only when present.
+   `hotspots` (optional) places the "Click here to view wheel" button on the two studio photos: each
+   entry is `{"rim": {"x", "y"}, "label": {"x", "y"}}` in percent of the photo (x across, y down), or
+   `null` for a photo with no button. The dot sits on the wheel's rim and the button at `label`. Set it only
+   with a `wheelSlug` that is in stock; a test fails otherwise. The owner's own photo never gets one.
 2. `OPENROUTER_API_KEY=... PAR=4 RES=2K ./batch_reshoot.sh [slug ...]`
    One car = front34 then side (the side is chained off the front for consistency); different
    cars run in parallel. `backdrop_ref.png` (an empty plate sampled from the approved mint-G80

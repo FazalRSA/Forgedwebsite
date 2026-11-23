@@ -648,12 +648,12 @@ firebase deploy --only firestore:rules
 
 ## Testing
 
-`bun run test` first runs `wheel-viewer:verify` (fails if `src/wheel-viewer/` was edited without a new stamp), then twenty-five test files (254 tests) with `node:test`. The files are listed by name in the `test` script in `package.json`, so a new test file does not run until it is added there.
+`bun run test` first runs `wheel-viewer:verify` (fails if `src/wheel-viewer/` was edited without a new stamp), then twenty-six test files (262 tests) with `node:test`. The files are listed by name in the `test` script in `package.json`, so a new test file does not run until it is added there.
 
 | Suite | Covers |
 | --- | --- |
 | `src/data/catalogue.test.ts` | The stock rule (every exported wheel is in stock, 14 listings across 6 designs, one finish each), siblings, to-order colours (never a colour the design has in stock), no store exports, wheel builder, and that every listed wheel has a 3D model and photos that exist |
-| `src/data/clientFitments.test.ts` | Customer installs data |
+| `src/data/clientFitments.test.ts` | Customer installs data: unique ids, the three photos of each install, the photo files on disk, sequential slot labels, filter families, and that a wheel button on an install's photo links only to an in-stock listing and marks only the two studio photos |
 | `src/data/sixnineSeries.test.ts` | The six Sixnine series and their page addresses; the range holds wheel specifications only (no prices, stock, certificates or shop links); every size has a bolt pattern and every single wheel its diameter, width and Sixnine finish names with a swatch; facts are worked out from the sizes; every Sixnine listing in stock belongs to a series |
 | `src/utils/sixnineShowcase.test.ts` | Every series has a showcase picture (the shop's own angled cut-out first), and "New at Sixnine" lists only what Sixnine has on pre-order |
 | `src/utils/listingSpecs.test.ts` | A Sixnine listing's diameters, offsets and bolt pattern match exactly one Sixnine size per diameter, the Technical data table carries Sixnine's figures, a Forged SA listing has none, and an unreadable spec sheet hides the table rather than showing a wrong one |
@@ -754,7 +754,7 @@ Build chunks are split per vendor (`react`, `motion`, `three`, `firebase`, `luci
 | **Install details** | Each car's make, model and paint were read from its photo, not confirmed | Shop to confirm, then correct `jobs.json` |
 | **Leftovers from the starter** | `package.json` still lists `@google/genai`, `express` and `dotenv`, which no file imports. `.env.example`, `metadata.json` and a tracked `.aistudio/` folder (6 MB of screenshots) come from the same starter | Remove in one clean-up pull request |
 | **Render routes** | Each address in `render.yaml`'s generated block has a rule on the domain's service, checked on 23 November 2026. A rule added in the dashboard that `render.yaml` does not list would not be tracked here | Re-check after any change to `render.yaml`: each `/blog/…` address should show its own title, not the home page's (see [Two Render services](#two-render-services)) |
-| **Automated checks** | Type check, 254 tests in 25 files and the build, all run by hand. No CI, no browser tests, and ESLint is not wired to a script | Run the three checks on every pull request with a CI workflow |
+| **Automated checks** | Type check, 262 tests in 26 files and the build, all run by hand. No CI, no browser tests, and ESLint is not wired to a script | Run the three checks on every pull request with a CI workflow |
 
 ## Contributing
 
