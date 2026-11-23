@@ -264,11 +264,11 @@ interface RawInventorySeed {
  * studio repaints it. FSA001 sets its own front/rear pair on the seed instead.
  */
 export const MODEL_URL_BY_CODE: Partial<Record<RawInventorySeed['modelCode'], string>> = {
-  FSA002: '/models/wheels/fsa002-forked-v3.glb',
-  FSA003: '/models/wheels/fsa003-v5.glb',
-  FSA004: '/models/wheels/fsa004-v5.glb',
-  'FF-1': '/models/wheels/ff-1-sixnine-v3.glb',
-  'FF-3': '/models/wheels/ff-3-sixnine-v3.glb',
+  FSA002: '/models/wheels/fsa002-forked-v4.glb',
+  FSA003: '/models/wheels/fsa003-v6.glb',
+  FSA004: '/models/wheels/fsa004-v6.glb',
+  'FF-1': '/models/wheels/ff-1-sixnine-v4.glb',
+  'FF-3': '/models/wheels/ff-3-sixnine-v4.glb',
 };
 
 /** The traced model of a design, by its code ("FSA002"); undefined for a design with no model yet. */
