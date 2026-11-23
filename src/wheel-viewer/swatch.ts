@@ -99,7 +99,7 @@ function drawSwatches(batch: Pending[]): string[] {
   renderer.setPixelRatio(1);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   // The same tone mapping and exposure as the stage, so the swatch matches the wheel.
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMapping = THREE.NeutralToneMapping;
   renderer.toneMappingExposure = 1.0;
   renderer.setClearColor(0x000000, 0);
 
@@ -113,7 +113,7 @@ function drawSwatches(batch: Pending[]): string[] {
     const keyLight = new THREE.DirectionalLight(0xffffff, 3.8);
     keyLight.position.set(1.2, 2.2, 1.0);
     scene.add(keyLight);
-    scene.add(new THREE.HemisphereLight(0xffffff, 0x8a8f98, 1.4));
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x8c8c8c, 1.4));
 
     geometry = new THREE.SphereGeometry(1, 96, 64);
     // A little above and to the side, so the overhead softbox and a side strip both land on the ball.

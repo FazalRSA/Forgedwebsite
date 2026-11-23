@@ -30,6 +30,11 @@ export interface StudioFinish {
   /** The dot on the finish chip. */
   swatchHex: string;
   paint: StudioPaint;
+  /**
+   * A picture of the wheel itself in this finish (a studio render, face-on). When the app has one, the
+   * swatch shows it instead of drawing a paint ball, so the chip is the wheel in that colour.
+   */
+  swatchImage?: string;
 }
 
 export interface PaintRenderer {

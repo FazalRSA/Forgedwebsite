@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { WHEEL_FINISHES, type WheelFinishId } from '../../data/catalogue';
 import { getStudioFinish } from '../../data/studioFinishes';
+import { finishSwatchSrc } from '../../data/finishStills';
 import {
   WheelStudio as SharedWheelStudio,
   DEFAULT_STUDIO_TOGGLES,
@@ -28,6 +29,8 @@ export interface WheelStudioProps {
    * keep the stage to the finish that is actually in stock.
    */
   availableFinishes: WheelFinishId[];
+  /** The wheel's design code ("FSA003"): finds the studio render of the wheel in each colour for the finish chips. */
+  design?: string;
   onSelectFinish: (finish: WheelFinishId) => void;
   /** The wheel's own finish name, e.g. "Black Matte"; a matte name gives the paint a matte sheen. */
   finishName?: string;
@@ -50,16 +53,20 @@ export interface WheelStudioProps {
   className?: string;
 }
 
-/** A catalogue finish as the viewer's row. `nameOverride` names the paint (a matte name flattens it). */
-export function toStudioFinish(id: WheelFinishId, nameOverride?: string): StudioFinish | null {
+/**
+ * A catalogue finish as the viewer's row. `nameOverride` names the paint (a matte name flattens it); `design`
+ * adds the studio render of that design in this colour, which the swatch then shows instead of a paint ball.
+ */
+export function toStudioFinish(id: WheelFinishId, nameOverride?: string, design?: string): StudioFinish | null {
   const option = WHEEL_FINISHES[id];
   if (!option) return null;
-  const { hex, metalness, roughness, clearcoat, clearcoatRoughness, envMapIntensity } = getStudioFinish(id);
+  const { hex, metalness, roughness, clearcoat, clearcoatRoughness, envMapIntensity } = getStudioFinish(id, design);
   return {
     id,
     name: nameOverride ?? option.name,
     swatchHex: option.swatchHex,
     paint: { hex, metalness, roughness, clearcoat, clearcoatRoughness, envMapIntensity },
+    swatchImage: finishSwatchSrc(design, id),
   };
 }
 
@@ -69,15 +76,16 @@ export const WheelStudio: React.FC<WheelStudioProps> = ({
   onSelectFinish,
   finishName,
   finishNames,
+  design,
   ...rest
 }) => {
   const finishes = useMemo(
-    () => availableFinishes.map((id) => toStudioFinish(id, finishNames?.[id])).filter((f): f is StudioFinish => !!f),
-    [availableFinishes, finishNames]
+    () => availableFinishes.map((id) => toStudioFinish(id, finishNames?.[id], design)).filter((f): f is StudioFinish => !!f),
+    [availableFinishes, finishNames, design]
   );
   // The selected finish carries the wheel's own name for the matte reading ("Black Matte"); the row
   // keeps the catalogue's chip names.
-  const selected = toStudioFinish(selectedFinish, finishName) ?? undefined;
+  const selected = toStudioFinish(selectedFinish, finishName, design) ?? undefined;
   return (
     <SharedWheelStudio
       {...rest}

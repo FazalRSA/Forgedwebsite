@@ -257,6 +257,7 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
                   wheelModel={wheel.model}
                   selectedFinish={previewFinish}
                   availableFinishes={[wheel.defaultFinish, ...toOrderFinishes.map((f) => f.id)]}
+                  design={wheel.modelCode}
                   onSelectFinish={setPreviewFinish}
                   finishName={previewingToOrder ? WHEEL_FINISHES[previewFinish]?.name ?? finishLabel : finishLabel}
                   finishNames={stageFinishNames}
@@ -322,6 +323,7 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
 
             <div className="mt-5">
               <ColourSwatches
+                design={wheel.modelCode}
                 current={{ finishId: wheel.defaultFinish, name: finishLabel }}
                 siblings={siblings.map((s) => ({
                   slug: s.slug,
@@ -368,7 +370,7 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
                     className="flex min-h-14 items-center justify-between gap-3 rounded-xl border border-[#26262E] px-4 py-2 hover:border-[#1D4ED8]"
                   >
                     <span className="flex items-center gap-3 min-w-0">
-                      <CatalogueSwatch finishId={w.defaultFinish} name={w.finishName} size={28} />
+                      <CatalogueSwatch finishId={w.defaultFinish} name={w.finishName} size={28} design={w.modelCode} />
                       <span className="truncate text-sm font-medium text-white">{w.model}</span>
                     </span>
                     <span className="shrink-0 text-sm text-neutral-300">{formatZAR(w.priceZAR)}</span>
