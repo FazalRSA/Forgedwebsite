@@ -23,6 +23,13 @@ To do it from a terminal instead, run `scripts/add-blog-rules.sh` (a preview wit
 | 15 | `/blog/wheel-care/how-to-clean-forged-wheels` | `/blog/wheel-care/how-to-clean-forged-wheels.html` | Rewrite |
 | 16 | `/blog/wheel-care/wheel-bolt-torque-and-care` | `/blog/wheel-care/wheel-bolt-torque-and-care.html` | Rewrite |
 | 17 | `/blog/wheel-care/protecting-wheels-from-potholes` | `/blog/wheel-care/protecting-wheels-from-potholes.html` | Rewrite |
+| 18 | `/blog/bmw-m-wheel-fitment/hub-centric-rings-when-you-need-them` | `/blog/bmw-m-wheel-fitment/hub-centric-rings-when-you-need-them.html` | Rewrite |
+| 19 | `/blog/bmw-m-wheel-fitment/tyre-pressure-sensors-after-a-wheel-change` | `/blog/bmw-m-wheel-fitment/tyre-pressure-sensors-after-a-wheel-change.html` | Rewrite |
+| 20 | `/blog/bmw-m-wheel-fitment/plus-sizing-wheels-and-tyres` | `/blog/bmw-m-wheel-fitment/plus-sizing-wheels-and-tyres.html` | Rewrite |
+| 21 | `/blog/forged-wheel-basics/how-to-read-a-wheel-load-rating` | `/blog/forged-wheel-basics/how-to-read-a-wheel-load-rating.html` | Rewrite |
+| 22 | `/blog/forged-wheel-basics/painted-powder-coated-and-polished-wheel-finishes` | `/blog/forged-wheel-basics/painted-powder-coated-and-polished-wheel-finishes.html` | Rewrite |
+| 23 | `/blog/wheel-care/wheel-balancing-and-alignment-after-new-wheels` | `/blog/wheel-care/wheel-balancing-and-alignment-after-new-wheels.html` | Rewrite |
+| 24 | `/blog/buying-forged-wheels-south-africa/what-to-ask-before-buying-forged-wheels` | `/blog/buying-forged-wheels-south-africa/what-to-ask-before-buying-forged-wheels.html` | Rewrite |
 
 Plain list (source -> destination):
 
@@ -44,4 +51,11 @@ Plain list (source -> destination):
 /blog/wheel-care/how-to-clean-forged-wheels -> /blog/wheel-care/how-to-clean-forged-wheels.html
 /blog/wheel-care/wheel-bolt-torque-and-care -> /blog/wheel-care/wheel-bolt-torque-and-care.html
 /blog/wheel-care/protecting-wheels-from-potholes -> /blog/wheel-care/protecting-wheels-from-potholes.html
+/blog/bmw-m-wheel-fitment/hub-centric-rings-when-you-need-them -> /blog/bmw-m-wheel-fitment/hub-centric-rings-when-you-need-them.html
+/blog/bmw-m-wheel-fitment/tyre-pressure-sensors-after-a-wheel-change -> /blog/bmw-m-wheel-fitment/tyre-pressure-sensors-after-a-wheel-change.html
+/blog/bmw-m-wheel-fitment/plus-sizing-wheels-and-tyres -> /blog/bmw-m-wheel-fitment/plus-sizing-wheels-and-tyres.html
+/blog/forged-wheel-basics/how-to-read-a-wheel-load-rating -> /blog/forged-wheel-basics/how-to-read-a-wheel-load-rating.html
+/blog/forged-wheel-basics/painted-powder-coated-and-polished-wheel-finishes -> /blog/forged-wheel-basics/painted-powder-coated-and-polished-wheel-finishes.html
+/blog/wheel-care/wheel-balancing-and-alignment-after-new-wheels -> /blog/wheel-care/wheel-balancing-and-alignment-after-new-wheels.html
+/blog/buying-forged-wheels-south-africa/what-to-ask-before-buying-forged-wheels -> /blog/buying-forged-wheels-south-africa/what-to-ask-before-buying-forged-wheels.html
 ```
