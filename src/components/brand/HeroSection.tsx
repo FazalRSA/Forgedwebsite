@@ -1,9 +1,7 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { BadgeCheck, Pause, Play } from 'lucide-react';
-import { installsThisYearLine, SITE } from '../../config/site';
-import { formatZAR, getAllBrandWheels } from '../../data/catalogue';
+import { installsThisYearLine } from '../../config/site';
 import { PARTNERS, type Partner } from '../../data/partners';
-import { useForgedStore } from '../../store/useForgedStore';
 import { Link } from '../../utils/router';
 import { CTA_PRIMARY_CLASS, CTA_SECONDARY_CLASS } from './ContactCta';
 import {
@@ -13,9 +11,6 @@ import {
   HERO_VIDEO_SMALL_MEDIA,
   heroVideoAllowed,
 } from '../../utils/heroVideo';
-
-/** The fallback sentence when nothing is listed in stock (the counts below come from the catalogue). */
-const STATIC_LINE = 'Every set below is in stock. Prices are in Rand for a set of four.';
 
 /** Whether a CSS media query matches, kept up to date as the window is resized. */
 function useMediaMatches(query: string): boolean {
@@ -74,25 +69,12 @@ const PartnerChip: React.FC<{ partner: Partner }> = ({ partner }) => {
 
 /**
  * The home page's opening, built like a SIXNINE hero over FORGED's brand film: the headline, the
- * owner's installs figure as a credibility pill, what is in stock, a white main button and a glass
- * one, then the industry partners. The film is muted, loops, plays only while the hero is on screen,
+ * owner's installs figure as a credibility pill, a white main button and a glass one, then the
+ * industry partners. The film is muted, loops, plays only while the hero is on screen,
  * and has a pause button (WCAG 2.2.2). Visitors who ask for reduced motion or a data saver get its
  * first frame as a still and download no video.
  */
 export const HeroSection: React.FC = () => {
-  const customBrandWheels = useForgedStore((state) => state.customBrandWheels);
-  // getAllBrandWheels returns only wheels that are in stock.
-  const wheels = useMemo(() => getAllBrandWheels(customBrandWheels), [customBrandWheels]);
-  // "Forged wheels for BMW M cars. 14 sets in stock in South Africa, from R 65,000 per set of four.",
-  // counted from the live catalogue. The headline speaks for the brand; this line says what is for sale
-  // and carries the words the page is found by (the home <title> says the same).
-  const stockLine = useMemo(() => {
-    if (wheels.length === 0) return STATIC_LINE;
-    const sets = wheels.reduce((sum, wheel) => sum + (wheel.stockQuantitySets ?? 0), 0);
-    const minPrice = Math.min(...wheels.map((wheel) => wheel.priceZAR));
-    return `Forged wheels for BMW M cars. ${sets} sets in stock in ${SITE.country}, from ${formatZAR(minPrice)} per set of four.`;
-  }, [wheels]);
-
   // "Over 80 successful wheels installed this year.", only during the year the figure counts.
   const installsLine = installsThisYearLine();
 
@@ -225,9 +207,8 @@ export const HeroSection: React.FC = () => {
             </p>
           )}
 
-          <p className="mt-5 max-w-xl text-pretty text-base sm:text-lg leading-relaxed text-neutral-200 [text-shadow:0_1px_12px_rgba(0,0,0,0.7)]">{stockLine}</p>
 
-          <div className="mt-7 flex flex-wrap gap-3">
+          <div className="mt-8 flex flex-wrap gap-3">
             <a href="#catalogue" onClick={jumpToCatalogue} className={CTA_PRIMARY_CLASS}>
               See wheels in stock
             </a>

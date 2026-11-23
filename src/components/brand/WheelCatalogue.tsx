@@ -59,8 +59,8 @@ const SHAPE_CLASSES: Record<DesignCardWidth, string> = {
 
 /** Wheel size and position per width on wide screens. */
 const WHEEL_CLASSES: Record<DesignCardWidth, string> = {
-  third: 'lg:h-[68%]',
-  half: 'lg:h-[70%]',
+  third: 'lg:h-[58%]',
+  half: 'lg:h-[60%]',
   full: 'lg:left-auto lg:right-[6%] lg:top-1/2 lg:h-[92%] lg:translate-x-0 lg:-translate-y-1/2',
 };
 
@@ -82,7 +82,7 @@ const DesignCard: React.FC<{
       <Link
         to={`/wheels/${card.representative.slug}`}
         // No aria-label: the link is named by its own text, in reading order (badge, design, price, finishes).
-        className={`press-card group relative block overflow-hidden rounded-3xl border border-[#26262E] hover:border-white/[0.18] bg-[#18181D] aspect-square ${fillTabletRow ? 'sm:aspect-[16/10]' : 'sm:aspect-[4/5]'} ${SHAPE_CLASSES[width]}`}
+        className={`press-card group relative block overflow-hidden rounded-3xl border border-[#26262E] hover:border-white/[0.18] bg-[#18181D] aspect-[4/5] ${fillTabletRow ? 'sm:aspect-[16/10]' : 'sm:aspect-[4/5]'} ${SHAPE_CLASSES[width]}`}
       >
         {/* A soft lighter glow behind the wheel. */}
         <div
@@ -98,7 +98,7 @@ const DesignCard: React.FC<{
             card's height so it never runs off the card or far into the text. */}
         <div
           aria-hidden="true"
-          className={`absolute left-1/2 top-[4%] aspect-square max-w-[94%] -translate-x-1/2 h-[66%] sm:h-[68%] ${WHEEL_CLASSES[width]}`}
+          className={`absolute left-1/2 top-[12%] aspect-square max-w-[90%] -translate-x-1/2 h-[52%] sm:top-[10%] sm:h-[56%] ${WHEEL_CLASSES[width]}`}
         >
           {image ? (
             <img
@@ -136,7 +136,7 @@ const DesignCard: React.FC<{
 
         <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 sm:p-6 lg:p-7">
           <div className="min-w-0">
-            <h4 className="font-[family-name:var(--font-display)] font-black uppercase text-3xl sm:text-4xl leading-none tracking-[-0.03em] text-white">
+            <h4 className="font-[family-name:var(--font-display)] font-black uppercase text-2xl sm:text-4xl leading-none tracking-[-0.03em] text-white">
               {card.design}
             </h4>
             <p className="mt-2 text-sm font-medium text-neutral-200 tabular-nums">{card.priceLine}</p>
@@ -148,18 +148,9 @@ const DesignCard: React.FC<{
                 ))}
               </span>
             )}
-            {(finishes || sizes) && (
-              <p className="mt-0.5 text-sm text-neutral-400">
-                {finishes}
-                {/* The separator wraps with the sizes, so a line never ends in a dangling " ·". */}
-                {sizes && (
-                  <span className="whitespace-nowrap">
-                    {finishes && ' · '}
-                    {sizes}
-                  </span>
-                )}
-              </p>
-            )}
+            {/* The swatches show the colours; their names are read aloud, and the sizes are shown. */}
+            {finishes && <span className="sr-only">{finishes}</span>}
+            {sizes && <p className="mt-1 text-sm text-neutral-400">{sizes}</p>}
           </div>
           <span
             aria-hidden="true"

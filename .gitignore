@@ -16,6 +16,5 @@ scripts/fitment-reshoot/logs/
 # Local agent-session tooling artifacts, not project source
 .cto-toolkit/
 .venv-cutouts/
-
-# Python bytecode from the scripts in scripts/
+qa-wheels/
 __pycache__/

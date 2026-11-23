@@ -155,6 +155,32 @@
         "Three-quarter view",
         "Side profile"
       ]
+    },
+    {
+      "slug": "fsa003-silver",
+      "images": [
+        "/images/wheels/fsa003-silver/front.webp",
+        "/images/wheels/fsa003-silver/hero.webp",
+        "/images/wheels/fsa003-silver/profile.webp"
+      ],
+      "imageLabels": [
+        "3D preview: front face",
+        "3D preview: three-quarter view",
+        "3D preview: side profile"
+      ]
+    },
+    {
+      "slug": "fsa004-hyper-black",
+      "images": [
+        "/images/wheels/fsa004-hyper-black/front.webp",
+        "/images/wheels/fsa004-hyper-black/hero.webp",
+        "/images/wheels/fsa004-hyper-black/profile.webp"
+      ],
+      "imageLabels": [
+        "3D preview: front face",
+        "3D preview: three-quarter view",
+        "3D preview: side profile"
+      ]
     }
   ]
 }
