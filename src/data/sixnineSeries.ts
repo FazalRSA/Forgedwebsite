@@ -68,8 +68,18 @@ const FEATURES: Record<string, string[]> = {
 /** "FF-ONE" → "ff-one", "OEM+ONE" → "oem-plus-one". */
 export const seriesSlug = (code: string): string => code.toLowerCase().replace(/\+/g, '-plus-');
 
+/**
+ * The owner confirmed on 2026-11-23 that every wheel the shop sells is forged. Sixnine's sheet calls most of
+ * its range "flow forged" or "flow formed"; the site says what the shop supplies, so every series reads
+ * "Forged", and a size keeps its own line only where it adds the piece count ("Forged, 2-piece").
+ */
+export const SHOP_CONSTRUCTION = 'Forged';
+const sizeConstruction = (value: string | null): string | null => (value && /^forged,/i.test(value) ? value : null);
+
 export const SIXNINE_SERIES: readonly SixnineSeries[] = RANGE.series.map((series) => ({
   ...series,
+  construction: SHOP_CONSTRUCTION,
+  sizes: series.sizes.map((size) => ({ ...size, construction: sizeConstruction(size.construction) })),
   slug: seriesSlug(series.code),
   features: FEATURES[series.code] ?? [],
 }));

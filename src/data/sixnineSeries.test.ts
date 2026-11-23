@@ -60,9 +60,11 @@ test('facts are worked out from the sizes', () => {
   assert.equal(ffOne.dualBoltPattern, false);
   assert.equal(seriesFacts(findSixnineSeries('evo-one')!).dualBoltPattern, true);
   assert.equal(diameterRange(seriesFacts(findSixnineSeries('ff-two')!)), '21″');
-  // A series is called flow forged only when most of its sizes say so.
-  assert.equal(findSixnineSeries('evo-one')!.construction, null);
-  assert.equal(findSixnineSeries('ff-three')!.construction, 'Flow forged');
+  // The owner confirmed every wheel the shop sells is forged: no series or size says flow formed.
+  for (const series of SIXNINE_SERIES) {
+    assert.equal(series.construction, 'Forged', series.code);
+    for (const size of series.sizes) assert.doesNotMatch(size.construction ?? '', /flow/i, series.code);
+  }
 });
 
 test('sizes read the Sixnine way and sort by diameter, width and offset, sets last', () => {
@@ -83,4 +85,13 @@ test('every Sixnine listing in stock belongs to a Sixnine series (FF-1 is the FF
   assert.equal(sixnineSeriesOfWheel({ modelCode: 'FF-1' })?.code, 'FF-ONE');
   assert.equal(sixnineSeriesOfWheel({ modelCode: 'ff-3' })?.code, 'FF-THREE');
   assert.equal(sixnineSeriesOfWheel({ modelCode: 'FSA001' }), undefined);
+});
+
+test('About Sixnine: every fact names a Sixnine page as its source, and no German approval is claimed', async () => {
+  const { SIXNINE_ABOUT, SIXNINE_PERSONALISATION, SIXNINE_SOURCES } = await import('./sixnineAbout');
+  for (const url of Object.values(SIXNINE_SOURCES)) assert.match(url, /^https:\/\/sixnine-wheels\.com\//);
+  assert.equal(SIXNINE_ABOUT.configuratorLooks, 3950);
+  assert.equal(SIXNINE_PERSONALISATION.length, 3);
+  const text = JSON.stringify([SIXNINE_ABOUT, SIXNINE_PERSONALISATION]);
+  assert.doesNotMatch(text, /T[ÜU]V|certif|approv/i);
 });

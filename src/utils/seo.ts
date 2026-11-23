@@ -12,6 +12,7 @@ import { SITE, socialLinks } from '../config/site';
 import { normalizePath } from './redirects';
 import { blogLastmod, blogMetaForPath, blogSitemapPaths } from './blogSeo';
 import { designCodes, joinList } from './brandFitment';
+import { listingDiameters, listingFitment, sixnineSizesForListing } from './listingSpecs';
 import {
   diameterRange,
   findSixnineSeries,
@@ -21,6 +22,7 @@ import {
   SIXNINE_SERIES,
   sixnineSeriesOfWheel,
   type SixnineSeries,
+  SHOP_CONSTRUCTION,
 } from '../data/sixnineSeries';
 
 /**
@@ -171,6 +173,35 @@ function wheelCrumbs(wheel: BrandWheelItem, path: string): Record<string, unknow
   return trail.map((crumb, index) => ({ '@type': 'ListItem', position: index + 1, ...crumb }));
 }
 
+/**
+ * A Sixnine listing whose sizes match Sixnine's published ones gets the title and description the
+ * sixnine-product-listing skill gives a product page: brand, series and finish, then the sizes and
+ * bolt pattern, all from the listing and sixnineRange.json. Null for any other listing.
+ */
+function sixnineWheelSearchText(wheel: BrandWheelItem, sets: number): { title: string; description: string } | null {
+  const sizes = sixnineSizesForListing(wheel);
+  const { pcd } = listingFitment(wheel.technicalSpecSheet);
+  if (!sizes.length || !pcd) return null;
+  const diameters = listingDiameters(wheel.sizesAvailable);
+  const title = `Sixnine ${wheel.model} ${diameters.join('/')} inch ${pcd} wheels`;
+  const sizeText = joinList(
+    sizes.map((size) => `${size.width ?? ''}Jx${size.diameter ?? ''}${size.offset !== null ? ` ET${size.offset}` : ''}`)
+  );
+  const builds = Array.from(new Set(sizes.map((size) => size.construction)));
+  const concaves = sizes.map((size) => size.concavityMm).filter((v): v is number => v !== null);
+  const benefit = [
+    // The size's own build when they agree, else the shop's: every wheel it sells is forged (owner, 2026-11-23).
+    (builds.length === 1 && builds[0] ? builds[0] : SHOP_CONSTRUCTION).toLowerCase(),
+    concaves.length ? `up to ${Math.max(...concaves)} mm concave` : '',
+  ].filter(Boolean);
+  const stock = `${formatZAR(wheel.priceZAR)} per set of four. In stock: ${sets} ${sets === 1 ? 'set' : 'sets'}.`;
+  const lead = `Sixnine ${wheel.model}, ${sizeText}, PCD ${pcd}${benefit.length ? `: ${benefit.join(', ')}` : ''}.`;
+  const withCar = wheel.compatibleCars ? `${lead} For BMW ${wheel.compatibleCars}. ${stock}` : '';
+  // The car is left out when it would push the description past what search results show.
+  const description = withCar && withCar.length <= 160 ? withCar : `${lead} ${stock}`;
+  return { title, description };
+}
+
 function wheelMeta(wheel: BrandWheelItem): PageMeta {
   const path = `/wheels/${wheel.slug}`;
   const facts = [
@@ -179,17 +210,21 @@ function wheelMeta(wheel: BrandWheelItem): PageMeta {
     wheel.technicalSpecSheet ?? '',
   ].filter(Boolean);
   const sets = wheel.stockQuantitySets ?? 0;
-  const description = [
-    `${wheel.model} forged wheels${facts.length ? ` ${facts.join(', ')}` : ''}.`,
-    `${formatZAR(wheel.priceZAR)} per set of four.`,
-    `In stock: ${sets} ${sets === 1 ? 'set' : 'sets'}.`,
-  ]
-    .filter(Boolean)
-    .join(' ');
+  const sixnine = sixnineWheelSearchText(wheel, sets);
+  const description =
+    sixnine?.description ??
+    [
+      `${wheel.model} forged wheels${facts.length ? ` ${facts.join(', ')}` : ''}.`,
+      `${formatZAR(wheel.priceZAR)} per set of four.`,
+      `In stock: ${sets} ${sets === 1 ? 'set' : 'sets'}.`,
+    ]
+      .filter(Boolean)
+      .join(' ');
   const image = getWheelImages(wheel).images[0];
   const brand = wheelBrand(wheel);
   return {
-    title: `${wheel.model} forged wheels | ${SITE_NAME}`,
+    // A Sixnine title drops the site name when it would not fit (page() does the same for other pages).
+    title: sixnine ? page(sixnine.title, description, path).title : `${wheel.model} forged wheels | ${SITE_NAME}`,
     description,
     canonicalPath: path,
     noindex: false,

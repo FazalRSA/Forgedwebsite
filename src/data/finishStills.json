@@ -1,0 +1,37 @@
+{
+  "FSA003": {
+    "silver": "/images/wheels/finishes/fsa003-silver.webp",
+    "satin-black": "/images/wheels/finishes/fsa003-satin-black.webp",
+    "champagne-bronze": "/images/wheels/finishes/fsa003-champagne-bronze.webp",
+    "dark-gunmetal": "/images/wheels/finishes/fsa003-dark-gunmetal.webp"
+  },
+  "FF-1": {
+    "hyper-silver": "/images/wheels/finishes/ff-1-hyper-silver.webp",
+    "liquid-metal": "/images/wheels/finishes/ff-1-liquid-metal.webp",
+    "glossy-black": "/images/wheels/finishes/ff-1-glossy-black.webp"
+  },
+  "FSA004": {
+    "silver": "/images/wheels/finishes/fsa004-silver.webp",
+    "satin-black": "/images/wheels/finishes/fsa004-satin-black.webp",
+    "champagne-bronze": "/images/wheels/finishes/fsa004-champagne-bronze.webp",
+    "dark-gunmetal": "/images/wheels/finishes/fsa004-dark-gunmetal.webp"
+  },
+  "FF-3": {
+    "liquid-metal": "/images/wheels/finishes/ff-3-liquid-metal.webp",
+    "glossy-black": "/images/wheels/finishes/ff-3-glossy-black.webp",
+    "hyper-silver": "/images/wheels/finishes/ff-3-hyper-silver.webp",
+    "pure-bronze": "/images/wheels/finishes/ff-3-pure-bronze.webp"
+  },
+  "FSA001": {
+    "silver": "/images/wheels/finishes/fsa001-silver.webp",
+    "satin-black": "/images/wheels/finishes/fsa001-satin-black.webp",
+    "champagne-bronze": "/images/wheels/finishes/fsa001-champagne-bronze.webp",
+    "dark-gunmetal": "/images/wheels/finishes/fsa001-dark-gunmetal.webp"
+  },
+  "FSA002": {
+    "silver": "/images/wheels/finishes/fsa002-silver.webp",
+    "satin-black": "/images/wheels/finishes/fsa002-satin-black.webp",
+    "champagne-bronze": "/images/wheels/finishes/fsa002-champagne-bronze.webp",
+    "dark-gunmetal": "/images/wheels/finishes/fsa002-dark-gunmetal.webp"
+  }
+}

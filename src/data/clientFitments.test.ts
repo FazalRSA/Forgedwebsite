@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { CLIENT_FITMENTS, FITMENT_FAMILIES } from './clientFitments';
+import { getAllBrandWheels } from './catalogue';
 
 test('the gallery is not empty and has at least one model family', () => {
   assert.ok(CLIENT_FITMENTS.length > 0, 'CLIENT_FITMENTS must not be empty');
@@ -43,4 +44,23 @@ test('filter families cover every fitment and list BMW M cars first', () => {
   for (const f of CLIENT_FITMENTS) assert.ok(FITMENT_FAMILIES.includes(f.family));
   const bmwOrder = ['M2', 'M3', 'M4', 'M5'].filter((m) => FITMENT_FAMILIES.includes(m));
   assert.deepEqual(FITMENT_FAMILIES.slice(0, bmwOrder.length), bmwOrder);
+});
+
+test('a wheel button links only to an in-stock listing, and marks only the two studio photos', () => {
+  const inStock = new Set(getAllBrandWheels().map((w) => w.slug));
+  for (const f of CLIENT_FITMENTS) {
+    if (!f.hotspots) continue;
+    assert.ok(f.wheelSlug, `${f.id} has hotspots but no wheelSlug to link to`);
+    assert.ok(inStock.has(f.wheelSlug), `${f.id} links to ${f.wheelSlug}, which is not an in-stock listing`);
+    assert.equal(f.hotspots.length, 2, `${f.id} marks the two studio photos only`);
+    f.hotspots.forEach((spot, index) => {
+      if (spot === null) return;
+      for (const point of [spot.rim, spot.label]) {
+        assert.ok(
+          point.x >= 0 && point.x <= 100 && point.y >= 0 && point.y <= 100,
+          `${f.id} photo ${index + 1} has a point outside the photo`,
+        );
+      }
+    });
+  }
 });

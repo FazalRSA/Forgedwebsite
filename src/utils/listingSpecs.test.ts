@@ -7,7 +7,10 @@ import { listingDiameters, listingFitment, sixnineSizesForListing } from './list
 test('a listing\'s diameters, offsets and bolt pattern are read from its own record', () => {
   assert.deepEqual(listingDiameters('20 inch / 21 inch'), [20, 21]);
   assert.deepEqual(listingFitment('PCD 5×112 · ET15/20 · CB66.6'), { offsets: [15, 20], pcd: '5x112' });
-  assert.deepEqual(listingFitment(undefined), { offsets: [], pcd: undefined });
+  // A sheet it cannot read names what is missing rather than throwing.
+  assert.deepEqual(listingFitment(undefined), { offsets: [], problem: 'no spec sheet' });
+  assert.equal(listingFitment('CB66.6').problem, 'no bolt pattern');
+  assert.equal(listingFitment('PCD 5×112 · CB66.6').problem, 'no offset');
 });
 
 test('each stocked FF set matches one Sixnine size per diameter', () => {
@@ -37,8 +40,9 @@ test('a Forged SA listing has no Sixnine sizes', () => {
 // dropping a wheel's technical data.
 test('every Sixnine listing in stock has a readable spec sheet and a Sixnine size per diameter', () => {
   for (const wheel of getAllBrandWheels().filter(isSixnineWheel)) {
-    const { offsets, pcd } = listingFitment(wheel.technicalSpecSheet);
+    const { offsets, pcd, problem } = listingFitment(wheel.technicalSpecSheet);
     const diameters = listingDiameters(wheel.sizesAvailable);
+    assert.equal(problem, undefined, `${wheel.slug}: ${problem} in "${wheel.technicalSpecSheet}"`);
     assert.ok(pcd, `${wheel.slug}: no bolt pattern in "${wheel.technicalSpecSheet}"`);
     assert.ok(offsets.length && offsets.every(Number.isFinite), `${wheel.slug}: no offset in "${wheel.technicalSpecSheet}"`);
     assert.ok(diameters.length, `${wheel.slug}: no diameter in "${wheel.sizesAvailable}"`);

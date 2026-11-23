@@ -13,7 +13,7 @@ overwritten by `pull` and a check fails if someone edits it by hand.
 | `WheelStudio.tsx` | The stage (three.js scene, studio reflections, camera views, exploded view, Front/Rear) and its controls |
 | `paint.ts` | `StudioFinish` rows and the `PaintRenderer` plug-in: how a finish becomes a material |
 | `studioEnvironment.ts` | The studio reflections (softboxes and flags), shared by the stage and the swatches |
-| `swatch.ts`, `FinishSwatch.tsx` | Photoreal finish swatches: a ball in the finish's own paint under the same reflections, drawn once, cached, one WebGL context per batch; a drawn ball when WebGL is missing |
+| `swatch.ts`, `FinishSwatch.tsx` | Finish swatches: the picture in `StudioFinish.swatchImage` (a studio render of the wheel in that colour) when given, otherwise a ball in the finish's paint under the same reflections, drawn once, cached, one WebGL context per batch; a drawn ball when WebGL is missing |
 | `wheelStudioParts.ts` | Which part a mesh is, how far each part moves exploded (pure, unit-tested in the website) |
 | `wheel-viewer.css` | All styles, plain CSS. Theme it with the `--wv-*` variables |
 | `index.ts` | The public exports |

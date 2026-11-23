@@ -3,6 +3,9 @@
 // Car make/model/paint were read off each phone photo and should be confirmed by the shop;
 // wheel model, sizes, finish name and city are optional and shown only when filled in.
 
+export interface FitmentPoint { x: number; y: number }
+export interface FitmentHotspot { rim: FitmentPoint; label: FitmentPoint }
+
 export interface ClientFitment {
   id: string;
   slotLabel: string;
@@ -27,6 +30,9 @@ export interface ClientFitment {
   imageLabels: [string, string, string];
   /** File name of the customer's original photo in Drive; served as images[2]. */
   sourcePhoto: string;
+  /** Optional: where the wheel sits on each studio photo (percent of the photo), and where its
+   *  'View wheel' button goes. Only shown on the studio photos when wheelSlug is set. */
+  hotspots?: [FitmentHotspot | null, FitmentHotspot | null];
 }
 
 export const CLIENT_FITMENTS: ClientFitment[] = [

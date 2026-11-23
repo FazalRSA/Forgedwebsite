@@ -27,8 +27,14 @@ export const WHEEL_IMAGE_WIDTHS: Record<string, readonly number[]> = {
 
 const SITE_PHOTO = /^(\/images\/wheels\/[^/]+\/)(front|hero|profile|cutout)\.webp$/;
 
+/** Sixnine's series renders: /images/sixnine/renders/<series>.webp, with a <series>-600.webp copy. */
+const RENDER = /^(\/images\/sixnine\/renders\/)([a-z-]+)\.webp$/;
+export const RENDER_WIDTHS: readonly number[] = [600, 1000];
+
 /** The smaller copies of a site photo, smallest first, or [] when the path is not a site photo. */
 export function wheelImageVariants(src: string): string[] {
+  const render = RENDER.exec(src);
+  if (render) return RENDER_WIDTHS.slice(0, -1).map((width) => `${render[1]}${render[2]}-${width}.webp`);
   const match = SITE_PHOTO.exec(src);
   if (!match) return [];
   const [, folder, name] = match;
@@ -42,6 +48,10 @@ export function wheelImageVariants(src: string): string[] {
  * there is a srcset for the browser to choose from.
  */
 export function wheelImageSrcSet(src: string, sizes: string): WheelImageSources {
+  if (RENDER.test(src)) {
+    const candidates = [...wheelImageVariants(src), src];
+    return { src, srcSet: candidates.map((path, i) => `${path} ${RENDER_WIDTHS[i]}w`).join(', '), sizes };
+  }
   const match = SITE_PHOTO.exec(src);
   if (!match) return { src };
   const [, , name] = match;

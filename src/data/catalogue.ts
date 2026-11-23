@@ -46,56 +46,56 @@ export const WHEEL_FINISHES: Record<WheelFinishId, WheelFinishOption> = {
   'silver': {
     id: 'silver',
     name: 'Silver / Liquid Metal',
-    swatchHex: '#D8DCE0',
+    swatchHex: '#CFCFCD',
     secondaryHex: '#8E959E',
     rimAccentHex: '#F3F5F7',
   },
   'satin-black': {
     id: 'satin-black',
     name: 'Black Matte / Gloss Black',
-    swatchHex: '#1B1C1E',
+    swatchHex: '#2B2B2A',
     secondaryHex: '#0D0E10',
     rimAccentHex: '#484B52',
   },
   'champagne-bronze': {
     id: 'champagne-bronze',
     name: 'Gold / Pure Bronze',
-    swatchHex: '#C5A059',
+    swatchHex: '#B19F7D',
     secondaryHex: '#6E552B',
     rimAccentHex: '#E5C888',
   },
   'dark-gunmetal': {
     id: 'dark-gunmetal',
     name: 'Hyper Black',
-    swatchHex: '#4A4E54',
+    swatchHex: '#5B5B59',
     secondaryHex: '#26292E',
     rimAccentHex: '#7A8088',
   },
   'liquid-metal': {
     id: 'liquid-metal',
     name: 'Liquid Metal',
-    swatchHex: '#E2E6EC',
+    swatchHex: '#B4B4B2',
     secondaryHex: '#9AA1AB',
     rimAccentHex: '#FFFFFF',
   },
   'hyper-silver': {
     id: 'hyper-silver',
     name: 'Hyper Silver',
-    swatchHex: '#C9CDD3',
+    swatchHex: '#C6C6C4',
     secondaryHex: '#8E959E',
     rimAccentHex: '#F3F5F7',
   },
   'glossy-black': {
     id: 'glossy-black',
     name: 'Glossy Black',
-    swatchHex: '#1B1C1E',
+    swatchHex: '#262624',
     secondaryHex: '#0D0E10',
     rimAccentHex: '#484B52',
   },
   'pure-bronze': {
     id: 'pure-bronze',
     name: 'Pure Bronze',
-    swatchHex: '#B8864D',
+    swatchHex: '#7A5B49',
     secondaryHex: '#6E552B',
     rimAccentHex: '#D9AE76',
   },
@@ -264,11 +264,11 @@ interface RawInventorySeed {
  * studio repaints it. FSA001 sets its own front/rear pair on the seed instead.
  */
 export const MODEL_URL_BY_CODE: Partial<Record<RawInventorySeed['modelCode'], string>> = {
-  FSA002: '/models/wheels/fsa002-forked-v3.glb',
-  FSA003: '/models/wheels/fsa003-v5.glb',
-  FSA004: '/models/wheels/fsa004-v5.glb',
-  'FF-1': '/models/wheels/ff-1-sixnine-v3.glb',
-  'FF-3': '/models/wheels/ff-3-sixnine-v3.glb',
+  FSA002: '/models/wheels/fsa002-forked-v4.glb',
+  FSA003: '/models/wheels/fsa003-v6.glb',
+  FSA004: '/models/wheels/fsa004-v6.glb',
+  'FF-1': '/models/wheels/ff-1-sixnine-v4.glb',
+  'FF-3': '/models/wheels/ff-3-sixnine-v4.glb',
 };
 
 /** The traced model of a design, by its code ("FSA002"); undefined for a design with no model yet. */

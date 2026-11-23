@@ -84,3 +84,17 @@ test('every smaller copy of every photographed listing exists on disk', () => {
   }
   assert.ok(checked > 0, 'no site photos were checked');
 });
+
+test('a Sixnine series render gets its 600 px copy in the srcset, and both files exist', async () => {
+  const { SIXNINE_RANGE } = await import('../data/sixnineRange');
+  assert.deepEqual(wheelImageSrcSet('/images/sixnine/renders/ff-one.webp', '90vw'), {
+    src: '/images/sixnine/renders/ff-one.webp',
+    srcSet: '/images/sixnine/renders/ff-one-600.webp 600w, /images/sixnine/renders/ff-one.webp 1000w',
+    sizes: '90vw',
+  });
+  for (const design of SIXNINE_RANGE) {
+    for (const file of [...wheelImageVariants(design.render), design.render]) {
+      assert.ok(existsSync(join(publicDir, file)), `${file} is missing from public/`);
+    }
+  }
+});

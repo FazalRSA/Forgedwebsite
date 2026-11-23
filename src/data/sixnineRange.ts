@@ -40,6 +40,12 @@ export interface SixnineDesign {
   stockedCode?: string;
   /** A face-on studio picture from Sixnine, saved in public/images/sixnine. */
   image: string;
+  /**
+   * Sixnine's own three-quarter render of the series, from sixnine-wheels.com, saved in
+   * public/images/sixnine/renders (a 600 px copy beside it). The owner confirmed on 23 November 2026
+   * that the shop, as an official dealer, may use Sixnine's renders.
+   */
+  render: string;
   /** The design's page on sixnine-wheels.com. */
   sourceUrl: string;
 }
@@ -53,7 +59,7 @@ export const SIXNINE_RANGE: readonly SixnineDesign[] = [
     tagline: 'One wheel, five designs',
     summary:
       "Sixnine's first design. Run it plain, or fit one of three inlays (V-ONE, V-TWO, X-ONE) or the AeroRing to change its look. Chrome-look stainless bolts on the lip give it the look of a two-piece wheel.",
-    construction: 'Flow-formed one-piece, two-piece look',
+    construction: 'Forged one-piece, two-piece look',
     diameters: '19–22"',
     widths: '8.5–11.5J',
     boltPatterns: ['5x112', '5x114.3', '5x120'],
@@ -66,6 +72,7 @@ export const SIXNINE_RANGE: readonly SixnineDesign[] = [
     editions: ['BMW M5 G90/G99 two-piece forged set (11x21 front, 11.5x22 rear, 5x132)'],
     stockedCode: 'FF-1',
     image: '/images/sixnine/ff-one.webp',
+    render: '/images/sixnine/renders/ff-one.webp',
     sourceUrl: `${SIXNINE}/ff-one`,
   },
   {
@@ -74,7 +81,7 @@ export const SIXNINE_RANGE: readonly SixnineDesign[] = [
     tagline: 'Lightweight and timeless',
     summary:
       'A clean ten-spoke with a deep concave. A one-piece forged Forged Series version is also made to order for the Audi RS4/RS5 B9.',
-    construction: 'Flow-formed; Forged Series is one-piece forged',
+    construction: 'Forged',
     diameters: '21"',
     widths: '10–10.5J',
     boltPatterns: ['5x112'],
@@ -85,6 +92,7 @@ export const SIXNINE_RANGE: readonly SixnineDesign[] = [
     ],
     editions: ['Audi RS4/RS5 B9 one-piece forged Forged Series (10.5x21 ET25), made to order in 8–10 weeks'],
     image: '/images/sixnine/ff-two.webp',
+    render: '/images/sixnine/renders/ff-two.webp',
     sourceUrl: `${SIXNINE}/ff-two`,
   },
   {
@@ -105,6 +113,7 @@ export const SIXNINE_RANGE: readonly SixnineDesign[] = [
     editions: ['Audi RS5 B10 (10.5x21), on pre-order for delivery in March 2027'],
     stockedCode: 'FF-3',
     image: '/images/sixnine/ff-three.webp',
+    render: '/images/sixnine/renders/ff-three.webp',
     sourceUrl: `${SIXNINE}/ff-three`,
   },
   {
@@ -123,6 +132,7 @@ export const SIXNINE_RANGE: readonly SixnineDesign[] = [
       { label: 'Load rating', value: '650–690 kg' },
     ],
     image: '/images/sixnine/evo-one.webp',
+    render: '/images/sixnine/renders/evo-one.webp',
     sourceUrl: `${SIXNINE}/evo-one-wheel`,
   },
   {
@@ -130,8 +140,8 @@ export const SIXNINE_RANGE: readonly SixnineDesign[] = [
     name: 'EVO-TWO',
     tagline: 'New Y-spokes, maximum lip depth',
     summary:
-      'Newly drawn Y-spokes that run out to a lip as deep as a multi-piece wheel, made possible by flow-forming the barrel. All sizes are drilled for both 5x112 and 5x120.',
-    construction: 'Flow-formed one-piece, two-piece look',
+      'Newly drawn Y-spokes that run out to a lip as deep as a multi-piece wheel. All sizes are drilled for both 5x112 and 5x120.',
+    construction: 'Forged one-piece, two-piece look',
     diameters: '20–21"',
     widths: '9–11.5J',
     boltPatterns: ['5x112', '5x120'],
@@ -139,6 +149,7 @@ export const SIXNINE_RANGE: readonly SixnineDesign[] = [
     figures: [{ label: 'Load rating', value: '650–865 kg' }],
     preOrder: true,
     image: '/images/sixnine/evo-two.webp',
+    render: '/images/sixnine/renders/evo-two.webp',
     sourceUrl: `${SIXNINE}/evo-two`,
   },
   {
@@ -157,6 +168,7 @@ export const SIXNINE_RANGE: readonly SixnineDesign[] = [
       { label: 'Load rating', value: '600 kg' },
     ],
     image: '/images/sixnine/oem-one.webp',
+    render: '/images/sixnine/renders/oem-one.webp',
     sourceUrl: `${SIXNINE}/oem-one`,
   },
 ];

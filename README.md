@@ -59,7 +59,7 @@ It shows the wheels that are in stock, each in photography and an interactive 3D
 Six pages, plus the privacy notice. The shop sells two brands, and the site is organised by them: **Forged SA** (the shop's own designs, every design code starting `FSA`) and **Sixnine Wheels** (sold as an official dealer, every code starting `FF`). `brandOfWheel` and `WHEEL_BRANDS` in `src/data/catalogue.ts` hold that rule and each brand's name, page and logo; a test fails if a listing's code is neither, so a new design is never left without a brand.
 
 - **Home (`/`).** Opens with the hero over the brand film: the headline "Forged Custom Wheels. Turning dreams into reality.", the owner's installs figure as a pill ("Over 80 successful wheels installed this year.", from `SITE.installsThisYear`, shown only during the year it counts), a white "See wheels in stock" button and a glass "See our installs" button, then "Our Industry Partners": the Sixnine Wheels (official dealer, linked to its page) and BMW logos as glass chips (`#partners`, from `src/data/partners.ts`). Then what is in stock, grouped by brand (Forged SA first, then Sixnine). Each group opens with the brand's logo and name, what the shop is to it ("Our own brand", "Official dealer"), how many designs and sets are in stock, and a link to the brand's page. Under it, one large dark card per wheel design (rows of three and two on wide screens, a lone last design full width; two columns on tablets, one on phones). Each card shows the design's wheel cut out on the dark card, its name, how many finishes are in stock, the lowest price per set of four, the finishes and sizes, all worked out from the catalogue (`src/utils/designCards.ts`); it links to the design's first photographed listing, whose page offers the other finishes. Then customer installs, Google reviews, the blog teaser and "Ask AI about us". Each section opens with an eyebrow label over its heading.
-- **Wheel page (`/wheels/:slug`).** One in-stock listing: photos, price per set of four, sizes and specification. The gallery works like SIXNINE's product page: arrows, an `n / total` counter and a row of thumbnails, running through this listing's cut-out and photos and then the same design's other finishes in stock, each of those labelled with its finish and linked to its own page. A Sixnine listing also shows a **Technical data** table, one column per size: Sixnine's published wheel size, offset, bolt pattern, load rating, centre bore, concavity and weight for the sizes the set is. `sixnineSizesForListing` (`src/utils/listingSpecs.ts`) finds them from the listing's own diameters, offsets and bolt pattern, and leaves out any diameter that does not match exactly one Sixnine size. Colours are **photoreal swatches** (`ColourSwatches.tsx`: a ball in the finish's own paint under the 3D studio's reflections, drawn once and cached; a drawn ball stands in until it is ready or without WebGL). They come in two groups: the design's finishes that are **in stock** (the one on this page shows on the 3D wheel when tapped; the others open their own listing), and its **other colours, to order**, always shown with the notice that a lead time of 3 months applies. Tapping a to-order swatch opens the 3D view in that colour and offers an "Ask about" button. The 3D viewer loads only when the visitor taps "View in 3D" (or a colour swatch). A "See it on my car" button (on while `carPreviewUrl` is set, as it is today) lets a visitor choose a photo of their car and see an AI-made impression of the wheel on it (see [See it on my car](#see-it-on-my-car-ai-preview)). The enquiry button opens the enquiry form with the design, finish and sizes filled in; a to-order colour prefills the colour and the lead time. The form logs the enquiry through n8n and then opens WhatsApp (see [Lead delivery](#lead-delivery-n8n)).
+- **Wheel page (`/wheels/:slug`).** One in-stock listing: photos, price per set of four, sizes and specification. The gallery works like SIXNINE's product page: arrows, an `n / total` counter and a row of thumbnails, running through this listing's cut-out and photos and then the same design's other finishes in stock, each of those labelled with its finish and linked to its own page. A Sixnine listing also shows a **Technical data** table, one column per size: Sixnine's published wheel size, offset, bolt pattern, load rating, centre bore, concavity and weight for the sizes the set is. `sixnineSizesForListing` (`src/utils/listingSpecs.ts`) finds them from the listing's own diameters, offsets and bolt pattern, and leaves out any diameter that does not match exactly one Sixnine size. Colours are **photoreal swatches** (`ColourSwatches.tsx`): each shows a studio render of this design's wheel in that colour (`public/images/wheels/finishes/`, listed in `src/data/finishStills.json`); the same picture is on the 3D viewer's finish chips. A drawn paint ball stands in for a design or colour with no render yet. They come in two groups: the design's finishes that are **in stock** (the one on this page shows on the 3D wheel when tapped; the others open their own listing), and its **other colours, to order**, always shown with the notice that a lead time of 3 months applies. Tapping a to-order swatch opens the 3D view in that colour and offers an "Ask about" button. The 3D viewer loads only when the visitor taps "View in 3D" (or a colour swatch). A "See it on my car" button (on while `carPreviewUrl` is set, as it is today) lets a visitor choose a photo of their car and see an AI-made impression of the wheel on it (see [See it on my car](#see-it-on-my-car-ai-preview)). The enquiry button opens the enquiry form with the design, finish and sizes filled in; a to-order colour prefills the colour and the lead time. The form logs the enquiry through n8n and then opens WhatsApp (see [Lead delivery](#lead-delivery-n8n)).
 - **Installs (`/installs`).** Customer cars the shop has fitted (BMW M cars and one Audi RS3; no install is linked to a catalogue wheel). Each install opens to three photos: two studio re-shoots made from the customer's own photo, then that photo itself with the number plate pixelated.
 - **Forged SA page (`/forged-sa-wheels`, "Forged SA" in the menu).** The shop's own brand: every FSA set in stock, and a fitment summary. It says only what the owner has confirmed: the FSA designs are Forged SA's own, and they are forged. Every number on it is worked out from the catalogue.
 - **Design names.** Visitors see Sixnine's names for its series: FF-ONE and FF-THREE, not the short codes FF-1 and FF-3 (`designName` in `src/data/catalogue.ts`). The codes stay the key for slugs, models, tests and the structured-data SKU.
@@ -75,7 +75,7 @@ Six pages, plus the privacy notice. The shop sells two brands, and the site is o
   - every size Sixnine lists, as cards with offset, load rating, centre bore, concavity and weight, filterable by bolt pattern, each with an "Ask about this size" button;
   - the other series, then an enquiry row.
 
-  The sizes come from `src/data/sixnineRange.json` (see [The Sixnine range data](#the-sixnine-range-data)). Stock and prices come only from the catalogue: FF-1 listings are the FF-ONE, FF-3 the FF-THREE (`sixnineSeriesOfWheel`). Sixnine's renders are not used; a series without a photo of the shop's own shows its name, outlined.
+  The sizes come from `src/data/sixnineRange.json` (see [The Sixnine range data](#the-sixnine-range-data)). Stock and prices come only from the catalogue: FF-1 listings are the FF-ONE, FF-3 the FF-THREE (`sixnineSeriesOfWheel`). The hero, the series cards and the mega menu show Sixnine's own three-quarter render of each series (`public/images/sixnine/renders/`; the owner confirmed on 23 November 2026 that the shop, as an official dealer, may use them). Stock cards and wheel pages keep the shop's own photos.
 - **Navigation.** The header reads Forged SA · Sixnine · Installs · Blog · Contact, with the Enquire button beside it. The brand links open the brand pages, and a wheel page marks its own brand as the current section. Beside "Sixnine" a chevron button opens the mega menu: the dealer page on the left, a tile per series on the right (the shop's photo or the series name, construction and diameters, and "In stock" when the shop has it). It is a disclosure (a link plus a button with `aria-expanded`), not an ARIA menu. It opens on click, or on hover with a mouse, and closes on Escape (focus returns to the button), on a click outside, when focus leaves it, or on a new page. In the phone menu, the same button under "Sixnine" lists the series. From 1024 px the links sit in the header; below that they are behind the menu button (five links and the button do not fit beside the logo at tablet width). On a wheel page, the line under the name names the brand and links to its page, the back link returns to the brand page, and the breadcrumb in the structured data is Home › brand › wheel. The footer links the wheels in stock, both brand pages, installs, the blog, contact and the privacy notice.
 - **Search-ready pages.** Per-route titles, descriptions, canonical URLs, link-preview tags, structured data (each wheel's Product names its brand: Forged SA or Sixnine) and a generated sitemap.
 - **AI-ready.** `/llms.txt` gives AI assistants the stock list, prices and contact details as plain text (see [For AI assistants and coding agents](#for-ai-assistants-and-coding-agents)).
@@ -95,7 +95,7 @@ Every change below is a file edit, then a pull request. Merging to `main` publis
 | Add a new listing | `bun run add-wheel` | Same section |
 | Add or replace a 3D model | A `.glb` in `public/models/wheels/` and `MODEL_URL_BY_CODE` (or the listing's `modelUrl`) in `catalogue.ts` | [docs/adding-3d-models.md](docs/adding-3d-models.md) and the `add-wheel-model` skill |
 | Rebuild all 3D models, or check all listings | `npm run build-wheel-models -- --src-dir <folder>`, then `npm run qa-wheels` | [docs/adding-3d-models.md](docs/adding-3d-models.md#doing-all-the-wheels-at-once) |
-| Change how a finish looks in 3D | `src/data/studioFinishes.ts` | Check the wheel page in the viewer. Its swatches are drawn from the same numbers, so they follow |
+| Change how a finish looks in 3D | `src/data/studioFinishes.ts` | Paints are fitted to the real photos (a few designs have their own row in `DESIGN_FINISH_PBR`). After changing one, run `pip install bpy pillow numpy` then `python3 scripts/render-finish-stills.py` to redraw the swatch stills and `finishStills.json`, and check the wheel page in the viewer |
 | Change the to-order lead time | `TO_ORDER_LEAD_TIME` in `catalogue.ts` | Nothing else; pages and `llms.txt` read it |
 | Change the phone, WhatsApp, address or social links | `src/config/site.ts` | Nothing else; empty values are hidden |
 | Switch "See it on my car" on or off | Set `carPreviewUrl` in `src/config/site.ts` (a Worker address to switch on, `''` to switch off). Changing the Worker itself: `worker/car-preview/` | See [See it on my car](#see-it-on-my-car-ai-preview); the privacy notice updates itself |
@@ -166,7 +166,7 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
 | `/installs` | `ClientFitmentsPage` | Customer cars the shop has fitted |
 | `/forged-sa-wheels` | `ForgedSaPage` | The shop's own brand: every FSA set in stock, fitment summary |
 | `/sixnine-wheels` | `SixnineDealerPage` | Official Sixnine dealer page: about Sixnine Wheels, every FF set in stock |
-| `/sixnine-wheels/:series` | `SixnineSeriesPage` | One Sixnine series: facts, finishes, sets in stock here, every size Sixnine lists. An unknown series shows the 404 page |
+| `/sixnine-wheels/:series` | `SixnineSeriesPage` | One Sixnine series: facts, finishes, sets in stock here (with a "View in 3D" of the stocked design), every size Sixnine lists. An unknown series shows the 404 page |
 | `/contact` | `ContactPage` | WhatsApp, phone, address, areas served |
 | `/account` | `AccountPage` | Customer account shared with the configurator. Lazy route, noindex, not in the sitemap |
 | `/privacy-policy` | `PrivacyPolicyPage` | Privacy notice (POPIA): what is collected, by whom, and how to make a request |
@@ -227,6 +227,7 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
 │  └─ fitment-reshoot/            Pipeline for the install studio re-shoots (jobs.json, Python scripts, README.md)
 ├─ docs/adding-3d-models.md       The owner's steps for adding or replacing a wheel's 3D model, and the limits of AI models
 ├─ docs/installs-pipeline.md      How the Installs gallery is made, with animated diagrams (docs/assets/)
+├─ docs/google-tag-manager/       forged-enquiry-events.json: the GTM import that sends the site's enquiry and car-preview events to GA4
 ├─ docs/blog-seo-plan.md          The blog's keyword map, on-page checklist and how to refine it in Search Console
 ├─ docs/render-blog-rewrites.md   The 24 blog rewrite rules to paste into a Render service whose routes are set by hand
 ├─ worker/car-preview/            Cloudflare Worker behind "See it on my car" (not part of the website build): src/handler.ts, its tests, wrangler.toml, dev-server.mjs, README.md
@@ -239,9 +240,13 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
    ├─ config/site.ts              Business identity and contact channels
    ├─ data/catalogue.ts           Types, the 14 stock listings, in-stock filter, siblings, to-order colours, helpers
    ├─ data/customWheels.json      Photography for stock listings, and listings added by the CLI
-   ├─ data/studioFinishes.ts      Paint settings per finish for the 3D viewer
+   ├─ data/studioFinishes.ts      Paint settings per finish (and per design where needed) for the 3D viewer, fitted to the real photos
+   ├─ data/finishStills.ts/.json  The swatch still of each design in each colour (made by scripts/render-finish-stills.py)
    ├─ data/clientFitments.ts      Customer installs data
    ├─ data/partners.ts            Industry partners shown on the home page
+   ├─ data/googleReviews.ts       Google reviews for the home page, copied word for word (empty until real ones are added)
+   ├─ data/sixnineRange.json      Every size Sixnine lists (see The Sixnine range data)
+   ├─ data/sixnineRange.ts        Sixnine's full range, design by design, for the range section on /sixnine-wheels
    ├─ wheel-viewer/               The 3D wheel viewer, shared with the BMW configurator: stage, paint, swatches, part classification (edited only here; see its README.md)
    ├─ store/                      Zustand store (enquiry form, admin preview) in localStorage
    ├─ context/AccountContext.tsx  Customer account provider (Supabase Auth, profile, builds); mounted by the account page only
@@ -260,6 +265,15 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
    ├─ utils/brandFitment.ts       A brand page's design list and fitment-at-a-glance facts
    ├─ data/sixnineSeries.ts       The Sixnine series and sizes (from sixnineRange.json), their facts, slugs and finish swatches
    ├─ utils/askAi.ts              The "Ask AI about us" links and their question
+   ├─ utils/listingSpecs.ts       The Sixnine sizes and figures a stocked Sixnine listing matches
+   ├─ utils/sixnineShowcase.ts    Data for the "New at Sixnine" and "Find your design" cards
+   ├─ utils/designCards.ts        The home page's design cards, worked out from the in-stock listings
+   ├─ utils/heroVideo.ts          The hero film's files and posters, named in one place
+   ├─ utils/wheelImageSrcSet.ts · fitmentImageSrcSet.ts   The smaller photo copies each srcset lists
+   ├─ utils/leads.ts              Posts every enquiry to the n8n webhook (see Lead delivery)
+   ├─ utils/googleTagManager.ts   The Google Tag Manager snippet, with the Consent Mode defaults, that the build writes into every page
+   ├─ utils/consent.ts            The cookie choice: read, save, tell GTM, delete the _ga cookies on Decline
+   ├─ utils/analytics.ts          trackEvent (to Umami when set up, and to the GTM data layer) and the Umami tracker
    ├─ utils/carPreview.ts         "See it on my car": is it on, shrink the photo, talk to the Worker
    ├─ utils/wheelBuilder.ts       Builds a stock listing from a short input
    ├─ utils/wheelEnquiry.ts       Reads the spec line and words the WhatsApp enquiry
@@ -267,7 +281,7 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
       ├─ ui/                      Re-exports of the root components/ui primitives
       ├─ brand/                   Header, footer, home, catalogue (grouped by brand), wheel page, car-preview dialog, installs, the two brand pages and their shared sections, partners strip, Ask AI, contact, privacy
       ├─ admin/                   Admin uploader
-      ├─ shared/                  BrandLogo, enquiry form
+      ├─ shared/                  BrandLogo, enquiry form, cookie banner, floating WhatsApp button, social icons
       └─ visuals/                 WheelStudio (the site's wrapper around `src/wheel-viewer`), WheelStage, its loading skeleton and error boundary
 ```
 
@@ -283,7 +297,7 @@ Since November 2026 the site is built the way the SIXNINE Wheels storefront is (
 - **Selected means lighter, not blue.** The current nav link sits on a lighter pill; the active photo dot is white.
 - **Calm motion.** `.press` shrinks a control to 97 % while pressed, `.press-card` a card to 98.5 %; cards lift their hairline on hover. Both are off under reduced motion.
 - **Product cards** (`ProductCard.tsx`, on the brand pages, the series pages and the blog's in-stock blocks) follow SIXNINE's card: the whole card is one link; the wheel is contained on a soft radial tile with a stock badge; under it a small brand and series label, the finish as the title, the sizes, then the price per set with the finish's swatch.
-- **Showcase cards** (`ShowcaseCard` in `SixnineShowcase.tsx`) follow SIXNINE's large home-page cards: a tall dark tile lit from the top, the wheel at three-quarters in its upper part, a white pill badge, the name large at the bottom left (Satoshi Black) and a round arrow at the bottom right. They show the shop's own angled cut-out where there is one; otherwise the face-on range picture, turned to three-quarters in CSS. Used for the Sixnine series on the dealer page, the series pages ("More Sixnine series") and under the Sixnine group on the home page (a swipe row on phones).
+- **Showcase cards** (`ShowcaseCard` in `SixnineShowcase.tsx`) follow SIXNINE's large home-page cards: a tall dark tile lit from the top, the wheel at three-quarters in its upper part, a white pill badge, the name large at the bottom left (Satoshi Black) and a round arrow at the bottom right. They show Sixnine's three-quarter render of the series; without one, the shop's own angled cut-out, then the face-on range picture turned to three-quarters in CSS. Used for the Sixnine series on the dealer page, the series pages ("More Sixnine series") and under the Sixnine group on the home page (a swipe row on phones).
 - **Sections open with an eyebrow** (`EYEBROW_CLASS`, `src/components/brand/sectionStyles.ts`): one or two uppercase words over the heading.
 
 What stays FORGED's own: the gold logo, Satoshi Black headlines, the palette below, rose for accent text and the focus ring, the brand film, the 3D studio and the photoreal swatches.
@@ -307,11 +321,11 @@ The catalogue mirrors the stock sheet. All prices are South African Rand for a c
 | Design | Finishes | Sizes | Price (R) | 3D model |
 | --- | --- | --- | --- | --- |
 | FSA001 (2-piece) | Black Matte | 19 / 20 inch | 90,000 | `stf399-front.glb`, `stf399-rear.glb` |
-| FSA002 | Hyper Black · Polished Face | 20 / 21 inch | 75,000 · 85,000 | `fsa002-forked-v3.glb` |
-| FSA003 | Gold · Silver · Hyper Black | 20 / 21 inch | 75,000 | `fsa003-v5.glb` |
-| FSA004 | Silver · Hyper Black · Gloss Black | 20 / 21 inch | 70,000 | `fsa004-v5.glb` |
-| FF-1 | Silver (Hyper Silver) · Liquid Metal | 20 / 21 inch | 80,000 · 95,000 | `ff-1-sixnine-v3.glb` |
-| FF-3 | Pure Bronze · Glossy Black · Liquid Metal | 20 / 21 inch | 80,000 · 80,000 · 95,000 | `ff-3-sixnine-v3.glb` |
+| FSA002 | Hyper Black · Polished Face | 20 / 21 inch | 75,000 · 85,000 | `fsa002-forked-v4.glb` |
+| FSA003 | Gold · Silver · Hyper Black | 20 / 21 inch | 75,000 | `fsa003-v6.glb` |
+| FSA004 | Silver · Hyper Black · Gloss Black | 20 / 21 inch | 70,000 | `fsa004-v6.glb` |
+| FF-1 | Silver (Hyper Silver) · Liquid Metal | 20 / 21 inch | 80,000 · 95,000 | `ff-1-sixnine-v4.glb` |
+| FF-3 | Pure Bronze · Glossy Black · Liquid Metal | 20 / 21 inch | 80,000 · 80,000 · 95,000 | `ff-3-sixnine-v4.glb` |
 
 All fitments are BMW M3 (G80), 5×112, centre bore 66.6. Stock counts live in the data, not in this file.
 
@@ -413,7 +427,7 @@ A wheel with a `modelUrl` opens in the studio. The stage itself, its paint, the 
 
 **How models are assigned**
 
-- One model per wheel **design**. FSA002 is the forked-spoke wheel (`fsa002-forked-v3.glb`) in every finish. The gold 15-spoke wheel was listed as FSA002 by mistake and is the FSA003 (the owner confirmed it); its old address `/wheels/fsa002-gold` redirects to `/wheels/fsa003-gold`. If a listing's photos ever show a different wheel from the rest of its design, check the design code before giving it a model of its own. `MODEL_URL_BY_CODE` in `catalogue.ts` maps a model code to its `.glb`; every finish of that design shares the file and the studio repaints it. Photo-backed entries in `customWheels.json` carry the same `modelUrl`.
+- One model per wheel **design**. FSA002 is the forked-spoke wheel (`fsa002-forked-v4.glb`) in every finish. The gold 15-spoke wheel was listed as FSA002 by mistake and is the FSA003 (the owner confirmed it); its old address `/wheels/fsa002-gold` redirects to `/wheels/fsa003-gold`. If a listing's photos ever show a different wheel from the rest of its design, check the design code before giving it a model of its own. `MODEL_URL_BY_CODE` in `catalogue.ts` maps a model code to its `.glb`; every finish of that design shares the file and the studio repaints it. Photo-backed entries in `customWheels.json` carry the same `modelUrl`.
 - FSA001 sets its own front and rear pair on its seed (`modelUrl` and `rearModelUrl`), which enables the Front / Rear switch.
 - Paint settings per finish live in `src/data/studioFinishes.ts`. The colour swatches on wheel pages and in the viewer are drawn from the same numbers (`src/wheel-viewer/swatch.ts`), so a finish and its swatch cannot disagree.
 - **Adding a model:** put the rim photo into Tripo3D, generate multi-view then 3D, export the `.glb`, upload it to Google Drive and give Claude the link. The `add-wheel-model` skill (`.claude/skills/add-wheel-model/`) cleans it and opens the pull request; the owner's steps, the limits of AI models and the better source (the maker's CAD) are in [docs/adding-3d-models.md](docs/adding-3d-models.md).
@@ -573,6 +587,8 @@ Google Analytics cookies are **off until the visitor taps Accept** in the cookie
 
 ### What is measured
 
+Since the cookie banner, everything in this table is recorded in full only for visitors who tapped **Accept**; the rest send cookieless pings (see [Cookie consent](#cookie-consent-opt-in)).
+
 | Event | When it fires | Comes from | In GA4 today? |
 | --- | --- | --- | --- |
 | `page_view` | A page opens, and each move to another page inside the site | GA4 enhanced measurement | Yes |
@@ -604,7 +620,7 @@ A practical rhythm: look at *Realtime* after any change, and read the weekly num
 ### Setting up and checking
 
 1. **Check it works.** Open the live site and tap **Accept**, then GA4 *Reports → Realtime*: your visit should show within a minute. In the browser's developer tools, the page should load `gtm.js?id=GTM-P554MVX4`, set no `_ga` cookie before Accept and set both after; on the Render address it should load neither.
-2. **Count enquiries as leads.** In GTM: *Variables → New → Data Layer Variable* named `delivered`, and another named `channel`. *Triggers → New → Custom Event*, event name `enquiry_sent`. *Tags → New → Google Analytics: GA4 Event*, measurement ID `G-H2TR6RVSK0`, event name `enquiry_sent`, event parameters `delivered` = `{{delivered}}` and `channel` = `{{channel}}`, fired by that trigger. Preview it on the live site, then *Submit* to publish. In GA4, mark `enquiry_sent` as a key event under *Admin → Data display → Events* once it has arrived (allow a day). Repeat for `enquiry_open` or the car-preview events if they are wanted.
+2. **Count enquiries as leads.** The quick way: in GTM, *Admin → Import container*, choose [docs/google-tag-manager/forged-enquiry-events.json](docs/google-tag-manager/forged-enquiry-events.json), your current workspace, **Merge** and **Rename conflicting tags, triggers, and variables**. It adds three Data Layer Variables (`delivered`, `channel`, `outcome`), a Custom Event trigger and a GA4 Event tag (to `G-H2TR6RVSK0`) for each of `enquiry_open`, `enquiry_sent`, `car_preview_open` and `car_preview_result`, all named `FORGED …`. Preview on the live site, send a test enquiry, then *Submit* to publish. The file was written by hand from published examples of the export format, not exported from GTM; if the import is refused, build the same thing by hand: *Variables → New → Data Layer Variable* named `delivered`, and another named `channel`. *Triggers → New → Custom Event*, event name `enquiry_sent`. *Tags → New → Google Analytics: GA4 Event*, measurement ID `G-H2TR6RVSK0`, event name `enquiry_sent`, event parameters `delivered` = `{{delivered}}` and `channel` = `{{channel}}`, fired by that trigger. Preview it on the live site, then *Submit* to publish. Repeat for `enquiry_open` or the car-preview events if they are wanted. Either way, in GA4 mark `enquiry_sent` as a key event under *Admin → Data display → Events* once it has arrived (allow a day).
 3. **Set data retention to 14 months** (see above).
 
 ### Keeping the privacy notice in step
@@ -675,12 +691,12 @@ The earlier Firebase accounts (Firebase Auth and Firestore, project `gen-lang-cl
 
 ## Testing
 
-`bun run test` first runs `wheel-viewer:verify` (fails if `src/wheel-viewer/` was edited without a new stamp), then twenty-six test files (269 tests) with `node:test`. The files are listed by name in the `test` script in `package.json`, so a new test file does not run until it is added there.
+`bun run test` first runs `wheel-viewer:verify` (fails if `src/wheel-viewer/` was edited without a new stamp), then twenty-eight test files (282 tests) with `node:test`. The files are listed by name in the `test` script in `package.json`, so a new test file does not run until it is added there.
 
 | Suite | Covers |
 | --- | --- |
 | `src/data/catalogue.test.ts` | The stock rule (every exported wheel is in stock, 14 listings across 6 designs, one finish each), siblings, to-order colours (never a colour the design has in stock), no store exports, wheel builder, and that every listed wheel has a 3D model and photos that exist |
-| `src/data/clientFitments.test.ts` | Customer installs data |
+| `src/data/clientFitments.test.ts` | Customer installs data: unique ids, the three photos of each install, the photo files on disk, sequential slot labels, filter families, and that a wheel button on an install's photo links only to an in-stock listing and marks only the two studio photos |
 | `src/data/sixnineSeries.test.ts` | The six Sixnine series and their page addresses; the range holds wheel specifications only (no prices, stock, certificates or shop links); every size has a bolt pattern and every single wheel its diameter, width and Sixnine finish names with a swatch; facts are worked out from the sizes; every Sixnine listing in stock belongs to a series |
 | `src/utils/sixnineShowcase.test.ts` | Every series has a showcase picture (the shop's own angled cut-out first), and "New at Sixnine" lists only what Sixnine has on pre-order |
 | `src/utils/listingSpecs.test.ts` | A Sixnine listing's diameters, offsets and bolt pattern match exactly one Sixnine size per diameter, the Technical data table carries Sixnine's figures, a Forged SA listing has none, and an unreadable spec sheet hides the table rather than showing a wrong one |
@@ -782,7 +798,7 @@ Build chunks are split per vendor (`react`, `motion`, `three`, `supabase`, `luci
 | **Install details** | Each car's make, model and paint were read from its photo, not confirmed | Shop to confirm, then correct `jobs.json` |
 | **Leftovers from the starter** | `package.json` still lists `@google/genai`, `express` and `dotenv`, which no file imports. `.env.example`, `metadata.json` and a tracked `.aistudio/` folder (6 MB of screenshots) come from the same starter | Remove in one clean-up pull request |
 | **Render routes** | Each address in `render.yaml`'s generated block has a rule on the domain's service, checked on 23 November 2026. A rule added in the dashboard that `render.yaml` does not list would not be tracked here | Re-check after any change to `render.yaml`: each `/blog/…` address should show its own title, not the home page's (see [Two Render services](#two-render-services)) |
-| **Automated checks** | Type check, 254 tests in 25 files and the build, all run by hand. No CI, no browser tests, and ESLint is not wired to a script | Run the three checks on every pull request with a CI workflow |
+| **Automated checks** | Type check, 262 tests in 26 files and the build, all run by hand. No CI, no browser tests, and ESLint is not wired to a script | Run the three checks on every pull request with a CI workflow |
 
 ## Contributing
 
