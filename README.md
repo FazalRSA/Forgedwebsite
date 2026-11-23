@@ -167,7 +167,7 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
 | `/admin`, `/admin/*` | `AdminWheelUploader` | Unlisted, passcode-gated, local preview only |
 | anything else | `NotFoundPage` | Not found, noindex |
 
-**Old addresses** are redirected in the browser by `redirectFor()` in `src/utils/redirects.ts`, using `history.replaceState` so the Back button is not trapped. The build also writes a small redirect page for each of the 43 addresses in `scripts/legacy-pages.json` (`scripts/legacy-shells.ts`), so an old link still lands on the right page when the host serves a file for it. A test checks that every address in that list has a redirect.
+**Old addresses** are redirected in the browser by `redirectFor()` in `src/utils/redirects.ts`, using `history.replaceState` so the Back button is not trapped. The build also writes a small redirect page for each of the 44 addresses in `scripts/legacy-pages.json` (`scripts/legacy-shells.ts`), so an old link still lands on the right page when the host serves a file for it. A test checks that every address in that list has a redirect.
 
 | Old address | Goes to |
 | --- | --- |
@@ -212,8 +212,13 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
 │  ├─ sixnine-range-from-sheet.py Writes src/data/sixnineRange.json from the owner's Sixnine catalogue sheet (run by hand, needs openpyxl)
 │  ├─ make-hero-video.sh          Makes the hero film's web files and posters in public/video/ from one source video (run by hand, needs ffmpeg)
 │  ├─ make-wheel-sizes.py         Makes the 800, 400 and 600 px copies of the wheel photos that the srcsets list (run by hand)
+│  ├─ build-wheel-models.py · wheel-models.json   Rebuilds every wheel's 3D model from the list in wheel-models.json (`npm run build-wheel-models`)
+│  ├─ qa-wheels.mjs               Opens every in-stock wheel at 390 px, photographs each 3D view and checks for errors and sideways scroll (`npm run qa-wheels`)
+│  ├─ wheel-viewer-sync.mjs       Stamps and verifies the shared wheel viewer copied into the BMW configurator (`npm run wheel-viewer:stamp`; `npm test` runs verify)
 │  └─ fitment-reshoot/            Pipeline for the install studio re-shoots (jobs.json, Python scripts, README.md)
 ├─ docs/installs-pipeline.md      How the Installs gallery is made, with animated diagrams (docs/assets/)
+├─ docs/adding-3d-models.md       The owner's steps for adding or replacing a wheel's 3D model
+├─ docs/google-tag-manager/       forged-enquiry-events.json: the GTM import that sends the site's enquiry and car-preview events to GA4
 ├─ docs/blog-seo-plan.md          The blog's keyword map, on-page checklist and how to refine it in Search Console
 ├─ docs/render-blog-rewrites.md   The 24 blog rewrite rules to paste into a Render service whose routes are set by hand
 ├─ worker/car-preview/            Cloudflare Worker behind "See it on my car" (not part of the website build): src/handler.ts, its tests, wrangler.toml, dev-server.mjs, README.md
@@ -228,6 +233,10 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
    ├─ data/studioFinishes.ts      Paint settings per finish for the 3D viewer
    ├─ data/clientFitments.ts      Customer installs data
    ├─ data/partners.ts            Industry partners shown on the home page
+   ├─ data/googleReviews.ts       Google reviews for the home page, copied word for word (empty until real ones are added)
+   ├─ data/sixnineRange.json      Every size Sixnine lists (see The Sixnine range data)
+   ├─ data/sixnineRange.ts        Sixnine's full range, design by design, for the range section on /sixnine-wheels
+   ├─ wheel-viewer/               The 3D wheel viewer shared with the BMW configurator; edited only here (see its README.md)
    ├─ store/                      Zustand store (enquiry form, admin preview) in localStorage
    ├─ context/FirebaseContext.tsx Firebase provider (kept, not mounted by any page)
    ├─ lib/firebase.ts             Firebase setup used by that provider
@@ -244,6 +253,15 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
    ├─ utils/brandFitment.ts       A brand page's design list and fitment-at-a-glance facts
    ├─ data/sixnineSeries.ts       The Sixnine series and sizes (from sixnineRange.json), their facts, slugs and finish swatches
    ├─ utils/askAi.ts              The "Ask AI about us" links and their question
+   ├─ utils/listingSpecs.ts       The Sixnine sizes and figures a stocked Sixnine listing matches
+   ├─ utils/sixnineShowcase.ts    Data for the "New at Sixnine" and "Find your design" cards
+   ├─ utils/designCards.ts        The home page's design cards, worked out from the in-stock listings
+   ├─ utils/heroVideo.ts          The hero film's files and posters, named in one place
+   ├─ utils/wheelImageSrcSet.ts · fitmentImageSrcSet.ts   The smaller photo copies each srcset lists
+   ├─ utils/leads.ts              Posts every enquiry to the n8n webhook (see Lead delivery)
+   ├─ utils/googleTagManager.ts   The Google Tag Manager snippet, with the Consent Mode defaults, that the build writes into every page
+   ├─ utils/consent.ts            The cookie choice: read, save, tell GTM, delete the _ga cookies on Decline
+   ├─ utils/analytics.ts          trackEvent (to Umami when set up, and to the GTM data layer) and the Umami tracker
    ├─ utils/carPreview.ts         "See it on my car": is it on, shrink the photo, talk to the Worker
    ├─ utils/wheelStudioParts.ts   Part classification and camera maths for the viewer
    ├─ utils/wheelBuilder.ts       Builds a stock listing from a short input
@@ -252,7 +270,7 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
       ├─ ui/                      Re-exports of the root components/ui primitives
       ├─ brand/                   Header, footer, home, catalogue (grouped by brand), wheel page, car-preview dialog, installs, the two brand pages and their shared sections, partners strip, Ask AI, contact, privacy
       ├─ admin/                   Admin uploader
-      ├─ shared/                  BrandLogo, enquiry form
+      ├─ shared/                  BrandLogo, enquiry form, cookie banner, floating WhatsApp button, social icons
       └─ visuals/                 WheelStudio (3D), WheelStage, its loading skeleton and error boundary
 ```
 
@@ -558,6 +576,8 @@ Google Analytics cookies are **off until the visitor taps Accept** in the cookie
 
 ### What is measured
 
+Since the cookie banner, everything in this table is recorded in full only for visitors who tapped **Accept**; the rest send cookieless pings (see [Cookie consent](#cookie-consent-opt-in)).
+
 | Event | When it fires | Comes from | In GA4 today? |
 | --- | --- | --- | --- |
 | `page_view` | A page opens, and each move to another page inside the site | GA4 enhanced measurement | Yes |
@@ -589,7 +609,7 @@ A practical rhythm: look at *Realtime* after any change, and read the weekly num
 ### Setting up and checking
 
 1. **Check it works.** Open the live site and tap **Accept**, then GA4 *Reports → Realtime*: your visit should show within a minute. In the browser's developer tools, the page should load `gtm.js?id=GTM-P554MVX4`, set no `_ga` cookie before Accept and set both after; on the Render address it should load neither.
-2. **Count enquiries as leads.** In GTM: *Variables → New → Data Layer Variable* named `delivered`, and another named `channel`. *Triggers → New → Custom Event*, event name `enquiry_sent`. *Tags → New → Google Analytics: GA4 Event*, measurement ID `G-H2TR6RVSK0`, event name `enquiry_sent`, event parameters `delivered` = `{{delivered}}` and `channel` = `{{channel}}`, fired by that trigger. Preview it on the live site, then *Submit* to publish. In GA4, mark `enquiry_sent` as a key event under *Admin → Data display → Events* once it has arrived (allow a day). Repeat for `enquiry_open` or the car-preview events if they are wanted.
+2. **Count enquiries as leads.** The quick way: in GTM, *Admin → Import container*, choose [docs/google-tag-manager/forged-enquiry-events.json](docs/google-tag-manager/forged-enquiry-events.json), your current workspace, **Merge** and **Rename conflicting tags, triggers, and variables**. It adds three Data Layer Variables (`delivered`, `channel`, `outcome`), a Custom Event trigger and a GA4 Event tag (to `G-H2TR6RVSK0`) for each of `enquiry_open`, `enquiry_sent`, `car_preview_open` and `car_preview_result`, all named `FORGED …`. Preview on the live site, send a test enquiry, then *Submit* to publish. The file was written by hand from published examples of the export format, not exported from GTM; if the import is refused, build the same thing by hand: *Variables → New → Data Layer Variable* named `delivered`, and another named `channel`. *Triggers → New → Custom Event*, event name `enquiry_sent`. *Tags → New → Google Analytics: GA4 Event*, measurement ID `G-H2TR6RVSK0`, event name `enquiry_sent`, event parameters `delivered` = `{{delivered}}` and `channel` = `{{channel}}`, fired by that trigger. Preview it on the live site, then *Submit* to publish. Repeat for `enquiry_open` or the car-preview events if they are wanted. Either way, in GA4 mark `enquiry_sent` as a key event under *Admin → Data display → Events* once it has arrived (allow a day).
 3. **Set data retention to 14 months** (see above).
 
 ### Keeping the privacy notice in step
@@ -638,7 +658,7 @@ firebase deploy --only firestore:rules
 
 ## Testing
 
-`bun run test` runs twenty-three test files (245 tests) with `node:test`. The files are listed by name in the `test` script in `package.json`, so a new test file does not run until it is added there.
+`bun run test` runs twenty-five test files (254 tests) with `node:test`. The files are listed by name in the `test` script in `package.json`, so a new test file does not run until it is added there.
 
 | Suite | Covers |
 | --- | --- |
@@ -652,6 +672,12 @@ firebase deploy --only firestore:rules
 | `src/utils/analytics.test.ts` | Visit statistics are off until both values are set, refuse a non-https address or a malformed ID, add one tracker that counts only the production host and respects Do Not Track, push each event to Google Tag Manager's data layer too, and never let a tracker failure reach the page |
 | `src/utils/consent.test.ts` | The cookie choice is read and saved safely (blocked storage never throws), consent updates reach the data layer as gtag-style `Arguments` objects and only where GTM runs, Decline deletes only the `_ga` cookies on every parent domain, Accept keeps them, and Cookie settings reopens the banner |
 | `src/utils/googleTagManager.test.ts` | Google Tag Manager is off without a well-formed container ID; the snippet sets every Consent Mode type to denied before the container starts and grants analytics only after an earlier Accept; it loads the container (with the `gtm.js` start event) only on the production host, goes straight after `<meta charset>` with the `<noscript>` straight after `<body>`, is added once, and is never typed into `index.html` |
+| `src/utils/leads.test.ts` | The webhook address (the `VITE_LEADS_WEBHOOK_URL` override, else the site config), the payload (page, time, consent, source), the reference n8n issues, a local reference and visitor notice when delivery fails, and that a filled honeypot is never sent |
+| `src/utils/brandFitment.test.ts` | A brand page's design list (each code once, in natural order) and its fitment facts: every car, and a size, bolt pattern or bore only when every set agrees |
+| `src/data/sixnineSeries.test.ts` | The six Sixnine series and their page addresses; the range holds wheel facts only (no prices, stock, certificates or shop links); every size has a bolt pattern and every single wheel a diameter, width and named finishes with a swatch; sizes sort the Sixnine way; every Sixnine listing in stock belongs to a series |
+| `src/utils/listingSpecs.test.ts` | Each stocked Sixnine set matches one Sixnine size per diameter and carries Sixnine's own figures; a Forged SA listing has none; every Sixnine listing has a readable spec sheet, and an unreadable one hides the table and says why |
+| `src/utils/sixnineShowcase.test.ts` | Every series has a showcase picture, and "New at Sixnine" lists only what Sixnine has on pre-order |
+| `src/utils/heroVideo.test.ts` | Every hero film file and poster is on disk; AV1 first, then H.264; the film stays within its download budget and can start before it has finished downloading; the poster `srcset`; the film plays only when the visitor asked neither for less motion nor to save data |
 | `src/utils/redirects.test.ts` | Old address to new address, `replaceState`, no loops, and every address in `scripts/legacy-pages.json` has a redirect |
 | `src/config/site.test.ts` | Published emails are empty or on the business domain; the host is the domain or `www.<domain>`; the statistics and Search Console values are well formed and set together; the car-preview address is empty or https; the privacy notice does not describe removed features |
 | `src/utils/carPreview.test.ts` | "See it on my car": off unless the address is https, shrinking keeps the shape and never enlarges, the request carries only the photo, wheel name and size and no cookies, every Worker error and malformed reply becomes a message fit to show |
