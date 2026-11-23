@@ -24,3 +24,13 @@ Keeps the wheel and removes the brake and stray fragments the AI welds on; drops
 - One mesh means the exploded view is off for that wheel.
 - Files are 2 to 4 MB, loaded only when someone taps "View in 3D".
 - If a design's photos show two different wheels, one is probably listed under the wrong design code (the FSA003 gold once was). Claude will ask you before giving a listing its own model.
+
+
+## Doing all the wheels at once
+
+When you have the files for every design, put them in one folder (for example `~/wheel-sources`) and let the scripts do the rest:
+
+1. **Rebuild every model:** `npm run build-wheel-models -- --src-dir ~/wheel-sources`. The list of designs, file names and cleanup options is `scripts/wheel-models.json`. Add `--only FSA003 FF-3` to rebuild some, or `--dry-run` to see the commands. Designs are built one after another (each needs a few GB of memory), and the slow first half is cached, so a second run with other options is quick.
+2. **Bump the file version** (`-v5` to `-v6`) in `scripts/wheel-models.json` and `MODEL_URL_BY_CODE` in `src/data/catalogue.ts` when a file changes, so browsers never serve an old copy.
+3. **Check every listing at phone width:** run `npm run dev`, then `npm run qa-wheels` in another terminal. It opens all listings in 3D, takes four views of each, and reports console errors, failed requests and sideways scroll. The pictures and a contact sheet are written to `qa-wheels/index.html`. It needs Playwright with Chromium (`npm i -D playwright && npx playwright install chromium`).
+4. **Colours** need no new files: a finish is one row in `src/data/studioFinishes.ts`. Compare its swatch with a real photo of that colour and adjust the numbers.

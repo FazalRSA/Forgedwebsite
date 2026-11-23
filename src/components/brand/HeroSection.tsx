@@ -1,8 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Pause, Play } from 'lucide-react';
-import { SITE } from '../../config/site';
-import { formatZAR, getAllBrandWheels } from '../../data/catalogue';
-import { useForgedStore } from '../../store/useForgedStore';
 import {
   HERO_POSTER_SIZES,
   HERO_POSTER_SRCSET,
@@ -10,9 +7,6 @@ import {
   HERO_VIDEO_SMALL_MEDIA,
   heroVideoAllowed,
 } from '../../utils/heroVideo';
-
-/** The fallback sentence when nothing is listed in stock (the counts below come from the catalogue). */
-const STATIC_LINE = 'Every set below is in stock. Prices are in Rand for a set of four.';
 
 /** Whether a CSS media query matches, kept up to date as the window is resized. */
 function useMediaMatches(query: string): boolean {
@@ -37,24 +31,11 @@ function prefersSavingData(): boolean {
 }
 
 /**
- * One headline, one sentence, one button, over the brand film. The film is muted, loops, plays only
+ * One headline, one button, over the brand film. The film is muted, loops, plays only
  * while the hero is on screen, and has a pause button (WCAG 2.2.2). Visitors who ask for reduced
  * motion or a data saver get its first frame as a still and download no video.
  */
 export const HeroSection: React.FC = () => {
-  const customBrandWheels = useForgedStore((state) => state.customBrandWheels);
-  // getAllBrandWheels returns only wheels that are in stock.
-  const wheels = useMemo(() => getAllBrandWheels(customBrandWheels), [customBrandWheels]);
-  // "Forged wheels for BMW M cars. 14 sets in stock in South Africa, from R 65,000 per set of four.",
-  // counted from the live catalogue. The headline speaks for the brand; this line says what is for sale
-  // and carries the words the page is found by (the home <title> says the same).
-  const stockLine = useMemo(() => {
-    if (wheels.length === 0) return STATIC_LINE;
-    const sets = wheels.reduce((sum, wheel) => sum + (wheel.stockQuantitySets ?? 0), 0);
-    const minPrice = Math.min(...wheels.map((wheel) => wheel.priceZAR));
-    return `Forged wheels for BMW M cars. ${sets} sets in stock in ${SITE.country}, from ${formatZAR(minPrice)} per set of four.`;
-  }, [wheels]);
-
   const small = useMediaMatches(HERO_VIDEO_SMALL_MEDIA);
   const reducedMotion = useMediaMatches('(prefers-reduced-motion: reduce)');
   const [saveData] = useState(prefersSavingData);
@@ -171,12 +152,9 @@ export const HeroSection: React.FC = () => {
             id="home-heading"
             className="text-balance text-4xl sm:text-6xl lg:text-7xl font-light tracking-[-0.035em] leading-[1.04] text-white"
           >
-            {/* How every wheel here is made, in the words of the forged-vs-cast guide on the blog: a cast
-                wheel is poured into a mould; a forged one is pressed from a solid block, then machined. */}
-            Forged, not cast.{' '}
-            <span className="block text-neutral-300">Pressed from solid aluminium.</span>
+            {/* How every wheel here is made, in the words of the forged-vs-cast guide on the blog. */}
+            Forged, not cast.
           </h1>
-          <p className="mt-5 max-w-xl text-pretty text-base sm:text-lg leading-relaxed text-neutral-200 [text-shadow:0_1px_12px_rgba(0,0,0,0.7)]">{stockLine}</p>
           <a
             href="#catalogue"
             onClick={jumpToCatalogue}

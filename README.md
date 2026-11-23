@@ -83,6 +83,7 @@ Every change below is a file edit, then a pull request. Merging to `main` publis
 | Add photos to a listing | Three WebPs in `public/images/wheels/<slug>/` and an entry in `src/data/customWheels.json` | See [Adding or changing a wheel](#adding-or-changing-a-wheel) |
 | Add a new listing | `bun run add-wheel` | Same section |
 | Add or replace a 3D model | A `.glb` in `public/models/wheels/` and `MODEL_URL_BY_CODE` (or the listing's `modelUrl`) in `catalogue.ts` | [docs/adding-3d-models.md](docs/adding-3d-models.md) and the `add-wheel-model` skill |
+| Rebuild all 3D models, or check all listings | `npm run build-wheel-models -- --src-dir <folder>`, then `npm run qa-wheels` | [docs/adding-3d-models.md](docs/adding-3d-models.md#doing-all-the-wheels-at-once) |
 | Change how a finish looks in 3D | `src/data/studioFinishes.ts` | Check the wheel page in the viewer. Its swatches are drawn from the same numbers, so they follow |
 | Change the to-order lead time | `TO_ORDER_LEAD_TIME` in `catalogue.ts` | Nothing else; pages and `llms.txt` read it |
 | Change the phone, WhatsApp, address or social links | `src/config/site.ts` | Nothing else; empty values are hidden |
@@ -267,8 +268,8 @@ The catalogue mirrors the stock sheet. All prices are South African Rand for a c
 | --- | --- | --- | --- | --- |
 | FSA001 (2-piece) | Black Matte | 19 / 20 inch | 90,000 | `stf399-front.glb`, `stf399-rear.glb` |
 | FSA002 | Hyper Black · Polished Face | 20 / 21 inch | 75,000 · 85,000 | `fsa002-forked-v3.glb` |
-| FSA003 | Gold · Silver · Hyper Black | 20 / 21 inch | 75,000 | `fsa003-v4.glb` |
-| FSA004 | Silver · Hyper Black · Gloss Black | 20 / 21 inch | 70,000 | `fsa004-v4.glb` |
+| FSA003 | Gold · Silver · Hyper Black | 20 / 21 inch | 75,000 | `fsa003-v5.glb` |
+| FSA004 | Silver · Hyper Black · Gloss Black | 20 / 21 inch | 70,000 | `fsa004-v5.glb` |
 | FF-1 | Silver (Hyper Silver) · Liquid Metal | 20 / 21 inch | 80,000 · 95,000 | `ff-1-sixnine-v3.glb` |
 | FF-3 | Pure Bronze · Glossy Black · Liquid Metal | 20 / 21 inch | 80,000 · 80,000 · 95,000 | `ff-3-sixnine-v3.glb` |
 

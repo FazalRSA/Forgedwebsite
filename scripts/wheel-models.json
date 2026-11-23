@@ -1,0 +1,10 @@
+{
+  "_about": "One entry per wheel design. `src` is the file name inside --src-dir (the downloaded AI/CAD file), `out` the file written to public/models/wheels/ (bump the -vN when a file changes, so browsers never serve an old copy), `args` the options for .claude/skills/add-wheel-model/scripts/build_wheel_model.py. Run: python3 scripts/build-wheel-models.py --src-dir <folder>",
+  "models": [
+    { "design": "FSA002", "src": "fsa002-forked.glb", "out": "fsa002-forked-v3.glb", "args": ["--fold-angle", "110", "--barrel-smooth", "4", "--normal-smooth", "12", "--normal-blend", "0.55"] },
+    { "design": "FSA003", "src": "fsa003.glb", "out": "fsa003-v5.glb", "args": ["--fold-angle", "110", "--rebuild-barrel", "6", "--normal-smooth", "12", "--normal-blend", "0.55"] },
+    { "design": "FSA004", "src": "fsa004.glb", "out": "fsa004-v5.glb", "args": ["--fold-angle", "110", "--rebuild-barrel", "6", "--normal-smooth", "12", "--normal-blend", "0.55"] },
+    { "design": "FF-1", "src": "ff-1.glb", "out": "ff-1-sixnine-v3.glb", "args": ["--fold-angle", "110", "--barrel-smooth", "4", "--normal-smooth", "12", "--normal-blend", "0.55"] },
+    { "design": "FF-3", "src": "ff-3.glb", "out": "ff-3-sixnine-v3.glb", "args": ["--fold-angle", "110", "--barrel-smooth", "4", "--normal-smooth", "12", "--normal-blend", "0.55", "--width", "0.27"] }
+  ]
+}
