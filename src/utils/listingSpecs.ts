@@ -26,12 +26,20 @@ export function listingFitment(sheet: string | undefined): { offsets: number[]; 
 }
 
 export function sixnineSizesForListing(
-  wheel: Pick<BrandWheelItem, 'modelCode' | 'sizesAvailable' | 'technicalSpecSheet'>
+  wheel: Pick<BrandWheelItem, 'modelCode' | 'sizesAvailable' | 'technicalSpecSheet'> & { slug?: string }
 ): SixnineSize[] {
   const series = sixnineSeriesOfWheel(wheel);
   if (!series) return [];
   const { offsets, pcd } = listingFitment(wheel.technicalSpecSheet);
-  if (!pcd || !offsets.length) return [];
+  if (!pcd || !offsets.length) {
+    // The page hides what it cannot read (AGENTS.md rule 2), but says why in the console, so a
+    // mistyped sheet on a listing added from the admin page is found. listingSpecs.test.ts catches
+    // the catalogue's own listings before they ship.
+    console.warn(
+      `Technical data hidden for ${wheel.slug ?? wheel.modelCode}: no ${!pcd ? 'bolt pattern' : 'offset'} in spec sheet "${wheel.technicalSpecSheet ?? ''}".`
+    );
+    return [];
+  }
   return listingDiameters(wheel.sizesAvailable).flatMap((diameter) => {
     const matches = series.sizes.filter(
       (size) =>

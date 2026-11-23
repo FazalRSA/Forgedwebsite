@@ -45,3 +45,10 @@ test('every Sixnine listing in stock has a readable spec sheet and a Sixnine siz
     assert.equal(sixnineSizesForListing(wheel).length, diameters.length, `${wheel.slug}: a diameter matches no single Sixnine size`);
   }
 });
+
+test('an unreadable spec sheet on a Sixnine listing hides the table and says why', (t) => {
+  const warn = t.mock.method(console, 'warn', () => {});
+  assert.deepEqual(sixnineSizesForListing({ slug: 'ff-1-test', modelCode: 'FF-1', sizesAvailable: '20 inch', technicalSpecSheet: 'CB66.6' }), []);
+  assert.equal(warn.mock.callCount(), 1);
+  assert.match(String(warn.mock.calls[0].arguments[0]), /ff-1-test: no bolt pattern/);
+});
