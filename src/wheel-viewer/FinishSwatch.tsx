@@ -13,15 +13,18 @@ export interface FinishSwatchProps {
 }
 
 /**
- * A photoreal swatch of a finish: a ball dressed in the wheel's own paint under the stage's reflections
- * (see swatch.ts). Decorative: put the finish's name next to it. Until the picture is ready, or when the
- * device has no WebGL, it shows a drawn ball in the finish's dot colour, so there is never a gap.
+ * A swatch of a finish. When the finish carries a `swatchImage` (a studio render of the wheel itself in that
+ * colour) it shows that picture. Otherwise it is a ball dressed in the wheel's own paint under the stage's
+ * reflections (see swatch.ts). Decorative: put the finish's name next to it. Until the picture is ready, or
+ * when the device has no WebGL, it shows a drawn ball in the finish's dot colour, so there is never a gap.
  */
 export const FinishSwatch = ({ finish, size = 28, paint = defaultPaintRenderer, className }: FinishSwatchProps) => {
-  const [src, setSrc] = useState<string | null>(() => cachedSwatch(finish, size, paint));
+  const image = finish.swatchImage;
+  const [src, setSrc] = useState<string | null>(() => (image ? null : cachedSwatch(finish, size, paint)));
   const paintKey = JSON.stringify([finish.name, finish.paint]);
 
   useEffect(() => {
+    if (image) return; // a picture of the wheel needs no drawing
     let live = true;
     const hit = cachedSwatch(finish, size, paint);
     if (hit) {
@@ -37,8 +40,9 @@ export const FinishSwatch = ({ finish, size = 28, paint = defaultPaintRenderer, 
     };
     // by value: a catalogue reload hands over new objects with the same numbers
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [paintKey, size, paint]);
+  }, [paintKey, size, paint, image]);
 
+  const shown = image ?? src;
   return (
     <span
       aria-hidden="true"
@@ -46,10 +50,10 @@ export const FinishSwatch = ({ finish, size = 28, paint = defaultPaintRenderer, 
       style={{
         width: size,
         height: size,
-        background: src ? 'transparent' : fallbackSwatchBackground(finish.swatchHex),
+        background: shown ? 'transparent' : fallbackSwatchBackground(finish.swatchHex),
       }}
     >
-      {src && <img src={src} alt="" width={size} height={size} draggable={false} />}
+      {shown && <img src={shown} alt="" width={size} height={size} draggable={false} decoding="async" />}
     </span>
   );
 };

@@ -78,7 +78,7 @@ export const ProductCard: React.FC<{ wheel: BrandWheelItem; index: number }> = (
             </p>
             {/* the same paint as the 3D viewer; decorative, the finish is named in the title */}
             <span aria-hidden="true">
-              <CatalogueSwatch finishId={wheel.defaultFinish} name={wheel.finishName} size={18} />
+              <CatalogueSwatch finishId={wheel.defaultFinish} name={wheel.finishName} size={18} design={wheel.modelCode} />
             </span>
           </div>
         </div>

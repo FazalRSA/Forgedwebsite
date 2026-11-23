@@ -1,12 +1,12 @@
 import * as THREE from 'three';
 
-/** Studio reflections: a gradient dome with bright softboxes and dark flags, prefiltered once. */
+/** Studio reflections: a neutral grey gradient dome (no colour cast, so a finish reads as its real colour) with bright softboxes and dark flags, prefiltered once. */
 export function buildStudioEnvironment(renderer: THREE.WebGLRenderer): THREE.Texture {
   const envScene = new THREE.Scene();
   const dome = new THREE.SphereGeometry(50, 48, 24);
-  const top = new THREE.Color(0.78, 0.82, 0.9);
-  const horizon = new THREE.Color(0.3, 0.32, 0.35);
-  const bottom = new THREE.Color(0.13, 0.13, 0.15);
+  const top = new THREE.Color(0.8, 0.8, 0.8);
+  const horizon = new THREE.Color(0.31, 0.31, 0.31);
+  const bottom = new THREE.Color(0.13, 0.13, 0.13);
   const tmp = new THREE.Color();
   const colours: number[] = [];
   const pos = dome.attributes.position;

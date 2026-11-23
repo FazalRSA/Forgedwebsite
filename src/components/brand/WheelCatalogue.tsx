@@ -146,7 +146,7 @@ const DesignCard: React.FC<{
               // decorative: the finish names are in the text below; the swatches are the viewer's own paint
               <span aria-hidden="true" className="mt-2 flex items-center gap-1.5">
                 {card.swatches.map((sw) => (
-                  <CatalogueSwatch key={sw.name} finishId={sw.finishId} name={sw.name} size={22} />
+                  <CatalogueSwatch key={sw.name} finishId={sw.finishId} name={sw.name} size={22} design={card.design} />
                 ))}
               </span>
             )}
