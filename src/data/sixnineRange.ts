@@ -40,6 +40,12 @@ export interface SixnineDesign {
   stockedCode?: string;
   /** A face-on studio picture from Sixnine, saved in public/images/sixnine. */
   image: string;
+  /**
+   * Sixnine's own three-quarter render of the series, from sixnine-wheels.com, saved in
+   * public/images/sixnine/renders (a 600 px copy beside it). The owner confirmed on 23 November 2026
+   * that the shop, as an official dealer, may use Sixnine's renders.
+   */
+  render: string;
   /** The design's page on sixnine-wheels.com. */
   sourceUrl: string;
 }
@@ -66,6 +72,7 @@ export const SIXNINE_RANGE: readonly SixnineDesign[] = [
     editions: ['BMW M5 G90/G99 two-piece forged set (11x21 front, 11.5x22 rear, 5x132)'],
     stockedCode: 'FF-1',
     image: '/images/sixnine/ff-one.webp',
+    render: '/images/sixnine/renders/ff-one.webp',
     sourceUrl: `${SIXNINE}/ff-one`,
   },
   {
@@ -85,6 +92,7 @@ export const SIXNINE_RANGE: readonly SixnineDesign[] = [
     ],
     editions: ['Audi RS4/RS5 B9 one-piece forged Forged Series (10.5x21 ET25), made to order in 8–10 weeks'],
     image: '/images/sixnine/ff-two.webp',
+    render: '/images/sixnine/renders/ff-two.webp',
     sourceUrl: `${SIXNINE}/ff-two`,
   },
   {
@@ -105,6 +113,7 @@ export const SIXNINE_RANGE: readonly SixnineDesign[] = [
     editions: ['Audi RS5 B10 (10.5x21), on pre-order for delivery in March 2027'],
     stockedCode: 'FF-3',
     image: '/images/sixnine/ff-three.webp',
+    render: '/images/sixnine/renders/ff-three.webp',
     sourceUrl: `${SIXNINE}/ff-three`,
   },
   {
@@ -123,6 +132,7 @@ export const SIXNINE_RANGE: readonly SixnineDesign[] = [
       { label: 'Load rating', value: '650–690 kg' },
     ],
     image: '/images/sixnine/evo-one.webp',
+    render: '/images/sixnine/renders/evo-one.webp',
     sourceUrl: `${SIXNINE}/evo-one-wheel`,
   },
   {
@@ -139,6 +149,7 @@ export const SIXNINE_RANGE: readonly SixnineDesign[] = [
     figures: [{ label: 'Load rating', value: '650–865 kg' }],
     preOrder: true,
     image: '/images/sixnine/evo-two.webp',
+    render: '/images/sixnine/renders/evo-two.webp',
     sourceUrl: `${SIXNINE}/evo-two`,
   },
   {
@@ -157,6 +168,7 @@ export const SIXNINE_RANGE: readonly SixnineDesign[] = [
       { label: 'Load rating', value: '600 kg' },
     ],
     image: '/images/sixnine/oem-one.webp',
+    render: '/images/sixnine/renders/oem-one.webp',
     sourceUrl: `${SIXNINE}/oem-one`,
   },
 ];

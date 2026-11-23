@@ -87,7 +87,10 @@ file wins:
   surcharges or sale lines. Finish names stay as the catalogue spells them.
 - Blog posts follow `src/data/blog.ts` and its tests, not the skills' article format.
 - The skills' own brand rule holds: no SIXNINE renders, photos or wording without the owner confirming permission.
-  The series pages and mega menu show the shop's own photos, or the series name when there is none.
+  On 23 November 2026 the owner confirmed the shop, as an official dealer, may use Sixnine's series renders. They are
+  in `public/images/sixnine/renders/` (`render` in `src/data/sixnineRange.ts`) and show on the series cards, the mega
+  menu and the series pages' hero. Stock cards and wheel pages keep the shop's own photos. Anything else from Sixnine
+  (lifestyle photos, wording) still needs the owner's say.
 
 ## Things that must stay in step
 

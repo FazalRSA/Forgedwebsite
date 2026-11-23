@@ -10,6 +10,7 @@ import {
 } from '../../data/sixnineSeries';
 import { cutoutSrcFor, threeQuarterPhoto } from '../../utils/designCards';
 import { Link } from '../../utils/router';
+import { SIXNINE_RANGE } from '../../data/sixnineRange';
 import { wheelImageSrcSet } from '../../utils/wheelImageSrcSet';
 
 /** The shop's in-stock listings of a Sixnine series (FF-1 listings for the FF-ONE, and so on). */
@@ -18,11 +19,13 @@ export function stockOfSeries(series: SixnineSeries, wheels: BrandWheelItem[] = 
 }
 
 /**
- * The picture for a series: the cut-out of the shop's own photo of a listing in stock, or undefined.
- * Sixnine's renders are not used until the owner confirms the dealer may (see AGENTS.md), so a series
- * the shop has not photographed is shown by its name instead.
+ * The picture for a series in the mega menu and the series page's hero: Sixnine's own three-quarter
+ * render (the owner confirmed their use on 23 November 2026), else the cut-out of the shop's own photo
+ * of a listing in stock, else undefined (the series name is shown, outlined).
  */
 export function seriesImage(series: SixnineSeries, wheels?: BrandWheelItem[]): string | undefined {
+  const render = SIXNINE_RANGE.find((d) => d.name === series.code)?.render;
+  if (render) return render;
   for (const wheel of stockOfSeries(series, wheels)) {
     const cutout = cutoutSrcFor(threeQuarterPhoto(wheel) ?? getWheelImages(wheel).images[0]);
     if (cutout) return cutout;
