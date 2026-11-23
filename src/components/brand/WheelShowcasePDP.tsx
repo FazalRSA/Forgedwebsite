@@ -634,6 +634,12 @@ const PhotoGallery: React.FC<{
                   loading="lazy"
                   decoding="async"
                   className={`h-full w-full ${slide.kind === 'cutout' ? 'object-contain p-[8%]' : 'object-cover'}`}
+                  // A photo that fails to load (for example one added from the admin page and since
+                  // removed) drops its thumbnail rather than showing a broken image; the arrows still reach it.
+                  onError={(e) => {
+                    const button = e.currentTarget.closest('button');
+                    if (button) button.hidden = true;
+                  }}
                 />
               </button>
             ))}

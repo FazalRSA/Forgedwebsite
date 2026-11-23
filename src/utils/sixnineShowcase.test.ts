@@ -1,4 +1,5 @@
 import test from 'node:test';
+import { existsSync } from 'node:fs';
 import assert from 'node:assert/strict';
 import { getAllBrandWheels, isSixnineWheel } from '../data/catalogue';
 import { findSixnineSeries, SIXNINE_SERIES } from '../data/sixnineSeries';
@@ -10,6 +11,7 @@ test('every series has a showcase picture, the shop\'s own angled cut-out first'
   for (const series of SIXNINE_SERIES) {
     const picture = showcasePicture(series, wheels);
     assert.ok(picture, `${series.code} has no picture`);
+    assert.ok(existsSync(`public${picture.src}`), `${picture.src} is missing from public/`);
   }
   // FF-ONE and FF-THREE are in stock and photographed, so they show the shop's own cut-out.
   for (const slug of ['ff-one', 'ff-three']) {
