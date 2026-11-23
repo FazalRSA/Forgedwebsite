@@ -79,9 +79,10 @@ export function listingDetails(wheel: BrandWheelItem): ListingDetails | null {
   const rangeDesign = SIXNINE_RANGE.find((d) => d.stockedCode === wheel.modelCode);
   const series = sixnineSeriesOfWheel(wheel);
 
-  // Said of this set only when every size it matches states the same build.
+  // Said of this set only when every size it matches states the same build; otherwise the series' build,
+  // which is "Forged" for every series (the owner confirmed every wheel the shop sells is forged).
   const builds = unique(sizes.map((size) => size.construction));
-  const construction = builds.length === 1 && builds[0] ? builds[0] : null;
+  const construction = builds.length === 1 && builds[0] ? builds[0] : series?.construction ?? null;
   const concaves = sizes.map((size) => size.concavityMm).filter((v): v is number => v !== null);
   const maxConcave = concaves.length ? Math.max(...concaves) : null;
 

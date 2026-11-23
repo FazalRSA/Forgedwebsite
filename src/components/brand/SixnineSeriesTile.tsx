@@ -30,7 +30,7 @@ export function seriesImage(series: SixnineSeries, wheels?: BrandWheelItem[]): s
   return undefined;
 }
 
-/** "Flow forged · 19″ to 22″", the line under a series name. */
+/** "Forged · 19″ to 22″", the line under a series name. */
 export function seriesSummary(series: SixnineSeries): string {
   return [series.construction, diameterRange(seriesFacts(series))].filter(Boolean).join(' · ');
 }

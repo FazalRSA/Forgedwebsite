@@ -22,6 +22,7 @@ import {
   SIXNINE_SERIES,
   sixnineSeriesOfWheel,
   type SixnineSeries,
+  SHOP_CONSTRUCTION,
 } from '../data/sixnineSeries';
 
 /**
@@ -189,7 +190,8 @@ function sixnineWheelSearchText(wheel: BrandWheelItem, sets: number): { title: s
   const builds = Array.from(new Set(sizes.map((size) => size.construction)));
   const concaves = sizes.map((size) => size.concavityMm).filter((v): v is number => v !== null);
   const benefit = [
-    builds.length === 1 && builds[0] ? builds[0].toLowerCase() : '',
+    // The size's own build when they agree, else the shop's: every wheel it sells is forged (owner, 2026-11-23).
+    (builds.length === 1 && builds[0] ? builds[0] : SHOP_CONSTRUCTION).toLowerCase(),
     concaves.length ? `up to ${Math.max(...concaves)} mm concave` : '',
   ].filter(Boolean);
   const stock = `${formatZAR(wheel.priceZAR)} per set of four. In stock: ${sets} ${sets === 1 ? 'set' : 'sets'}.`;
