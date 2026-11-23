@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
-import { ChevronRight } from 'lucide-react';
-import { getAllBrandWheels, WHEEL_BRANDS } from '../../data/catalogue';
+import { ChevronRight, Play } from 'lucide-react';
+import { capLogoForDesign, getAllBrandWheels, WHEEL_BRANDS, type WheelFinishId } from '../../data/catalogue';
+import { WheelStage } from '../visuals/WheelStage';
 import {
   diameterRange,
   finishSwatch,
@@ -130,6 +131,16 @@ export const SixnineSeriesPage: React.FC<{ series: SixnineSeries }> = ({ series 
   const facts = useMemo(() => seriesFacts(series), [series]);
   const sizes = useMemo(() => sortedSizes(series), [series]);
   const [pcd, setPcd] = useState<string>('all');
+  // The 3D view: the model of the sets in stock, in each finish the shop has (one model per design).
+  const modelWheel = stock.find((wheel) => wheel.modelUrl);
+  const stockFinishes = useMemo(() => [...new Set(stock.map((wheel) => wheel.defaultFinish))], [stock]);
+  const stockFinishNames = useMemo(
+    () => Object.fromEntries(stock.map((wheel) => [wheel.defaultFinish, wheel.finishName])) as Partial<Record<WheelFinishId, string>>,
+    [stock]
+  );
+  const [show3D, setShow3D] = useState(false);
+  const [stageFinish, setStageFinish] = useState<WheelFinishId | undefined>(undefined);
+  const finish3D = stageFinish ?? modelWheel?.defaultFinish;
   const shown = pcd === 'all' ? sizes : sizes.filter((size) => size.boltPatterns.includes(pcd));
   const range = diameterRange(facts);
   const enquiry = `Hi, I'd like to ask about the Sixnine ${series.code}.`;
@@ -191,15 +202,45 @@ export const SixnineSeriesPage: React.FC<{ series: SixnineSeries }> = ({ series 
                 )}
               </ul>
             </div>
-            <div className="relative mx-auto mt-10 aspect-[4/3] sm:aspect-[16/8] max-w-5xl overflow-hidden rounded-[28px] border border-white/[0.09] bg-[radial-gradient(90%_90%_at_50%_35%,rgba(255,255,255,0.075)_0%,rgba(255,255,255,0.02)_70%)]">
-              {image ? (
-                <img src={image} alt={`Sixnine ${series.code}`} width={1000} height={1000} fetchPriority="high" className="absolute inset-0 h-full w-full object-contain p-[6%] drop-shadow-[0_24px_40px_rgba(0,0,0,0.55)]" />
-              ) : (
-                <span aria-hidden="true" className="absolute inset-0 flex items-center justify-center font-[family-name:var(--font-display)] font-black uppercase text-transparent text-6xl sm:text-9xl tracking-[-0.04em] [-webkit-text-stroke:1.5px_rgba(255,255,255,0.4)]">
-                  {series.code}
-                </span>
-              )}
-            </div>
+            {show3D && modelWheel && finish3D ? (
+              <div className="mx-auto mt-10 max-w-5xl text-left">
+                <WheelStage
+                  wheelModel={`${series.code}`}
+                  selectedFinish={finish3D}
+                  availableFinishes={stockFinishes}
+                  onSelectFinish={setStageFinish}
+                  finishName={stockFinishNames[finish3D]}
+                  finishNames={stockFinishNames}
+                  modelUrl={modelWheel.modelUrl}
+                  rearModelUrl={modelWheel.rearModelUrl}
+                  capLogo={capLogoForDesign(modelWheel.modelCode)}
+                  onClose={() => setShow3D(false)}
+                />
+                <p className="mt-2 text-xs text-neutral-400">
+                  The 3D view is a guide to shape and finish, in the finishes we have in stock.
+                </p>
+              </div>
+            ) : (
+              <div className="relative mx-auto mt-10 aspect-[4/3] sm:aspect-[16/8] max-w-5xl overflow-hidden rounded-[28px] border border-white/[0.09] bg-[radial-gradient(90%_90%_at_50%_35%,rgba(255,255,255,0.075)_0%,rgba(255,255,255,0.02)_70%)]">
+                {image ? (
+                  <img src={image} alt={`Sixnine ${series.code}`} width={1000} height={1000} fetchPriority="high" className="absolute inset-0 h-full w-full object-contain p-[6%] drop-shadow-[0_24px_40px_rgba(0,0,0,0.55)]" />
+                ) : (
+                  <span aria-hidden="true" className="absolute inset-0 flex items-center justify-center font-[family-name:var(--font-display)] font-black uppercase text-transparent text-6xl sm:text-9xl tracking-[-0.04em] [-webkit-text-stroke:1.5px_rgba(255,255,255,0.4)]">
+                    {series.code}
+                  </span>
+                )}
+                {modelWheel && (
+                  <button
+                    type="button"
+                    onClick={() => setShow3D(true)}
+                    className="press absolute bottom-4 left-4 inline-flex min-h-12 items-center gap-2 rounded-full bg-black/80 px-5 text-base font-semibold text-white ring-1 ring-white/20 backdrop-blur-sm hover:bg-black cursor-pointer"
+                  >
+                    <Play className="h-4 w-4 fill-current" aria-hidden="true" />
+                    View in 3D
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </section>
 
