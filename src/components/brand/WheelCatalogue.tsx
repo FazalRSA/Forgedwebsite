@@ -4,6 +4,7 @@ import { ArrowRight } from 'lucide-react';
 import {
   BrandWheelItem,
   brandOfWheel,
+  designName,
   getAllBrandWheels,
   WHEEL_BRAND_ORDER,
   WHEEL_BRANDS,
@@ -138,7 +139,7 @@ const DesignCard: React.FC<{
         <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 sm:p-6 lg:p-7">
           <div className="min-w-0">
             <h4 className="font-[family-name:var(--font-display)] font-black uppercase text-2xl sm:text-4xl leading-none tracking-[-0.03em] text-white">
-              {card.design}
+              {designName(card.design)}
             </h4>
             <p className="mt-2 text-sm font-medium text-neutral-200 tabular-nums">{card.priceLine}</p>
             {card.swatches.length > 0 && (

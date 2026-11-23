@@ -4,7 +4,7 @@
  * installs list and SITE, so it cannot drift from the pages or state anything they do not.
  */
 import { brandOfWheel, formatZAR, getAllBrandWheels, isForgedSaWheel, isSixnineWheel, TO_ORDER_LEAD_TIME, WHEEL_BRAND_ORDER, WHEEL_BRANDS } from '../data/catalogue';
-import { designCodes, joinList } from './brandFitment';
+import { designNames, joinList } from './brandFitment';
 import { diameterRange, seriesFacts, seriesPath, SIXNINE_SERIES } from '../data/sixnineSeries';
 import { CLIENT_FITMENTS } from '../data/clientFitments';
 import { SITE, whatsappLink } from '../config/site';
@@ -27,7 +27,7 @@ export function buildLlmsTxt(origin: string = SITE_ORIGIN): string {
   const wa = whatsappLink();
   // "FF-1 and FF-3", "FSA001, FSA002, FSA003 and FSA004": each brand's designs in stock, from the catalogue.
   const designsOf = (match: (w: (typeof wheels)[number]) => boolean, fallback: string): string =>
-    joinList(designCodes(wheels.filter(match))) || fallback;
+    joinList(designNames(wheels.filter(match))) || fallback;
   const sixnineDesigns = designsOf(isSixnineWheel, 'FF');
   const forgedSaDesigns = designsOf(isForgedSaWheel, 'FSA');
 

@@ -523,6 +523,19 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
   },
 ];
 
+/**
+ * The name a visitor sees for a design code. Sixnine writes its series in words (FF-ONE, FF-THREE),
+ * so the shop's short codes FF-1 and FF-3 are shown that way; FSA codes are shown as they are. The
+ * code itself stays the key everywhere else (slugs, models, tests, enquiry SKUs).
+ */
+export function designName(code: string | undefined): string {
+  const trimmed = (code ?? '').trim();
+  const words = ['ONE', 'TWO', 'THREE', 'FOUR', 'FIVE'];
+  return trimmed.toUpperCase().replace(/^(FF|EVO)-(\d)$/, (match, family: string, n: string) =>
+    words[Number(n) - 1] ? `${family}-${words[Number(n) - 1]}` : match
+  ) || trimmed;
+}
+
 export const BRAND_WHEELS: BrandWheelItem[] = INVENTORY_SEEDS.map((seed) => {
   const fullFinishLabel = seed.otherFinishes
     ? `${seed.finishName} · ${seed.otherFinishes}`
@@ -532,10 +545,10 @@ export const BRAND_WHEELS: BrandWheelItem[] = INVENTORY_SEEDS.map((seed) => {
   return {
     id: seed.id,
     slug: seed.slug,
-    model: `${seed.modelCode} — ${seed.finishName}`,
+    model: `${designName(seed.modelCode)} — ${seed.finishName}`,
     modelCode: seed.modelCode,
     series: `${seed.sizesAvailable.toUpperCase()} · ${seed.stockStatus.toUpperCase()} (${setsLabel.toUpperCase()})`,
-    headline: `${seed.modelCode} (${fullFinishLabel}) for BMW ${seed.compatibleCars}.`,
+    headline: `${designName(seed.modelCode)} (${fullFinishLabel}) for BMW ${seed.compatibleCars}.`,
     editorialLead: `${seed.sizesAvailable} for BMW ${seed.compatibleCars}. ${seed.technicalSpecSheet}.`,
     editorialBody: `${seed.stockStatus}: ${setsLabel}, finished in ${fullFinishLabel}. The price is for a complete set of four.`,
     marques: ['BMW'],

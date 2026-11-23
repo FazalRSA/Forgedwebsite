@@ -39,6 +39,8 @@ Run the type check, the tests and the build before you open a pull request. All 
    and specifications Sixnine publishes for its whole range are in `src/data/sixnineRange.json`, written
    by `scripts/sixnine-range-from-sheet.py`; stock and prices still come only from the catalogue.
 5. **Prices are South African Rand per set of four.** Format with `formatZAR`.
+5a. **Design names.** Show a design with `designName(code)` (FF-1 reads FF-ONE, FF-3 reads FF-THREE); keep the
+   code itself as the key. Never type "FF-1" or "FF-3" into text a visitor reads.
 6. **Tests are listed by name.** `npm test` runs the files named in `package.json`. A new
    `*.test.ts` file does not run until you add it to that list.
 7. **Generated files.** `public/sitemap.xml` and the page-route block in `render.yaml` are written
