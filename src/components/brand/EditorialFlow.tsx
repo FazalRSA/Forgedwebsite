@@ -3,6 +3,7 @@ import { CLIENT_FITMENTS } from '../../data/clientFitments';
 import { Link } from '../../utils/router';
 import { fitmentCar, fitmentTitle, fitmentWheels } from './fitmentFormat';
 import { fitmentImageSrcSet } from '../../utils/fitmentImageSrcSet';
+import { EYEBROW_CLASS } from './sectionStyles';
 
 /** How many installs the home page previews; the rest are on /installs. */
 const STRIP_COUNT = 4;
@@ -25,12 +26,15 @@ export const EditorialFlow: React.FC = () => {
           className="scroll-mt-20 max-w-7xl mx-auto px-4 sm:px-6 md:px-10 py-12 sm:py-16 border-t border-[#26262E]"
         >
           <div className="flex items-end justify-between gap-4">
-            <h2
-              id="installs-heading"
-              className="text-3xl sm:text-4xl font-light tracking-[-0.03em] leading-tight text-white"
-            >
-              Customer installs
-            </h2>
+            <div>
+              <span className={EYEBROW_CLASS}>Installs</span>
+              <h2
+                id="installs-heading"
+                className="mt-2 text-3xl sm:text-4xl font-light tracking-[-0.03em] leading-tight text-white"
+              >
+                Customer installs
+              </h2>
+            </div>
             <Link
               to="/installs"
               className="inline-flex items-center min-h-11 text-sm font-medium text-[#F43F5E] hover:text-[#F43F5E] whitespace-nowrap"

@@ -3,6 +3,7 @@ import { ArrowUpRight } from 'lucide-react';
 import { askAiLinks } from '../../utils/askAi';
 import { CTA_SECONDARY_CLASS } from './ContactCta';
 import { SITE_ORIGIN } from '../../utils/seo';
+import { EYEBROW_CLASS } from './sectionStyles';
 
 /**
  * "Ask AI about us". Each button opens that AI assistant in a new tab with a question about the
@@ -20,7 +21,8 @@ export const AskAiSection: React.FC<{ className?: string }> = ({ className = '' 
       aria-labelledby="ask-ai-heading"
       className={`max-w-7xl mx-auto px-4 sm:px-6 md:px-10 py-12 sm:py-16 border-t border-[#26262E] ${className}`}
     >
-      <h2 id="ask-ai-heading" className="text-3xl sm:text-4xl font-light tracking-[-0.03em] leading-tight text-white">
+      <span className={EYEBROW_CLASS}>AI assistants</span>
+      <h2 id="ask-ai-heading" className="mt-2 text-3xl sm:text-4xl font-light tracking-[-0.03em] leading-tight text-white">
         Ask AI about us
       </h2>
       <p className="mt-4 max-w-xl text-neutral-300">

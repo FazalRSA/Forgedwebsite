@@ -3,13 +3,13 @@ import { RouterProvider, useRouter } from './utils/router';
 import { normalizePath } from './utils/redirects';
 import { applyPageMeta, isHomePath, metaForPath } from './utils/seo';
 import { findWheelBySlug } from './data/catalogue';
+import { findSixnineSeries, SIXNINE_PATH } from './data/sixnineSeries';
 import { resolveBlogPath } from './data/blogPosts';
 import { useForgedStore } from './store/useForgedStore';
 import { BrandHeader } from './components/brand/BrandHeader';
 import { HeroSection } from './components/brand/HeroSection';
 import { EditorialFlow } from './components/brand/EditorialFlow';
 import { WheelCatalogue } from './components/brand/WheelCatalogue';
-import { IndustryPartnersSection } from './components/brand/IndustryPartnersSection';
 import { GoogleReviewsSection } from './components/brand/GoogleReviewsSection';
 import { FloatingWhatsApp } from './components/shared/FloatingWhatsApp';
 import { ConsentBanner } from './components/shared/ConsentBanner';
@@ -37,6 +37,11 @@ const ContactPage = lazy(() =>
 const ForgedSaPage = lazy(() =>
   import('./components/brand/ForgedSaPage').then((m) => ({
     default: m.ForgedSaPage,
+  }))
+);
+const SixnineSeriesPage = lazy(() =>
+  import('./components/brand/SixnineSeriesPage').then((m) => ({
+    default: m.SixnineSeriesPage,
   }))
 );
 const SixnineDealerPage = lazy(() =>
@@ -108,7 +113,6 @@ function BrandHomePage() {
         <EditorialFlow />
         <GoogleReviewsSection />
         <BlogTeaser />
-        <IndustryPartnersSection />
         <AskAiSection />
       </main>
     </div>
@@ -153,6 +157,12 @@ function AppRoutes() {
 
   // /forged-sa-wheels: the shop's own brand, every FSA design in stock
   if (path === '/forged-sa-wheels') return <ForgedSaPage />;
+
+  // /sixnine-wheels/:series: one Sixnine series (FF-ONE, EVO-TWO, ...); an unknown one is not found
+  if (path.startsWith(`${SIXNINE_PATH}/`)) {
+    const series = findSixnineSeries(path.slice(SIXNINE_PATH.length + 1).split('/')[0]);
+    return series ? <SixnineSeriesPage series={series} /> : <NotFoundPage />;
+  }
 
   // /sixnine-wheels: the shop's page as an official Sixnine Wheels dealer
   if (path === '/sixnine-wheels') return <SixnineDealerPage />;

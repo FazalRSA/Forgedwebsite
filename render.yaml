@@ -118,6 +118,24 @@ services:
         source: /sixnine-wheels
         destination: /sixnine-wheels.html
       - type: rewrite
+        source: /sixnine-wheels/ff-one
+        destination: /sixnine-wheels/ff-one.html
+      - type: rewrite
+        source: /sixnine-wheels/ff-two
+        destination: /sixnine-wheels/ff-two.html
+      - type: rewrite
+        source: /sixnine-wheels/ff-three
+        destination: /sixnine-wheels/ff-three.html
+      - type: rewrite
+        source: /sixnine-wheels/evo-one
+        destination: /sixnine-wheels/evo-one.html
+      - type: rewrite
+        source: /sixnine-wheels/evo-two
+        destination: /sixnine-wheels/evo-two.html
+      - type: rewrite
+        source: /sixnine-wheels/oem-plus-one
+        destination: /sixnine-wheels/oem-plus-one.html
+      - type: rewrite
         source: /contact
         destination: /contact.html
       - type: rewrite

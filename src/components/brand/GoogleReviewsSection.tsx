@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
 import { SITE } from '../../config/site';
 import { GOOGLE_REVIEWS } from '../../data/googleReviews';
 import { CTA_PRIMARY_CLASS, CTA_SECONDARY_CLASS } from './ContactCta';
+import { EYEBROW_CLASS } from './sectionStyles';
 
 const Stars: React.FC<{ count: number }> = ({ count }) => (
   <span className="inline-flex" aria-hidden="true">
@@ -108,7 +109,8 @@ export const GoogleReviewsSection: React.FC = () => {
       aria-labelledby="reviews-heading"
       className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 py-12 sm:py-16 border-t border-[#26262E]"
     >
-      <h2 id="reviews-heading" className="text-3xl sm:text-4xl font-light tracking-[-0.03em] leading-tight text-white">
+      <span className={EYEBROW_CLASS}>Reviews</span>
+      <h2 id="reviews-heading" className="mt-2 text-3xl sm:text-4xl font-light tracking-[-0.03em] leading-tight text-white">
         What customers say on Google
       </h2>
       {hasRating && (

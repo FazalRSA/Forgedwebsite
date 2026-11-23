@@ -50,7 +50,7 @@ interface WheelShowcasePDPProps {
 }
 
 const PRIMARY_BUTTON =
-  'inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[#1D4ED8] px-6 text-base font-semibold text-white hover:bg-[#2563EB] active:bg-[#1E40AF] transition-colors cursor-pointer';
+  'press inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-white px-6 text-base font-semibold text-[#111111] hover:bg-white/90 cursor-pointer';
 
 /** Black with white text; the neon laser runs round its edge while a preview is being made (index.css). */
 const CAR_PREVIEW_BUTTON =
@@ -576,7 +576,7 @@ const PhotoGallery: React.FC<{
               >
                 <span
                   className={`block h-2 w-2 rounded-full transition-colors ${
-                    active === i ? 'bg-[#1D4ED8]' : 'bg-neutral-600'
+                    active === i ? 'bg-white' : 'bg-neutral-600'
                   }`}
                 />
               </button>

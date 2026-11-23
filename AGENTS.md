@@ -35,7 +35,9 @@ Run the type check, the tests and the build before you open a pull request. All 
 3. **One source for business details.** Phone, WhatsApp, address and domain come from
    `src/config/site.ts`. Do not hardcode them anywhere else. Emails must be on `SITE.domain`.
 4. **Numbers come from data.** Prices, set counts, sizes and fitment on any page or in
-   `llms.txt` are derived from `src/data/catalogue.ts`. Do not type them into components.
+   `llms.txt` are derived from `src/data/catalogue.ts`. Do not type them into components. The sizes
+   and specifications Sixnine publishes for its whole range are in `src/data/sixnineRange.json`, written
+   by `scripts/sixnine-range-from-sheet.py`; stock and prices still come only from the catalogue.
 5. **Prices are South African Rand per set of four.** Format with `formatZAR`.
 6. **Tests are listed by name.** `npm test` runs the files named in `package.json`. A new
    `*.test.ts` file does not run until you add it to that list.
@@ -64,6 +66,26 @@ Run the type check, the tests and the build before you open a pull request. All 
 ## Adding a 3D model
 
 Use the `add-wheel-model` skill (`.claude/skills/add-wheel-model/`); the owner's steps are in `docs/adding-3d-models.md`. Check a model against the real photos of the listing before wiring it, and never wire an AI model of a wheel the shop does not sell.
+
+## The SIXNINE style skills
+
+`.claude/skills/sixnine-website`, `sixnine-product-listing`, `sixnine-marketing-pages` and `sixnine-blog-writing`
+describe the sixnine-wheels.com storefront (measured 19 November 2026; source: the owner's "forged sixnine skills"
+Drive folder). They are reference material, kept exactly as the owner supplied them. On 20 November 2026 the owner
+asked for the site to follow SIXNINE's build ideology while keeping FORGED's own touches; README → Design system says
+what was taken (pills, glass, white primary buttons, one accent, eyebrow heads, press feedback) and what stays. Their
+descriptions say "use for any wheel listing / landing page / blog post", but here they guide structure only, and this
+file wins:
+
+- FORGED's palette and type stay: `#111111`, blue `#1D4ED8` as the one accent, rose accent text and focus ring, the
+  three typefaces. Do not bring in the skills' violet, `#08080A`, Albert Sans or Montserrat unless the owner asks.
+- There is no checkout: no cart, "Add to cart", quantity stepper, VAT or shipping lines. Every call to action opens
+  the enquiry form.
+- Prices are Rand per set of four from the catalogue (rules 4 and 5), never the skills' euro example prices,
+  surcharges or sale lines. Finish names stay as the catalogue spells them.
+- Blog posts follow `src/data/blog.ts` and its tests, not the skills' article format.
+- The skills' own brand rule holds: no SIXNINE renders, photos or wording without the owner confirming permission.
+  The series pages and mega menu show the shop's own photos, or the series name when there is none.
 
 ## Things that must stay in step
 
