@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { SixnineRangeStrip } from './SixnineRange';
 import { ArrowRight } from 'lucide-react';
 import {
   BrandWheelItem,
@@ -333,6 +334,7 @@ const BrandGroup: React.FC<{
           />
         ))}
       </ul>
+      {brand?.id === 'sixnine' && <SixnineRangeStrip inStock={wheels} brandPath={brand.path} />}
     </section>
   );
 };
