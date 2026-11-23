@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { SITE } from '../config/site';
-import { formatZAR, getAllBrandWheels } from './catalogue';
+import { designName, formatZAR, getAllBrandWheels } from './catalogue';
 import {
   BLOG_PILLARS,
   blogPostPath,
@@ -214,10 +214,10 @@ test('text that depends on the catalogue is built from it, and nothing reads "un
 test('the design table has one row per design in stock, priced from the cheapest listing', () => {
   const rows = designRows();
   const wheels = getAllBrandWheels();
-  const designs = new Set(wheels.map((w) => w.modelCode || w.model));
+  const designs = new Set(wheels.map((w) => designName(w.modelCode || w.model)));
   assert.equal(rows.length, designs.size);
   for (const row of rows) {
-    const listings = wheels.filter((w) => (w.modelCode || w.model) === row.design);
+    const listings = wheels.filter((w) => designName(w.modelCode || w.model) === row.design);
     assert.equal(row.from, formatZAR(Math.min(...listings.map((w) => w.priceZAR))));
     assert.ok(listings.some((w) => w.slug === row.slug));
   }

@@ -16,11 +16,14 @@ import {
   brandOfWheel,
   WHEEL_BRANDS,
   capLogoForDesign,
+  designName,
 } from '../../data/catalogue';
 import { whatsappLink } from '../../config/site';
 import { carPreviewEnabled } from '../../utils/carPreview';
 import { Link, useRouter } from '../../utils/router';
 import { cutoutSrcFor, formatSizes } from '../../utils/designCards';
+import { sixnineSizesForListing } from '../../utils/listingSpecs';
+import { sizeLine, type SixnineSize } from '../../data/sixnineSeries';
 import { wheelImageSrcSet } from '../../utils/wheelImageSrcSet';
 import { useForgedStore } from '../../store/useForgedStore';
 import {
@@ -111,6 +114,15 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
   // The transparent cut-out of the three-quarter photo opens the gallery on the dark page colour.
   const cutout = cutoutSrcFor(getWheelImages(wheel).images[1]);
   const siblings = getSiblingListings(wheel, customBrandWheels);
+  const otherFinishPhotos: OtherFinishPhotos[] = siblings
+    .map((s) => ({
+      name: s.finishName ?? WHEEL_FINISHES[s.defaultFinish]?.name ?? 'Standard',
+      slug: s.slug,
+      photos: realPhotos(s),
+    }))
+    .filter((s) => s.photos.length > 0);
+  // Sixnine's published figures for the sizes this set is (see listingSpecs.ts); empty for Forged SA.
+  const sixnineSizes = sixnineSizesForListing(wheel);
   const toOrderFinishes = getToOrderFinishes(wheel, customBrandWheels);
   // The colour shown in the 3D view: the stocked one, or a to-order colour being previewed.
   const [previewFinish, setPreviewFinish] = useState(wheel.defaultFinish);
@@ -119,7 +131,7 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
     .filter((w) => w.slug !== wheel.slug)
     .slice(0, 4);
 
-  const design = wheel.modelCode ?? wheel.model;
+  const design = wheel.modelCode ? designName(wheel.modelCode) : wheel.model;
   const finishLabel = wheel.finishName ?? WHEEL_FINISHES[wheel.defaultFinish]?.name ?? 'Standard';
   const stageFinishNames = useMemo(() => ({ [wheel.defaultFinish]: finishLabel }), [wheel.defaultFinish, finishLabel]);
   const priceText = formatZAR(wheel.priceZAR);
@@ -225,9 +237,10 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
 
   const specRows: { label: string; value: string }[] = [
     wheel.sizesAvailable && { label: 'Sizes', value: formatSizes(wheel.sizesAvailable) },
-    specs.pcd && { label: 'PCD (bolt pattern)', value: specs.pcd },
-    specs.et && { label: 'ET (offset)', value: specs.et },
-    specs.cb && {
+    // Bolt pattern, offset and centre bore are in the technical data table when Sixnine's sizes match.
+    !sixnineSizes.length && specs.pcd && { label: 'PCD (bolt pattern)', value: specs.pcd },
+    !sixnineSizes.length && specs.et && { label: 'ET (offset)', value: specs.et },
+    !sixnineSizes.length && specs.cb && {
       label: 'CB (centre bore)',
       value: /^\d+(\.\d+)?$/.test(specs.cb) ? `${specs.cb} mm` : specs.cb,
     },
@@ -278,6 +291,7 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
               <PhotoGallery
                 photos={photos}
                 cutout={cutout}
+                otherFinishes={otherFinishPhotos}
                 altBase={`${wheel.model} forged wheel`}
                 onView3D={has3D ? openStudio : undefined}
                 triggerRef={view3DButtonRef}
@@ -347,6 +361,8 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
                 </div>
               ))}
             </dl>
+
+            {sixnineSizes.length > 0 && <TechnicalData sizes={sixnineSizes} />}
 
             <div className="mt-6 hidden lg:block space-y-3">
               {enquireButton}
@@ -456,6 +472,15 @@ interface GallerySlide {
   kind: 'cutout' | 'photo';
   /** The pixel size of the file, for the img width/height attributes. */
   size: number;
+  /** Set on photos of the design's other finishes in stock: the finish shown and its own page. */
+  finish?: { name: string; slug: string };
+}
+
+/** The design's other finishes in stock, as gallery photos after this listing's own. */
+export interface OtherFinishPhotos {
+  name: string;
+  slug: string;
+  photos: string[];
 }
 
 /**
@@ -467,15 +492,21 @@ const PhotoGallery: React.FC<{
   photos: string[];
   cutout?: string;
   altBase: string;
+  otherFinishes?: OtherFinishPhotos[];
   onView3D?: () => void;
   triggerRef: React.Ref<HTMLButtonElement>;
-}> = ({ photos, cutout, altBase, onView3D, triggerRef }) => {
+}> = ({ photos, cutout, altBase, otherFinishes = [], onView3D, triggerRef }) => {
   const trackRef = useRef<HTMLDivElement | null>(null);
   const [active, setActive] = useState(0);
 
   const slides: GallerySlide[] = [
     ...(cutout ? [{ src: cutout, kind: 'cutout' as const, size: 1000 }] : []),
     ...photos.map((src) => ({ src, kind: 'photo' as const, size: 1600 })),
+    // Then the same design in its other finishes in stock, as SIXNINE's gallery runs through every
+    // finish. Each is labelled and links to its own page, since its price and stock are its own.
+    ...otherFinishes.flatMap((other) =>
+      other.photos.map((src) => ({ src, kind: 'photo' as const, size: 1600, finish: { name: other.name, slug: other.slug } }))
+    ),
   ];
   const count = slides.length;
 
@@ -499,7 +530,9 @@ const PhotoGallery: React.FC<{
   const slideAlt = (slide: GallerySlide, i: number) =>
     slide.kind === 'cutout'
       ? `${altBase}, cut-out, 1 of ${count}`
-      : `${altBase}, photo ${i + 1} of ${count}`;
+      : slide.finish
+        ? `The same design in ${slide.finish.name}, photo ${i + 1} of ${count}`
+        : `${altBase}, photo ${i + 1} of ${count}`;
 
   return (
     <div role="region" aria-roledescription="carousel" aria-label={`${altBase} photos`}>
@@ -536,6 +569,16 @@ const PhotoGallery: React.FC<{
                 }`}
               />
               {i === 0 && onView3D && <View3DPoster onClick={onView3D} triggerRef={triggerRef} />}
+              {slide.finish && (
+                <Link
+                  to={`/wheels/${slide.finish.slug}`}
+                  tabIndex={active === i ? 0 : -1}
+                  className="absolute left-3 top-3 inline-flex min-h-9 items-center gap-1.5 rounded-full bg-white px-3.5 text-xs font-bold uppercase tracking-[0.08em] text-[#111111] hover:bg-white/90"
+                >
+                  {slide.finish.name}
+                  <span className="font-semibold normal-case tracking-normal text-[#111111]/60">· view this finish</span>
+                </Link>
+              )}
             </div>
           ))}
         </div>
@@ -546,7 +589,7 @@ const PhotoGallery: React.FC<{
               type="button"
               onClick={() => goTo(active - 1)}
               aria-label="Previous photo"
-              className="absolute left-2 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black md:flex cursor-pointer"
+              className="absolute left-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-black/55 text-white backdrop-blur-sm hover:bg-black cursor-pointer"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
@@ -554,30 +597,49 @@ const PhotoGallery: React.FC<{
               type="button"
               onClick={() => goTo(active + 1)}
               aria-label="Next photo"
-              className="absolute right-2 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black md:flex cursor-pointer"
+              className="absolute right-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-black/55 text-white backdrop-blur-sm hover:bg-black cursor-pointer"
             >
               <ChevronRight className="h-5 w-5" />
             </button>
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-black/55 px-2.5 py-1 text-xs tabular-nums text-white backdrop-blur-sm"
+            >
+              {active + 1} / {count}
+            </span>
           </>
         )}
       </div>
 
       {count > 1 && (
         <>
-          <div className="mt-1 flex justify-center">
+          {/* Thumbnails, as on SIXNINE's product page: every slide, the current one outlined. */}
+          <div className="no-scrollbar mt-3 flex gap-2.5 overflow-x-auto p-0.5">
             {slides.map((slide, i) => (
               <button
                 key={slide.src}
                 type="button"
                 onClick={() => goTo(i)}
-                aria-label={`Show photo ${i + 1} of ${count}`}
+                aria-label={`Show photo ${i + 1} of ${count}${slide.finish ? `, ${slide.finish.name}` : ''}`}
                 aria-current={active === i ? 'true' : undefined}
-                className="flex h-11 w-9 items-center justify-center cursor-pointer"
+                className={`press relative aspect-square w-[68px] shrink-0 overflow-hidden rounded-xl border bg-[#18181D] transition-[opacity,border-color] sm:w-[84px] cursor-pointer ${
+                  active === i ? 'border-neutral-400 opacity-100' : 'border-[#26262E] opacity-60 hover:opacity-90'
+                }`}
               >
-                <span
-                  className={`block h-2 w-2 rounded-full transition-colors ${
-                    active === i ? 'bg-white' : 'bg-neutral-600'
-                  }`}
+                <img
+                  {...wheelImageSrcSet(slide.src, '84px')}
+                  alt=""
+                  width={84}
+                  height={84}
+                  loading="lazy"
+                  decoding="async"
+                  className={`h-full w-full ${slide.kind === 'cutout' ? 'object-contain p-[8%]' : 'object-cover'}`}
+                  // A photo that fails to load (for example one added from the admin page and since
+                  // removed) drops its thumbnail rather than showing a broken image; the arrows still reach it.
+                  onError={(e) => {
+                    const button = e.currentTarget.closest('button');
+                    if (button) button.hidden = true;
+                  }}
                 />
               </button>
             ))}
@@ -588,6 +650,60 @@ const PhotoGallery: React.FC<{
         </>
       )}
     </div>
+  );
+};
+
+/**
+ * Sixnine's technical data for the sizes this set is, laid out like the table on SIXNINE's product
+ * pages: one column per size, a row per figure. A figure Sixnine does not give is shown as a dash.
+ */
+const TechnicalData: React.FC<{ sizes: SixnineSize[] }> = ({ sizes }) => {
+  const rows: { label: string; value: (size: SixnineSize) => string | null }[] = [
+    { label: 'Wheel size', value: (z) => (z.width && z.diameter ? `${z.width}Jx${z.diameter}` : z.size) },
+    { label: 'Offset (ET)', value: (z) => (z.offset !== null ? `ET${z.offset}` : null) },
+    { label: 'Bolt pattern', value: (z) => z.boltPatterns.join(' / ') || null },
+    { label: 'Load rating', value: (z) => (z.loadKg ? `${z.loadKg} kg` : null) },
+    { label: 'Centre bore', value: (z) => (z.centreBoreMm ? `${z.centreBoreMm} mm` : null) },
+    { label: 'Concavity', value: (z) => (z.concavityMm ? `${z.concavityMm} mm` : null) },
+    { label: 'Wheel weight', value: (z) => (z.weightKg ? `≈ ${z.weightKg} kg` : null) },
+  ];
+  return (
+    <section aria-labelledby="technical-data" className="mt-8">
+      <h2 id="technical-data" className="text-xs font-bold uppercase tracking-[0.14em] text-neutral-400">
+        Technical data
+      </h2>
+      <table className="mt-3 w-full border-collapse text-sm tabular-nums">
+        <thead>
+          <tr className="border-b border-[#3A3A44]">
+            <th scope="col" className="py-2.5 pr-3 text-left font-medium text-neutral-400">
+              <span className="sr-only">Figure</span>
+            </th>
+            {sizes.map((z) => (
+              <th key={sizeLine(z)} scope="col" className="py-2.5 pl-3 text-right font-semibold text-white">
+                {z.diameter}″
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.label} className="border-b border-[#26262E]">
+              <th scope="row" className="py-2.5 pr-3 text-left font-normal text-neutral-400">
+                {row.label}
+              </th>
+              {sizes.map((z) => (
+                <td key={sizeLine(z)} className="py-2.5 pl-3 text-right font-medium text-white">
+                  {row.value(z) ?? '–'}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p className="mt-2 text-xs text-neutral-500">
+        Sixnine Wheels' published figures for these sizes. Ask us to confirm the fit for your car.
+      </p>
+    </section>
   );
 };
 
