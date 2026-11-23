@@ -9,6 +9,18 @@ import { sixnineSeriesOfWheel, type SixnineSize } from '../data/sixnineSeries';
  * from sixnineRange.json; nothing is typed by hand.
  */
 
+/*
+ * Error handling, reviewed 23 November 2026 and approved by the owner:
+ * - The input is catalogue text already in memory (sizesAvailable, technicalSpecSheet), not a file
+ *   or network read, so nothing here can fail the way I/O fails.
+ * - A sheet that cannot be read does not throw: a throw would take the whole wheel page down for a
+ *   visitor over one missing figure. listingFitment names what is missing in `problem`.
+ * - sixnineSizesForListing then logs that problem with console.warn and returns no sizes, so the page
+ *   hides the technical data instead of showing a guessed figure (AGENTS.md rule 2).
+ * - listingSpecs.test.ts fails on any catalogue listing with a problem, so the catalogue's own wheels
+ *   cannot ship with an unreadable sheet; the warning covers listings added from the admin page.
+ */
+
 /** "20 inch / 21 inch" → [20, 21]. */
 export function listingDiameters(sizes: string | undefined): number[] {
   return Array.from((sizes ?? '').matchAll(/(\d{2})(?:\.\d)?\s*(?:inch|″|")/gi), (m) => Number(m[1]));
