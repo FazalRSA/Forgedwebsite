@@ -233,13 +233,8 @@ export async function requestCarPreview({
     throw new CarPreviewError('network', NETWORK_MESSAGE);
   }
 
-  let body: unknown;
-  try {
-    body = await readJson(response);
-  } catch (error) {
-    if (isAbort(error, signal)) throw new CarPreviewError('aborted', '');
-    throw new CarPreviewError('network', NETWORK_MESSAGE);
-  }
+  // readJson never rejects (an unreadable body is null), so an abort during the read shows up here.
+  const body = await readJson(response);
   if (signal?.aborted) throw new CarPreviewError('aborted', '');
   const record = typeof body === 'object' && body !== null ? (body as Record<string, unknown>) : {};
 
