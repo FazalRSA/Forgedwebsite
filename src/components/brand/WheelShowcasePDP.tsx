@@ -23,6 +23,7 @@ import { carPreviewEnabled } from '../../utils/carPreview';
 import { Link, useRouter } from '../../utils/router';
 import { cutoutSrcFor, formatSizes } from '../../utils/designCards';
 import { sixnineSizesForListing } from '../../utils/listingSpecs';
+import { listingDetails, type ListingDetails } from '../../utils/listingDetails';
 import { sizeLine, type SixnineSize } from '../../data/sixnineSeries';
 import { wheelImageSrcSet } from '../../utils/wheelImageSrcSet';
 import { useForgedStore } from '../../store/useForgedStore';
@@ -123,6 +124,8 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
     .filter((s) => s.photos.length > 0);
   // Sixnine's published figures for the sizes this set is (see listingSpecs.ts); empty for Forged SA.
   const sixnineSizes = sixnineSizesForListing(wheel);
+  // The written Details section (listingDetails.ts): Sixnine listings with matched sizes only.
+  const details = listingDetails(wheel);
   const toOrderFinishes = getToOrderFinishes(wheel, customBrandWheels);
   // The colour shown in the 3D view: the stocked one, or a to-order colour being previewed.
   const [previewFinish, setPreviewFinish] = useState(wheel.defaultFinish);
@@ -370,6 +373,8 @@ const WheelDetail: React.FC<{ wheel: BrandWheelItem }> = ({ wheel }) => {
             </div>
           </div>
         </div>
+
+        {details && <DetailsSection details={details} />}
 
         {others.length > 0 && (
           <section aria-labelledby="more-wheels" className="mt-14 border-t border-[#26262E] pt-8">
@@ -706,6 +711,38 @@ const TechnicalData: React.FC<{ sizes: SixnineSize[] }> = ({ sizes }) => {
     </section>
   );
 };
+
+/**
+ * The listing's description, laid out as the sixnine-product-listing skill describes: eyebrow,
+ * headline, intro, three short feature notes, highlights at a glance and the note on the pictures.
+ * The text and every figure in it come from listingDetails (catalogue and Sixnine's published sizes).
+ */
+const DetailsSection: React.FC<{ details: ListingDetails }> = ({ details }) => (
+  <section aria-labelledby="wheel-details" className="mt-14 max-w-[760px] border-t border-[#26262E] pt-8">
+    <p className="text-xs font-bold uppercase tracking-[0.14em] text-neutral-400">Details</p>
+    <h2 id="wheel-details" className="mt-3 text-2xl sm:text-3xl font-semibold leading-tight tracking-[-0.02em] text-white tabular-nums">
+      {details.headline}
+    </h2>
+    <p className="mt-4 text-base leading-relaxed text-neutral-300">{details.intro}</p>
+    {details.features.map((feature) => (
+      <div key={feature.heading} className="mt-7">
+        <h3 className="text-lg font-semibold text-white">{feature.heading}</h3>
+        <p className="mt-2 text-base leading-relaxed text-neutral-300 tabular-nums">{feature.text}</p>
+      </div>
+    ))}
+    {details.highlights.length > 0 && (
+      <div className="mt-7">
+        <h3 className="text-lg font-semibold text-white">Highlights at a glance</h3>
+        <ul className="mt-2 list-disc space-y-1.5 pl-5 text-base text-neutral-300 tabular-nums marker:text-neutral-500">
+          {details.highlights.map((line) => (
+            <li key={line}>{line}</li>
+          ))}
+        </ul>
+      </div>
+    )}
+    <p className="mt-7 text-sm italic text-neutral-400">{details.pictureNote}</p>
+  </section>
+);
 
 /** A listing with no photos yet: say so plainly, and offer the 3D view if there is one. */
 const NoPhotoPanel: React.FC<{
