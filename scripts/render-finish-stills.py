@@ -243,7 +243,10 @@ def plain_glb(path, tmp):
         return path
     out = os.path.join(tmp, os.path.basename(path))
     if not os.path.exists(out):
-        subprocess.check_call(['npx', '-y', '@gltf-transform/cli@4', 'copy', path, out])
+        try:
+            subprocess.check_call(['npx', '-y', '@gltf-transform/cli@4', 'copy', path, out])
+        except (subprocess.CalledProcessError, OSError) as err:
+            raise SystemExit(f'Could not decode meshopt model {path}: {err}')
     return out
 
 
@@ -251,7 +254,10 @@ def build_stills(repo, size=384, samples=24, only=None):
     """Render every design x colour as a face-on studio still, convert to webp and write src/data/finishStills.json."""
     import subprocess, tempfile
     from PIL import Image
-    jobs = json.loads(subprocess.check_output(['npx', 'tsx', 'scripts/finish-still-jobs.ts'], cwd=repo))
+    try:
+        jobs = json.loads(subprocess.check_output(['npx', 'tsx', 'scripts/finish-still-jobs.ts'], cwd=repo))
+    except (subprocess.CalledProcessError, OSError, ValueError) as err:
+        raise SystemExit(f'Could not read the still jobs from scripts/finish-still-jobs.ts: {err}')
     out_dir = os.path.join(repo, 'public/images/wheels/finishes')
     os.makedirs(out_dir, exist_ok=True)
     tmp = tempfile.mkdtemp()
@@ -268,10 +274,18 @@ def build_stills(repo, size=384, samples=24, only=None):
         webp = f"{j['key']}.webp"
         png = os.path.join(tmp, f"{j['key']}_face.png")
         if os.path.exists(png):
-            Image.open(png).save(os.path.join(out_dir, webp), 'WEBP', quality=88)
+            try:
+                Image.open(png).save(os.path.join(out_dir, webp), 'WEBP', quality=88)
+            except OSError as err:
+                raise SystemExit(f'Could not write {webp}: {err}')
+        elif not os.path.exists(os.path.join(out_dir, webp)):
+            raise SystemExit(f"No render and no existing still for {j['key']}; manifest not written")
         manifest.setdefault(j['design'], {})[j['finishId']] = f'/images/wheels/finishes/{webp}'
-    with open(os.path.join(repo, 'src/data/finishStills.json'), 'w') as fh:
-        json.dump(manifest, fh, indent=2)
+    try:
+        with open(os.path.join(repo, 'src/data/finishStills.json'), 'w') as fh:
+            json.dump(manifest, fh, indent=2)
+    except OSError as err:
+        raise SystemExit(f'Could not write finishStills.json: {err}')
     print('wrote', len(jobs), 'stills')
 
 
