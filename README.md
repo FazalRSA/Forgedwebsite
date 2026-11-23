@@ -664,6 +664,12 @@ firebase deploy --only firestore:rules
 | `src/utils/wheelImageSrcSet.test.ts` | The `srcset` for each wheel photo (site photos only; nothing for admin uploads or placeholders) and that every smaller copy exists on disk |
 | `src/utils/fitmentImageSrcSet.test.ts` | The `srcset` for the install thumbnails (800 px copy, then the original) and that every install photo has its 800 px copy on disk |
 | `src/utils/wheelStudioParts.test.ts` | Viewer part classification, exploded-view offsets, camera distance |
+| `src/utils/heroVideo.test.ts` | The home-page hero film: every film file and poster is on disk, AV1 is offered before H.264, the download budget holds, each file can start before it has fully downloaded, and the film plays only when the visitor has not asked for less motion or to save data |
+| `src/utils/brandFitment.test.ts` | Brand pages: the design list, and fitment facts that show a size, bolt pattern or bore only when every set agrees |
+| `src/data/sixnineSeries.test.ts` | The six Sixnine series and their addresses; the range holds wheel specifications only (no prices, stock, certificates or shop links); sizes sort the Sixnine way; every in-stock FF listing belongs to a series |
+| `src/utils/sixnineShowcase.test.ts` | Every Sixnine series has a showcase picture |
+| `src/utils/listingSpecs.test.ts` | The spec sheet on each Sixnine listing: one Sixnine size per diameter, no Sixnine sizes on a Forged SA listing, and an unreadable sheet hides the table and says why |
+| `src/utils/leads.test.ts` | Lead delivery: the webhook address, the reference format, the payload (page, time, consent, source), the local reference and visitor notice when delivery fails, and no send when the honeypot is filled |
 | `src/utils/seo.test.ts` | Per-route metadata, canonical URLs, structured data, share images, sitemap (no removed route), `render.yaml`; that the sitemap, `robots.txt` and `index.html` all use the same host; the Search Console tag (added once, never from an unsafe token) |
 | `src/utils/analytics.test.ts` | Visit statistics are off until both values are set, refuse a non-https address or a malformed ID, add one tracker that counts only the production host and respects Do Not Track, push each event to Google Tag Manager's data layer too, and never let a tracker failure reach the page |
 | `src/utils/consent.test.ts` | The cookie choice is read and saved safely (blocked storage never throws), consent updates reach the data layer as gtag-style `Arguments` objects and only where GTM runs, Decline deletes only the `_ga` cookies on every parent domain, Accept keeps them, and Cookie settings reopens the banner |
@@ -697,14 +703,20 @@ The page rules in `render.yaml` are written by the build. Do not edit the block 
 
 #### Two Render services
 
-Two Render static sites build this repository's `main` (found on 17 November 2026 by listing the services and requesting the same addresses on each):
+Two Render static sites build this repository's `main`:
 
 | Service | Address | What it does today |
 | --- | --- | --- |
-| **Forged Wheels** | `forged-custom-wheels-gu3l.onrender.com` | Its routes appear to have been set by hand in the dashboard, because it ignores the blog rules in `render.yaml`. Its behaviour matches `www.forgedsa.co.za`, so the custom domain appears to be attached to it |
-| **forged-custom-wheels-gu3l** | `forged-custom-wheels-gu3l-lfgl.onrender.com` | Follows `render.yaml`: every page in the sitemap, including the blog, is served from its own prerendered file |
+| **Forged Wheels** (`srv-dbphe7on74is73dvmi2g`) | `forged-custom-wheels-gu3l.onrender.com` | Serves `www.forgedsa.co.za`, so the custom domain is attached to it. Its routes are set by hand in the dashboard and do not follow `render.yaml` on their own. On 23 November 2026 the rules for the Sixnine series pages, `/forged-sa-wheels`, `/wheels/fsa003-gold` and the blog's articles were added to it, and the old rules were kept. Seven blog articles added to `main` later were added on 23 November 2026 too, so every address in `render.yaml` now has its rule |
+| **forged-custom-wheels-gu3l** (`srv-dbqhtl5bedkc73dlu350`) | `forged-custom-wheels-gu3l-lfgl.onrender.com` | Not on the domain. It follows `render.yaml` directly, so every page in the sitemap is served from its own prerendered file. It is a second build of the same branch and can be deleted |
 
-Because of this, **a new page is correct on the second service and wrong on the live domain until its rewrite rule is added to the first**. Today that affects the blog, `/forged-sa-wheels` and the six Sixnine series pages (their rules are `/forged-sa-wheels` → `/forged-sa-wheels.html` and `/sixnine-wheels/<series>` → `/sixnine-wheels/<series>.html`, all listed in `render.yaml`; `add-blog-rules.sh` adds only the `/blog` rules, so add these by hand under Redirects/Rewrites). The blog's 24 addresses (`/blog`, four pillars, nineteen articles) return the generic home-page title and no structured data to crawlers and link previews on the live domain; visitors still get the right page, because the app sets the title itself. The fix is either to move the custom domain to the second service (so everything follows `render.yaml` from then on) or to add the rules to the first: paste those in [docs/render-blog-rewrites.md](docs/render-blog-rewrites.md) under Redirects/Rewrites, or run `scripts/add-blog-rules.sh` with a Render API key (it previews first, skips rules that already exist and reads the rules from `render.yaml`; see the comments at its top). The Render MCP tools cannot edit routes or domains, so this is done in the dashboard or with that script. To check, `curl -s https://www.forgedsa.co.za/blog/wheel-care | grep '<title>'` should show "Forged wheel care", not "Forged wheels for BMW M cars in stock".
+Because of this, **a new page is correct on the second service and wrong on the live domain until its rewrite rule is on the first**. The rules to add are the ones in the generated block of `render.yaml`. Three ways to add them:
+
+- `scripts/add-blog-rules.sh` adds the blog's rules from `render.yaml` to the domain's service. It previews first (`DRY_RUN=0` applies), skips rules that already exist and saves the current rules before it changes anything. It needs a Render API key in `RENDER_API_KEY`; the comments at its top say where to get one.
+- [docs/render-blog-rewrites.md](docs/render-blog-rewrites.md) lists the blog rules to paste under Redirects/Rewrites in the dashboard.
+- The Sixnine and Forged SA rules are `/forged-sa-wheels` → `/forged-sa-wheels.html` and `/sixnine-wheels/<series>` → `/sixnine-wheels/<series>.html`. The script does not add them; add them by hand, above the catch-all `/*` → `/index.html`.
+
+Render applies the first rule that matches, from the top, so the catch-all must stay last. The Render MCP tools cannot edit routes or domains. To check a page, `curl -s https://www.forgedsa.co.za/blog/wheel-care/how-to-clean-forged-wheels | grep '<title>'` should show "How to clean forged wheels safely", not "Forged wheels for BMW M cars in stock".
 
 **Checking a deploy.** Render's CDN caches each page's HTML for up to five minutes, so a visitor can see the previous version briefly after a deploy goes live. To check a new deploy straight away, add any query string to the URL, for example `/installs?check=1`.
 
@@ -741,7 +753,7 @@ Build chunks are split per vendor (`react`, `motion`, `three`, `firebase`, `luci
 | **Ask AI buttons** | The link formats follow each assistant's documented pattern; they have not been clicked through signed in | Test each once on the live site |
 | **Install details** | Each car's make, model and paint were read from its photo, not confirmed | Shop to confirm, then correct `jobs.json` |
 | **Leftovers from the starter** | `package.json` still lists `@google/genai`, `express` and `dotenv`, which no file imports. `.env.example`, `metadata.json` and a tracked `.aistudio/` folder (6 MB of screenshots) come from the same starter | Remove in one clean-up pull request |
-| **Render routes** | Two Render services build `main`; the one that appears to carry the live domain ignores `render.yaml`, so the blog's addresses are not served from their prerendered files there (see [Two Render services](#two-render-services)) | Move the domain to the service that follows `render.yaml`, or add the rules in `docs/render-blog-rewrites.md` |
+| **Render routes** | Each address in `render.yaml`'s generated block has a rule on the domain's service, checked on 23 November 2026. A rule added in the dashboard that `render.yaml` does not list would not be tracked here | Re-check after any change to `render.yaml`: each `/blog/…` address should show its own title, not the home page's (see [Two Render services](#two-render-services)) |
 | **Automated checks** | Type check, 254 tests in 25 files and the build, all run by hand. No CI, no browser tests, and ESLint is not wired to a script | Run the three checks on every pull request with a CI workflow |
 
 ## Contributing
