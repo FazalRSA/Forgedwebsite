@@ -237,7 +237,9 @@ def run(jobs, outdir, size, samples, views=('hero',)):
 def plain_glb(path, tmp):
     """bpy cannot read meshopt-compressed GLBs (FSA001); decode those to a plain copy first."""
     import subprocess
-    if b'EXT_meshopt_compression' not in open(path, 'rb').read(200000):
+    with open(path, 'rb') as fh:
+        head = fh.read(200000)
+    if b'EXT_meshopt_compression' not in head:
         return path
     out = os.path.join(tmp, os.path.basename(path))
     if not os.path.exists(out):
@@ -268,7 +270,8 @@ def build_stills(repo, size=384, samples=24, only=None):
         if os.path.exists(png):
             Image.open(png).save(os.path.join(out_dir, webp), 'WEBP', quality=88)
         manifest.setdefault(j['design'], {})[j['finishId']] = f'/images/wheels/finishes/{webp}'
-    json.dump(manifest, open(os.path.join(repo, 'src/data/finishStills.json'), 'w'), indent=2)
+    with open(os.path.join(repo, 'src/data/finishStills.json'), 'w') as fh:
+        json.dump(manifest, fh, indent=2)
     print('wrote', len(jobs), 'stills')
 
 
