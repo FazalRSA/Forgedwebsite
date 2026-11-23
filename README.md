@@ -347,7 +347,7 @@ To refresh the data, download the sheet as .xlsx (File › Download › Microsof
 python3 scripts/sixnine-range-from-sheet.py path/to/SIXNINE_Wheels_Catalogue.xlsx
 ```
 
-The script needs `pip install openpyxl`. It refuses a series it does not know: add a new one to `SERIES_ORDER` in the script, and any words about it to `FEATURES` in `src/data/sixnineSeries.ts`. Construction is said of a whole series only when most of its sizes state it (EVO-ONE states it for 1 size of 11, so its page does not).
+The script needs `pip install openpyxl`. It refuses a series it does not know: add a new one to `SERIES_ORDER` in the script, and any words about it to `FEATURES` in `src/data/sixnineSeries.ts`. The sheet's construction wording ("flow forged", "flow formed") is **not** shown: on 23 November 2026 the owner confirmed every wheel the shop sells is forged, so `SIXNINE_SERIES` in `src/data/sixnineSeries.ts` sets every series to `SHOP_CONSTRUCTION` ("Forged") and keeps a size's own line only where it adds the piece count ("Forged, 2-piece"). The series pages, range cards, wheel-page write-ups and search descriptions all read it from there; a test fails if any series or size says "flow".
 
 ## Catalogue data model
 
@@ -431,6 +431,8 @@ A wheel with a `modelUrl` opens in the studio. The stage itself, its paint, the 
 - FSA001 sets its own front and rear pair on its seed (`modelUrl` and `rearModelUrl`), which enables the Front / Rear switch.
 - Paint settings per finish live in `src/data/studioFinishes.ts`. The colour swatches on wheel pages and in the viewer are drawn from the same numbers (`src/wheel-viewer/swatch.ts`), so a finish and its swatch cannot disagree.
 - **Adding a model:** put the rim photo into Tripo3D, generate multi-view then 3D, export the `.glb`, upload it to Google Drive and give Claude the link. The `add-wheel-model` skill (`.claude/skills/add-wheel-model/`) cleans it and opens the pull request; the owner's steps, the limits of AI models and the better source (the maker's CAD) are in [docs/adding-3d-models.md](docs/adding-3d-models.md).
+- **Centre-cap logos** are drawn by the viewer, not baked into the file: `capLogoForDesign` in `catalogue.ts` gives the FORGED monogram for FSA designs and the SIXNINE badge for FF designs, and the viewer's `capLogo` prop finds the cap by looking down the axle, lays the logo on it (gold mark on dark paint, dark ink on light paint) and, when a model has an open centre bore (FSA002), fills it with a cap in the wheel's paint first.
+- **Sixnine series pages** for designs in stock (FF-ONE, FF-THREE) have a "View in 3D" button that opens the stocked design's model in the finishes the shop has.
 - On a wheel page the studio offers the listing's own finish plus the design's to-order colours. While a to-order colour is selected, the page shows the lead-time notice under the viewer.
 
 **Model requirements** (full detail in `public/models/wheels/README.md`)
@@ -439,10 +441,11 @@ A wheel with a `modelUrl` opens in the studio. The stage itself, its paint, the 
 - Axle bore centre at the origin, face toward +Z, real metres.
 - Sub-meshes named `Rim_Barrel`, `Rim_Face_Spokes`, `Hardware_Bolts`, `Center_Cap`. The barrel, face and cap take the selected finish; bolts keep their own material. A wheel with no cap may omit `Center_Cap`.
 - Optional `Brake_Rotor` and `Brake_Caliper` meshes enable the brake clearance check.
-- Baked textures are not needed: the studio applies its own paint, so models ship without them to keep downloads small (0.4 to 0.8 MB each today).
-- Keep under roughly 150k triangles for mobile.
+- Baked textures are not needed: the studio applies its own paint, so models ship without them. Today FSA001's pair is 0.4 MB each and the five AI-made models 3.4 to 4.6 MB each (no Draco compression yet).
+- Keep near 150k to 200k triangles for mobile (the AI-made models are 146k to 200k).
+- A one-mesh AI model (everything named `Rim_Face_Spokes`) is fine: it all takes the finish. Its bolts are painted too.
 
-**Accuracy of the current models.** The FSA002, FSA003, FSA004, FF-1 and FF-3 models were generated with Tripo3D from the real wheel photos and cleaned (see [docs/adding-3d-models.md](docs/adding-3d-models.md)); each was checked against its photos (spoke pattern, rim, hub, centre cap). They are close to the real wheels, not CAD: fine surface detail is the AI's, and a few thin streaks from the AI mesh may show at some angles. The maker's CAD or 3D scans are the better source if they become available. The FSA001 brake meshes use assumed G80 brake dimensions, not a measured caliper.
+**Accuracy of the current models.** The FSA002, FSA003, FSA004, FF-1 and FF-3 models were generated with Tripo3D from the real wheel photos and cleaned with the `add-wheel-model` skill's `build_wheel_model.py` (see [docs/adding-3d-models.md](docs/adding-3d-models.md)); each was checked against its photos (spoke pattern, rim, hub, centre cap). The current files (`fsa002-forked-v4`, `fsa003-v6`, `fsa004-v6`, `ff-1-sixnine-v4`, `ff-3-sixnine-v4`, settings in `scripts/wheel-models.json`) have the AI's thin fins cut, smoothed surfaces and shading, and the barrel rebuilt as one clean 6 mm wall (the AI meshes modelled it as a thick double skin) on every design except FF-3, whose bolted two-piece lip the rebuild cuts. They are close to the real wheels, not CAD: faint bumps and the odd thin spike from the AI mesh remain at some angles. The maker's CAD or 3D scans are the better source if they become available. The FSA001 brake meshes use assumed G80 brake dimensions, not a measured caliper.
 
 ## Search and sharing
 
@@ -529,6 +532,7 @@ Things to know before relying on it:
 - **Social buttons** (`SocialButtons`, in the footer and on `/contact`) come from `instagramUrl`, `facebookUrl`, `tiktokUrl` and `youtubeUrl` in `src/config/site.ts`. An empty value hides its button; filled ones also go into the home page's `sameAs` structured data.
 - **Google reviews** (`GoogleReviewsSection`, home page, after the installs) shows the rating and count from `SITE.googleRating` and `SITE.googleReviewCount`, review text copied from Google into `src/data/googleReviews.ts`, and the "Read all reviews" and "Leave a review" links from `SITE`. It is hidden until something is filled in. It adds no review structured data on purpose: Google does not show stars for a business's own reviews of itself.
 - **`AGENTS.md`** at the repository root gives AI coding agents the commands and the rules that are easy to break. Keep it in step with this file.
+- **[docs/agent-handoff.md](docs/agent-handoff.md)** is the working context for the next agent: what has been built, why, the owner's decisions and preferences, the 3D-model pipeline in practice, environment gotchas, and what is still open.
 - **Agent skills** live in `.claude/skills/`: `add-wheel-model` (adding a 3D model), and four SIXNINE style skills (`sixnine-website`, `sixnine-product-listing`, `sixnine-marketing-pages`, `sixnine-blog-writing`) that describe the sixnine-wheels.com storefront, as supplied by the owner. `AGENTS.md` says when the SIXNINE skills apply and which of this repository's rules they never override.
 
 ## Google Tag Manager and Google Analytics
@@ -782,8 +786,8 @@ Build chunks are split per vendor (`react`, `motion`, `three`, `supabase`, `luci
 | --- | --- | --- |
 | **Lead delivery** | Every enquiry is posted to n8n, which logs it and emails the business (see [Lead delivery](#lead-delivery-n8n)); with a WhatsApp number set, the form also opens WhatsApp. The inbox is set inside the n8n workflow. | Route leads into a CRM from the same workflow |
 | **Contact channels** | Set in `src/config/site.ts`; any channel left empty there is hidden (Instagram, Facebook and trade email are empty today) | Fill in once confirmed |
-| **3D accuracy** | Five designs are traced from photos with simplified surfaces | Replace with scans of the physical wheels |
-| **Photography** | Two listings have no product photos and show a plain drawn stand-in (FSA003 Silver and FSA004 Hyper Black) | Add their photos to the Drive folder, then run the studio-photo steps in [Adding or changing a wheel](#adding-or-changing-a-wheel) |
+| **3D accuracy** | Five designs are AI models (Tripo3D) made from photos and cleaned; faint bumps remain | Get the maker's CAD (ask Sixnine for FF-ONE and FF-THREE) or scans, then rebuild with `npm run build-wheel-models` |
+| **Photography** | Two listings have no product photos (FSA003 Silver and FSA004 Hyper Black); their gallery shows renders of the 3D model, labelled "3D preview" in `customWheels.json` | Add their photos to the Drive folder, then run the studio-photo steps in [Adding or changing a wheel](#adding-or-changing-a-wheel) |
 | **Link previews** | The app is client-rendered; `npm run build` bakes each page's title and share image into its own HTML file so chat apps show the right preview for the pages in the sitemap. Blog pages also carry their full article text in that file | Server-render the rest if more pages are added |
 | **Blog content** | Nineteen articles of general knowledge, written without customer stories, photographs or a named author, because none were supplied | Add real install stories, workshop photographs and a named author, which search engines weigh as experience and expertise |
 | **Old links** | Redirected in the browser and by a redirect page per removed address, not with an HTTP 301 | Add 301 rules on the host |
@@ -798,7 +802,7 @@ Build chunks are split per vendor (`react`, `motion`, `three`, `supabase`, `luci
 | **Install details** | Each car's make, model and paint were read from its photo, not confirmed | Shop to confirm, then correct `jobs.json` |
 | **Leftovers from the starter** | `package.json` still lists `@google/genai`, `express` and `dotenv`, which no file imports. `.env.example`, `metadata.json` and a tracked `.aistudio/` folder (6 MB of screenshots) come from the same starter | Remove in one clean-up pull request |
 | **Render routes** | Each address in `render.yaml`'s generated block has a rule on the domain's service, checked on 23 November 2026. A rule added in the dashboard that `render.yaml` does not list would not be tracked here | Re-check after any change to `render.yaml`: each `/blog/…` address should show its own title, not the home page's (see [Two Render services](#two-render-services)) |
-| **Automated checks** | Type check, 262 tests in 26 files and the build, all run by hand. No CI, no browser tests, and ESLint is not wired to a script | Run the three checks on every pull request with a CI workflow |
+| **Automated checks** | Type check, 282 tests in 28 files and the build, all run by hand, plus `npm run qa-wheels` for the 3D views. No CI, no browser tests, and ESLint is not wired to a script | Run the three checks on every pull request with a CI workflow |
 
 ## Contributing
 
