@@ -2,7 +2,7 @@
  * Old addresses that no longer have a page of their own, and where they go now.
  *
  * The site was cut down to five pages (home, a wheel, installs, the Sixnine dealer page, contact). People still hold links
- * and bookmarks to the old store, dealer, account and fitments pages, so those are sent on rather
+ * and bookmarks to the old store, dealer, garage and fitments pages, so those are sent on rather
  * than shown a "not found" page. The router applies this with history.replaceState, so the old
  * address is replaced in the history and the Back button is not trapped.
  */
@@ -30,15 +30,13 @@ export function redirectFor(pathname: string): string | null {
   // Past installations moved from /client-fitments to /installs.
   if (path === '/client-fitments' || path === '/store/client-fitments') return '/installs';
 
-  // Account, garage and dealer sign-up are gone; contact is the way in now.
-  if (
-    isWithin(path, '/account') ||
-    isWithin(path, '/garage') ||
-    isWithin(path, '/dealer-application') ||
-    path === '/store/dealer-application'
-  ) {
+  // Dealer sign-up is gone; contact is the way in now.
+  if (isWithin(path, '/dealer-application') || path === '/store/dealer-application') {
     return '/contact';
   }
+
+  // The garage lives on the account page now (the account is shared with the configurator).
+  if (isWithin(path, '/garage')) return '/account';
 
   // The Sixnine dealer page has one address; its old longer address goes there.
   if (isWithin(path, '/official-dealer-sixnine-wheels')) return '/sixnine-wheels';

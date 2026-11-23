@@ -60,6 +60,7 @@ Run the type check, the tests and the build before you open a pull request. All 
 - `worker/car-preview/`: the Cloudflare Worker behind "See it on my car" (deployed by the owner, not by Render). The feature stays off while `SITE.carPreviewUrl` is empty; never commit a local address there. `src/utils/carPreview.ts` and `CarPreviewDialog.tsx` are the website side.
 - `src/utils/seo.ts`: page titles, descriptions, sitemap paths. `src/utils/redirects.ts`: old
   addresses. `src/utils/llms.ts`: `llms.txt`. `src/utils/askAi.ts`: the "Ask AI about us" links.
+- `src/lib/supabase.ts`, `src/context/AccountContext.tsx`, `src/utils/accountService.ts`, `src/components/brand/AccountPage.tsx`: the customer account (README → Customer accounts). `/account` is noindex and stays out of the sitemap.
 - `src/utils/router.tsx`: the client-side router. Routes are matched in `src/App.tsx`.
 - `src/wheel-viewer/`: the 3D wheel viewer, shared with the BMW configurator repo (`FazalRSA/BMW-AND-FORGED-`, copied into its `shared/wheel-viewer/`). It is edited only here. After a change run `npm run wheel-viewer:stamp` (`npm test` fails without it), then tell the owner the configurator needs `node scripts/wheel-viewer-sync.mjs pull`. See its README.
 - `src/components/brand/`: pages and sections. `scripts/`: build steps, in the order in the
@@ -93,6 +94,11 @@ file wins:
 
 - The privacy notice (`PrivacyPolicyPage.tsx`) describes what the site does. If a change collects,
   stores or sends visitor data, update the notice in the same pull request.
+- Customer accounts are **shared with the BMW configurator**: the same Supabase project, tables and functions
+  (`profiles`, `saved_configurations`, `rename_configuration`, `export_my_data`, `delete_my_account`). The schema belongs to
+  the configurator repo (`FazalRSA/BMW-AND-FORGED-`, `supabase/migrations/`); change it there, never from this repo, and keep
+  `src/utils/accountService.ts` in step. Supabase is imported by the `/account` chunk only; do not import `src/lib/supabase.ts`
+  from a page that every visitor loads. Firebase accounts are superseded (see README → Customer accounts).
 - `README.md` describes the routes, the build steps, the tests and the stock rule. Update it when
   you change any of them.
 - Google Tag Manager (`SITE.googleTagManagerId`, `src/utils/googleTagManager.ts`) loads whatever the owner

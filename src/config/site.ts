@@ -16,6 +16,18 @@ export interface SiteConfig {
   phoneDisplay: string;
   tradeEmail: string;
   privacyEmail: string;
+  /**
+   * The mailbox the service emails (welcome, enquiry confirmations) come from and replies go to. Must be on `domain`.
+   * Not shown as a contact channel: tradeEmail and privacyEmail stay the published ones.
+   */
+  supportEmail: string;
+  /** The Information Officer's name, for the privacy notice (POPIA). Empty until the owner confirms it; hidden while empty. */
+  informationOfficerName: string;
+  /**
+   * The FORGEDSA configurator, which shares customer accounts with this site (same Supabase project). The account
+   * page links a saved build to `${configuratorUrl}/?config=CODE`. Empty hides those links.
+   */
+  configuratorUrl: string;
   instagramUrl: string;
   facebookUrl: string;
   tiktokUrl: string;
@@ -77,6 +89,9 @@ export const SITE: SiteConfig = {
   tradeEmail: '',
   /** Privacy contact email, shown in the privacy notice when set. Must be on `domain`; leave empty until the mailbox exists. */
   privacyEmail: '',
+  supportEmail: 'admin@forgedsa.co.za',
+  informationOfficerName: '',
+  configuratorUrl: 'https://forged-configurator.vercel.app',
 
   instagramUrl: 'https://www.instagram.com/forged_sa1/',
   facebookUrl: '',
@@ -127,6 +142,12 @@ export function whatsappLink(message?: string): string | null {
   if (!SITE.whatsappNumber) return null;
   const text = message ? `?text=${encodeURIComponent(message)}` : '';
   return `https://wa.me/${SITE.whatsappNumber}${text}`;
+}
+
+/** Opens a saved build in the configurator (`/?config=CODE`), or null when no configurator address is set. */
+export function configuratorBuildLink(code: string): string | null {
+  if (!SITE.configuratorUrl || !code) return null;
+  return `${SITE.configuratorUrl.replace(/\/+$/, '')}/?config=${encodeURIComponent(code)}`;
 }
 
 /** tel: link derived from the display number, or null when none is configured. */

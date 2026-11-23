@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
-import { installsThisYearLine, SITE } from './site';
+import { configuratorBuildLink, installsThisYearLine, SITE } from './site';
 
 // A published email must sit on the business's own domain. An address on a domain the business
 // does not own sends real privacy requests to a stranger.
 test('published emails are empty or on the business domain', () => {
-  for (const [field, value] of [['tradeEmail', SITE.tradeEmail], ['privacyEmail', SITE.privacyEmail]] as const) {
+  for (const [field, value] of [['tradeEmail', SITE.tradeEmail], ['privacyEmail', SITE.privacyEmail], ['supportEmail', SITE.supportEmail]] as const) {
     if (value === '') continue;
     assert.ok(
       value.toLowerCase().endsWith(`@${SITE.domain}`),
@@ -16,11 +16,12 @@ test('published emails are empty or on the business domain', () => {
 });
 
 // The notice must describe the site as it is. These features were removed, so the notice must not
-// promise or describe them.
+// promise or describe them. (Customer accounts are back, on Supabase and shared with the configurator, so
+// "Google account" and "garage" are now true; Firebase, the old dealer application and the allocation list stay gone.)
 test('privacy notice does not describe features the site no longer has', () => {
   const source = readFileSync(new URL('../components/brand/PrivacyPolicyPage.tsx', import.meta.url), 'utf8');
   // "newsletter" is not listed: the notice may truthfully say the site has none.
-  const removed = /firebase|firestore|google account|sign in with google|garage|dealer application|allocation alert|client account/i;
+  const removed = /firebase|firestore|dealer application|allocation alert|client account/i;
   const hit = source.match(removed);
   assert.equal(hit, null, `privacy notice still mentions "${hit?.[0]}"`);
 });
@@ -49,6 +50,15 @@ test('the car-preview address is empty or an https address', () => {
   if (carPreviewUrl === '') return;
   assert.ok(carPreviewUrl.startsWith('https://'), 'carPreviewUrl must be https');
   assert.doesNotThrow(() => new URL(carPreviewUrl), 'carPreviewUrl must be a valid URL');
+});
+
+// Accounts are shared with the configurator; a saved build links there, so the address must be https.
+test('the configurator address is empty or an https address, and builds link to it', () => {
+  if (SITE.configuratorUrl === '') return;
+  assert.ok(SITE.configuratorUrl.startsWith('https://'), 'configuratorUrl must be https');
+  assert.doesNotThrow(() => new URL(SITE.configuratorUrl));
+  assert.equal(configuratorBuildLink('AB12CD'), `${SITE.configuratorUrl.replace(/\/+$/, '')}/?config=AB12CD`);
+  assert.equal(configuratorBuildLink(''), null);
 });
 
 test('the host is the domain or www.<domain>', () => {

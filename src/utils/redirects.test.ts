@@ -29,17 +29,22 @@ test('/client-fitments and /store/client-fitments go to /installs', () => {
   }
 });
 
-test('account, garage and dealer addresses go to /contact', () => {
+test('dealer addresses go to /contact', () => {
   for (const old of [
-    '/account',
-    '/account/',
-    '/garage',
-    '/garage/',
     '/dealer-application',
     '/dealer-application/',
     '/store/dealer-application',
   ]) {
     assert.equal(redirectFor(old), '/contact', old);
+  }
+});
+
+test('the account page is a real page again (shared with the configurator), and the old garage address goes to it', () => {
+  for (const real of ['/account', '/account/', '/Account?x=1', '/account#top']) {
+    assert.equal(redirectFor(real), null, real);
+  }
+  for (const old of ['/garage', '/garage/', '/garage/saved']) {
+    assert.equal(redirectFor(old), '/account', old);
   }
 });
 
@@ -56,7 +61,7 @@ test('the old gold wheel address goes to the FSA003 page it really is', () => {
 test('matching ignores case, query strings and hashes', () => {
   assert.equal(redirectFor('/Store/Products/X'), '/#catalogue');
   assert.equal(redirectFor('/client-fitments?utm_source=x'), '/installs');
-  assert.equal(redirectFor('/account#top'), '/contact');
+  assert.equal(redirectFor('/Garage#top'), '/account');
 });
 
 test('the pages that exist, and look-alike paths, are not redirected', () => {
@@ -74,6 +79,7 @@ test('the pages that exist, and look-alike paths, are not redirected', () => {
     '/admin/wheels',
     '/storefront',
     '/accounts',
+    '/account',
     '/no-such-page',
   ]) {
     assert.equal(redirectFor(real), null, real);
@@ -81,7 +87,7 @@ test('the pages that exist, and look-alike paths, are not redirected', () => {
 });
 
 test('no redirect target is itself an old address, so a redirect can never loop', () => {
-  const olds = ['/store', '/client-fitments', '/account', '/garage', '/dealer-application', '/official-dealer-sixnine-wheels', '/wheels'];
+  const olds = ['/store', '/client-fitments', '/garage', '/dealer-application', '/official-dealer-sixnine-wheels', '/wheels'];
   for (const old of olds) {
     const target = redirectFor(old);
     assert.ok(target, old);
@@ -95,7 +101,7 @@ test('applyRedirect replaces the history entry (never pushes) and only for an ol
 
   assert.equal(applyRedirect({ pathname: '/store/products/x' }, history), true);
   assert.equal(applyRedirect({ pathname: '/client-fitments' }, history), true);
-  assert.equal(applyRedirect({ pathname: '/garage' }, history), true);
+  assert.equal(applyRedirect({ pathname: '/dealer-application' }, history), true);
   assert.deepEqual(
     calls.map((c) => c[2]),
     ['/#catalogue', '/installs', '/contact']

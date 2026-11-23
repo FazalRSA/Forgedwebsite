@@ -316,6 +316,9 @@ export function metaForPath(rawPath: string): PageMeta {
       );
     case '/privacy-policy':
       return plainPage('WebPage', 'Privacy notice', 'Privacy notice', `How ${SITE_NAME} collects, uses and protects personal information.`, path);
+    case '/account':
+      // A signed-in page: useful to its owner only, so it stays out of search results and the sitemap.
+      return page('Your account', `Sign in to see your saved wheel builds and manage your details with ${SITE_NAME}.`, path, true);
     default:
       break;
   }

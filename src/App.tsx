@@ -64,6 +64,11 @@ const PrivacyPolicyPage = lazy(() =>
     default: m.PrivacyPolicyPage,
   }))
 );
+const AccountPage = lazy(() =>
+  import('./components/brand/AccountPage').then((m) => ({
+    default: m.AccountPage,
+  }))
+);
 const StudioPreviewPage = lazy(() =>
   import('./components/brand/StudioPreviewPage').then((m) => ({
     default: m.StudioPreviewPage,
@@ -171,6 +176,9 @@ function AppRoutes() {
   if (path === '/contact') return <ContactPage />;
 
   if (path === '/privacy-policy') return <PrivacyPolicyPage />;
+
+  // /account: the customer's account, shared with the configurator. Private: noindex, not in the sitemap.
+  if (path === '/account') return <AccountPage />;
 
   // Unlisted: /studio/:slug previews a wheel's 3D model before it is in the catalogue.
   if (path.startsWith('/studio/')) {

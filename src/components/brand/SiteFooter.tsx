@@ -19,6 +19,7 @@ const FOOTER_LINKS = [
   { label: 'Installs', to: '/installs' },
   { label: 'Blog', to: '/blog' },
   { label: 'Contact', to: '/contact' },
+  { label: 'Account', to: '/account' },
   { label: 'Privacy notice', to: '/privacy-policy' },
 ] as const;
 

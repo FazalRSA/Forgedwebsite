@@ -44,7 +44,8 @@ It shows the wheels that are in stock, each in photography and an interactive 3D
     - [Setting up and checking](#setting-up-and-checking)
     - [Keeping the privacy notice in step](#keeping-the-privacy-notice-in-step)
 13. [Business details and contact channels](#business-details-and-contact-channels)
-14. [Firebase](#firebase)
+14. [Customer accounts](#customer-accounts)
+    - [Firebase (superseded)](#firebase-superseded)
 15. [Testing](#testing)
 16. [Deployment](#deployment)
 17. [Known limitations and roadmap](#known-limitations-and-roadmap)
@@ -65,7 +66,8 @@ Six pages, plus the privacy notice. The shop sells two brands, and the site is o
 - **Sixnine dealer page (`/sixnine-wheels`, "Sixnine" in the menu).** FORGED as an official Sixnine Wheels dealer: what Sixnine Wheels is (from sixnine-wheels.com, with a source link) and every Sixnine set in stock. Sixnine's range is on the series pages below, reached from the mega menu. A wheel is Sixnine when its design code starts with `FF` (`isSixnineWheel` in `src/data/catalogue.ts`), so a new FF design appears on the page by itself. Every number on it is worked out from the catalogue; the brand text is in `SixnineDealerPage.tsx`. Under the stock it has SIXNINE's two home-page card rows: **New at Sixnine** (what Sixnine has on pre-order, from `sixnineRange.json`: a whole series on pre-order, such as the EVO-TWO, or a single pre-order size named after its car, such as the FF-THREE for the Audi RS5 B10) and **Find your design** (one card per series, linking to its series page). Both use `ShowcaseCard` (`SixnineShowcase.tsx`, data in `src/utils/sixnineShowcase.ts`). The two brand pages share their opening, stock grid, fitment summary and enquiry row (`BrandSections.tsx`, with the fitment facts from `src/utils/brandFitment.ts`), so they stay alike.
 - **Blog (`/blog`).** Nineteen guides in four content pillars (forged wheel basics, BMW M wheel fitment, buying in South Africa, wheel care), at `/blog`, `/blog/:pillar` and `/blog/:pillar/:post`. Every price, size, offset, bolt pattern, lead time and stock count in an article is read from the catalogue, never typed (see [The blog](#the-blog)).
 - **Contact (`/contact`).** WhatsApp, phone, address and areas served; any channel not set in `src/config/site.ts` is hidden.
-- **Privacy notice (`/privacy-policy`).** Describes what the site does today: no accounts, contact by WhatsApp or phone, local storage for an unsent enquiry and the cookie choice, and Google Analytics (loaded through Google Tag Manager), whose two cookies are set only after a visitor accepts the cookie banner. The Google Analytics, cookie and recipient text appears only while `googleTagManagerId` is set in `src/config/site.ts`.
+- **Account (`/account`).** The customer's account, shared with the FORGEDSA configurator: Continue with Google, profile, saved builds, the email choice, and download or delete of their data (see [Customer accounts](#customer-accounts)). Private: noindex, not in the sitemap, linked only from the footer.
+- **Privacy notice (`/privacy-policy`).** Describes what the site does today: the optional account (Google sign-in, shared with the configurator), contact by WhatsApp or phone, local storage for an unsent enquiry, the cookie choice and the sign-in session, and Google Analytics (loaded through Google Tag Manager), whose two cookies are set only after a visitor accepts the cookie banner. The Google Analytics, cookie and recipient text appears only while `googleTagManagerId` is set in `src/config/site.ts`.
 - **Sixnine series pages (`/sixnine-wheels/:series`).** One page per Sixnine series: `ff-one`, `ff-two`, `ff-three`, `evo-one`, `evo-two`, `oem-plus-one`. Each is built like a SIXNINE series landing page:
   - a centred hero with the facts (sizes, diameters, bolt patterns, finishes, sets in stock here);
   - the finishes with Sixnine's names and on-screen swatches;
@@ -80,7 +82,7 @@ Six pages, plus the privacy notice. The shop sells two brands, and the site is o
 
 The 3D viewer is a Three.js studio with physically based paint finishes, fixed camera views (face, 3/4, side, back, top), an exploded view and, for staggered sets with two models, a Front / Rear switch. The centre cap shows the FORGED monogram on FSA designs and the SIXNINE badge on FF designs (`capLogoForDesign` in `catalogue.ts`): the viewer finds the cap by looking down the axle, lays the logo on it and, when a model has an open centre bore, fills it with a cap in the wheel's paint first.
 
-Removed in the simplification: the store and its fitment finder, collections and product pages, dealer applications, and client accounts with a garage. Their old addresses redirect (see [Routes](#routes)).
+Removed in the simplification: the store and its fitment finder, collections and product pages, and dealer applications. Their old addresses redirect (see [Routes](#routes)). Client accounts came back on 23 November 2026, rebuilt on the configurator's Supabase accounts (see [Customer accounts](#customer-accounts)).
 
 ### Where to change what
 
@@ -166,6 +168,7 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
 | `/sixnine-wheels` | `SixnineDealerPage` | Official Sixnine dealer page: about Sixnine Wheels, every FF set in stock |
 | `/sixnine-wheels/:series` | `SixnineSeriesPage` | One Sixnine series: facts, finishes, sets in stock here, every size Sixnine lists. An unknown series shows the 404 page |
 | `/contact` | `ContactPage` | WhatsApp, phone, address, areas served |
+| `/account` | `AccountPage` | Customer account shared with the configurator. Lazy route, noindex, not in the sitemap |
 | `/privacy-policy` | `PrivacyPolicyPage` | Privacy notice (POPIA): what is collected, by whom, and how to make a request |
 | `/studio/:slug` | `StudioPreviewPage` | Unlisted, noindex 3D preview (currently `stf399`) |
 | `/admin`, `/admin/*` | `AdminWheelUploader` | Unlisted, passcode-gated, local preview only |
@@ -178,7 +181,8 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
 | `/store`, `/store/*`, `/wheels` | `/#catalogue` |
 | `/official-dealer-sixnine-wheels*` | `/sixnine-wheels` |
 | `/client-fitments`, `/store/client-fitments` | `/installs` |
-| `/account`, `/garage`, `/dealer-application`, `/store/dealer-application` | `/contact` |
+| `/garage` | `/account` |
+| `/dealer-application`, `/store/dealer-application` | `/contact` |
 
 ## Project structure
 
@@ -189,9 +193,9 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
 ├─ render.yaml · vercel.json      Host configuration (Render is in use)
 ├─ vite.config.ts                 Build config: the `@` alias (repository root) and vendor chunks
 ├─ metadata.json · .env.example   Left over from the Google AI Studio starter; the site reads neither
-├─ firebase-applet-config.json    Firebase project config (public web keys)
-├─ firebase-blueprint.json        JSON Schema for the Firestore documents
-├─ firestore.rules                Firestore security rules
+├─ firebase-applet-config.json    Firebase project config (public web keys); superseded, nothing loads it
+├─ firebase-blueprint.json        JSON Schema for the old Firestore documents (superseded)
+├─ firestore.rules                Firestore security rules (superseded)
 ├─ firestore.rules.test.ts        Structural tests for the rules
 ├─ security_spec.md               Rules invariants and adversarial payloads
 ├─ public/
@@ -240,8 +244,9 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
    ├─ data/partners.ts            Industry partners shown on the home page
    ├─ wheel-viewer/               The 3D wheel viewer, shared with the BMW configurator: stage, paint, swatches, part classification (edited only here; see its README.md)
    ├─ store/                      Zustand store (enquiry form, admin preview) in localStorage
-   ├─ context/FirebaseContext.tsx Firebase provider (kept, not mounted by any page)
-   ├─ lib/firebase.ts             Firebase setup used by that provider
+   ├─ context/AccountContext.tsx  Customer account provider (Supabase Auth, profile, builds); mounted by the account page only
+   ├─ lib/supabase.ts             Supabase client (the configurator's project, PKCE sign-in)
+   ├─ utils/accountService.ts     The account's data calls, written against a client passed in (tested with a stub)
    ├─ utils/router.tsx            pushState router and crawlable <Link>
    ├─ utils/lazyWithRetry.ts      React.lazy with retries, for the 3D viewer's code
    ├─ utils/redirects.ts          Old address to new address
@@ -636,19 +641,41 @@ The workflow **FORGED · Website Leads** (production URL `https://novahavensai.a
 
 Emails go out through the Gmail credential attached to the workflow. To point a deployment at a different workflow (for example the test URL while developing), set `VITE_LEADS_WEBHOOK_URL`; otherwise `SITE.leadsWebhookUrl` in `src/config/site.ts` is used.
 
-## Firebase
+## Customer accounts
 
-Client accounts and the garage are gone from the site and no page loads Firebase. The Firebase provider (`src/context/FirebaseContext.tsx`), `firestore.rules` and their tests are kept as they were, for a possible later return of accounts. `firestore.rules` denies everything by default and allows owner-only access with a verified email, exact key sets, bounded string sizes, enum allow-lists, server timestamps and immutable identity fields. `security_spec.md` documents the invariants and the adversarial payloads each rule rejects.
+The site and the FORGEDSA configurator ([forged-configurator.vercel.app](https://forged-configurator.vercel.app), repository `FazalRSA/BMW-AND-FORGED-`) share **one account system**: the configurator's Supabase project (`qxlfkfhzpqbxffuqqewg`, "Apex Forged Configurator"). A Google account is one user, one profile and one garage on both sites.
 
-```bash
-firebase deploy --only firestore:rules
-```
+| Piece | Where |
+| --- | --- |
+| Supabase client (public URL and publishable key; `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` override them) | `src/lib/supabase.ts` |
+| Data calls: profile, saved builds, rename, delete, export, account deletion | `src/utils/accountService.ts` |
+| Provider (session, profile, builds, errors) | `src/context/AccountContext.tsx` |
+| The page | `src/components/brand/AccountPage.tsx`, route `/account` |
+| Tables and functions (owned by the configurator repo, `supabase/migrations/`) | `public.profiles`, `public.saved_configurations`, `rename_configuration()`, `export_my_data()`, `delete_my_account()` |
 
-`firebase-applet-config.json` holds the public web configuration for the Firebase project.
+**What a customer can do on `/account`:** continue with Google; edit name, phone, city and brake system; see the builds they saved in the configurator and open (in the configurator), rename or delete them; tick **Email me news and offers** (a separate box, off unless ticked; the service emails about their account and enquiries are not optional while the account exists); download everything stored about them as JSON; delete the account (two steps; it removes the sign-in, profile and saved builds, while enquiries already sent stay with the business as sales records). The website does not create builds: that is the configurator's job.
+
+**Sign-in flow.** PKCE: Google returns the visitor to `/account?code=...`, supabase-js swaps the code for a session, and `AccountContext` removes the code from the address. No token ever sits in the URL or history. `supabase-js` is imported by the account page only (the `vendor-supabase` chunk), so no other page downloads it.
+
+**Honest limit: one sign-in per site.** Browsers keep a session per origin, so a customer signs in once on each site (one click on "Continue with Google"); after that it is the same user, profile and garage on both. True single sign-on would need both sites under one parent domain (for example the configurator on `app.forgedsa.co.za` sharing a cookie with `www.forgedsa.co.za`) and is not built.
+
+**Owner steps** (Supabase dashboard, project *Apex Forged Configurator*):
+
+1. **Authentication → URL Configuration → Redirect URLs:** add `https://www.forgedsa.co.za/**` and `https://forgedsa.co.za/**` (and `http://localhost:3000/**` to try it locally). Without them Google's return is refused.
+2. Google Cloud: nothing new if the Supabase callback `https://qxlfkfhzpqbxffuqqewg.supabase.co/auth/v1/callback` is already an authorised redirect URI of the OAuth client the configurator uses (its set-up is in the configurator's `docs/ACCOUNTS.md`). The Google provider itself must be switched on in Supabase (**Authentication → Providers → Google**), and **Confirm email must stay on**.
+3. The migration that adds `export_my_data()`, `delete_my_account()` and the marketing-consent timestamp (`20261124090000_shared_accounts_and_mailer.sql` in the configurator repo) must be applied before the download and delete buttons work.
+
+**Keeping the privacy notice true.** The notice describes the account, the Supabase and Google recipients, the sign-in entry in local storage and the email choice. If the account page starts collecting anything else, update the notice in the same pull request (and `src/config/site.test.ts` guards the list of features the notice must not describe).
+
+**Real sign-in is not tested by the suite.** Google sign-in cannot run in a test; the unit tests use a stub client, and the page was checked signed out and with a stubbed session at 390 px and 1280 px.
+
+### Firebase (superseded)
+
+The earlier Firebase accounts (Firebase Auth and Firestore, project `gen-lang-client-0484314317`) were never mounted on a page and are superseded by the Supabase accounts above. `src/context/FirebaseContext.tsx`, `src/lib/firebase.ts` and the `firebase` dependency are removed. `firestore.rules`, `firestore.rules.test.ts`, `firebase-blueprint.json`, `security_spec.md` and `firebase-applet-config.json` are kept untouched for now; nothing in the site loads them, and they can be deleted with the Firebase project when the owner decides.
 
 ## Testing
 
-`bun run test` first runs `wheel-viewer:verify` (fails if `src/wheel-viewer/` was edited without a new stamp), then twenty-five test files (254 tests) with `node:test`. The files are listed by name in the `test` script in `package.json`, so a new test file does not run until it is added there.
+`bun run test` first runs `wheel-viewer:verify` (fails if `src/wheel-viewer/` was edited without a new stamp), then twenty-six test files (269 tests) with `node:test`. The files are listed by name in the `test` script in `package.json`, so a new test file does not run until it is added there.
 
 | Suite | Covers |
 | --- | --- |
@@ -659,6 +686,7 @@ firebase deploy --only firestore:rules
 | `src/utils/listingSpecs.test.ts` | A Sixnine listing's diameters, offsets and bolt pattern match exactly one Sixnine size per diameter, the Technical data table carries Sixnine's figures, a Forged SA listing has none, and an unreadable spec sheet hides the table rather than showing a wrong one |
 | `src/utils/brandFitment.test.ts` | The brand pages' fitment summary: a size, bolt pattern or bore is stated only when every set agrees, and lists read as English |
 | `src/utils/heroVideo.test.ts` | Every hero film file and poster exists, AV1 is offered before H.264, the film stays inside its download budget, it can start before it has fully downloaded, and it plays only for visitors who asked neither for less motion nor to save data |
+| `src/utils/accountService.test.ts` | The customer account's data calls against a stub Supabase client: a profile patch writes only the five editable columns (never the email), limits, builds mapped from their payload, names for ids with a fallback, rename and delete of a build that is not the customer's, the data export and the account deletion |
 | `src/utils/leads.test.ts` | The enquiry's delivery to n8n: the webhook address, the payload, the reference number, a visitor notice when delivery fails, and no send when the hidden honeypot field is filled |
 | `src/utils/designCards.test.ts` | Home page design cards: one per design, badge, price and link from the data, the 3-then-2 row plan, and a cut-out on disk for every photographed listing |
 | `src/utils/wheelImageSrcSet.test.ts` | The `srcset` for each wheel photo (site photos only; nothing for admin uploads or placeholders) and that every smaller copy exists on disk |
@@ -730,7 +758,7 @@ For Firebase Hosting instead:
 { "hosting": { "public": "dist", "rewrites": [{ "source": "**", "destination": "/index.html" }] } }
 ```
 
-Build chunks are split per vendor (`react`, `motion`, `three`, `firebase`, `lucide`) and per route.
+Build chunks are split per vendor (`react`, `motion`, `three`, `supabase`, `lucide`) and per route. `vendor-supabase` is fetched only when `/account` opens.
 
 ## Known limitations and roadmap
 
