@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 import type { BrandWheelItem } from '../../data/catalogue';
 import { seriesPath, SIXNINE_SERIES, sixnineSeriesOfWheel, type SixnineSeries } from '../../data/sixnineSeries';
@@ -36,6 +36,9 @@ export const ShowcaseCard: React.FC<{
   className?: string;
 }> = ({ to, title, fallbackName, picture, badge, description, headingLevel = 'h3', className = '' }) => {
   const Heading = headingLevel;
+  // A picture that fails to load (a render removed or renamed) falls back to the outlined name.
+  const [failed, setFailed] = useState(false);
+  const shown = failed ? undefined : picture;
   return (
     <Link
       to={to}
@@ -48,17 +51,18 @@ export const ShowcaseCard: React.FC<{
       )}
 
       <div aria-hidden="true" className="absolute inset-x-0 top-[3%] bottom-[19%] -z-10 flex items-center justify-center">
-        {picture ? (
-          <div className={`flex h-full w-full items-center justify-center ${picture.angled ? '' : TILT_CLASS}`}>
+        {shown ? (
+          <div className={`flex h-full w-full items-center justify-center ${shown.angled ? '' : TILT_CLASS}`}>
             <img
-              {...wheelImageSrcSet(picture.src, CARD_IMAGE_SIZES)}
+              {...wheelImageSrcSet(shown.src, CARD_IMAGE_SIZES)}
+              onError={() => setFailed(true)}
               alt=""
               width={600}
               height={600}
               loading="lazy"
               decoding="async"
               className={`w-auto max-w-[86%] object-contain drop-shadow-[0_28px_36px_rgba(0,0,0,0.65)] transition-transform duration-700 ease-[cubic-bezier(.23,1,.32,1)] group-hover:scale-[1.04] motion-reduce:transition-none ${
-                picture.angled ? 'h-full' : 'h-[88%]'
+                shown.angled ? 'h-full' : 'h-[88%]'
               }`}
             />
           </div>
