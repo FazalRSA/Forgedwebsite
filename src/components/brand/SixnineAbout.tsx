@@ -9,7 +9,7 @@ const H3 = 'mt-2 text-2xl sm:text-3xl font-light tracking-[-0.02em] leading-tigh
 const formatCount = (n: number) => n.toLocaleString('en-ZA').replace(/ /g, ' ');
 
 /** A picture of a Sixnine wheel on a dark tile, contained, as Sixnine shows its renders. */
-const Render: React.FC<{ src: string; alt: string }> = ({ src, alt }) => (
+const WheelRenderTile: React.FC<{ src: string; alt: string }> = ({ src, alt }) => (
   <div className="relative aspect-square w-full overflow-hidden rounded-2xl border border-[#26262E] bg-[#16161A]">
     <div
       aria-hidden="true"
@@ -65,7 +65,7 @@ export const SixnineAboutSection: React.FC = () => {
       </dl>
 
       <div className="mt-14 grid items-center gap-8 lg:gap-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
-        {ffOne && <Render src={ffOne.image} alt="The SIXNINE FF-ONE" />}
+        {ffOne && <WheelRenderTile src={ffOne.image} alt="The SIXNINE FF-ONE" />}
         <div>
           <p className={EYEBROW}>Who they are</p>
           <h3 className={H3}>Friends from the trade</h3>
@@ -86,7 +86,7 @@ export const SixnineAboutSection: React.FC = () => {
       <div className="mt-14 grid items-center gap-8 lg:gap-16 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
         {ffThree && (
           <div className="lg:order-2">
-            <Render src={ffThree.image} alt="The SIXNINE FF-THREE" />
+            <WheelRenderTile src={ffThree.image} alt="The SIXNINE FF-THREE" />
           </div>
         )}
         <div className="lg:order-1">
