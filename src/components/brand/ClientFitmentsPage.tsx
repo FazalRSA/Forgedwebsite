@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { ArrowUpRight, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { BrandHeader } from './BrandHeader';
 import { ContactCta, CTA_PRIMARY_CLASS, CTA_SECONDARY_CLASS } from './ContactCta';
 import { fitmentCar, fitmentMessage, fitmentTitle, fitmentWheels } from './fitmentFormat';
 import { Link } from '../../utils/router';
-import { CLIENT_FITMENTS, FITMENT_FAMILIES, type ClientFitment } from '../../data/clientFitments';
+import { CLIENT_FITMENTS, FITMENT_FAMILIES, type ClientFitment, type FitmentHotspot } from '../../data/clientFitments';
 import { fitmentImageSrcSet } from '../../utils/fitmentImageSrcSet';
 
 const ALL = 'All';
@@ -18,6 +18,64 @@ const PHOTO_COUNT = 3;
  * inside the 1280 px page (padding and gaps taken off). Lets the browser pick the 800 px copy.
  */
 const CARD_SIZES = '(min-width:1280px) 285px, (min-width:1024px) 24vw, (min-width:768px) 31vw, 48vw';
+
+/**
+ * A thin line from a dot on the wheel's rim to a solid blue button that opens that wheel's own page.
+ * Positions are percentages of the photo, so the marks follow the picture at any width. The photo
+ * box is 4:3 (the studio renders are 1600 x 1200), so the 100 x 75 viewBox maps onto it exactly.
+ */
+const WheelHotspot: React.FC<{ slug: string; title: string; spot: FitmentHotspot; onNavigate: () => void }> = ({
+  slug,
+  title,
+  spot,
+  onNavigate,
+}) => {
+  // The label sits to the left of its button when the button is on the right half, so it stays on the photo.
+  const labelOnLeft = spot.label.x > 55;
+  const rimY = spot.rim.y * 0.75;
+  const labelY = spot.label.y * 0.75;
+  return (
+    <>
+      <svg
+        aria-hidden="true"
+        className="absolute inset-0 w-full h-full pointer-events-none"
+        viewBox="0 0 100 75"
+        preserveAspectRatio="none"
+      >
+        <line x1={spot.rim.x} y1={rimY} x2={spot.label.x} y2={labelY} stroke="#111111" strokeWidth={1} strokeLinecap="round" />
+        <line x1={spot.rim.x} y1={rimY} x2={spot.label.x} y2={labelY} stroke="#FFFFFF" strokeWidth={0.4} strokeLinecap="round" />
+        <circle cx={spot.rim.x} cy={rimY} r={0.9} fill="#FFFFFF" stroke="#111111" strokeWidth={0.3} />
+      </svg>
+      <div
+        className="absolute"
+        style={{
+          left: `${spot.label.x}%`,
+          top: `${spot.label.y}%`,
+          transform: labelOnLeft ? 'translate(calc(-100% + 22px), -50%)' : 'translate(-50%, -50%)',
+        }}
+      >
+        <Link
+          to={`/wheels/${slug}`}
+          onClick={onNavigate}
+          aria-label={`View the ${title} wheel`}
+          className={`group flex items-center gap-2 rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#F43F5E] ${
+            labelOnLeft ? 'flex-row-reverse' : ''
+          }`}
+        >
+          <span
+            aria-hidden="true"
+            className="w-11 h-11 shrink-0 rounded-full bg-[#1D4ED8] text-white flex items-center justify-center shadow-[0_0_0_3px_rgba(255,255,255,0.9)] group-hover:bg-[#2563EB] transition-colors"
+          >
+            <ArrowUpRight className="w-5 h-5" />
+          </span>
+          <span className="whitespace-nowrap rounded-full bg-[#111111]/90 px-3 py-1.5 text-sm font-medium text-white">
+            Click here to view wheel
+          </span>
+        </Link>
+      </div>
+    </>
+  );
+};
 
 /** Photos of one customer car, with the details that are known and a way to ask about the setup. */
 const InstallLightbox: React.FC<{ fitment: ClientFitment; onClose: () => void }> = ({
@@ -116,6 +174,15 @@ const InstallLightbox: React.FC<{ fitment: ClientFitment; onClose: () => void }>
                 decoding="async"
                 className={`w-full aspect-[4/3] ${isOwnerPhoto ? 'object-contain' : 'object-cover'}`}
               />
+              {/* Only on the studio renders: the owner's own photo is shown whole, so its positions would not line up. */}
+              {!isOwnerPhoto && fitment.wheelSlug && fitment.hotspots?.[photo] && (
+                <WheelHotspot
+                  slug={fitment.wheelSlug}
+                  title={title}
+                  spot={fitment.hotspots[photo]}
+                  onNavigate={onClose}
+                />
+              )}
               <button
                 type="button"
                 onClick={previousPhoto}
