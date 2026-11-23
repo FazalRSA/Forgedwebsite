@@ -53,7 +53,7 @@ export const SIXNINE_RANGE: readonly SixnineDesign[] = [
     tagline: 'One wheel, five designs',
     summary:
       "Sixnine's first design. Run it plain, or fit one of three inlays (V-ONE, V-TWO, X-ONE) or the AeroRing to change its look. Chrome-look stainless bolts on the lip give it the look of a two-piece wheel.",
-    construction: 'Flow-formed one-piece, two-piece look',
+    construction: 'Forged one-piece, two-piece look',
     diameters: '19–22"',
     widths: '8.5–11.5J',
     boltPatterns: ['5x112', '5x114.3', '5x120'],
@@ -74,7 +74,7 @@ export const SIXNINE_RANGE: readonly SixnineDesign[] = [
     tagline: 'Lightweight and timeless',
     summary:
       'A clean ten-spoke with a deep concave. A one-piece forged Forged Series version is also made to order for the Audi RS4/RS5 B9.',
-    construction: 'Flow-formed; Forged Series is one-piece forged',
+    construction: 'Forged',
     diameters: '21"',
     widths: '10–10.5J',
     boltPatterns: ['5x112'],
@@ -130,8 +130,8 @@ export const SIXNINE_RANGE: readonly SixnineDesign[] = [
     name: 'EVO-TWO',
     tagline: 'New Y-spokes, maximum lip depth',
     summary:
-      'Newly drawn Y-spokes that run out to a lip as deep as a multi-piece wheel, made possible by flow-forming the barrel. All sizes are drilled for both 5x112 and 5x120.',
-    construction: 'Flow-formed one-piece, two-piece look',
+      'Newly drawn Y-spokes that run out to a lip as deep as a multi-piece wheel. All sizes are drilled for both 5x112 and 5x120.',
+    construction: 'Forged one-piece, two-piece look',
     diameters: '20–21"',
     widths: '9–11.5J',
     boltPatterns: ['5x112', '5x120'],
