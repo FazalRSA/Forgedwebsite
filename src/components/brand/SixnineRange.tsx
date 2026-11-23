@@ -4,6 +4,8 @@ import type { BrandWheelItem } from '../../data/catalogue';
 import { SIXNINE_RANGE, stockedSets, type SixnineDesign } from '../../data/sixnineRange';
 import { Link } from '../../utils/router';
 import { ContactCta, CTA_SECONDARY_CLASS } from './ContactCta';
+import { SIXNINE_SERIES } from '../../data/sixnineSeries';
+import { SeriesShowcaseCard } from './SixnineShowcase';
 
 /** "In stock · 3 sets", "Pre-order with Sixnine" or "Ask us": what the shop can say about a design. */
 function availability(design: SixnineDesign, sets: number): { label: string; tone: 'stock' | 'plain' } {
@@ -136,13 +138,14 @@ export const SixnineRangeSection: React.FC<{ inStock: BrandWheelItem[] }> = ({ i
 );
 
 /**
- * A row of every Sixnine design, shown under the Sixnine heading in the wheels catalogue. Each tile
- * links to that design's card on /sixnine-wheels; designs the shop has in stock say so.
+ * Every Sixnine series under the Sixnine heading in the wheels catalogue, as SIXNINE's "Find your
+ * design" cards: a swipe row on phones, a grid from tablet width. Each card opens its series page;
+ * series the shop has in stock say so.
  */
 export const SixnineRangeStrip: React.FC<{ inStock: BrandWheelItem[]; brandPath: string }> = ({ inStock, brandPath }) => (
-  <div className="mt-6">
+  <div className="mt-10">
     <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-      <h4 className="text-sm uppercase tracking-[0.14em] text-neutral-400">The full Sixnine range</h4>
+      <h4 className="text-sm uppercase tracking-[0.14em] text-neutral-400">Find your Sixnine design</h4>
       <Link
         to={`${brandPath}#sixnine-range`}
         className="group/link inline-flex min-h-11 items-center gap-2 text-sm text-neutral-300 hover:text-white"
@@ -151,34 +154,12 @@ export const SixnineRangeStrip: React.FC<{ inStock: BrandWheelItem[]; brandPath:
         <ArrowRight aria-hidden="true" className="h-4 w-4 transition-transform group-hover/link:translate-x-0.5" />
       </Link>
     </div>
-    <ul className="mt-3 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-      {SIXNINE_RANGE.map((design) => {
-        const sets = stockedSets(design, inStock);
-        return (
-          <li key={design.id}>
-            <Link
-              to={`${brandPath}#${anchor(design)}`}
-              className="group/tile flex h-full flex-col rounded-xl border border-[#26262E] bg-[#16161A] p-3 hover:border-[#3A3A44]"
-            >
-              <img
-                src={design.image}
-                alt=""
-                aria-hidden="true"
-                width={720}
-                height={720}
-                loading="lazy"
-                decoding="async"
-                className="aspect-square w-full object-contain transition-transform duration-300 group-hover/tile:scale-[1.03]"
-              />
-              <span className="mt-2 text-base text-white">{design.name}</span>
-              <span className="text-xs text-neutral-400">{design.tagline}</span>
-              <span className={`mt-1 text-xs ${sets > 0 ? 'text-emerald-300' : 'text-neutral-500'}`}>
-                {sets > 0 ? 'In stock with us' : design.preOrder ? 'Pre-order' : 'Ask us'}
-              </span>
-            </Link>
-          </li>
-        );
-      })}
+    <ul className="no-scrollbar -mx-4 mt-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-3">
+      {SIXNINE_SERIES.map((series) => (
+        <li key={series.code} className="w-[84%] shrink-0 snap-start sm:w-auto">
+          <SeriesShowcaseCard series={series} wheels={inStock} headingLevel="h5" />
+        </li>
+      ))}
     </ul>
   </div>
 );

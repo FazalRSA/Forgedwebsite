@@ -58,11 +58,12 @@ It shows the wheels that are in stock, each in photography and an interactive 3D
 Six pages, plus the privacy notice. The shop sells two brands, and the site is organised by them: **Forged SA** (the shop's own designs, every design code starting `FSA`) and **Sixnine Wheels** (sold as an official dealer, every code starting `FF`). `brandOfWheel` and `WHEEL_BRANDS` in `src/data/catalogue.ts` hold that rule and each brand's name, page and logo; a test fails if a listing's code is neither, so a new design is never left without a brand.
 
 - **Home (`/`).** Opens with the hero over the brand film: the headline "Forged Custom Wheels. Turning dreams into reality.", the owner's installs figure as a pill ("Over 80 successful wheels installed this year.", from `SITE.installsThisYear`, shown only during the year it counts), a white "See wheels in stock" button and a glass "See our installs" button, then "Our Industry Partners": the Sixnine Wheels (official dealer, linked to its page) and BMW logos as glass chips (`#partners`, from `src/data/partners.ts`). Then what is in stock, grouped by brand (Forged SA first, then Sixnine). Each group opens with the brand's logo and name, what the shop is to it ("Our own brand", "Official dealer"), how many designs and sets are in stock, and a link to the brand's page. Under it, one large dark card per wheel design (rows of three and two on wide screens, a lone last design full width; two columns on tablets, one on phones). Each card shows the design's wheel cut out on the dark card, its name, how many finishes are in stock, the lowest price per set of four, the finishes and sizes, all worked out from the catalogue (`src/utils/designCards.ts`); it links to the design's first photographed listing, whose page offers the other finishes. Then customer installs, Google reviews, the blog teaser and "Ask AI about us". Each section opens with an eyebrow label over its heading.
-- **Wheel page (`/wheels/:slug`).** One in-stock listing: photos, price per set of four, sizes and specification. Colours are **photoreal swatches** (`ColourSwatches.tsx`): each shows a studio render of this design's wheel in that colour (`public/images/wheels/finishes/`, listed in `src/data/finishStills.json`); the same picture is on the 3D viewer's finish chips. A drawn paint ball stands in for a design or colour with no render yet. They come in two groups: the design's finishes that are **in stock** (the one on this page shows on the 3D wheel when tapped; the others open their own listing), and its **other colours, to order**, always shown with the notice that a lead time of 3 months applies. Tapping a to-order swatch opens the 3D view in that colour and offers an "Ask about" button. The 3D viewer loads only when the visitor taps "View in 3D" (or a colour swatch). Once the preview Worker is set up, a "See it on my car" button lets a visitor choose a photo of their car and see an AI-made impression of the wheel on it (see [See it on my car](#see-it-on-my-car-ai-preview)). The enquiry button opens the enquiry form with the design, finish and sizes filled in; a to-order colour prefills the colour and the lead time. The form logs the enquiry through n8n and then opens WhatsApp (see [Lead delivery](#lead-delivery-n8n)).
+- **Wheel page (`/wheels/:slug`).** One in-stock listing: photos, price per set of four, sizes and specification. The gallery works like SIXNINE's product page: arrows, an `n / total` counter and a row of thumbnails, running through this listing's cut-out and photos and then the same design's other finishes in stock, each of those labelled with its finish and linked to its own page. A Sixnine listing also shows a **Technical data** table, one column per size: Sixnine's published wheel size, offset, bolt pattern, load rating, centre bore, concavity and weight for the sizes the set is. `sixnineSizesForListing` (`src/utils/listingSpecs.ts`) finds them from the listing's own diameters, offsets and bolt pattern, and leaves out any diameter that does not match exactly one Sixnine size. Colours are **photoreal swatches** (`ColourSwatches.tsx`): each shows a studio render of this design's wheel in that colour (`public/images/wheels/finishes/`, listed in `src/data/finishStills.json`); the same picture is on the 3D viewer's finish chips. A drawn paint ball stands in for a design or colour with no render yet. They come in two groups: the design's finishes that are **in stock** (the one on this page shows on the 3D wheel when tapped; the others open their own listing), and its **other colours, to order**, always shown with the notice that a lead time of 3 months applies. Tapping a to-order swatch opens the 3D view in that colour and offers an "Ask about" button. The 3D viewer loads only when the visitor taps "View in 3D" (or a colour swatch). A "See it on my car" button (on while `carPreviewUrl` is set, as it is today) lets a visitor choose a photo of their car and see an AI-made impression of the wheel on it (see [See it on my car](#see-it-on-my-car-ai-preview)). The enquiry button opens the enquiry form with the design, finish and sizes filled in; a to-order colour prefills the colour and the lead time. The form logs the enquiry through n8n and then opens WhatsApp (see [Lead delivery](#lead-delivery-n8n)).
 - **Installs (`/installs`).** Customer cars the shop has fitted (BMW M cars and one Audi RS3; no install is linked to a catalogue wheel). Each install opens to three photos: two studio re-shoots made from the customer's own photo, then that photo itself with the number plate pixelated.
 - **Forged SA page (`/forged-sa-wheels`, "Forged SA" in the menu).** The shop's own brand: every FSA set in stock, and a fitment summary. It says only what the owner has confirmed: the FSA designs are Forged SA's own, and they are forged. Every number on it is worked out from the catalogue.
-- **Sixnine dealer page (`/sixnine-wheels`, "Sixnine" in the menu).** FORGED as an official Sixnine Wheels dealer: what Sixnine Wheels is (from sixnine-wheels.com, with a source link) and every Sixnine set in stock. Sixnine's range is on the series pages below, reached from the mega menu. A wheel is Sixnine when its design code starts with `FF` (`isSixnineWheel` in `src/data/catalogue.ts`), so a new FF design appears on the page by itself. Every number on it is worked out from the catalogue; the brand text is in `SixnineDealerPage.tsx`. The two brand pages share their opening, stock grid, fitment summary and enquiry row (`BrandSections.tsx`, with the fitment facts from `src/utils/brandFitment.ts`), so they stay alike.
-- **Blog (`/blog`).** Twelve guides in four content pillars (forged wheel basics, BMW M wheel fitment, buying in South Africa, wheel care), at `/blog`, `/blog/:pillar` and `/blog/:pillar/:post`. Every price, size, offset, bolt pattern, lead time and stock count in an article is read from the catalogue, never typed (see [The blog](#the-blog)).
+- **Design names.** Visitors see Sixnine's names for its series: FF-ONE and FF-THREE, not the short codes FF-1 and FF-3 (`designName` in `src/data/catalogue.ts`). The codes stay the key for slugs, models, tests and the structured-data SKU.
+- **Sixnine dealer page (`/sixnine-wheels`, "Sixnine" in the menu).** FORGED as an official Sixnine Wheels dealer: what Sixnine Wheels is (from sixnine-wheels.com, with a source link) and every Sixnine set in stock. Sixnine's range is on the series pages below, reached from the mega menu. A wheel is Sixnine when its design code starts with `FF` (`isSixnineWheel` in `src/data/catalogue.ts`), so a new FF design appears on the page by itself. Every number on it is worked out from the catalogue; the brand text is in `SixnineDealerPage.tsx`. Under the stock it has SIXNINE's two home-page card rows: **New at Sixnine** (what Sixnine has on pre-order, from `sixnineRange.json`: a whole series on pre-order, such as the EVO-TWO, or a single pre-order size named after its car, such as the FF-THREE for the Audi RS5 B10) and **Find your design** (one card per series, linking to its series page). Both use `ShowcaseCard` (`SixnineShowcase.tsx`, data in `src/utils/sixnineShowcase.ts`). The two brand pages share their opening, stock grid, fitment summary and enquiry row (`BrandSections.tsx`, with the fitment facts from `src/utils/brandFitment.ts`), so they stay alike.
+- **Blog (`/blog`).** Nineteen guides in four content pillars (forged wheel basics, BMW M wheel fitment, buying in South Africa, wheel care), at `/blog`, `/blog/:pillar` and `/blog/:pillar/:post`. Every price, size, offset, bolt pattern, lead time and stock count in an article is read from the catalogue, never typed (see [The blog](#the-blog)).
 - **Contact (`/contact`).** WhatsApp, phone, address and areas served; any channel not set in `src/config/site.ts` is hidden.
 - **Privacy notice (`/privacy-policy`).** Describes what the site does today: no accounts, contact by WhatsApp or phone, local storage for an unsent enquiry and the cookie choice, and Google Analytics (loaded through Google Tag Manager), whose two cookies are set only after a visitor accepts the cookie banner. The Google Analytics, cookie and recipient text appears only while `googleTagManagerId` is set in `src/config/site.ts`.
 - **Sixnine series pages (`/sixnine-wheels/:series`).** One page per Sixnine series: `ff-one`, `ff-two`, `ff-three`, `evo-one`, `evo-two`, `oem-plus-one`. Each is built like a SIXNINE series landing page:
@@ -95,7 +96,7 @@ Every change below is a file edit, then a pull request. Merging to `main` publis
 | Change how a finish looks in 3D | `src/data/studioFinishes.ts` | Paints are fitted to the real photos (a few designs have their own row in `DESIGN_FINISH_PBR`). After changing one, run `pip install bpy pillow numpy` then `python3 scripts/render-finish-stills.py` to redraw the swatch stills and `finishStills.json`, and check the wheel page in the viewer |
 | Change the to-order lead time | `TO_ORDER_LEAD_TIME` in `catalogue.ts` | Nothing else; pages and `llms.txt` read it |
 | Change the phone, WhatsApp, address or social links | `src/config/site.ts` | Nothing else; empty values are hidden |
-| Switch on "See it on my car" | Deploy `worker/car-preview/`, then set `carPreviewUrl` in `src/config/site.ts` | See [See it on my car](#see-it-on-my-car-ai-preview); the privacy notice updates itself |
+| Switch "See it on my car" on or off | Set `carPreviewUrl` in `src/config/site.ts` (a Worker address to switch on, `''` to switch off). Changing the Worker itself: `worker/car-preview/` | See [See it on my car](#see-it-on-my-car-ai-preview); the privacy notice updates itself |
 | Add a tag, or send an event to Google Analytics | In Google Tag Manager, not in code | See [Google Tag Manager and Google Analytics](#google-tag-manager-and-google-analytics); a new kind of tag also needs the privacy notice updated |
 | Add or correct a customer install | `scripts/fitment-reshoot/jobs.json`, then the re-shoot scripts | See [Adding or correcting a customer install](#adding-or-correcting-a-customer-install) |
 | Add or remove a partner logo | `src/data/partners.ts` and `public/images/partners/` | Owner's confirmation first |
@@ -137,8 +138,12 @@ Two things look like setup and are not:
 | `bun run build` | Five steps, in order: regenerate `public/sitemap.xml`, `public/robots.txt`, the blog's RSS feed (`public/blog/feed.xml`) and the page rules in `render.yaml` from the catalogue and `SITE.host`; build to `dist/`; write each page's own HTML file with its title and share image, plus the full text of each blog page for crawlers, and add the Google Tag Manager snippet to every page (`prerender-meta.ts`); write a redirect page for every removed address (`legacy-shells.ts`); write `dist/llms.txt` (`generate-llms.ts`) |
 | `bun run preview` | Serves the production build locally |
 | `bun run lint` | Type-check with `tsc --noEmit` |
-| `bun run test` | Data, home-page design-card, hero film, SEO, redirect, business-details, `llms.txt`, 3D-studio and security-rules tests (`node:test` via `tsx`) |
+| `bun run test` | First checks that the shared 3D viewer folder was stamped (`wheel-viewer:verify`), then runs the data, design-card, hero film, brand fitment, Sixnine range and page, SEO, redirect, business-details, lead, car-preview (website and Worker), blog, `llms.txt`, 3D-studio and security-rules tests (`node:test` via `tsx`) |
 | `bun run add-wheel` | Catalogue CLI (`--help` for options) |
+| `bun run qa-wheels` | Opens every in-stock listing at 390 px against a running dev server, takes a picture from each 3D camera view and checks for console errors, failed requests, sideways scroll and a blank stage. Writes a contact sheet to `qa-wheels/`. Needs Playwright with Chromium, which is not a dependency of the site (`npx playwright install chromium`) |
+| `bun run build-wheel-models` | Rebuilds every 3D model from the design list in `scripts/wheel-models.json` (`--src-dir <folder>` holds the downloaded source files; `--dry-run` shows what would run). Python 3, run by hand; see [docs/adding-3d-models.md](docs/adding-3d-models.md) |
+| `bun run wheel-viewer:stamp` | Records the content hash of `src/wheel-viewer/` in its `VERSION.json`. Run it after any change to that folder |
+| `bun run wheel-viewer:verify` | Fails if `src/wheel-viewer/` was edited without a new stamp (also the first step of `bun run test`) |
 | `bun run clean` | Removes `dist/` |
 
 Run `lint`, `test` and `build` before every pull request. The repository has no CI, so these local checks are the gate.
@@ -166,7 +171,7 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
 | `/admin`, `/admin/*` | `AdminWheelUploader` | Unlisted, passcode-gated, local preview only |
 | anything else | `NotFoundPage` | Not found, noindex |
 
-**Old addresses** are redirected in the browser by `redirectFor()` in `src/utils/redirects.ts`, using `history.replaceState` so the Back button is not trapped. The build also writes a small redirect page for each of the 43 addresses in `scripts/legacy-pages.json` (`scripts/legacy-shells.ts`), so an old link still lands on the right page when the host serves a file for it. A test checks that every address in that list has a redirect.
+**Old addresses** are redirected in the browser by `redirectFor()` in `src/utils/redirects.ts`, using `history.replaceState` so the Back button is not trapped. The build also writes a small redirect page for each of the 44 addresses in `scripts/legacy-pages.json` (`scripts/legacy-shells.ts`), so an old link still lands on the right page when the host serves a file for it. A test checks that every address in that list has a redirect.
 
 | Old address | Goes to |
 | --- | --- |
@@ -206,16 +211,22 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
 │  ├─ legacy-shells.ts            Writes a redirect page for each address in legacy-pages.json
 │  ├─ legacy-pages.json           The removed addresses that still get a redirect page
 │  ├─ generate-llms.ts            Writes dist/llms.txt
+│  ├─ qa-wheels.mjs               Phone-width check of every listing and its 3D views (run by hand, needs Playwright)
+│  ├─ build-wheel-models.py       Rebuilds every 3D model from wheel-models.json (run by hand)
+│  ├─ wheel-models.json           One entry per wheel design: source file, output .glb and build options
+│  ├─ wheel-viewer-sync.mjs       Stamps and verifies src/wheel-viewer/, and copies it to the BMW configurator
 │  ├─ add-blog-rules.sh           Adds the blog's rewrite rules to a Render service whose routes are set by hand (needs a Render API key; previews first)
 │  ├─ make-wheel-cutouts.py       Makes the transparent wheel cut-outs for the home page's design cards (run by hand)
 │  ├─ sixnine-range-from-sheet.py Writes src/data/sixnineRange.json from the owner's Sixnine catalogue sheet (run by hand, needs openpyxl)
 │  ├─ make-hero-video.sh          Makes the hero film's web files and posters in public/video/ from one source video (run by hand, needs ffmpeg)
 │  ├─ make-wheel-sizes.py         Makes the 800, 400 and 600 px copies of the wheel photos that the srcsets list (run by hand)
 │  └─ fitment-reshoot/            Pipeline for the install studio re-shoots (jobs.json, Python scripts, README.md)
+├─ docs/adding-3d-models.md       The owner's steps for adding or replacing a wheel's 3D model, and the limits of AI models
 ├─ docs/installs-pipeline.md      How the Installs gallery is made, with animated diagrams (docs/assets/)
 ├─ docs/blog-seo-plan.md          The blog's keyword map, on-page checklist and how to refine it in Search Console
-├─ docs/render-blog-rewrites.md   The 17 blog rewrite rules to paste into a Render service whose routes are set by hand
+├─ docs/render-blog-rewrites.md   The 24 blog rewrite rules to paste into a Render service whose routes are set by hand
 ├─ worker/car-preview/            Cloudflare Worker behind "See it on my car" (not part of the website build): src/handler.ts, its tests, wrangler.toml, dev-server.mjs, README.md
+├─ .claude/skills/                Agent skills: add-wheel-model, and the four SIXNINE style skills
 ├─ components/ui/                 Shared UI primitives (button, input, label, icons)
 ├─ lib/utils.ts                   `cn()` class-name helper used by those primitives
 └─ src/
@@ -228,6 +239,7 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
    ├─ data/finishStills.ts/.json  The swatch still of each design in each colour (made by scripts/render-finish-stills.py)
    ├─ data/clientFitments.ts      Customer installs data
    ├─ data/partners.ts            Industry partners shown on the home page
+   ├─ wheel-viewer/               The 3D wheel viewer, shared with the BMW configurator: stage, paint, swatches, part classification (edited only here; see its README.md)
    ├─ store/                      Zustand store (enquiry form, admin preview) in localStorage
    ├─ context/FirebaseContext.tsx Firebase provider (kept, not mounted by any page)
    ├─ lib/firebase.ts             Firebase setup used by that provider
@@ -235,7 +247,7 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
    ├─ utils/lazyWithRetry.ts      React.lazy with retries, for the 3D viewer's code
    ├─ utils/redirects.ts          Old address to new address
    ├─ data/blog.ts                Blog pillars, the post model and the catalogue facts articles quote
-   ├─ data/blogPosts.ts           The twelve articles, and blog path resolution
+   ├─ data/blogPosts.ts           The nineteen articles, and blog path resolution
    ├─ components/blog/            Blog pages, article renderer, cards, FAQ, home teaser, prerendered HTML
    ├─ components/ui/              shadcn-style primitives: button, badge, card, alert, table, accordion, breadcrumb
    ├─ utils/blogSeo.ts            Blog metadata, Article/Breadcrumb/FAQ structured data, sitemap dates, RSS feed
@@ -245,7 +257,6 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
    ├─ data/sixnineSeries.ts       The Sixnine series and sizes (from sixnineRange.json), their facts, slugs and finish swatches
    ├─ utils/askAi.ts              The "Ask AI about us" links and their question
    ├─ utils/carPreview.ts         "See it on my car": is it on, shrink the photo, talk to the Worker
-   ├─ utils/wheelStudioParts.ts   Part classification and camera maths for the viewer
    ├─ utils/wheelBuilder.ts       Builds a stock listing from a short input
    ├─ utils/wheelEnquiry.ts       Reads the spec line and words the WhatsApp enquiry
    └─ components/
@@ -253,7 +264,7 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
       ├─ brand/                   Header, footer, home, catalogue (grouped by brand), wheel page, car-preview dialog, installs, the two brand pages and their shared sections, partners strip, Ask AI, contact, privacy
       ├─ admin/                   Admin uploader
       ├─ shared/                  BrandLogo, enquiry form
-      └─ visuals/                 WheelStudio (3D), WheelStage, its loading skeleton and error boundary
+      └─ visuals/                 WheelStudio (the site's wrapper around `src/wheel-viewer`), WheelStage, its loading skeleton and error boundary
 ```
 
 ## Design system
@@ -268,6 +279,7 @@ Since November 2026 the site is built the way the SIXNINE Wheels storefront is (
 - **Selected means lighter, not blue.** The current nav link sits on a lighter pill; the active photo dot is white.
 - **Calm motion.** `.press` shrinks a control to 97 % while pressed, `.press-card` a card to 98.5 %; cards lift their hairline on hover. Both are off under reduced motion.
 - **Product cards** (`ProductCard.tsx`, on the brand pages, the series pages and the blog's in-stock blocks) follow SIXNINE's card: the whole card is one link; the wheel is contained on a soft radial tile with a stock badge; under it a small brand and series label, the finish as the title, the sizes, then the price per set with the finish's swatch.
+- **Showcase cards** (`ShowcaseCard` in `SixnineShowcase.tsx`) follow SIXNINE's large home-page cards: a tall dark tile lit from the top, the wheel at three-quarters in its upper part, a white pill badge, the name large at the bottom left (Satoshi Black) and a round arrow at the bottom right. They show the shop's own angled cut-out where there is one; otherwise the face-on range picture, turned to three-quarters in CSS. Used for the Sixnine series on the dealer page, the series pages ("More Sixnine series") and under the Sixnine group on the home page (a swipe row on phones).
 - **Sections open with an eyebrow** (`EYEBROW_CLASS`, `src/components/brand/sectionStyles.ts`): one or two uppercase words over the heading.
 
 What stays FORGED's own: the gold logo, Satoshi Black headlines, the palette below, rose for accent text and the focus ring, the brand film, the 3D studio and the photoreal swatches.
@@ -393,7 +405,7 @@ The make, model and paint of each car were read from its photo. They are a best 
 
 ## 3D wheel studio
 
-A wheel with a `modelUrl` opens in the studio (`src/components/visuals/WheelStudio.tsx`, mounted through `WheelStage.tsx`). Three.js is downloaded only after the visitor taps "View in 3D". If a model fails to load, the studio shows a message with a retry button. If the studio's own code fails to download, `lazyWithRetry` tries twice more, then `Wheel3DSceneErrorBoundary` shows a reload card instead of breaking the page.
+A wheel with a `modelUrl` opens in the studio. The stage itself, its paint, the colour swatches and the part classification live in `src/wheel-viewer/`, a folder shared with the BMW configurator (`FazalRSA/BMW-AND-FORGED-`, which keeps a copy in `shared/wheel-viewer/`). The website owns it: edit it only here, run `bun run wheel-viewer:stamp` (`bun run test` fails without it), then tell the owner the configurator needs `node scripts/wheel-viewer-sync.mjs pull`. The site's own `src/components/visuals/WheelStudio.tsx` wraps it with this catalogue's finishes and is mounted through `WheelStage.tsx`. Three.js is downloaded only after the visitor taps "View in 3D". If a model fails to load, the studio shows a message with a retry button. If the studio's own code fails to download, `lazyWithRetry` tries twice more, then `Wheel3DSceneErrorBoundary` shows a reload card instead of breaking the page.
 
 **How models are assigned**
 
@@ -432,10 +444,10 @@ The blog is built to rank for what owners of BMW M cars in South Africa search f
 
 | Pillar | Address | Articles |
 | --- | --- | --- |
-| Forged wheel basics | `/blog/forged-wheel-basics` | forged vs cast vs flow-formed, unsprung weight, are forged wheels worth it |
-| BMW M wheel fitment | `/blog/bmw-m-wheel-fitment` | PCD, offset and centre bore explained, the G80 M3 guide, staggered vs square |
-| Buying forged wheels in South Africa | `/blog/buying-forged-wheels-south-africa` | what forged wheels cost, in stock vs made to order, choosing a colour and finish |
-| Wheel care | `/blog/wheel-care` | cleaning, wheel bolt torque, protecting wheels from potholes |
+| Forged wheel basics | `/blog/forged-wheel-basics` | forged vs cast vs flow-formed, unsprung weight, are forged wheels worth it, how to read a wheel's load rating, painted vs powder-coated vs polished finishes |
+| BMW M wheel fitment | `/blog/bmw-m-wheel-fitment` | PCD, offset and centre bore explained, the G80 M3 guide, staggered vs square, hub-centric rings, tyre pressure sensors after a wheel change, plus-sizing |
+| Buying forged wheels in South Africa | `/blog/buying-forged-wheels-south-africa` | what forged wheels cost, in stock vs made to order, choosing a colour and finish, a buyer's checklist |
+| Wheel care | `/blog/wheel-care` | cleaning, wheel bolt torque, protecting wheels from potholes, balancing and alignment after new wheels |
 
 **Writing an article.** Add an entry to `BLOG_POSTS` in `src/data/blogPosts.ts`: slug, pillar, title, `metaTitle` (60 characters or fewer with the site name), a 100 to 160 character description, the target keyword, related phrases, a body of blocks (`h2`, `p`, `ul`, `ol`, `callout`, `table`, `designTable`, `stock`, `cta`), FAQs and two to four `more` slugs. Text takes `[link](/path)` and `**bold**`. Add the article to a pillar by setting `pillar`; nothing else needs registering, because the pillar page, hub, sitemap, RSS feed, `llms.txt`, route and prerendered HTML all read the list.
 
@@ -637,12 +649,18 @@ firebase deploy --only firestore:rules
 
 ## Testing
 
-`bun run test` runs twenty-three test files (245 tests) with `node:test`. The files are listed by name in the `test` script in `package.json`, so a new test file does not run until it is added there.
+`bun run test` first runs `wheel-viewer:verify` (fails if `src/wheel-viewer/` was edited without a new stamp), then twenty-five test files (254 tests) with `node:test`. The files are listed by name in the `test` script in `package.json`, so a new test file does not run until it is added there.
 
 | Suite | Covers |
 | --- | --- |
 | `src/data/catalogue.test.ts` | The stock rule (every exported wheel is in stock, 14 listings across 6 designs, one finish each), siblings, to-order colours (never a colour the design has in stock), no store exports, wheel builder, and that every listed wheel has a 3D model and photos that exist |
 | `src/data/clientFitments.test.ts` | Customer installs data |
+| `src/data/sixnineSeries.test.ts` | The six Sixnine series and their page addresses; the range holds wheel specifications only (no prices, stock, certificates or shop links); every size has a bolt pattern and every single wheel its diameter, width and Sixnine finish names with a swatch; facts are worked out from the sizes; every Sixnine listing in stock belongs to a series |
+| `src/utils/sixnineShowcase.test.ts` | Every series has a showcase picture (the shop's own angled cut-out first), and "New at Sixnine" lists only what Sixnine has on pre-order |
+| `src/utils/listingSpecs.test.ts` | A Sixnine listing's diameters, offsets and bolt pattern match exactly one Sixnine size per diameter, the Technical data table carries Sixnine's figures, a Forged SA listing has none, and an unreadable spec sheet hides the table rather than showing a wrong one |
+| `src/utils/brandFitment.test.ts` | The brand pages' fitment summary: a size, bolt pattern or bore is stated only when every set agrees, and lists read as English |
+| `src/utils/heroVideo.test.ts` | Every hero film file and poster exists, AV1 is offered before H.264, the film stays inside its download budget, it can start before it has fully downloaded, and it plays only for visitors who asked neither for less motion nor to save data |
+| `src/utils/leads.test.ts` | The enquiry's delivery to n8n: the webhook address, the payload, the reference number, a visitor notice when delivery fails, and no send when the hidden honeypot field is filled |
 | `src/utils/designCards.test.ts` | Home page design cards: one per design, badge, price and link from the data, the 3-then-2 row plan, and a cut-out on disk for every photographed listing |
 | `src/utils/wheelImageSrcSet.test.ts` | The `srcset` for each wheel photo (site photos only; nothing for admin uploads or placeholders) and that every smaller copy exists on disk |
 | `src/utils/fitmentImageSrcSet.test.ts` | The `srcset` for the install thumbnails (800 px copy, then the original) and that every install photo has its 800 px copy on disk |
@@ -687,7 +705,7 @@ Two Render static sites build this repository's `main` (found on 17 November 202
 | **Forged Wheels** | `forged-custom-wheels-gu3l.onrender.com` | Its routes appear to have been set by hand in the dashboard, because it ignores the blog rules in `render.yaml`. Its behaviour matches `www.forgedsa.co.za`, so the custom domain appears to be attached to it |
 | **forged-custom-wheels-gu3l** | `forged-custom-wheels-gu3l-lfgl.onrender.com` | Follows `render.yaml`: every page in the sitemap, including the blog, is served from its own prerendered file |
 
-Because of this, **a new page is correct on the second service and wrong on the live domain until its rewrite rule is added to the first**. Today that affects the blog, `/forged-sa-wheels` and the six Sixnine series pages (their rules are `/forged-sa-wheels` → `/forged-sa-wheels.html` and `/sixnine-wheels/<series>` → `/sixnine-wheels/<series>.html`, all listed in `render.yaml`; `add-blog-rules.sh` adds only the `/blog` rules, so add these by hand under Redirects/Rewrites). The blog's 17 addresses (`/blog`, four pillars, twelve articles) return the generic home-page title and no structured data to crawlers and link previews on the live domain; visitors still get the right page, because the app sets the title itself. The fix is either to move the custom domain to the second service (so everything follows `render.yaml` from then on) or to add the rules to the first: paste those in [docs/render-blog-rewrites.md](docs/render-blog-rewrites.md) under Redirects/Rewrites, or run `scripts/add-blog-rules.sh` with a Render API key (it previews first, skips rules that already exist and reads the rules from `render.yaml`; see the comments at its top). The Render MCP tools cannot edit routes or domains, so this is done in the dashboard or with that script. To check, `curl -s https://www.forgedsa.co.za/blog/wheel-care | grep '<title>'` should show "Forged wheel care", not "Forged wheels for BMW M cars in stock".
+Because of this, **a new page is correct on the second service and wrong on the live domain until its rewrite rule is added to the first**. Today that affects the blog, `/forged-sa-wheels` and the six Sixnine series pages (their rules are `/forged-sa-wheels` → `/forged-sa-wheels.html` and `/sixnine-wheels/<series>` → `/sixnine-wheels/<series>.html`, all listed in `render.yaml`; `add-blog-rules.sh` adds only the `/blog` rules, so add these by hand under Redirects/Rewrites). The blog's 24 addresses (`/blog`, four pillars, nineteen articles) return the generic home-page title and no structured data to crawlers and link previews on the live domain; visitors still get the right page, because the app sets the title itself. The fix is either to move the custom domain to the second service (so everything follows `render.yaml` from then on) or to add the rules to the first: paste those in [docs/render-blog-rewrites.md](docs/render-blog-rewrites.md) under Redirects/Rewrites, or run `scripts/add-blog-rules.sh` with a Render API key (it previews first, skips rules that already exist and reads the rules from `render.yaml`; see the comments at its top). The Render MCP tools cannot edit routes or domains, so this is done in the dashboard or with that script. To check, `curl -s https://www.forgedsa.co.za/blog/wheel-care | grep '<title>'` should show "Forged wheel care", not "Forged wheels for BMW M cars in stock".
 
 **Checking a deploy.** Render's CDN caches each page's HTML for up to five minutes, so a visitor can see the previous version briefly after a deploy goes live. To check a new deploy straight away, add any query string to the URL, for example `/installs?check=1`.
 
@@ -712,7 +730,7 @@ Build chunks are split per vendor (`react`, `motion`, `three`, `firebase`, `luci
 | **3D accuracy** | Five designs are traced from photos with simplified surfaces | Replace with scans of the physical wheels |
 | **Photography** | Two listings have no product photos and show a plain drawn stand-in (FSA003 Silver and FSA004 Hyper Black) | Add their photos to the Drive folder, then run the studio-photo steps in [Adding or changing a wheel](#adding-or-changing-a-wheel) |
 | **Link previews** | The app is client-rendered; `npm run build` bakes each page's title and share image into its own HTML file so chat apps show the right preview for the pages in the sitemap. Blog pages also carry their full article text in that file | Server-render the rest if more pages are added |
-| **Blog content** | Twelve articles of general knowledge, written without customer stories, photographs or a named author, because none were supplied | Add real install stories, workshop photographs and a named author, which search engines weigh as experience and expertise |
+| **Blog content** | Nineteen articles of general knowledge, written without customer stories, photographs or a named author, because none were supplied | Add real install stories, workshop photographs and a named author, which search engines weigh as experience and expertise |
 | **Old links** | Redirected in the browser and by a redirect page per removed address, not with an HTTP 301 | Add 301 rules on the host |
 | **Unknown addresses** | Show the noindex not-found page, but the host still answers HTTP 200 | Return HTTP 404 from the host for unknown paths |
 | **Domain** | Live at `www.forgedsa.co.za`; the bare domain redirects to it. The Render address still answers too (its pages name the `www` host as canonical, and the visit statistics ignore it) | Keep the Render address, or point it at the custom domain in the host's dashboard |
@@ -725,7 +743,7 @@ Build chunks are split per vendor (`react`, `motion`, `three`, `firebase`, `luci
 | **Install details** | Each car's make, model and paint were read from its photo, not confirmed | Shop to confirm, then correct `jobs.json` |
 | **Leftovers from the starter** | `package.json` still lists `@google/genai`, `express` and `dotenv`, which no file imports. `.env.example`, `metadata.json` and a tracked `.aistudio/` folder (6 MB of screenshots) come from the same starter | Remove in one clean-up pull request |
 | **Render routes** | Two Render services build `main`; the one that appears to carry the live domain ignores `render.yaml`, so the blog's addresses are not served from their prerendered files there (see [Two Render services](#two-render-services)) | Move the domain to the service that follows `render.yaml`, or add the rules in `docs/render-blog-rewrites.md` |
-| **Automated checks** | Type check, 245 tests in 23 files and the build, all run by hand. No CI, no browser tests, and ESLint is not wired to a script | Run the three checks on every pull request with a CI workflow |
+| **Automated checks** | Type check, 254 tests in 25 files and the build, all run by hand. No CI, no browser tests, and ESLint is not wired to a script | Run the three checks on every pull request with a CI workflow |
 
 ## Contributing
 

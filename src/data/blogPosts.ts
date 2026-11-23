@@ -16,6 +16,7 @@ const BUYING = '/blog/buying-forged-wheels-south-africa';
 const CARE = '/blog/wheel-care';
 
 const PUBLISHED = '2026-11-17';
+const PUBLISHED_2 = '2026-11-23';
 
 const NUMBER_WORDS: Record<string, string> = { '3': 'three', '4': 'four', '5': 'five', '6': 'six' };
 
@@ -221,7 +222,7 @@ export const BLOG_POSTS: readonly BlogPost[] = [
         a: 'Ask the seller for the weight of each wheel at the size you want. If a listing does not state it, ask before you buy.',
       },
     ],
-    more: ['forged-vs-cast-vs-flow-formed-wheels', 'are-forged-wheels-worth-it', 'protecting-wheels-from-potholes'],
+    more: ['forged-vs-cast-vs-flow-formed-wheels', 'are-forged-wheels-worth-it', 'protecting-wheels-from-potholes', 'how-to-read-a-wheel-load-rating'],
   },
 
   {
@@ -326,7 +327,7 @@ export const BLOG_POSTS: readonly BlogPost[] = [
         a: 'In most cases the wheels bolt on, provided the bolt pattern, centre bore, offset and brake clearance suit your car. We confirm the fit for your exact car before anything is ordered.',
       },
     ],
-    more: ['forged-vs-cast-vs-flow-formed-wheels', 'how-much-do-forged-wheels-cost-in-south-africa', 'bmw-g80-m3-forged-wheels'],
+    more: ['forged-vs-cast-vs-flow-formed-wheels', 'how-much-do-forged-wheels-cost-in-south-africa', 'bmw-g80-m3-forged-wheels', 'what-to-ask-before-buying-forged-wheels'],
   },
 
   /* ============================================================ FITMENT */
@@ -444,7 +445,7 @@ export const BLOG_POSTS: readonly BlogPost[] = [
         a: 'Look up your exact model and chassis code (for example G80 for the current M3), or send it to us and we will confirm it.',
       },
     ],
-    more: ['bmw-g80-m3-forged-wheels', 'staggered-vs-square-wheel-setups', 'are-forged-wheels-worth-it'],
+    more: ['bmw-g80-m3-forged-wheels', 'staggered-vs-square-wheel-setups', 'are-forged-wheels-worth-it', 'hub-centric-rings-when-you-need-them'],
   },
 
   {
@@ -555,7 +556,7 @@ export const BLOG_POSTS: readonly BlogPost[] = [
         a: (f) => `Yes. Other colours of a design can be ordered. ${f.toOrderNotice}`,
       },
     ],
-    more: ['wheel-fitment-explained-pcd-offset-centre-bore', 'staggered-vs-square-wheel-setups', 'in-stock-vs-made-to-order-forged-wheels'],
+    more: ['wheel-fitment-explained-pcd-offset-centre-bore', 'staggered-vs-square-wheel-setups', 'in-stock-vs-made-to-order-forged-wheels', 'tyre-pressure-sensors-after-a-wheel-change'],
   },
 
   {
@@ -644,7 +645,7 @@ export const BLOG_POSTS: readonly BlogPost[] = [
         a: 'It can be done, but it changes the tyres, the offsets and the handling balance. Message us before you decide.',
       },
     ],
-    more: ['wheel-fitment-explained-pcd-offset-centre-bore', 'bmw-g80-m3-forged-wheels', 'protecting-wheels-from-potholes'],
+    more: ['wheel-fitment-explained-pcd-offset-centre-bore', 'bmw-g80-m3-forged-wheels', 'protecting-wheels-from-potholes', 'plus-sizing-wheels-and-tyres'],
   },
 
   /* ============================================================ BUYING */
@@ -901,7 +902,7 @@ export const BLOG_POSTS: readonly BlogPost[] = [
         a: 'Yes. The [installs page](/installs) shows customer cars on their wheels.',
       },
     ],
-    more: ['in-stock-vs-made-to-order-forged-wheels', 'how-to-clean-forged-wheels', 'how-much-do-forged-wheels-cost-in-south-africa'],
+    more: ['in-stock-vs-made-to-order-forged-wheels', 'how-to-clean-forged-wheels', 'how-much-do-forged-wheels-cost-in-south-africa', 'painted-powder-coated-and-polished-wheel-finishes'],
   },
 
   /* ============================================================ CARE */
@@ -1071,7 +1072,7 @@ export const BLOG_POSTS: readonly BlogPost[] = [
         a: 'After the first short drive following any wheel change, and whenever the wheels have been off the car. Ask your fitter if you want a routine check.',
       },
     ],
-    more: ['how-to-clean-forged-wheels', 'protecting-wheels-from-potholes', 'wheel-fitment-explained-pcd-offset-centre-bore'],
+    more: ['how-to-clean-forged-wheels', 'protecting-wheels-from-potholes', 'wheel-fitment-explained-pcd-offset-centre-bore', 'wheel-balancing-and-alignment-after-new-wheels'],
   },
 
   {
@@ -1151,6 +1152,562 @@ export const BLOG_POSTS: readonly BlogPost[] = [
     ],
     more: ['unsprung-weight-explained', 'how-to-clean-forged-wheels', 'wheel-bolt-torque-and-care'],
   },
+  /* ====================================================== MORE (23 Nov 2026) */
+  {
+    slug: 'hub-centric-rings-when-you-need-them',
+    pillar: 'fitment',
+    title: 'Hub-centric rings: when you need them and when you do not',
+    metaTitle: 'Hub-centric rings: when your wheels need them',
+    description:
+      'What hub-centric rings are, when a wheel needs them, how a poor fit shows up as vibration, and how to check a wheel’s centre bore against your BMW’s hub.',
+    excerpt: 'Rings fill the gap between a wheel’s centre hole and your hub. When you need one, and when you do not.',
+    keyword: 'hub centric rings BMW',
+    related: ['hub centric vs lug centric', 'centre bore hub rings', 'wheel vibration at speed', 'do I need hub rings'],
+    intent: 'informational',
+    published: PUBLISHED_2,
+    updated: PUBLISHED_2,
+    body: [
+      {
+        type: 'p',
+        text: 'Most wheels made for a BMW M car are centred on the hub by the hole in the middle of the wheel, not by the wheel bolts. That is what hub-centric means. If the wheel’s centre hole is bigger than your car’s hub, a hub-centric ring fills the gap. If the hole already matches the hub, you do not need one.',
+      },
+      { type: 'h2', text: 'What hub-centric means' },
+      {
+        type: 'p',
+        text: 'A hub-centric wheel sits on a short collar of the hub, called the spigot. The collar centres the wheel, and the bolts then only clamp it in place. A lug-centric wheel is centred by the tapered seats of the bolts alone. Hub-centric centring is accurate and repeatable, which is why it is the normal design for BMW wheels.',
+      },
+      { type: 'h2', text: 'When you need a ring' },
+      {
+        type: 'p',
+        text: 'You need rings when the wheel’s centre bore is larger than your hub and the wheel’s maker specifies rings for your car. If the two match, rings are not needed. If the wheel’s bore is smaller than the hub, the wheel will not fit at all, and a ring cannot help. Never machine a hub or force a wheel on.',
+      },
+      {
+        type: 'p',
+        text: (f) =>
+          f.centreBore.length
+            ? `The wheels in stock list a centre bore of ${mm(f.centreBore)}. Each wheel’s page shows the exact figure for that set, and we confirm it against your car before anything is ordered. Read [wheel fitment explained](${FITMENT}/wheel-fitment-explained-pcd-offset-centre-bore) for how the centre bore sits alongside the other fitment numbers.`
+            : `Read [wheel fitment explained](${FITMENT}/wheel-fitment-explained-pcd-offset-centre-bore) for how the centre bore sits alongside the other fitment numbers.`,
+      },
+      { type: 'h2', text: 'What a poor fit feels like' },
+      {
+        type: 'p',
+        text: `If a wheel is not centred properly, the usual sign is a vibration that builds with speed and does not go away after balancing: a shake in the steering wheel or a buzz through the seat. Centring is one possible cause, but a bent wheel or a faulty tyre gives the same symptoms, so ask the fitter to check before assuming. [Balancing and alignment after new wheels](${CARE}/wheel-balancing-and-alignment-after-new-wheels) covers the other checks.`,
+      },
+      { type: 'h2', text: 'Choosing and fitting rings' },
+      {
+        type: 'ul',
+        items: [
+          '**Match both sizes.** The ring’s outer diameter must fit the wheel’s bore, and its inner diameter must fit your hub.',
+          '**Ask what the wheel’s maker recommends.** Rings are made in plastic and in metal.',
+          '**Clean the hub, the ring and the wheel seat** before fitting, so there is no grit between them.',
+          `**Tighten the wheel bolts to the specified figure** once the wheel is on (see [how to torque wheel bolts](${CARE}/wheel-bolt-torque-and-care)).`,
+          '**Refit the rings every time the wheels come off.** A loose ring is easy to lose.',
+        ],
+      },
+      {
+        type: 'callout',
+        tone: 'tip',
+        title: 'Check before you buy',
+        text: 'Ask the seller for the wheel’s centre bore and your car’s hub size in writing. If they differ, ask which ring is needed and whether it comes with the wheels.',
+      },
+      {
+        type: 'cta',
+        heading: 'Not sure what your car needs?',
+        text: 'Send us your model and year. We will tell you what the wheel needs to fit your car.',
+      },
+    ],
+    faqs: [
+      {
+        q: 'Do I need hub-centric rings?',
+        a: 'Only if the wheel’s centre bore is larger than your car’s hub and the wheel’s maker specifies rings. If the bore matches the hub, the wheel centres on the hub by itself and no ring is needed.',
+      },
+      {
+        q: 'Can a ring make a wheel fit when its centre hole is too small?',
+        a: 'No. A ring fills the gap between a larger hole and a smaller hub. A hole that is too small for the hub cannot be fixed with a ring.',
+      },
+      {
+        q: 'Are hub-centric rings safe?',
+        a: 'They are widely used and are safe when they are the right size, clean and fitted with the wheel bolts tightened to the specified figure. The bolts, not the ring, clamp the wheel to the car.',
+      },
+    ],
+    more: ['wheel-fitment-explained-pcd-offset-centre-bore', 'wheel-balancing-and-alignment-after-new-wheels', 'wheel-bolt-torque-and-care'],
+  },
+
+  {
+    slug: 'tyre-pressure-sensors-after-a-wheel-change',
+    pillar: 'fitment',
+    title: 'Tyre pressure sensors after a wheel change on a BMW',
+    metaTitle: 'Tyre pressure sensors after a wheel change',
+    description:
+      'What happens to your BMW’s tyre pressure monitoring when you change wheels: moving the sensors, fitting new ones, the reset and what to ask your fitter.',
+    excerpt: 'Move the old sensors or fit new ones, then tell the car. What to do and what to ask your fitter.',
+    keyword: 'tyre pressure sensors BMW wheel change',
+    related: ['TPMS new wheels BMW', 'RDC reset after wheel change', 'tyre pressure warning new wheels', 'transfer TPMS sensors'],
+    intent: 'informational',
+    published: PUBLISHED_2,
+    updated: PUBLISHED_2,
+    body: [
+      {
+        type: 'p',
+        text: 'Many current BMWs watch your tyre pressures with a sensor in each wheel. When you change to a new set of wheels, those sensors have to move across or be replaced, and the car has to be told about the change. It is a short job, but it is easy to get wrong.',
+      },
+      { type: 'h2', text: 'How the system works' },
+      {
+        type: 'p',
+        text: 'A direct system has a small battery-powered sensor inside each wheel, normally fixed to the valve, which sends the pressure to the car. Each sensor’s identity is registered with the car so it knows which signals are its own. Some cars use an indirect system that works out pressure from wheel speed instead. Which type your car has, and the exact steps for it, are in your owner’s manual.',
+      },
+      { type: 'h2', text: 'Two ways to do it' },
+      {
+        type: 'ul',
+        items: [
+          '**Move your existing sensors** to the new wheels. The car already knows them, but ask for fresh valve seals when they are moved, because the old ones have been disturbed.',
+          '**Fit new sensors** in the new wheels. They have to be registered so the car recognises them. The fitter does this with a tool, and on some cars the car learns them as you drive. The method depends on the car and the sensors.',
+        ],
+      },
+      { type: 'h2', text: 'After the wheels are on' },
+      {
+        type: 'ol',
+        items: [
+          'Set every tyre to the recommended pressure, from the placard in the door frame or your owner’s manual.',
+          'Reset or confirm the pressure monitoring in the car’s menu, as your owner’s manual describes.',
+          'Drive for a short while, because the car may need to learn the sensors.',
+          'Check that the warning light is off and that all four pressures show.',
+        ],
+      },
+      { type: 'h2', text: 'What can go wrong' },
+      {
+        type: 'ul',
+        items: [
+          'A warning light stays on because a sensor was not registered, or is faulty.',
+          'With two sets of wheels, for example summer and winter, each set needs its sensors registered, or the system needs a reset at every swap.',
+          'Sensor batteries wear out over the years, so an old sensor can fail soon after the swap.',
+        ],
+      },
+      {
+        type: 'callout',
+        tone: 'warning',
+        title: 'Do not ignore a pressure warning',
+        text: 'It may only be a sensor fault, but it may also be a real puncture or a slow leak. Check the tyres before you assume the sensor is at fault.',
+      },
+      { type: 'h2', text: 'Questions to ask your fitter' },
+      {
+        type: 'ul',
+        items: [
+          'Will you move my sensors or fit new ones?',
+          'Will the valve seals be replaced?',
+          'Who registers the sensors with the car, and how do you confirm it worked?',
+          'What should I do if the warning light comes back?',
+        ],
+      },
+      {
+        type: 'p',
+        text: `Planning a wheel change for your M3? The [G80 M3 guide](${FITMENT}/bmw-g80-m3-forged-wheels) lists everything else to check before you order.`,
+      },
+    ],
+    faqs: [
+      {
+        q: 'Do I need new tyre pressure sensors with new wheels?',
+        a: 'Not necessarily. Your existing sensors can be moved to the new wheels, or new ones fitted. Which is better depends on the age and condition of the sensors.',
+      },
+      {
+        q: 'Will the car need coding?',
+        a: 'Usually the car only needs to be told about the sensors, which is a registration or a reset rather than coding. Coding is mostly needed when the system is added or removed. Follow your owner’s manual, or ask a BMW specialist.',
+      },
+      {
+        q: 'Can I drive without the sensors?',
+        a: 'It is usually not a good idea. The car will typically show a warning, and you lose an early warning of a puncture or a slow leak.',
+      },
+    ],
+    more: ['bmw-g80-m3-forged-wheels', 'wheel-bolt-torque-and-care', 'wheel-fitment-explained-pcd-offset-centre-bore'],
+  },
+
+  {
+    slug: 'plus-sizing-wheels-and-tyres',
+    pillar: 'fitment',
+    title: 'Plus-sizing wheels and tyres without changing the rolling diameter',
+    metaTitle: 'Plus-sizing wheels: keep the rolling diameter',
+    description:
+      'How plus-sizing works: a bigger wheel with a lower-profile tyre, why the overall diameter should stay close to the original, and what changes in ride and risk.',
+    excerpt: 'A bigger wheel and a shorter tyre can keep the car’s height the same. How to do it, and what it costs you.',
+    keyword: 'plus sizing wheels tyres',
+    related: ['plus size wheels', 'rolling diameter', 'tyre size calculator', 'speedometer error new tyres'],
+    intent: 'informational',
+    published: PUBLISHED_2,
+    updated: PUBLISHED_2,
+    body: [
+      {
+        type: 'p',
+        text: 'Plus-sizing means fitting a larger-diameter wheel together with a lower-profile tyre, so that the wheel and tyre are about the same overall height as before. The bigger wheel takes a tyre with a shorter sidewall, and the two changes cancel out. Done well, the car drives the same and looks different. Done badly, the speedometer is wrong and the tyre rubs.',
+      },
+      { type: 'h2', text: 'Why the overall diameter matters' },
+      {
+        type: 'ul',
+        items: [
+          '**The speedometer and odometer** count wheel turns. A taller or shorter wheel and tyre makes them read wrongly.',
+          '**The stability, braking and traction systems** compare the speeds of the four wheels, and are set up for the original rolling circumference.',
+          '**Clearance** in the arch and around the suspension changes when the overall height does.',
+        ],
+      },
+      {
+        type: 'p',
+        text: 'A common rule of thumb is to stay within about three per cent of the original overall diameter. It is a guide only: matching the diameter does not prove that everything will clear and work, so treat it as a starting point and not as proof of fit.',
+      },
+      { type: 'h2', text: 'How to work it out' },
+      {
+        type: 'p',
+        text: 'The overall diameter is the wheel’s diameter plus twice the height of the sidewall. The sidewall height is the tyre’s width multiplied by its aspect ratio, which is the second number in the tyre size, divided by one hundred. You do not need to do this by hand: a tyre-size calculator compares your current size with the one you want, and shows the difference in overall diameter and in speedometer reading.',
+      },
+      { type: 'h2', text: 'What changes besides the size' },
+      {
+        type: 'ul',
+        items: [
+          '**Ride.** A shorter sidewall cushions less, so the car feels firmer and bumps are felt more.',
+          `**Road damage.** There is less rubber between the rim and a pothole, so the risk goes up (see [how to protect your wheels from potholes](${CARE}/protecting-wheels-from-potholes)).`,
+          `**Weight.** A larger wheel can weigh more, even when it is forged, which works against what lighter wheels are for (see [unsprung weight explained](${BASICS}/unsprung-weight-explained)).`,
+          '**Choice and cost.** Fewer tyres are made in very low profiles, and they often cost more.',
+        ],
+      },
+      { type: 'h2', text: 'On a staggered M car' },
+      {
+        type: 'p',
+        text: (f) =>
+          `On a staggered car the front and the rear are worked out separately, and the relationship between them stays as the car was designed. Read [staggered vs square wheel setups](${FITMENT}/staggered-vs-square-wheel-setups) first.${
+            f.sizes.length ? ` The sets in stock are listed with sizes of ${joinList(f.sizes)}. Ask us which tyre sizes suit each one on your car.` : ''
+          }`,
+      },
+      {
+        type: 'callout',
+        tone: 'warning',
+        title: 'Matching diameter is not the same as fitting',
+        text: 'A wheel can match the overall diameter and still rub if it is wider or sits further out. Check the width and the offset as well (see wheel fitment explained).',
+      },
+    ],
+    faqs: [
+      {
+        q: 'What is plus-sizing?',
+        a: 'It is fitting a larger-diameter wheel with a lower-profile tyre so the combined height stays about the same as the original.',
+      },
+      {
+        q: 'Will plus-sizing change my speedometer?',
+        a: 'If the overall diameter stays within a small margin of the original, the change is small. If it grows or shrinks, the speedometer and odometer read differently, because they are based on how often the wheel turns.',
+      },
+      {
+        q: 'Is a bigger wheel always better?',
+        a: 'No. A bigger wheel gives a firmer ride and more exposure to road damage, and can weigh more. Choose the size that suits the car and the roads you drive.',
+      },
+    ],
+    more: ['wheel-fitment-explained-pcd-offset-centre-bore', 'staggered-vs-square-wheel-setups', 'protecting-wheels-from-potholes'],
+  },
+
+  {
+    slug: 'how-to-read-a-wheel-load-rating',
+    pillar: 'basics',
+    title: 'How to read a wheel’s load rating (and why tyres have their own)',
+    metaTitle: 'How to read a wheel’s load rating',
+    description:
+      'What a wheel’s load rating means, where to find it, how it differs from a tyre’s load index and why both must cover the weight on each corner of your car.',
+    excerpt: 'The number that says how much a wheel can carry, and the separate one on your tyre.',
+    keyword: 'wheel load rating',
+    related: ['tyre load index', 'wheel weight capacity', 'wheel load rating BMW M', 'is my wheel strong enough'],
+    intent: 'informational',
+    published: PUBLISHED_2,
+    updated: PUBLISHED_2,
+    body: [
+      {
+        type: 'p',
+        text: 'A wheel carries part of the weight of the car, and a rating says how much. On a heavy performance car it matters, because the load on each corner is large and gets larger in corners, under braking and over bumps. Here is where to find the rating and how to check it.',
+      },
+      { type: 'h2', text: 'What the rating means' },
+      {
+        type: 'p',
+        text: 'The load rating is the most weight a wheel is designed to carry, normally given in kilograms for one wheel. It is usually marked on the wheel or listed in the maker’s specification. A wheel without a stated rating is a wheel you cannot check, which is a reason to ask before you buy.',
+      },
+      { type: 'h2', text: 'How to check it against your car' },
+      {
+        type: 'ol',
+        items: [
+          'Find the wheel’s load rating from the seller or the maker.',
+          'Find your car’s maximum axle weights, which are on the car’s data plate or in the owner’s manual.',
+          'Halve each axle figure for a rough load per wheel on that axle.',
+          'Check that the wheel’s rating is comfortably above that figure.',
+          'Check the tyre’s load index separately (see below).',
+        ],
+      },
+      { type: 'h2', text: 'Tyres have their own rating' },
+      {
+        type: 'p',
+        text: 'The load index is a number on the tyre’s sidewall that corresponds to the maximum weight the tyre can carry, in a standard table. The tyre and the wheel each have a limit, and the lower of the two sets what that corner can carry safely. A wheel with a high rating does not help if the tyre’s index is too low, and the reverse is also true.',
+      },
+      { type: 'h2', text: 'Why you want margin' },
+      {
+        type: 'p',
+        text: 'The load on a wheel is not constant. Cornering, hard braking and bumps raise it well above the static figure, so a wheel’s rating should comfortably exceed the weight you worked out, not just meet it.',
+      },
+      { type: 'h2', text: 'What to ask the seller' },
+      {
+        type: 'ul',
+        items: [
+          'What is the load rating of this wheel, at the size I want?',
+          'Is that figure from the wheel’s maker?',
+          'Is the rating enough for my car’s axle weights?',
+        ],
+      },
+      {
+        type: 'callout',
+        tone: 'note',
+        title: 'Strength and weight are different questions',
+        text: `A strong wheel can still be heavy, and a light wheel still needs a rating that suits the car. Read [forged vs cast vs flow-formed wheels](${BASICS}/forged-vs-cast-vs-flow-formed-wheels) for how the way a wheel is made affects both.`,
+      },
+    ],
+    faqs: [
+      {
+        q: 'Where do I find a wheel’s load rating?',
+        a: 'Look for a figure marked on the wheel, or ask the seller for the maker’s specification. If neither can give you a rating, treat that as a warning sign.',
+      },
+      {
+        q: 'What is the difference between a wheel’s load rating and a tyre’s load index?',
+        a: 'The load rating belongs to the wheel and is given in kilograms. The load index belongs to the tyre and is a number on its sidewall that maps to a weight in a standard table. Both must cover the load on that corner of the car.',
+      },
+      {
+        q: 'Do forged wheels have a higher load rating?',
+        a: 'Not automatically. The rating comes from how the wheel is designed and engineered. Forging allows a strong wheel at a low weight, but you should still check the figure for the exact wheel.',
+      },
+    ],
+    more: ['forged-vs-cast-vs-flow-formed-wheels', 'unsprung-weight-explained', 'protecting-wheels-from-potholes'],
+  },
+
+  {
+    slug: 'painted-powder-coated-and-polished-wheel-finishes',
+    pillar: 'basics',
+    title: 'Painted, powder-coated and polished wheel finishes compared',
+    metaTitle: 'Painted, powder-coated and polished finishes',
+    description:
+      'How painted, powder-coated and polished wheel finishes differ in look and care, and what to ask a seller about the finish on the wheels you are buying.',
+    excerpt: 'Three ways to finish a wheel, how each looks and wears, and what to ask before you buy.',
+    keyword: 'wheel finishes painted powder coated polished',
+    related: ['powder coat vs paint wheels', 'polished wheels care', 'matte vs gloss wheels', 'wheel finish durability'],
+    intent: 'informational',
+    published: PUBLISHED_2,
+    updated: PUBLISHED_2,
+    body: [
+      {
+        type: 'p',
+        text: 'The finish is the surface layer of a wheel, and there are three common ways to make it: paint, powder coat, or polishing the bare metal. They look different, wear differently and ask different things of you. This guide explains each, so you know what to ask before you choose a colour.',
+      },
+      { type: 'h2', text: 'Painted' },
+      {
+        type: 'p',
+        text: 'A painted wheel has liquid paint applied in layers, usually finished with a clear coat. It offers the widest choice of colours and sheens, and small chips can often be touched in.',
+      },
+      { type: 'h2', text: 'Powder-coated' },
+      {
+        type: 'p',
+        text: 'A powder coat is a dry powder that is sprayed on and then baked, so it melts into one continuous layer. It is typically harder against chips than ordinary paint, which is why it is common on wheels that see rough use.',
+      },
+      { type: 'h2', text: 'Polished' },
+      {
+        type: 'p',
+        text: 'A polished finish leaves the metal itself bright. It has a distinctive look, but bare metal marks and dulls if it is not looked after, so polished wheels are usually protected by a clear layer or need regular polishing.',
+      },
+      {
+        type: 'table',
+        caption: 'General tendencies. The exact process and coating on a given wheel varies, so ask.',
+        head: ['', 'Painted', 'Powder-coated', 'Polished'],
+        rows: [
+          ['Look', 'Widest range of colours and sheens', 'A solid, even colour', 'Bright bare metal'],
+          ['Chips and wear', 'Chips can often be touched in', 'Typically harder against chips', 'Marks and dulls without care'],
+          ['Care', 'Gentle wash and soft tools', 'Gentle wash and soft tools', 'The most delicate; use the mildest cleaner'],
+        ],
+      },
+      { type: 'h2', text: 'Matte, satin and gloss are separate' },
+      {
+        type: 'p',
+        text: (f) =>
+          `Matte, satin and gloss describe the sheen, not the process. A painted wheel and a powder-coated wheel can each be any of them.${
+            f.finishes.length ? ` The finishes in stock right now are ${joinList(f.finishes)}.` : ''
+          }`,
+      },
+      { type: 'h2', text: 'What to ask before you buy' },
+      {
+        type: 'ul',
+        items: [
+          'Which process was used on this wheel: paint, powder coat or polish?',
+          'Is there a clear coat on top, and what are the cleaning instructions?',
+          'Can chips be repaired, and by whom?',
+        ],
+      },
+      {
+        type: 'p',
+        text: `A listing may give the colour without saying how it is applied, so ask. When you know what you have, [how to clean forged wheels](${CARE}/how-to-clean-forged-wheels) covers each finish, and [how to choose a wheel colour and finish](${BUYING}/choosing-a-wheel-finish-for-your-bmw-m-car) helps with the look.`,
+      },
+    ],
+    faqs: [
+      {
+        q: 'Is powder coating better than paint?',
+        a: 'Powder coat is typically harder against chips, while paint offers more colours and is easier to touch in. Neither is better in every case, so choose by the look you want and how you will look after the wheel.',
+      },
+      {
+        q: 'Do polished wheels need more care?',
+        a: 'Yes. Bare metal marks and dulls more easily than a coated surface, so a polished face needs gentler cleaning and more regular attention.',
+      },
+      {
+        q: 'Is matte a different process from gloss?',
+        a: 'No. Matte, satin and gloss describe how shiny the surface is. The same painted or powder-coated process can produce any of them.',
+      },
+    ],
+    more: ['choosing-a-wheel-finish-for-your-bmw-m-car', 'how-to-clean-forged-wheels', 'forged-vs-cast-vs-flow-formed-wheels'],
+  },
+
+  {
+    slug: 'wheel-balancing-and-alignment-after-new-wheels',
+    pillar: 'care',
+    title: 'Wheel balancing and alignment after fitting new wheels',
+    metaTitle: 'Wheel balancing and alignment after new wheels',
+    description:
+      'Why new wheels need balancing, what centring has to do with it, when an alignment check is worth doing and how to spot a problem on the first drives.',
+    excerpt: 'Balance every new wheel, know what a vibration means, and decide whether you need an alignment check.',
+    keyword: 'wheel balancing new wheels',
+    related: ['balance new tyres', 'wheel alignment after new wheels', 'steering wheel vibration new wheels', 'road force balancing'],
+    intent: 'informational',
+    published: PUBLISHED_2,
+    updated: PUBLISHED_2,
+    body: [
+      {
+        type: 'p',
+        text: 'A new set of wheels and tyres should always be balanced before you drive away, and sometimes an alignment check is worth doing too. They are two different jobs. Balancing is about weight spread around the wheel. Alignment is about the angles the wheels sit at. This guide explains what each does and how to tell if something is wrong.',
+      },
+      { type: 'h2', text: 'What balancing does' },
+      {
+        type: 'p',
+        text: 'No wheel and tyre is perfectly even all the way round. A heavy spot makes the wheel wobble as it spins, which you feel as a vibration at speed. Balancing measures the heavy spot and adds small weights to cancel it. Every wheel and tyre assembly should be balanced when the tyre is fitted.',
+      },
+      { type: 'h2', text: 'Why centring matters' },
+      {
+        type: 'p',
+        text: `A wheel has to be centred on the balancing machine the way it is centred on your car, or it will balance well in the workshop and vibrate on the road. If your wheels need hub-centric rings, they should be used when balancing too (see [hub-centric rings](${FITMENT}/hub-centric-rings-when-you-need-them)). Some workshops offer a road-force balance, which also checks how round the wheel and tyre are under load.`,
+      },
+      { type: 'h2', text: 'What alignment does' },
+      {
+        type: 'p',
+        text: 'Alignment sets the angles of the wheels to each other and to the road. Changing wheels on its own does not change those settings. A different offset or size can change how the car feels, however, and any change to the suspension or a hard knock can move the angles. If the car pulls to one side, the steering wheel sits off-centre, or the tyres wear unevenly, have the alignment checked.',
+      },
+      { type: 'h2', text: 'Spotting a problem on the first drives' },
+      {
+        type: 'ul',
+        items: [
+          '**Vibration through the steering wheel or seat** that changes with speed usually points to balance or centring.',
+          '**The car pulling to one side** points to alignment, tyre pressures or a faulty tyre.',
+          '**A shake only under braking** can come from the brakes, not the wheels.',
+          '**Uneven tyre wear** after a few weeks is a sign to have the alignment checked.',
+        ],
+      },
+      {
+        type: 'callout',
+        tone: 'tip',
+        title: 'Re-check the bolts too',
+        text: `Check the wheel bolt torque after the first short drive, as described in [how to torque wheel bolts correctly](${CARE}/wheel-bolt-torque-and-care). A loose wheel also causes vibration.`,
+      },
+    ],
+    faqs: [
+      {
+        q: 'Do new wheels need balancing?',
+        a: 'Yes. Every wheel and tyre assembly should be balanced when the tyre is fitted, because no assembly is perfectly even.',
+      },
+      {
+        q: 'Do I need an alignment after changing wheels?',
+        a: 'Changing wheels does not change the alignment on its own, so it is not always needed. Have it checked if the car pulls, the steering wheel is off-centre, the tyres wear unevenly, or the offset or size has changed noticeably.',
+      },
+      {
+        q: 'What causes a vibration at speed after new wheels?',
+        a: 'The most common causes are balance, centring, a bent wheel, a faulty tyre or loose wheel bolts. Ask the fitter to check these in turn.',
+      },
+    ],
+    more: ['wheel-bolt-torque-and-care', 'hub-centric-rings-when-you-need-them', 'protecting-wheels-from-potholes'],
+  },
+
+  {
+    slug: 'what-to-ask-before-buying-forged-wheels',
+    pillar: 'buying',
+    title: 'What to ask before you buy forged wheels: a checklist',
+    metaTitle: 'What to ask before buying forged wheels',
+    description:
+      'A practical checklist of questions to ask any seller before buying forged wheels: fitment, weight, stock, lead time, what is included and who confirms the fit.',
+    excerpt: 'Ten questions that tell you whether a set will fit, arrive and last, and whether the seller knows.',
+    keyword: 'buying forged wheels checklist',
+    related: ['questions to ask wheel seller', 'forged wheels buyers guide', 'how to buy forged wheels', 'forged wheels South Africa'],
+    intent: 'commercial',
+    published: PUBLISHED_2,
+    updated: PUBLISHED_2,
+    body: [
+      {
+        type: 'p',
+        text: 'A set of forged wheels is a large purchase, and most of the things that go wrong can be avoided by asking the right questions first. Use this checklist with any seller. A seller who answers clearly, in writing, is a good sign. One who cannot, or will not, is a reason to look elsewhere.',
+      },
+      { type: 'h2', text: 'The checklist' },
+      {
+        type: 'ol',
+        items: [
+          `**Does it fit my exact car?** Give the model, year and brake option, and ask who confirms the fit (see [wheel fitment explained](${FITMENT}/wheel-fitment-explained-pcd-offset-centre-bore)).`,
+          '**What are the bolt pattern, offset and centre bore?** All three, for each axle, in writing.',
+          `**Does the wheel need hub-centric rings?** And if so, are they included (see [hub-centric rings](${FITMENT}/hub-centric-rings-when-you-need-them))?`,
+          `**What does each wheel weigh at my size?** Compare stated weights, not labels (see [unsprung weight explained](${BASICS}/unsprung-weight-explained)).`,
+          `**What is the load rating?** And is it enough for my car (see [how to read a wheel’s load rating](${BASICS}/how-to-read-a-wheel-load-rating))?`,
+          `**Is it staggered, and which size goes where?** Check front and rear separately (see [staggered vs square setups](${FITMENT}/staggered-vs-square-wheel-setups)).`,
+          '**Is this set in stock, or made to order?** And if it is made to order, how long will it take?',
+          `**What finish is it, and how is it applied?** (see [painted, powder-coated and polished finishes](${BASICS}/painted-powder-coated-and-polished-wheel-finishes))`,
+          '**What is included in the price?** Wheel bolts, rings, sensors and fitting are all separate questions.',
+          '**Who do I call if something is wrong?** Know how to reach the seller after the sale.',
+        ],
+      },
+      { type: 'h2', text: 'What the answers should tell you' },
+      {
+        type: 'p',
+        text: (f) =>
+          f.priceRange
+            ? `Prices on this site are in Rand per set of four, and the forged sets listed now run from ${f.minPrice} to ${f.maxPrice}. ${f.toOrderNotice} Prices and stock change, so confirm both before you rely on them. The guide to [what forged wheels cost in South Africa](${BUYING}/how-much-do-forged-wheels-cost-in-south-africa) shows how to compare quotes fairly.`
+            : `Prices on this site are in Rand per set of four, and stock changes, so confirm both before you rely on them. The guide to [what forged wheels cost in South Africa](${BUYING}/how-much-do-forged-wheels-cost-in-south-africa) shows how to compare quotes fairly.`,
+      },
+      { type: 'h2', text: 'Red flags' },
+      {
+        type: 'ul',
+        items: [
+          'The seller cannot say what the bolt pattern, offset or centre bore is.',
+          'The seller will not confirm the fit for your exact car, or only says “it should fit”.',
+          'There is no stated weight or load rating, and no explanation for why.',
+          'The price is quoted per wheel in one place and per set in another, with no clear total.',
+          'You are pushed to pay before the fit and the lead time are confirmed.',
+        ],
+      },
+      {
+        type: 'callout',
+        tone: 'tip',
+        title: 'Get the fit confirmed for your car, not for “a car like it”',
+        text: 'Two cars from the same generation can have different brakes or options. The seller who asks for your exact model, year and brake option is the one who is checking.',
+      },
+      { type: 'stock', heading: 'Forged wheels in stock now' },
+      {
+        type: 'cta',
+        heading: 'Want these questions answered for your car?',
+        text: 'Send us your model, year and brake option. We will tell you what fits, what is in stock and how long a made-to-order set takes.',
+      },
+    ],
+    faqs: [
+      {
+        q: 'What is the most important question to ask a wheel seller?',
+        a: 'Who confirms that the wheel fits your exact car. Fitment depends on the bolt pattern, offset, centre bore, width and brake clearance together, and a seller who checks all of them for your car is worth more than a low price.',
+      },
+      {
+        q: 'Should I get the answers in writing?',
+        a: 'Yes, for the fitment numbers and for what is included in the price. It keeps both sides clear about what was agreed.',
+      },
+      {
+        q: 'Can I buy forged wheels without knowing my car’s fitment numbers?',
+        a: 'You can, if the seller works them out for you. Give them your model, year and brake option, and ask them to confirm the fit before you pay.',
+      },
+    ],
+    more: ['are-forged-wheels-worth-it', 'how-much-do-forged-wheels-cost-in-south-africa', 'in-stock-vs-made-to-order-forged-wheels'],
+  },
+
 ];
 
 /* ---------------------------------------------------------------- accessors */

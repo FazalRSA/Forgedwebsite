@@ -20,7 +20,8 @@ import { BrandHeader } from './BrandHeader';
 import { ContactCta, CTA_PRIMARY_CLASS, CTA_SECONDARY_CLASS } from './ContactCta';
 import { PRODUCT_GRID_CLASS, ProductCard } from './ProductCard';
 import { EYEBROW_CLASS } from './sectionStyles';
-import { seriesImage, SixnineSeriesTile, stockOfSeries } from './SixnineSeriesTile';
+import { seriesImage, stockOfSeries } from './SixnineSeriesTile';
+import { SeriesShowcaseCard } from './SixnineShowcase';
 
 const WRAP = 'max-w-7xl mx-auto px-4 sm:px-6 md:px-10';
 const H2 = 'mt-2 text-3xl sm:text-4xl font-light tracking-[-0.03em] leading-tight text-white';
@@ -289,10 +290,10 @@ export const SixnineSeriesPage: React.FC<{ series: SixnineSeries }> = ({ series 
           <div className={`${WRAP} py-12 sm:py-16`}>
             <span className={EYEBROW_CLASS}>Sixnine range</span>
             <h2 id="more-heading" className={H2}>More Sixnine series</h2>
-            <ul className="mt-8 grid grid-cols-2 gap-x-3 gap-y-8 sm:grid-cols-3 lg:grid-cols-5 sm:gap-x-5">
+            <ul className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {others.map((other) => (
                 <li key={other.code}>
-                  <SixnineSeriesTile series={other} inStock={stockOfSeries(other, wheels).length > 0} image={seriesImage(other, wheels)} />
+                  <SeriesShowcaseCard series={other} wheels={wheels} />
                 </li>
               ))}
             </ul>

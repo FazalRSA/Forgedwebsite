@@ -1,4 +1,4 @@
-import type { BrandWheelItem } from '../data/catalogue';
+import { designName, type BrandWheelItem } from '../data/catalogue';
 import { formatSizes } from './designCards';
 
 /** "FF-1", "FF-1 and FF-3", "FF-1, FF-2 and FF-3". */
@@ -11,6 +11,11 @@ export function designCodes(wheels: Pick<BrandWheelItem, 'modelCode'>[]): string
   return Array.from(new Set(wheels.map((wheel) => wheel.modelCode).filter((code): code is string => Boolean(code)))).sort(
     (a, b) => a.localeCompare(b, 'en', { numeric: true })
   );
+}
+
+/** The designs among some listings as a visitor reads them: FF-ONE for FF-1, FSA003 as it is. */
+export function designNames(wheels: Pick<BrandWheelItem, 'modelCode'>[]): string[] {
+  return designCodes(wheels).map(designName);
 }
 
 /** The one value every row agrees on, or null when the rows differ or have none. */

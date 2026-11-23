@@ -18,6 +18,7 @@ import {
   formatZAR,
   getAllBrandWheels,
   type BrandWheelItem,
+  designName,
 } from './catalogue';
 
 /* ------------------------------------------------------------------ pillars */
@@ -222,7 +223,7 @@ export function catalogueFacts(wheels: BrandWheelItem[] = getAllBrandWheels()): 
     priceRange: prices.length ? (min === max ? formatZAR(min) : `${formatZAR(min)} to ${formatZAR(max)}`) : '',
     minPrice: prices.length ? formatZAR(min) : '',
     maxPrice: prices.length ? formatZAR(max) : '',
-    designs: unique(wheels.map((w) => w.modelCode || w.model)),
+    designs: unique(wheels.map((w) => (w.modelCode ? designName(w.modelCode) : w.model))),
     cars,
     chassis: unique(cars.flatMap((car) => Array.from(car.matchAll(/\b([EFG]\d{2})\b/g), (m) => m[1]))),
     pcd: unique(
@@ -240,7 +241,7 @@ export function catalogueFacts(wheels: BrandWheelItem[] = getAllBrandWheels()): 
     example: (() => {
       const wheel = wheels.find((w) => w.technicalSpecSheet && w.finishName);
       return wheel
-        ? { design: wheel.modelCode || wheel.model, finish: wheel.finishName as string, spec: wheel.technicalSpecSheet as string }
+        ? { design: wheel.modelCode ? designName(wheel.modelCode) : wheel.model, finish: wheel.finishName as string, spec: wheel.technicalSpecSheet as string }
         : undefined;
     })(),
   };
@@ -275,7 +276,8 @@ export function designRows(wheels: BrandWheelItem[] = getAllBrandWheels()): Desi
   return Array.from(byDesign, ([design, listings]) => {
     const cheapest = listings.reduce((a, b) => (b.priceZAR < a.priceZAR ? b : a));
     return {
-      design,
+      // Shown to readers, so FF-1 reads FF-ONE (designName); the grouping above keeps the code.
+      design: designName(design),
       finishes: unique(listings.map((w) => w.finishName)),
       sizes: unique(listings.map((w) => (w.sizesAvailable ? prettySizes(w.sizesAvailable) : undefined))),
       spec: unique(listings.map((w) => w.technicalSpecSheet)).join('; '),

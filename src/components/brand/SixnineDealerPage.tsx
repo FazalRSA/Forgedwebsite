@@ -2,9 +2,10 @@ import React, { useMemo } from 'react';
 import { BrandHeader } from './BrandHeader';
 import { BrandEnquirySection, BrandPageHero, BrandStockSection } from './BrandSections';
 import { SixnineRangeSection } from './SixnineRange';
+import { SixnineFindYourDesignSection, SixnineNewSection } from './SixnineShowcase';
 import { getAllBrandWheels, isSixnineWheel, WHEEL_BRANDS } from '../../data/catalogue';
 import { useForgedStore } from '../../store/useForgedStore';
-import { designCodes, joinList } from '../../utils/brandFitment';
+import { designNames, joinList } from '../../utils/brandFitment';
 
 /** Where the facts about the brand below come from. */
 const SIXNINE_SOURCE_URL = 'https://www.sixnine-wheels.com/pages/about';
@@ -23,7 +24,7 @@ export const SixnineDealerPage: React.FC = () => {
     [customBrandWheels]
   );
 
-  const designs = useMemo(() => designCodes(wheels), [wheels]);
+  const designs = useMemo(() => designNames(wheels), [wheels]);
   const designList = joinList(designs);
   const enquiryMessage = `Hi, I'd like to ask about the Sixnine wheels${designList ? ` (${designs.join(' / ')})` : ''}.`;
   // Fitment facts are shown only where every listed set agrees, so a mixed row is never papered over.
@@ -95,6 +96,10 @@ export const SixnineDealerPage: React.FC = () => {
           wheels={wheels}
           emptyText="No Sixnine sets are listed in stock right now. Message us to ask about availability."
         />
+
+        <SixnineNewSection wheels={wheels} />
+
+        <SixnineFindYourDesignSection wheels={wheels} />
 
         <SixnineRangeSection inStock={wheels} />
 
