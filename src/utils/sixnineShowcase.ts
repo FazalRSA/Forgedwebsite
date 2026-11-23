@@ -25,11 +25,14 @@ export interface ShowcasePicture {
 }
 
 /**
- * The picture for a series card. The shop's own cut-out of a listing in stock comes first: it is
- * angled, and it is the shop's photo. Otherwise the face-on picture already saved for the range section,
- * or undefined (the card then shows the series name, outlined).
+ * The picture for a series card. Sixnine's own three-quarter render comes first, so every series card
+ * matches SIXNINE's storefront (the owner confirmed their use on 23 November 2026); the shop's own
+ * photos stay on its stock cards and wheel pages. Without a render: the shop's cut-out of a listing in
+ * stock, then the face-on range picture, then undefined (the card shows the series name, outlined).
  */
 export function showcasePicture(series: SixnineSeries, wheels: BrandWheelItem[]): ShowcasePicture | undefined {
+  const render = SIXNINE_RANGE.find((d) => d.name === series.code)?.render;
+  if (render) return { src: render, angled: true };
   for (const wheel of wheels) {
     if (sixnineSeriesOfWheel(wheel)?.code !== series.code) continue;
     const cutout = cutoutSrcFor(threeQuarterPhoto(wheel) ?? getWheelImages(wheel).images[0]);

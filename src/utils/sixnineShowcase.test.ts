@@ -2,26 +2,19 @@ import test from 'node:test';
 import { existsSync } from 'node:fs';
 import assert from 'node:assert/strict';
 import { getAllBrandWheels, isSixnineWheel } from '../data/catalogue';
-import { findSixnineSeries, SIXNINE_SERIES } from '../data/sixnineSeries';
+import { SIXNINE_SERIES } from '../data/sixnineSeries';
 import { showcasePicture, sixnineNews } from './sixnineShowcase';
 
 const wheels = getAllBrandWheels().filter(isSixnineWheel);
 
-test('every series has a showcase picture, the shop\'s own angled cut-out first', () => {
+test('every series card shows Sixnine\'s own three-quarter render, and the file is in public/', () => {
   for (const series of SIXNINE_SERIES) {
     const picture = showcasePicture(series, wheels);
     assert.ok(picture, `${series.code} has no picture`);
+    assert.equal(picture.src, `/images/sixnine/renders/${series.slug.replace('-plus-', '-')}.webp`);
+    assert.equal(picture.angled, true);
     assert.ok(existsSync(`public${picture.src}`), `${picture.src} is missing from public/`);
   }
-  // FF-ONE and FF-THREE are in stock and photographed, so they show the shop's own cut-out.
-  for (const slug of ['ff-one', 'ff-three']) {
-    const picture = showcasePicture(findSixnineSeries(slug)!, wheels);
-    assert.match(picture!.src, /^\/images\/wheels\/ff-[13]-[a-z-]+\/cutout\.webp$/);
-    assert.equal(picture!.angled, true);
-  }
-  // A series the shop has not photographed falls back to the face-on range picture.
-  const evoTwo = showcasePicture(findSixnineSeries('evo-two')!, wheels);
-  assert.deepEqual(evoTwo, { src: '/images/sixnine/evo-two.webp', angled: false });
 });
 
 test('"New at Sixnine" lists only what Sixnine has on pre-order', () => {
