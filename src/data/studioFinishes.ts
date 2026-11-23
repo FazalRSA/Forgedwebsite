@@ -17,7 +17,7 @@ export interface StudioFinishPBR {
 }
 
 export const STUDIO_FINISH_PBR: Record<WheelFinishId, StudioFinishPBR> = {
-  // Silver / Liquid Metal: polished, bright metallic silver under a crisp clear coat.
+  // Silver / LiquidMetal: polished, bright metallic silver under a crisp clear coat.
   silver: {
     hex: '#e4e7ec',
     metalness: 1.0,
@@ -26,8 +26,8 @@ export const STUDIO_FINISH_PBR: Record<WheelFinishId, StudioFinishPBR> = {
     clearcoatRoughness: 0.05,
     envMapIntensity: 1.2,
   },
-  // Black Matte / Gloss Black: deep black paint under a full gloss coat. A matte listing name
-  // ("Black Matte") flattens this in the viewer, so the one row serves both.
+  // BlackMatte / GlossBlack: deep black paint under a full gloss coat. A matte listing name
+  // ("BlackMatte") flattens this in the viewer, so the one row serves both.
   'satin-black': {
     hex: '#0a0a0c',
     metalness: 0.35,
@@ -36,7 +36,7 @@ export const STUDIO_FINISH_PBR: Record<WheelFinishId, StudioFinishPBR> = {
     clearcoatRoughness: 0.03,
     envMapIntensity: 1.3,
   },
-  // Gold / Pure Bronze: warm metallic.
+  // Gold / PureBronze: warm metallic.
   'champagne-bronze': {
     hex: '#b98a52',
     metalness: 1.0,
@@ -45,7 +45,7 @@ export const STUDIO_FINISH_PBR: Record<WheelFinishId, StudioFinishPBR> = {
     clearcoatRoughness: 0.06,
     envMapIntensity: 1.1,
   },
-  // Hyper Black: dark chrome-like metallic under a full gloss coat.
+  // HyperBlack: dark chrome-like metallic under a full gloss coat.
   'dark-gunmetal': {
     hex: '#3d4148',
     metalness: 1.0,
@@ -54,7 +54,7 @@ export const STUDIO_FINISH_PBR: Record<WheelFinishId, StudioFinishPBR> = {
     clearcoatRoughness: 0.04,
     envMapIntensity: 1.35,
   },
-  // Liquid Metal: mirror-polished, chrome-like silver.
+  // LiquidMetal: mirror-polished, chrome-like silver.
   'liquid-metal': {
     hex: '#eef0f3',
     metalness: 1.0,
@@ -63,7 +63,7 @@ export const STUDIO_FINISH_PBR: Record<WheelFinishId, StudioFinishPBR> = {
     clearcoatRoughness: 0.04,
     envMapIntensity: 1.35,
   },
-  // Hyper Silver: bright metallic silver under a crisp clear coat (less mirror than Liquid Metal).
+  // HyperSilver: bright metallic silver under a crisp clear coat (less mirror than LiquidMetal).
   'hyper-silver': {
     hex: '#d3d7dc',
     metalness: 1.0,
@@ -72,7 +72,7 @@ export const STUDIO_FINISH_PBR: Record<WheelFinishId, StudioFinishPBR> = {
     clearcoatRoughness: 0.05,
     envMapIntensity: 1.2,
   },
-  // Glossy Black: deep black paint under a full gloss coat.
+  // GlossyBlack: deep black paint under a full gloss coat.
   'glossy-black': {
     hex: '#0a0a0c',
     metalness: 0.35,
@@ -81,7 +81,7 @@ export const STUDIO_FINISH_PBR: Record<WheelFinishId, StudioFinishPBR> = {
     clearcoatRoughness: 0.03,
     envMapIntensity: 1.3,
   },
-  // Pure Bronze: warm metallic bronze.
+  // PureBronze: warm metallic bronze.
   'pure-bronze': {
     hex: '#b98a52',
     metalness: 1.0,

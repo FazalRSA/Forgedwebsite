@@ -19,9 +19,9 @@ export interface WheelStageProps {
   /** Paint choices on offer. Pass only the wheel's own finish: a single entry shows no finish row. */
   availableFinishes: WheelFinishId[];
   onSelectFinish: (finish: WheelFinishId) => void;
-  /** The wheel's finish name, e.g. "Black Matte". */
+  /** The wheel's finish name, e.g. "BlackMatte". */
   finishName?: string;
-  /** The listing's own wording for a colour in the finish row, e.g. { 'satin-black': 'Glossy Black' }. */
+  /** The listing's own wording for a colour in the finish row, e.g. { 'satin-black': 'GlossyBlack' }. */
   finishNames?: Partial<Record<WheelFinishId, string>>;
   /** The wheel's .glb. Without one there is no 3D stage and the page shows photography instead. */
   modelUrl?: string | null;

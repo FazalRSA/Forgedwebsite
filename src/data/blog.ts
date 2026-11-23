@@ -181,9 +181,9 @@ export interface CatalogueFacts {
   offsetRange: string;
   /** `20" / 21"` and `19" / 20"`. */
   sizes: string[];
-  /** Finish names in stock: "Gold", "Silver", "Pure Bronze". */
+  /** Finish names in stock: "Gold", "Silver", "PureBronze". */
   finishes: string[];
-  /** Finish families a visitor can order: "Silver / Liquid Metal". */
+  /** Finish families a visitor can order: "Silver / LiquidMetal". */
   finishFamilies: string[];
   leadTime: string;
   toOrderNotice: string;

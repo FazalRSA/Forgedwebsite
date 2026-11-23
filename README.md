@@ -301,16 +301,16 @@ The catalogue mirrors the stock sheet. All prices are South African Rand for a c
 
 | Design | Finishes | Sizes | Price (R) | 3D model |
 | --- | --- | --- | --- | --- |
-| FSA001 (2-piece) | Black Matte | 19 / 20 inch | 90,000 | `stf399-front.glb`, `stf399-rear.glb` |
-| FSA002 | Hyper Black · Polished Face | 20 / 21 inch | 75,000 · 85,000 | `fsa002-forked-v4.glb` |
-| FSA003 | Gold · Silver · Hyper Black | 20 / 21 inch | 75,000 | `fsa003-v6.glb` |
-| FSA004 | Silver · Hyper Black · Gloss Black | 20 / 21 inch | 70,000 | `fsa004-v6.glb` |
-| FF-1 | Silver (Hyper Silver) · Liquid Metal | 20 / 21 inch | 80,000 · 95,000 | `ff-1-sixnine-v4.glb` |
-| FF-3 | Pure Bronze · Glossy Black · Liquid Metal | 20 / 21 inch | 80,000 · 80,000 · 95,000 | `ff-3-sixnine-v4.glb` |
+| FSA001 (2-piece) | BlackMatte | 19 / 20 inch | 90,000 | `stf399-front.glb`, `stf399-rear.glb` |
+| FSA002 | HyperBlack · PolishedFace | 20 / 21 inch | 75,000 · 85,000 | `fsa002-forked-v4.glb` |
+| FSA003 | Gold · Silver · HyperBlack | 20 / 21 inch | 75,000 | `fsa003-v6.glb` |
+| FSA004 | Silver · HyperBlack · GlossBlack | 20 / 21 inch | 70,000 | `fsa004-v6.glb` |
+| FF-1 | HyperSilver · LiquidMetal | 20 / 21 inch | 80,000 · 95,000 | `ff-1-sixnine-v4.glb` |
+| FF-3 | PureBronze · GlossyBlack · LiquidMetal | 20 / 21 inch | 80,000 · 80,000 · 95,000 | `ff-3-sixnine-v4.glb` |
 
 All fitments are BMW M3 (G80), 5×112, centre bore 66.6. Stock counts live in the data, not in this file.
 
-**Colours to order.** The table lists the finishes in stock. On each wheel page, every colour the design comes in (`designPalette`) that it has no stock of is offered as made to order, with the notice in `TO_ORDER_NOTICE` ("Colours not in stock are made to order. A lead time of 3 months applies."). `getToOrderFinishes(wheel)` returns them. FSA designs use the generic four-colour palette. **Sixnine (FF) designs use Sixnine's own published finishes, by their own names** (`SIXNINE_DESIGN_FINISHES`: FF-3 comes in Liquid Metal, Glossy Black, Hyper Silver and Pure Bronze; FF-1 in Hyper Silver, Liquid Metal and Glossy Black; the owner confirmed the FF-1 "Silver" is Hyper Silver), researched on 2026-11-18 from sixnine-wheels.com and a reseller listing. Sixnine publishes no Hyper Black, so it is never offered on an FF wheel. Check Sixnine's site again when they add a finish. A to-order colour has no listing, no page and no price of its own; the visitor asks about it on WhatsApp. Never show one as in stock or without the notice.
+**Colours to order.** The table lists the finishes in stock. On each wheel page, every colour the design comes in (`designPalette`) that it has no stock of is offered as made to order, with the notice in `TO_ORDER_NOTICE` ("Colours not in stock are made to order. A lead time of 3 months applies."). `getToOrderFinishes(wheel)` returns them. FSA designs use the generic four-colour palette. **Sixnine (FF) designs use Sixnine's own published finishes, by their own names** (`SIXNINE_DESIGN_FINISHES`: FF-3 comes in LiquidMetal, GlossyBlack, HyperSilver and PureBronze; FF-1 in HyperSilver, LiquidMetal and GlossyBlack; the owner confirmed the FF-1 "Silver" is HyperSilver), researched on 2026-11-18 from sixnine-wheels.com and a reseller listing. Sixnine publishes no HyperBlack, so it is never offered on an FF wheel. Check Sixnine's site again when they add a finish. A to-order colour has no listing, no page and no price of its own; the visitor asks about it on WhatsApp. Never show one as in stock or without the notice.
 
 ### The Sixnine range data
 
@@ -739,7 +739,7 @@ Build chunks are split per vendor (`react`, `motion`, `three`, `firebase`, `luci
 | **Lead delivery** | Every enquiry is posted to n8n, which logs it and emails the business (see [Lead delivery](#lead-delivery-n8n)); with a WhatsApp number set, the form also opens WhatsApp. The inbox is set inside the n8n workflow. | Route leads into a CRM from the same workflow |
 | **Contact channels** | Set in `src/config/site.ts`; any channel left empty there is hidden (Instagram, Facebook and trade email are empty today) | Fill in once confirmed |
 | **3D accuracy** | Five designs are traced from photos with simplified surfaces | Replace with scans of the physical wheels |
-| **Photography** | Two listings have no product photos and show a plain drawn stand-in (FSA003 Silver and FSA004 Hyper Black) | Add their photos to the Drive folder, then run the studio-photo steps in [Adding or changing a wheel](#adding-or-changing-a-wheel) |
+| **Photography** | Two listings have no product photos and show a plain drawn stand-in (FSA003 Silver and FSA004 HyperBlack) | Add their photos to the Drive folder, then run the studio-photo steps in [Adding or changing a wheel](#adding-or-changing-a-wheel) |
 | **Link previews** | The app is client-rendered; `npm run build` bakes each page's title and share image into its own HTML file so chat apps show the right preview for the pages in the sitemap. Blog pages also carry their full article text in that file | Server-render the rest if more pages are added |
 | **Blog content** | Nineteen articles of general knowledge, written without customer stories, photographs or a named author, because none were supplied | Add real install stories, workshop photographs and a named author, which search engines weigh as experience and expertise |
 | **Old links** | Redirected in the browser and by a redirect page per removed address, not with an HTTP 301 | Add 301 rules on the host |

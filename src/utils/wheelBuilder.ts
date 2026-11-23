@@ -75,7 +75,7 @@ export function createWheelEntry(input: NewWheelInput): BrandWheelItem {
   const series = (input.series?.trim() || 'FORGED SERIES').toUpperCase();
   const geometry: SpokeGeometryType = input.geometry || 'y-spoke-forged';
   const defaultFinish: WheelFinishId = input.defaultFinish || 'satin-black';
-  const finishName = WHEEL_FINISHES[defaultFinish]?.name ?? 'Satin Black';
+  const finishName = WHEEL_FINISHES[defaultFinish]?.name ?? 'SatinBlack';
   const sizesAvailable = input.sizesAvailable?.trim() || undefined;
   const compatibleCars = input.compatibleCars?.trim() || undefined;
   const technicalSpecSheet = input.technicalSpecSheet?.trim() || undefined;

@@ -29,9 +29,9 @@ export interface WheelStudioProps {
    */
   availableFinishes: WheelFinishId[];
   onSelectFinish: (finish: WheelFinishId) => void;
-  /** The wheel's own finish name, e.g. "Black Matte"; a matte name gives the paint a matte sheen. */
+  /** The wheel's own finish name, e.g. "BlackMatte"; a matte name gives the paint a matte sheen. */
   finishName?: string;
-  /** Names for chips in the finish row where the listing's own wording differs from the palette's ("Glossy Black"). */
+  /** Names for chips in the finish row where the listing's own wording differs from the palette's ("GlossyBlack"). */
   finishNames?: Partial<Record<WheelFinishId, string>>;
   /** Served path to the wheel's .glb, e.g. "/models/wheels/stf399-front.glb". */
   modelUrl: string;
@@ -75,7 +75,7 @@ export const WheelStudio: React.FC<WheelStudioProps> = ({
     () => availableFinishes.map((id) => toStudioFinish(id, finishNames?.[id])).filter((f): f is StudioFinish => !!f),
     [availableFinishes, finishNames]
   );
-  // The selected finish carries the wheel's own name for the matte reading ("Black Matte"); the row
+  // The selected finish carries the wheel's own name for the matte reading ("BlackMatte"); the row
   // keeps the catalogue's chip names.
   const selected = toStudioFinish(selectedFinish, finishName) ?? undefined;
   return (

@@ -22,20 +22,20 @@ import { createWheelEntry } from '../utils/wheelBuilder';
 
 /** The 14 stock-sheet rows: design, finish name, sets in stock, price in Rand per set of four. */
 const STOCK_SHEET: Array<[string, string, number, number]> = [
-  ['FF-1', 'Silver', 1, 80000],
-  ['FF-1', 'Liquid Metal', 2, 95000],
-  ['FF-3', 'Pure Bronze', 1, 80000],
-  ['FF-3', 'Glossy Black', 1, 80000],
-  ['FF-3', 'Liquid Metal', 2, 95000],
-  ['FSA001', 'Black Matte', 1, 90000],
-  ['FSA002', 'Hyper Black', 1, 75000],
-  ['FSA002', 'Polished Face', 1, 85000],
+  ['FF-1', 'HyperSilver', 1, 80000],
+  ['FF-1', 'LiquidMetal', 2, 95000],
+  ['FF-3', 'PureBronze', 1, 80000],
+  ['FF-3', 'GlossyBlack', 1, 80000],
+  ['FF-3', 'LiquidMetal', 2, 95000],
+  ['FSA001', 'BlackMatte', 1, 90000],
+  ['FSA002', 'HyperBlack', 1, 75000],
+  ['FSA002', 'PolishedFace', 1, 85000],
   ['FSA003', 'Gold', 1, 75000],
   ['FSA003', 'Silver', 1, 75000],
-  ['FSA003', 'Hyper Black', 1, 75000],
+  ['FSA003', 'HyperBlack', 1, 75000],
   ['FSA004', 'Silver', 1, 70000],
-  ['FSA004', 'Hyper Black', 1, 70000],
-  ['FSA004', 'Gloss Black', 1, 70000],
+  ['FSA004', 'HyperBlack', 1, 70000],
+  ['FSA004', 'GlossBlack', 1, 70000],
 ];
 
 const soldOut = (slug: string): BrandWheelItem => ({
@@ -332,25 +332,25 @@ test('isSixnineWheel: every design code starting with FF is Sixnine, and nothing
   );
 });
 
-test('Sixnine designs are offered in Sixnine\'s own published finishes, by their own names, and never Hyper Black', async () => {
+test('Sixnine designs are offered in Sixnine\'s own published finishes, by their own names, and never HyperBlack', async () => {
   const { SIXNINE_DESIGN_FINISHES, WHEEL_FINISHES, designPalette, getAllBrandWheels, getToOrderFinishes } = await import('./catalogue');
   const names = (code: string) => designPalette(code).map((id) => WHEEL_FINISHES[id].name).sort();
-  assert.deepEqual(names('FF-3'), ['Glossy Black', 'Hyper Silver', 'Liquid Metal', 'Pure Bronze']);
-  assert.deepEqual(names('FF-1'), ['Glossy Black', 'Hyper Silver', 'Liquid Metal']);
+  assert.deepEqual(names('FF-3'), ['GlossyBlack', 'HyperSilver', 'LiquidMetal', 'PureBronze']);
+  assert.deepEqual(names('FF-1'), ['GlossyBlack', 'HyperSilver', 'LiquidMetal']);
   assert.deepEqual(names('ff-3 '), names('FF-3'), 'the design code is read loosely');
-  // every FF design the shop stocks has a published list, and none of them offers the FSA palette's Hyper Black
+  // every FF design the shop stocks has a published list, and none of them offers the FSA palette's HyperBlack
   for (const wheel of getAllBrandWheels().filter(isSixnineWheel)) {
     assert.ok(SIXNINE_DESIGN_FINISHES[wheel.modelCode!], `${wheel.slug}: no Sixnine finish list for ${wheel.modelCode}`);
-    assert.ok(!designPalette(wheel.modelCode).includes('dark-gunmetal'), `${wheel.slug}: Hyper Black is not a Sixnine finish`);
+    assert.ok(!designPalette(wheel.modelCode).includes('dark-gunmetal'), `${wheel.slug}: HyperBlack is not a Sixnine finish`);
     // the finish a listing is stocked in is one Sixnine publishes for the design
     assert.ok(designPalette(wheel.modelCode).includes(wheel.defaultFinish), `${wheel.slug}: ${wheel.defaultFinish} is not a Sixnine finish for ${wheel.modelCode}`);
   }
   // FSA designs keep the original four colours
   assert.deepEqual(designPalette('FSA002').sort(), ['champagne-bronze', 'dark-gunmetal', 'satin-black', 'silver']);
-  // what is left to order: FF-3 has Hyper Silver; FF-1 has Glossy Black
+  // what is left to order: FF-3 has HyperSilver; FF-1 has GlossyBlack
   const toOrder = (slug: string) => getToOrderFinishes(getAllBrandWheels().find((w) => w.slug === slug)!).map((f) => f.name);
-  assert.deepEqual(toOrder('ff-3-pure-bronze'), ['Hyper Silver']);
-  assert.deepEqual(toOrder('ff-1-silver'), ['Glossy Black']);
+  assert.deepEqual(toOrder('ff-3-pure-bronze'), ['HyperSilver']);
+  assert.deepEqual(toOrder('ff-1-silver'), ['GlossyBlack']);
 });
 
 test('the FSA003, FSA004 and FF-1 listings share their design\'s model across finishes', () => {

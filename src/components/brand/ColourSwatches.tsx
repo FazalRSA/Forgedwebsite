@@ -27,7 +27,7 @@ export interface InStockColour {
   /** Listing slug: the swatch opens /wheels/<slug>. */
   slug: string;
   finishId: WheelFinishId;
-  /** The listing's own finish name, e.g. "Black Matte" (a matte name gives a matte swatch). */
+  /** The listing's own finish name, e.g. "BlackMatte" (a matte name gives a matte swatch). */
   name: string;
 }
 
@@ -137,7 +137,7 @@ export const ColourSwatches: React.FC<ColourSwatchesProps> = ({
 };
 
 /**
- * The photoreal ball for a catalogue colour. `name` is the listing's own finish name ("Black Matte"),
+ * The photoreal ball for a catalogue colour. `name` is the listing's own finish name ("BlackMatte"),
  * which decides matte or gloss; without it the palette's name is used.
  */
 export const CatalogueSwatch: React.FC<{ finishId: WheelFinishId; name?: string; size?: number }> = ({

@@ -831,8 +831,8 @@ export const BLOG_POSTS: readonly BlogPost[] = [
     title: 'How to choose a wheel colour and finish for your BMW M car',
     metaTitle: 'Choosing a wheel colour for your BMW M car',
     description:
-      'Silver, black, bronze or hyper black: how to choose a wheel colour and finish for your BMW M car, with paint pairings and care differences.',
-    excerpt: 'Silver, black, bronze or hyper black: how to pick a finish, and what each asks of you.',
+      'Silver, black, bronze or HyperBlack: how to choose a wheel colour and finish for your BMW M car, with paint pairings and care differences.',
+    excerpt: 'Silver, black, bronze or HyperBlack: how to pick a finish, and what each asks of you.',
     keyword: 'BMW M3 wheel colour',
     related: ['best wheel colour for BMW', 'bronze wheels BMW', 'black wheels M3', 'matte vs gloss wheels'],
     intent: 'commercial',
@@ -857,10 +857,10 @@ export const BLOG_POSTS: readonly BlogPost[] = [
       {
         type: 'ul',
         items: [
-          '**Silver and liquid metal.** A clean look that works on almost any paint, and shows off the spoke design on darker cars.',
+          '**Silver and LiquidMetal.** A clean look that works on almost any paint, and shows off the spoke design on darker cars.',
           '**Black, matte or gloss.** Subtle on dark paint and a strong contrast on light paint. Gloss reflects light; matte absorbs it.',
           '**Gold and bronze.** Warm tones that stand out on black, grey and blue paint.',
-          '**Hyper black.** A very dark finish for a low-key, uniform look.',
+          '**HyperBlack.** A very dark finish for a low-key, uniform look.',
         ],
       },
       {
