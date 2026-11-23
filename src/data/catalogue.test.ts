@@ -415,3 +415,26 @@ test('scripts/wheel-models.json names the model file each design actually uses',
     assert.ok(existsSync(`public/models/wheels/${m.out}`), `${m.out} is missing`);
   }
 });
+
+test('the Sixnine range: six designs, each with a picture on disk, and stocked codes the catalogue uses', async () => {
+  const { SIXNINE_RANGE, stockedSets } = await import('./sixnineRange');
+  const fs = await import('node:fs');
+  const path = await import('node:path');
+  assert.deepEqual(
+    SIXNINE_RANGE.map((d) => d.name),
+    ['FF-ONE', 'FF-TWO', 'FF-THREE', 'EVO-ONE', 'EVO-TWO', 'OEM+ONE']
+  );
+  const inStock = getAllBrandWheels();
+  for (const design of SIXNINE_RANGE) {
+    assert.ok(fs.existsSync(path.join('public', design.image)), `${design.image} is missing`);
+    assert.ok(design.finishes.length > 0 && design.boltPatterns.length > 0, `${design.name} has no finishes or bolt patterns`);
+    assert.match(design.sourceUrl, /^https:\/\/sixnine-wheels\.com\//);
+    if (design.stockedCode) {
+      assert.ok(catalogue.SIXNINE_DESIGN_FINISHES[design.stockedCode], `${design.stockedCode} is not a Sixnine design code here`);
+    }
+  }
+  const ffOne = SIXNINE_RANGE.find((d) => d.id === 'ff-one')!;
+  const expected = inStock.filter((w) => w.modelCode === 'FF-1').reduce((n, w) => n + (w.stockQuantitySets ?? 0), 0);
+  assert.equal(stockedSets(ffOne, inStock), expected);
+  assert.equal(stockedSets(SIXNINE_RANGE.find((d) => d.id === 'evo-one')!, inStock), 0);
+});
