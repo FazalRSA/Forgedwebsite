@@ -1,6 +1,8 @@
 import React from 'react';
 import { SIXNINE_ABOUT, SIXNINE_PERSONALISATION, SIXNINE_SOURCES } from '../../data/sixnineAbout';
 import { SIXNINE_RANGE } from '../../data/sixnineRange';
+import { SIXNINE_SERIES } from '../../data/sixnineSeries';
+import { seriesImage } from './SixnineSeriesTile';
 
 const EYEBROW = 'text-sm uppercase tracking-[0.14em] text-neutral-400';
 const H2 = 'mt-2 text-3xl sm:text-4xl font-light tracking-[-0.03em] leading-tight text-white';
@@ -8,7 +10,7 @@ const H3 = 'mt-2 text-2xl sm:text-3xl font-light tracking-[-0.02em] leading-tigh
 
 const formatCount = (n: number) => n.toLocaleString('en-ZA').replace(/ /g, ' ');
 
-/** A picture of a Sixnine wheel on a dark tile, contained, as Sixnine shows its renders. */
+/** A cut-out photo of a wheel on a dark tile, contained. */
 const WheelRenderTile: React.FC<{ src: string; alt: string }> = ({ src, alt }) => (
   <div className="relative aspect-square w-full overflow-hidden rounded-2xl border border-[#26262E] bg-[#16161A]">
     <div
@@ -33,8 +35,14 @@ const WheelRenderTile: React.FC<{ src: string; alt: string }> = ({ src, alt }) =
  * personalise the modular designs. Every fact comes from src/data/sixnineAbout.ts, which names its sources.
  */
 export const SixnineAboutSection: React.FC = () => {
-  const ffOne = SIXNINE_RANGE.find((d) => d.id === 'ff-one');
-  const ffThree = SIXNINE_RANGE.find((d) => d.id === 'ff-three');
+  // The shop's own photos of the sets it stocks (as on the series tiles), never Sixnine's renders:
+  // AGENTS.md keeps those off the site until the owner confirms the dealer may use them.
+  const photoOf = (code: string) => {
+    const series = SIXNINE_SERIES.find((s) => s.code === code);
+    return series ? seriesImage(series) : undefined;
+  };
+  const ffOnePhoto = photoOf('FF-ONE');
+  const ffThreePhoto = photoOf('FF-THREE');
   const stats = [
     { value: String(SIXNINE_RANGE.length), label: 'wheel designs' },
     { value: String(SIXNINE_ABOUT.ffOneDesigns), label: 'looks in one FF-ONE' },
@@ -65,7 +73,7 @@ export const SixnineAboutSection: React.FC = () => {
       </dl>
 
       <div className="mt-14 grid items-center gap-8 lg:gap-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
-        {ffOne && <WheelRenderTile src={ffOne.image} alt="The SIXNINE FF-ONE" />}
+        {ffOnePhoto && <WheelRenderTile src={ffOnePhoto} alt="A Sixnine FF-ONE set in stock with us" />}
         <div>
           <p className={EYEBROW}>Who they are</p>
           <h3 className={H3}>Friends from the trade</h3>
@@ -84,9 +92,9 @@ export const SixnineAboutSection: React.FC = () => {
       </div>
 
       <div className="mt-14 grid items-center gap-8 lg:gap-16 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
-        {ffThree && (
+        {ffThreePhoto && (
           <div className="lg:order-2">
-            <WheelRenderTile src={ffThree.image} alt="The SIXNINE FF-THREE" />
+            <WheelRenderTile src={ffThreePhoto} alt="A Sixnine FF-THREE set in stock with us" />
           </div>
         )}
         <div className="lg:order-1">

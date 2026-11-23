@@ -159,7 +159,7 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
 | `/installs` | `ClientFitmentsPage` | Customer cars the shop has fitted |
 | `/forged-sa-wheels` | `ForgedSaPage` | The shop's own brand: every FSA set in stock, fitment summary |
 | `/sixnine-wheels` | `SixnineDealerPage` | Official Sixnine dealer page: about Sixnine Wheels, every FF set in stock |
-| `/sixnine-wheels/:series` | `SixnineSeriesPage` | One Sixnine series: facts, finishes, sets in stock here, every size Sixnine lists. An unknown series shows the 404 page |
+| `/sixnine-wheels/:series` | `SixnineSeriesPage` | One Sixnine series: facts, finishes, sets in stock here (with a "View in 3D" of the stocked design), every size Sixnine lists. An unknown series shows the 404 page |
 | `/contact` | `ContactPage` | WhatsApp, phone, address, areas served |
 | `/privacy-policy` | `PrivacyPolicyPage` | Privacy notice (POPIA): what is collected, by whom, and how to make a request |
 | `/studio/:slug` | `StudioPreviewPage` | Unlisted, noindex 3D preview (currently `stf399`) |
