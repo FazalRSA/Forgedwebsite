@@ -223,6 +223,7 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
 │  └─ fitment-reshoot/            Pipeline for the install studio re-shoots (jobs.json, Python scripts, README.md)
 ├─ docs/adding-3d-models.md       The owner's steps for adding or replacing a wheel's 3D model, and the limits of AI models
 ├─ docs/installs-pipeline.md      How the Installs gallery is made, with animated diagrams (docs/assets/)
+├─ docs/google-tag-manager/       forged-enquiry-events.json: the GTM import that sends the site's enquiry and car-preview events to GA4
 ├─ docs/blog-seo-plan.md          The blog's keyword map, on-page checklist and how to refine it in Search Console
 ├─ docs/render-blog-rewrites.md   The 24 blog rewrite rules to paste into a Render service whose routes are set by hand
 ├─ worker/car-preview/            Cloudflare Worker behind "See it on my car" (not part of the website build): src/handler.ts, its tests, wrangler.toml, dev-server.mjs, README.md
@@ -238,6 +239,9 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
    ├─ data/studioFinishes.ts      Paint settings per finish for the 3D viewer
    ├─ data/clientFitments.ts      Customer installs data
    ├─ data/partners.ts            Industry partners shown on the home page
+   ├─ data/googleReviews.ts       Google reviews for the home page, copied word for word (empty until real ones are added)
+   ├─ data/sixnineRange.json      Every size Sixnine lists (see The Sixnine range data)
+   ├─ data/sixnineRange.ts        Sixnine's full range, design by design, for the range section on /sixnine-wheels
    ├─ wheel-viewer/               The 3D wheel viewer, shared with the BMW configurator: stage, paint, swatches, part classification (edited only here; see its README.md)
    ├─ store/                      Zustand store (enquiry form, admin preview) in localStorage
    ├─ context/FirebaseContext.tsx Firebase provider (kept, not mounted by any page)
@@ -255,6 +259,15 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
    ├─ utils/brandFitment.ts       A brand page's design list and fitment-at-a-glance facts
    ├─ data/sixnineSeries.ts       The Sixnine series and sizes (from sixnineRange.json), their facts, slugs and finish swatches
    ├─ utils/askAi.ts              The "Ask AI about us" links and their question
+   ├─ utils/listingSpecs.ts       The Sixnine sizes and figures a stocked Sixnine listing matches
+   ├─ utils/sixnineShowcase.ts    Data for the "New at Sixnine" and "Find your design" cards
+   ├─ utils/designCards.ts        The home page's design cards, worked out from the in-stock listings
+   ├─ utils/heroVideo.ts          The hero film's files and posters, named in one place
+   ├─ utils/wheelImageSrcSet.ts · fitmentImageSrcSet.ts   The smaller photo copies each srcset lists
+   ├─ utils/leads.ts              Posts every enquiry to the n8n webhook (see Lead delivery)
+   ├─ utils/googleTagManager.ts   The Google Tag Manager snippet, with the Consent Mode defaults, that the build writes into every page
+   ├─ utils/consent.ts            The cookie choice: read, save, tell GTM, delete the _ga cookies on Decline
+   ├─ utils/analytics.ts          trackEvent (to Umami when set up, and to the GTM data layer) and the Umami tracker
    ├─ utils/carPreview.ts         "See it on my car": is it on, shrink the photo, talk to the Worker
    ├─ utils/wheelBuilder.ts       Builds a stock listing from a short input
    ├─ utils/wheelEnquiry.ts       Reads the spec line and words the WhatsApp enquiry
@@ -262,7 +275,7 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
       ├─ ui/                      Re-exports of the root components/ui primitives
       ├─ brand/                   Header, footer, home, catalogue (grouped by brand), wheel page, car-preview dialog, installs, the two brand pages and their shared sections, partners strip, Ask AI, contact, privacy
       ├─ admin/                   Admin uploader
-      ├─ shared/                  BrandLogo, enquiry form
+      ├─ shared/                  BrandLogo, enquiry form, cookie banner, floating WhatsApp button, social icons
       └─ visuals/                 WheelStudio (the site's wrapper around `src/wheel-viewer`), WheelStage, its loading skeleton and error boundary
 ```
 
@@ -568,6 +581,8 @@ Google Analytics cookies are **off until the visitor taps Accept** in the cookie
 
 ### What is measured
 
+Since the cookie banner, everything in this table is recorded in full only for visitors who tapped **Accept**; the rest send cookieless pings (see [Cookie consent](#cookie-consent-opt-in)).
+
 | Event | When it fires | Comes from | In GA4 today? |
 | --- | --- | --- | --- |
 | `page_view` | A page opens, and each move to another page inside the site | GA4 enhanced measurement | Yes |
@@ -599,7 +614,7 @@ A practical rhythm: look at *Realtime* after any change, and read the weekly num
 ### Setting up and checking
 
 1. **Check it works.** Open the live site and tap **Accept**, then GA4 *Reports → Realtime*: your visit should show within a minute. In the browser's developer tools, the page should load `gtm.js?id=GTM-P554MVX4`, set no `_ga` cookie before Accept and set both after; on the Render address it should load neither.
-2. **Count enquiries as leads.** In GTM: *Variables → New → Data Layer Variable* named `delivered`, and another named `channel`. *Triggers → New → Custom Event*, event name `enquiry_sent`. *Tags → New → Google Analytics: GA4 Event*, measurement ID `G-H2TR6RVSK0`, event name `enquiry_sent`, event parameters `delivered` = `{{delivered}}` and `channel` = `{{channel}}`, fired by that trigger. Preview it on the live site, then *Submit* to publish. In GA4, mark `enquiry_sent` as a key event under *Admin → Data display → Events* once it has arrived (allow a day). Repeat for `enquiry_open` or the car-preview events if they are wanted.
+2. **Count enquiries as leads.** The quick way: in GTM, *Admin → Import container*, choose [docs/google-tag-manager/forged-enquiry-events.json](docs/google-tag-manager/forged-enquiry-events.json), your current workspace, **Merge** and **Rename conflicting tags, triggers, and variables**. It adds three Data Layer Variables (`delivered`, `channel`, `outcome`), a Custom Event trigger and a GA4 Event tag (to `G-H2TR6RVSK0`) for each of `enquiry_open`, `enquiry_sent`, `car_preview_open` and `car_preview_result`, all named `FORGED …`. Preview on the live site, send a test enquiry, then *Submit* to publish. The file was written by hand from published examples of the export format, not exported from GTM; if the import is refused, build the same thing by hand: *Variables → New → Data Layer Variable* named `delivered`, and another named `channel`. *Triggers → New → Custom Event*, event name `enquiry_sent`. *Tags → New → Google Analytics: GA4 Event*, measurement ID `G-H2TR6RVSK0`, event name `enquiry_sent`, event parameters `delivered` = `{{delivered}}` and `channel` = `{{channel}}`, fired by that trigger. Preview it on the live site, then *Submit* to publish. Repeat for `enquiry_open` or the car-preview events if they are wanted. Either way, in GA4 mark `enquiry_sent` as a key event under *Admin → Data display → Events* once it has arrived (allow a day).
 3. **Set data retention to 14 months** (see above).
 
 ### Keeping the privacy notice in step
