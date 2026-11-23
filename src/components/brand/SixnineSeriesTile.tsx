@@ -38,7 +38,7 @@ export function seriesSummary(series: SixnineSeries): string {
 /**
  * A series as a tile: its picture (or its name, outlined, when there is no picture) on a soft radial
  * tile, then its name, construction and diameters, and whether the shop has it in stock. Used in the
- * header's mega menu and in "More Sixnine series".
+ * header's mega menu; the pages use the larger SixnineShowcase cards.
  */
 export const SixnineSeriesTile: React.FC<{
   series: SixnineSeries;
