@@ -237,8 +237,11 @@ def run(jobs, outdir, size, samples, views=('hero',)):
 def plain_glb(path, tmp):
     """bpy cannot read meshopt-compressed GLBs (FSA001); decode those to a plain copy first."""
     import subprocess
-    with open(path, 'rb') as fh:
-        head = fh.read(200000)
+    try:
+        with open(path, 'rb') as fh:
+            head = fh.read(200000)
+    except OSError as err:
+        raise SystemExit(f'Could not read model {path}: {err}')
     if b'EXT_meshopt_compression' not in head:
         return path
     out = os.path.join(tmp, os.path.basename(path))
@@ -259,8 +262,11 @@ def build_stills(repo, size=384, samples=24, only=None):
     except (subprocess.CalledProcessError, OSError, ValueError) as err:
         raise SystemExit(f'Could not read the still jobs from scripts/finish-still-jobs.ts: {err}')
     out_dir = os.path.join(repo, 'public/images/wheels/finishes')
-    os.makedirs(out_dir, exist_ok=True)
-    tmp = tempfile.mkdtemp()
+    try:
+        os.makedirs(out_dir, exist_ok=True)
+        tmp = tempfile.mkdtemp()
+    except OSError as err:
+        raise SystemExit(f'Could not create output folders: {err}')
     todo = []
     for j in jobs:
         j['key'] = f"{j['design'].lower()}-{j['finishId']}"
@@ -268,7 +274,10 @@ def build_stills(repo, size=384, samples=24, only=None):
         j['face_size'] = size
         if not only or j['key'] in only:
             todo.append(j)
-    run(todo, tmp, size, samples, views=('face',))
+    try:
+        run(todo, tmp, size, samples, views=('face',))
+    except (OSError, RuntimeError) as err:
+        raise SystemExit(f'Render failed: {err}')
     manifest = {}
     for j in jobs:
         webp = f"{j['key']}.webp"
