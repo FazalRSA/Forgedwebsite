@@ -3,6 +3,7 @@ import { BrandHeader } from './BrandHeader';
 import { BrandEnquirySection, BrandPageHero, BrandStockSection } from './BrandSections';
 import { SixnineRangeSection } from './SixnineRange';
 import { SixnineAboutSection } from './SixnineAbout';
+import { SixnineFindYourDesignSection, SixnineNewSection } from './SixnineShowcase';
 import { getAllBrandWheels, isSixnineWheel, WHEEL_BRANDS } from '../../data/catalogue';
 import { useForgedStore } from '../../store/useForgedStore';
 import { designCodes, joinList } from '../../utils/brandFitment';
@@ -53,6 +54,10 @@ export const SixnineDealerPage: React.FC = () => {
           wheels={wheels}
           emptyText="No Sixnine sets are listed in stock right now. Message us to ask about availability."
         />
+
+        <SixnineNewSection wheels={wheels} />
+
+        <SixnineFindYourDesignSection wheels={wheels} />
 
         <SixnineRangeSection inStock={wheels} />
 
