@@ -46,6 +46,13 @@ Each article links to its pillar (breadcrumb and "all guides" link), to two to f
 | How to clean forged wheels | how to clean forged wheels | clean matte wheels, brake dust | Informational |
 | Wheel bolt torque | wheel bolt torque | BMW wheel bolt torque | Informational |
 | Protecting wheels from potholes | pothole damage wheels | bent rim, low profile tyres potholes | Informational |
+| Hub-centric rings | hub centric rings BMW | hub centric vs lug centric, do I need hub rings | Informational |
+| Tyre pressure sensors after a wheel change | tyre pressure sensors BMW wheel change | TPMS new wheels BMW, RDC reset | Informational |
+| Plus-sizing wheels and tyres | plus sizing wheels tyres | rolling diameter, speedometer error | Informational |
+| How to read a wheel's load rating | wheel load rating | tyre load index, wheel weight capacity | Informational |
+| Painted, powder-coated and polished finishes | wheel finishes painted powder coated polished | powder coat vs paint wheels, matte vs gloss | Informational |
+| Balancing and alignment after new wheels | wheel balancing new wheels | wheel alignment after new wheels, steering vibration | Informational |
+| What to ask before buying forged wheels | buying forged wheels checklist | questions to ask wheel seller, forged wheels South Africa | Commercial |
 
 The primary keyword for every article is also in `src/data/blogPosts.ts` (`keyword` and `related`) and is checked by a test to appear in the title or description.
 
@@ -81,12 +88,11 @@ These can only come from you, and search engines weigh them as proof of experien
 
 ## Next articles, in order of value
 
+Written so far: nineteen. The rest need facts only the business has.
+
 1. Forged wheels for the BMW G82 M4 (once a set is confirmed for it).
 2. Forged wheels for the BMW G87 M2 (as above).
-3. Hub-centric rings: when you need them.
-4. Tyre pressure sensors after a wheel change.
-5. Plus-sizing wheels and tyres without changing the rolling diameter.
-6. How to read a wheel's load rating.
-7. Painted, powder-coated and polished wheel finishes compared.
-8. Wheel weight by design (needs the weights).
-9. Customer install write-ups (needs the stories).
+3. Wheel weight by design (needs the weights).
+4. Customer install write-ups (needs the stories).
+5. Wheel storage and seasonal swaps (check which advice the shop gives before writing it).
+6. A glossary of wheel terms (offset, spigot, load rating, staggered), linking every guide.

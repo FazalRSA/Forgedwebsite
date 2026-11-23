@@ -109,6 +109,27 @@ services:
         source: /blog/wheel-care/protecting-wheels-from-potholes
         destination: /blog/wheel-care/protecting-wheels-from-potholes.html
       - type: rewrite
+        source: /blog/bmw-m-wheel-fitment/hub-centric-rings-when-you-need-them
+        destination: /blog/bmw-m-wheel-fitment/hub-centric-rings-when-you-need-them.html
+      - type: rewrite
+        source: /blog/bmw-m-wheel-fitment/tyre-pressure-sensors-after-a-wheel-change
+        destination: /blog/bmw-m-wheel-fitment/tyre-pressure-sensors-after-a-wheel-change.html
+      - type: rewrite
+        source: /blog/bmw-m-wheel-fitment/plus-sizing-wheels-and-tyres
+        destination: /blog/bmw-m-wheel-fitment/plus-sizing-wheels-and-tyres.html
+      - type: rewrite
+        source: /blog/forged-wheel-basics/how-to-read-a-wheel-load-rating
+        destination: /blog/forged-wheel-basics/how-to-read-a-wheel-load-rating.html
+      - type: rewrite
+        source: /blog/forged-wheel-basics/painted-powder-coated-and-polished-wheel-finishes
+        destination: /blog/forged-wheel-basics/painted-powder-coated-and-polished-wheel-finishes.html
+      - type: rewrite
+        source: /blog/wheel-care/wheel-balancing-and-alignment-after-new-wheels
+        destination: /blog/wheel-care/wheel-balancing-and-alignment-after-new-wheels.html
+      - type: rewrite
+        source: /blog/buying-forged-wheels-south-africa/what-to-ask-before-buying-forged-wheels
+        destination: /blog/buying-forged-wheels-south-africa/what-to-ask-before-buying-forged-wheels.html
+      - type: rewrite
         source: /installs
         destination: /installs.html
       - type: rewrite
