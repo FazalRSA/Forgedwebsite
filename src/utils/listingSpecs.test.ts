@@ -31,3 +31,17 @@ test('a Forged SA listing has no Sixnine sizes', () => {
   const fsa = getAllBrandWheels().find((w) => !isSixnineWheel(w))!;
   assert.deepEqual(sixnineSizesForListing(fsa), []);
 });
+
+// listingFitment and listingDiameters return empty values for text they cannot read, and the page then
+// hides the figures (AGENTS.md rule 2). So a mistyped spec sheet fails here instead of silently
+// dropping a wheel's technical data.
+test('every Sixnine listing in stock has a readable spec sheet and a Sixnine size per diameter', () => {
+  for (const wheel of getAllBrandWheels().filter(isSixnineWheel)) {
+    const { offsets, pcd } = listingFitment(wheel.technicalSpecSheet);
+    const diameters = listingDiameters(wheel.sizesAvailable);
+    assert.ok(pcd, `${wheel.slug}: no bolt pattern in "${wheel.technicalSpecSheet}"`);
+    assert.ok(offsets.length && offsets.every(Number.isFinite), `${wheel.slug}: no offset in "${wheel.technicalSpecSheet}"`);
+    assert.ok(diameters.length, `${wheel.slug}: no diameter in "${wheel.sizesAvailable}"`);
+    assert.equal(sixnineSizesForListing(wheel).length, diameters.length, `${wheel.slug}: a diameter matches no single Sixnine size`);
+  }
+});
