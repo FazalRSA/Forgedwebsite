@@ -2,12 +2,10 @@ import React, { useMemo } from 'react';
 import { BrandHeader } from './BrandHeader';
 import { BrandEnquirySection, BrandPageHero, BrandStockSection } from './BrandSections';
 import { SixnineRangeSection } from './SixnineRange';
+import { SixnineAboutSection } from './SixnineAbout';
 import { getAllBrandWheels, isSixnineWheel, WHEEL_BRANDS } from '../../data/catalogue';
 import { useForgedStore } from '../../store/useForgedStore';
 import { designCodes, joinList } from '../../utils/brandFitment';
-
-/** Where the facts about the brand below come from. */
-const SIXNINE_SOURCE_URL = 'https://www.sixnine-wheels.com/pages/about';
 
 /**
  * /sixnine-wheels. The shop's page as an official Sixnine Wheels dealer. Everything about stock, sizes
@@ -47,47 +45,7 @@ export const SixnineDealerPage: React.FC = () => {
           </p>
         </BrandPageHero>
 
-        <section
-          aria-labelledby="sixnine-about-heading"
-          className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 py-12 sm:py-16 border-t border-[#26262E]"
-        >
-          <p className="text-sm uppercase tracking-[0.14em] text-neutral-400">The brand</p>
-          <h2
-            id="sixnine-about-heading"
-            className="mt-2 text-3xl sm:text-4xl font-light tracking-[-0.03em] leading-tight text-white"
-          >
-            What is Sixnine Wheels?
-          </h2>
-          <div className="mt-6 grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
-            <div className="max-w-2xl space-y-4 text-neutral-300">
-              <p>
-                Sixnine Wheels is a German aftermarket wheel brand from Neumarkt, Germany. Its wheels are designed and
-                developed in Germany, and made together with one of the largest alloy wheel manufacturers in the world.
-              </p>
-              <p>
-                The company was started by a group of friends with years of experience in the car and aftermarket
-                industry, to bring new ideas to wheels: custom wheels, new ways of making them and new combinations of
-                materials.
-              </p>
-              <p>
-                Its best-known idea is the FF-ONE: one wheel with swappable inlays, so the same wheel can take on five
-                different looks.
-              </p>
-              <p className="text-sm text-neutral-400">
-                Source:{' '}
-                <a
-                  href={SIXNINE_SOURCE_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline underline-offset-4 hover:text-neutral-300"
-                >
-                  sixnine-wheels.com
-                </a>
-              </p>
-            </div>
-
-          </div>
-        </section>
+        <SixnineAboutSection />
 
         <BrandStockSection
           id="sixnine-stock"
