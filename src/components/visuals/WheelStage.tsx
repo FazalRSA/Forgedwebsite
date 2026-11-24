@@ -21,9 +21,9 @@ export interface WheelStageProps {
   /** The wheel's design code ("FSA003"), for the studio render of each colour on the finish chips. */
   design?: string;
   onSelectFinish: (finish: WheelFinishId) => void;
-  /** The wheel's finish name, e.g. "Black Matte". */
+  /** The wheel's finish name, e.g. "BlackMatte". */
   finishName?: string;
-  /** The listing's own wording for a colour in the finish row, e.g. { 'satin-black': 'Glossy Black' }. */
+  /** The listing's own wording for a colour in the finish row, e.g. { 'satin-black': 'GlossyBlack' }. */
   finishNames?: Partial<Record<WheelFinishId, string>>;
   /** The wheel's .glb. Without one there is no 3D stage and the page shows photography instead. */
   modelUrl?: string | null;

@@ -11,7 +11,7 @@ import { getStudioFinish } from '../src/data/studioFinishes';
 interface Job {
   design: string;
   finishId: string;
-  /** The name the 3D view paints this colour under: a listing's own name ("Black Matte") reads matte, "Gloss Black" gloss. */
+  /** The name the 3D view paints this colour under: a listing's own name ("BlackMatte") reads matte, "GlossBlack" gloss. */
   name: string;
   /** Served path of the design's model. */
   model: string;

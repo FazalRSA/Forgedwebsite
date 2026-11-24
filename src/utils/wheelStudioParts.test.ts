@@ -72,6 +72,17 @@ test('isMatteFinishName flattens matte and satin names only', () => {
   assert.equal(isMatteFinishName('Gloss Black'), false);
   assert.equal(isMatteFinishName('Glossy Black'), false);
   assert.equal(isMatteFinishName('Hyper Black'), false);
+  // One-word names, as the catalogue now writes them.
+  assert.equal(isMatteFinishName('BlackMatte'), true);
+  assert.equal(isMatteFinishName('SatinBronze'), true);
+  assert.equal(isMatteFinishName('GlossBlack'), false);
+  assert.equal(isMatteFinishName('GlossyBlack'), false);
+  assert.equal(isMatteFinishName('HyperBlack'), false);
+  assert.equal(isMatteFinishName('PolishedFace'), false);
+  // A word that only contains "mat" or "flat" is not a matte finish.
+  assert.equal(isMatteFinishName('Formatted'), false);
+  assert.equal(isMatteFinishName('Flatline'), false);
+  assert.equal(isMatteFinishName(''), false);
   assert.equal(isMatteFinishName(undefined), false);
 });
 

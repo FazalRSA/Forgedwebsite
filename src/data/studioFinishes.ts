@@ -27,7 +27,7 @@ export const STUDIO_FINISH_PBR: Record<WheelFinishId, StudioFinishPBR> = {
     clearcoatRoughness: 0.06,
     envMapIntensity: 1.2,
   },
-  // Black Matte / Gloss Black: black paint under a gloss coat (a matte name flattens it in the viewer); fitted to the FSA004 Gloss Black photo.
+  // BlackMatte / GlossBlack: black paint under a gloss coat (a matte name flattens it in the viewer); fitted to the FSA004 GlossBlack photo.
   'satin-black': {
     hex: '#3b3b3b',
     metalness: 0.0,
@@ -45,7 +45,7 @@ export const STUDIO_FINISH_PBR: Record<WheelFinishId, StudioFinishPBR> = {
     clearcoatRoughness: 0.06,
     envMapIntensity: 1.2,
   },
-  // Hyper Black: grey metal under a coat, fitted to the FSA003 Hyper Black photo.
+  // HyperBlack: grey metal under a coat, fitted to the FSA003 HyperBlack photo.
   'dark-gunmetal': {
     hex: '#a0a0a0',
     metalness: 1.0,
@@ -54,7 +54,7 @@ export const STUDIO_FINISH_PBR: Record<WheelFinishId, StudioFinishPBR> = {
     clearcoatRoughness: 0.06,
     envMapIntensity: 1.2,
   },
-  // Liquid Metal: bright mirror-polished metal, fitted to the FF-3 Liquid Metal photo.
+  // LiquidMetal: bright mirror-polished metal, fitted to the FF-3 LiquidMetal photo.
   'liquid-metal': {
     hex: '#ababab',
     metalness: 1.0,
@@ -63,7 +63,7 @@ export const STUDIO_FINISH_PBR: Record<WheelFinishId, StudioFinishPBR> = {
     clearcoatRoughness: 0.04,
     envMapIntensity: 1.2,
   },
-  // Hyper Silver: bright metallic silver, fitted to the FF-1 Silver photo.
+  // HyperSilver: bright metallic silver, fitted to the FF-1 Silver photo.
   'hyper-silver': {
     hex: '#dcdcdc',
     metalness: 1.0,
@@ -72,7 +72,7 @@ export const STUDIO_FINISH_PBR: Record<WheelFinishId, StudioFinishPBR> = {
     clearcoatRoughness: 0.06,
     envMapIntensity: 1.2,
   },
-  // Glossy Black: black paint under a gloss coat, fitted to the FF-3 Glossy Black photo.
+  // GlossyBlack: black paint under a gloss coat, fitted to the FF-3 GlossyBlack photo.
   'glossy-black': {
     hex: '#202020',
     metalness: 0.0,
@@ -81,7 +81,7 @@ export const STUDIO_FINISH_PBR: Record<WheelFinishId, StudioFinishPBR> = {
     clearcoatRoughness: 0.04,
     envMapIntensity: 1.2,
   },
-  // Pure Bronze: dark warm metallic, fitted to the FF-3 Pure Bronze photo.
+  // PureBronze: dark warm metallic, fitted to the FF-3 PureBronze photo.
   'pure-bronze': {
     hex: '#7d7067',
     metalness: 1.0,

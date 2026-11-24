@@ -63,7 +63,7 @@ export const SIXNINE_RANGE: readonly SixnineDesign[] = [
     diameters: '19–22"',
     widths: '8.5–11.5J',
     boltPatterns: ['5x112', '5x114.3', '5x120'],
-    finishes: ['Hyper Silver', 'Liquid Metal', 'Glossy Black'],
+    finishes: ['HyperSilver', 'LiquidMetal', 'GlossyBlack'],
     figures: [
       { label: 'Concave', value: 'up to 120 mm' },
       { label: 'Weight', value: 'about 10–12.4 kg' },
@@ -85,7 +85,7 @@ export const SIXNINE_RANGE: readonly SixnineDesign[] = [
     diameters: '21"',
     widths: '10–10.5J',
     boltPatterns: ['5x112'],
-    finishes: ['Hyper Silver', 'Glossy Black'],
+    finishes: ['HyperSilver', 'GlossyBlack'],
     figures: [
       { label: 'Weight', value: 'about 11.6–11.8 kg' },
       { label: 'Load rating', value: '620–725 kg' },
@@ -104,7 +104,7 @@ export const SIXNINE_RANGE: readonly SixnineDesign[] = [
     diameters: '20–22"',
     widths: '8.5–11.5J',
     boltPatterns: ['5x112', '5x114.3', '5x120', '5x132'],
-    finishes: ['Liquid Metal', 'Glossy Black', 'Hyper Silver', 'Pure Bronze'],
+    finishes: ['LiquidMetal', 'GlossyBlack', 'HyperSilver', 'PureBronze'],
     figures: [
       { label: 'Concave', value: 'up to 120 mm' },
       { label: 'Weight', value: 'about 11.1–14.8 kg' },
@@ -125,7 +125,7 @@ export const SIXNINE_RANGE: readonly SixnineDesign[] = [
     diameters: '18–20"',
     widths: '8.5–11J',
     boltPatterns: ['5x100', '5x110', '5x112', '5x114.3', '5x120'],
-    finishes: ['Hyper Silver', 'Glossy Black', 'Pure White', 'Liquid Metal'],
+    finishes: ['HyperSilver', 'GlossyBlack', 'PureWhite', 'LiquidMetal'],
     figures: [
       { label: 'Concave', value: 'up to 105 mm' },
       { label: 'Weight', value: 'about 10.2–12.7 kg' },
@@ -145,7 +145,7 @@ export const SIXNINE_RANGE: readonly SixnineDesign[] = [
     diameters: '20–21"',
     widths: '9–11.5J',
     boltPatterns: ['5x112', '5x120'],
-    finishes: ['Hyper Silver', 'Glossy Black', 'Champagne Gold', 'Liquid Metal'],
+    finishes: ['HyperSilver', 'GlossyBlack', 'ChampagneGold', 'LiquidMetal'],
     figures: [{ label: 'Load rating', value: '650–865 kg' }],
     preOrder: true,
     image: '/images/sixnine/evo-two.webp',
