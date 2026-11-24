@@ -105,18 +105,7 @@ export const SixnineAboutSection: React.FC = () => {
               Sixnine designs and develops its wheels in Germany and produces them in a partnership with one of the
               largest alloy wheel manufacturers in the world.
             </p>
-            <p>
-              Its main series are flow-formed. A smaller{' '}
-              <a
-                href={SIXNINE_SOURCES.forgedSeries}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline underline-offset-4 hover:text-white"
-              >
-                Forged Series
-              </a>{' '}
-              offers selected designs and sizes forged. The range below says how each design is made.
-            </p>
+            <p>Every Sixnine set we supply is forged. The range below has each design's sizes and finishes.</p>
           </div>
         </div>
       </div>

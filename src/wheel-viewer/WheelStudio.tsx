@@ -174,7 +174,7 @@ function createStudioEngine(mount: HTMLDivElement, callbacks: EngineCallbacks, o
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMapping = THREE.NeutralToneMapping;
   renderer.toneMappingExposure = 1.0;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFShadowMap;
@@ -215,7 +215,7 @@ function createStudioEngine(mount: HTMLDivElement, callbacks: EngineCallbacks, o
   keyLight.shadow.bias = -0.0004;
   keyLight.shadow.radius = 6;
   scene.add(keyLight);
-  scene.add(new THREE.HemisphereLight(0xffffff, 0x8a8f98, 1.4));
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x8c8c8c, 1.4));
 
   const floorGeo = new THREE.PlaneGeometry(12, 12);
   const floorMat = new THREE.ShadowMaterial({ opacity: 0.28 });

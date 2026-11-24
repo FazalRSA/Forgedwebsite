@@ -19,10 +19,10 @@ const RESPONSIBLE_PARTY = {
   registrationNumber: '',
   physicalAddress: SITE.addressLine,
   country: SITE.country,
-  informationOfficerName: '',
+  informationOfficerName: SITE.informationOfficerName,
 };
 
-const LAST_REVISED = '18 November 2026';
+const LAST_REVISED = '23 November 2026';
 
 /**
  * Whether this site runs visit statistics (Umami). The notice describes them only when they are
@@ -190,8 +190,9 @@ export const PrivacyPolicyPage: React.FC = () => {
             This notice explains what personal information {RESPONSIBLE_PARTY.tradingName} (&quot;we&quot;,
             &quot;us&quot;) handles when you use this website or contact us, why, who else sees it, how
             long we keep it, and the rights you have under the Protection of Personal Information Act,
-            2013 (POPIA). This website has no accounts and no sign-in. You contact us through the
-            enquiry form on this website, on WhatsApp or by phone.
+            2013 (POPIA). You do not need an account to use this website: you can contact us through the
+            enquiry form, on WhatsApp or by phone. If you choose to, you can create an account by signing in
+            with Google; it is the same account as in our wheel configurator.
           </p>
 
           <nav aria-label="Contents" className="pt-4">
@@ -250,6 +251,16 @@ export const PrivacyPolicyPage: React.FC = () => {
                   <Strong>Messages and calls to us</Strong>: when you message us on WhatsApp or phone
                   us, we see your phone number, your WhatsApp profile name, and whatever you tell us,
                   such as your name, your car and the wheels you are asking about.
+                </>,
+                <>
+                  <Strong>Your account (optional)</Strong>: if you sign in with Google on the account page
+                  we receive your name, email address and Google profile picture from your Google account
+                  (never your Google password). You may add a phone number, city and the brake system on
+                  your car, and you can save wheel builds from the configurator to your garage; we keep
+                  the build, its name and the date. The account is shared with our wheel configurator at{' '}
+                  {SITE.configuratorUrl ? SITE.configuratorUrl.replace(/^https?:\/\//, '') : 'the configurator'}, so what you
+                  enter on one is there on the other. You can also tick a separate box to receive news and
+                  offers by email; it is off unless you tick it.
                 </>,
                 <>
                   <Strong>Technical information</Strong>: like every website, our hosting provider
@@ -317,7 +328,7 @@ export const PrivacyPolicyPage: React.FC = () => {
               ]}
             />
             <p className="pt-1">
-              We do not run accounts, sign-in or mailing lists, and we do not use advertising
+              We do not use advertising
               {STATISTICS || GOOGLE_ANALYTICS ? ' trackers; the only statistics we keep are the visit statistics described above' : ' or analytics trackers'}. We do not collect special personal information (such as health,
               religious or biometric data) or information about children. No law requires you to
               contact us; if you choose not to, we simply cannot answer your question.
@@ -331,6 +342,16 @@ export const PrivacyPolicyPage: React.FC = () => {
                   <Strong>To respond to you and take steps towards a sale at your request</Strong>:
                   checking fitment for your vehicle, giving you a quotation, and following up on your
                   enquiry (POPIA s11(1)(b)).
+                </>,
+                <>
+                  <Strong>To run the account you ask for</Strong>: signing you in, keeping your profile and
+                  saved builds, and sending the service emails about your account and enquiries (POPIA
+                  s11(1)(b)).
+                </>,
+                <>
+                  <Strong>To send you news and offers by email</Strong>, only if you tick the box for it,
+                  which is your consent (s11(1)(a) and s69). You can untick it on the account page at any
+                  time.
                 </>,
                 <>
                   <Strong>To keep business records</Strong> that South African tax, company and consumer
@@ -369,6 +390,13 @@ export const PrivacyPolicyPage: React.FC = () => {
                   the form, keeps a log of enquiries for us, and sends the emails described in section
                   02 through <Strong>Google (Gmail)</Strong>. Both act on our instructions as operators
                   under POPIA.
+                </>,
+                <>
+                  <Strong>Our account service (Supabase)</Strong>: hosts the account database (profile,
+                  saved builds, enquiries sent from the configurator) and runs the sign-in. It acts on our
+                  instructions as an operator under POPIA. Sign-in itself is done by{' '}
+                  <Strong>Google</Strong>, which tells us who you are when you press &quot;Continue with
+                  Google&quot; and handles that under its own privacy policy.
                 </>,
                 <>
                   <Strong>WhatsApp (Meta Platforms)</Strong>: carries the messages you send us and
@@ -419,7 +447,7 @@ export const PrivacyPolicyPage: React.FC = () => {
 
           <Section index="05" title="Transfers outside South Africa">
             <p>
-              Some of the providers in section 04, including Meta, Google, n8n{STATISTICS ? ', Umami' : ''}{CAR_PREVIEW ? `, ${CAR_PREVIEW_PROVIDER}` : ''} and our hosting
+              Some of the providers in section 04, including Meta, Google, Supabase, n8n{STATISTICS ? ', Umami' : ''}{CAR_PREVIEW ? `, ${CAR_PREVIEW_PROVIDER}` : ''} and our hosting
               provider, store and process information on servers outside South Africa. Section 72 of POPIA allows
               this where the recipient is subject to a law, binding corporate rules or a binding
               agreement that provides substantially similar protection to POPIA, where the transfer is
@@ -460,8 +488,12 @@ export const PrivacyPolicyPage: React.FC = () => {
             <p>
               {GOOGLE_ANALYTICS
                 ? 'This website keeps two small entries in your browser\'s local storage: your cookie choice, so that the banner does not ask again on every page, and a copy of an enquiry that could not be sent to us, so that it is not lost (empty otherwise). Both stay on your device and are never read by us.'
-                : 'This website keeps one small entry in your browser\'s local storage. It holds only a copy of an enquiry that could not be sent to us, so that it is not lost, and is empty otherwise; it stays on your device and is never read by us.'} When you open WhatsApp from this website, WhatsApp applies its own
-              cookie and privacy practices.
+                : 'This website keeps one small entry in your browser\'s local storage. It holds only a copy of an enquiry that could not be sent to us, so that it is not lost, and is empty otherwise; it stays on your device and is never read by us.'} If you
+              sign in, your browser also keeps the sign-in session (and, while you are going through Google&apos;s
+              sign-in, a one-time code that completes it) in local storage so that you stay signed in; signing out
+              removes the session. These entries are needed to run the account you asked for and are not used for
+              tracking. When you open WhatsApp from this website, WhatsApp applies its own cookie and privacy
+              practices.
             </p>
           </Section>
 
@@ -477,6 +509,11 @@ export const PrivacyPolicyPage: React.FC = () => {
                   <Strong>Transaction records</Strong>: where an enquiry leads to a sale, invoices and
                   related records are kept for the periods required by South African tax and company law,
                   generally five to seven years.
+                </>,
+                <>
+                  <Strong>Your account</Strong>: until you delete it on the account page (or ask us to).
+                  Deleting it removes your sign-in, profile and saved builds. Enquiries you have already sent
+                  are kept as described above, no longer linked to an account.
                 </>,
                 <>
                   <Strong>Server logs</Strong>: retained by our hosting providers for their standard
@@ -518,7 +555,9 @@ export const PrivacyPolicyPage: React.FC = () => {
               ]}
             />
             <p className="pt-2">
-              To exercise any of these rights, contact us using the details in section 01
+              If you have an account you can do two of these yourself on the account page: download a copy of
+              what we hold, and delete the account. To exercise any of these rights, or for anything else,
+              contact us using the details in section 01
               {requestLink ? ' or use the button below' : ''}. Requests under the Promotion of Access to
               Information Act may be made on the prescribed forms, which we will supply on request. We
               may ask you to confirm your identity before acting, and we will respond without undue delay
@@ -542,9 +581,11 @@ export const PrivacyPolicyPage: React.FC = () => {
 
           <Section index="10" title="Contacting you">
             <p>
-              This website has no newsletter or mailing list. We message or call you only in reply to
-              your own enquiry, or about a sale you have asked about. If you do not want us to contact
-              you, tell us and we will stop. This follows section 69 of POPIA.
+              We message or call you in reply to your own enquiry, or about a sale you have asked about. If
+              you have an account we also send the service emails about it (a welcome, and confirmations of
+              enquiries you send){SITE.supportEmail ? <> from {SITE.supportEmail}</> : null}. We send news and offers by email only to people who
+              tick the box for them on the account page, and you can untick it at any time. If you do not
+              want us to contact you, tell us and we will stop. This follows section 69 of POPIA.
             </p>
           </Section>
 

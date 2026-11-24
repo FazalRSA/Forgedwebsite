@@ -9,7 +9,7 @@ const ff3 = () => listingDetails(findWheelBySlug('ff-3-pure-bronze')!)!;
 
 test('the FF-THREE write-up is built from the listing and Sixnine\'s figures for its two sizes', () => {
   const details = ff3();
-  assert.equal(details.headline, 'FF-THREE 10.5x20 ET15 and 11.5x21 ET17 · 5x112 – flow forged, up to 120 mm concave');
+  assert.equal(details.headline, 'FF-THREE 10.5x20 ET15 and 11.5x21 ET17 · 5x112 – forged, up to 120 mm concave');
   assert.match(details.intro, /PureBronze/);
   assert.match(details.intro, /BMW M3 Competition Sedan \(G80\)/);
   assert.deepEqual(
@@ -79,6 +79,6 @@ test('a Forged SA listing has no Sixnine write-up', () => {
 test('a Sixnine wheel page is titled with the brand, sizes and bolt pattern', () => {
   const m = metaForPath('/wheels/ff-3-pure-bronze');
   assert.equal(m.title, 'Sixnine FF-THREE — PureBronze 20/21 inch 5x112 wheels');
-  assert.match(m.description, /^Sixnine FF-THREE — PureBronze, 10\.5Jx20 ET15 and 11\.5Jx21 ET17, PCD 5x112: flow forged, up to 120 mm concave\./);
+  assert.match(m.description, /^Sixnine FF-THREE — PureBronze, 10\.5Jx20 ET15 and 11\.5Jx21 ET17, PCD 5x112: forged, up to 120 mm concave\./);
   assert.match(m.description, /R 80,000 per set of four\. In stock: 1 set\./);
 });

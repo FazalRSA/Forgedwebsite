@@ -44,7 +44,8 @@ It shows the wheels that are in stock, each in photography and an interactive 3D
     - [Setting up and checking](#setting-up-and-checking)
     - [Keeping the privacy notice in step](#keeping-the-privacy-notice-in-step)
 13. [Business details and contact channels](#business-details-and-contact-channels)
-14. [Firebase](#firebase)
+14. [Customer accounts](#customer-accounts)
+    - [Firebase (superseded)](#firebase-superseded)
 15. [Testing](#testing)
 16. [Deployment](#deployment)
 17. [Known limitations and roadmap](#known-limitations-and-roadmap)
@@ -58,14 +59,15 @@ It shows the wheels that are in stock, each in photography and an interactive 3D
 Six pages, plus the privacy notice. The shop sells two brands, and the site is organised by them: **Forged SA** (the shop's own designs, every design code starting `FSA`) and **Sixnine Wheels** (sold as an official dealer, every code starting `FF`). `brandOfWheel` and `WHEEL_BRANDS` in `src/data/catalogue.ts` hold that rule and each brand's name, page and logo; a test fails if a listing's code is neither, so a new design is never left without a brand.
 
 - **Home (`/`).** Opens with the hero over the brand film: the headline "Forged Custom Wheels. Turning dreams into reality.", the owner's installs figure as a pill ("Over 80 successful wheels installed this year.", from `SITE.installsThisYear`, shown only during the year it counts), a white "See wheels in stock" button and a glass "See our installs" button, then "Our Industry Partners": the Sixnine Wheels (official dealer, linked to its page) and BMW logos as glass chips (`#partners`, from `src/data/partners.ts`). Then what is in stock, grouped by brand (Forged SA first, then Sixnine). Each group opens with the brand's logo and name, what the shop is to it ("Our own brand", "Official dealer"), how many designs and sets are in stock, and a link to the brand's page. Under it, one large dark card per wheel design (rows of three and two on wide screens, a lone last design full width; two columns on tablets, one on phones). Each card shows the design's wheel cut out on the dark card, its name, how many finishes are in stock, the lowest price per set of four, the finishes and sizes, all worked out from the catalogue (`src/utils/designCards.ts`); it links to the design's first photographed listing, whose page offers the other finishes. Then customer installs, Google reviews, the blog teaser and "Ask AI about us". Each section opens with an eyebrow label over its heading.
-- **Wheel page (`/wheels/:slug`).** One in-stock listing: photos, price per set of four, sizes and specification. The gallery works like SIXNINE's product page: arrows, an `n / total` counter and a row of thumbnails, running through this listing's cut-out and photos and then the same design's other finishes in stock, each of those labelled with its finish and linked to its own page. A Sixnine listing also shows a **Technical data** table, one column per size: Sixnine's published wheel size, offset, bolt pattern, load rating, centre bore, concavity and weight for the sizes the set is. `sixnineSizesForListing` (`src/utils/listingSpecs.ts`) finds them from the listing's own diameters, offsets and bolt pattern, and leaves out any diameter that does not match exactly one Sixnine size. Colours are **photoreal swatches** (`ColourSwatches.tsx`: a ball in the finish's own paint under the 3D studio's reflections, drawn once and cached; a drawn ball stands in until it is ready or without WebGL). They come in two groups: the design's finishes that are **in stock** (the one on this page shows on the 3D wheel when tapped; the others open their own listing), and its **other colours, to order**, always shown with the notice that a lead time of 3 months applies. Tapping a to-order swatch opens the 3D view in that colour and offers an "Ask about" button. The 3D viewer loads only when the visitor taps "View in 3D" (or a colour swatch). A "See it on my car" button (on while `carPreviewUrl` is set, as it is today) lets a visitor choose a photo of their car and see an AI-made impression of the wheel on it (see [See it on my car](#see-it-on-my-car-ai-preview)). The enquiry button opens the enquiry form with the design, finish and sizes filled in; a to-order colour prefills the colour and the lead time. The form logs the enquiry through n8n and then opens WhatsApp (see [Lead delivery](#lead-delivery-n8n)).
+- **Wheel page (`/wheels/:slug`).** One in-stock listing: photos, price per set of four, sizes and specification. The gallery works like SIXNINE's product page: arrows, an `n / total` counter and a row of thumbnails, running through this listing's cut-out and photos and then the same design's other finishes in stock, each of those labelled with its finish and linked to its own page. A Sixnine listing also shows a **Technical data** table, one column per size: Sixnine's published wheel size, offset, bolt pattern, load rating, centre bore, concavity and weight for the sizes the set is. `sixnineSizesForListing` (`src/utils/listingSpecs.ts`) finds them from the listing's own diameters, offsets and bolt pattern, and leaves out any diameter that does not match exactly one Sixnine size. Colours are **photoreal swatches** (`ColourSwatches.tsx`): each shows a studio render of this design's wheel in that colour (`public/images/wheels/finishes/`, listed in `src/data/finishStills.json`); the same picture is on the 3D viewer's finish chips. A drawn paint ball stands in for a design or colour with no render yet. They come in two groups: the design's finishes that are **in stock** (the one on this page shows on the 3D wheel when tapped; the others open their own listing), and its **other colours, to order**, always shown with the notice that a lead time of 3 months applies. Tapping a to-order swatch opens the 3D view in that colour and offers an "Ask about" button. The 3D viewer loads only when the visitor taps "View in 3D" (or a colour swatch). A "See it on my car" button (on while `carPreviewUrl` is set, as it is today) lets a visitor choose a photo of their car and see an AI-made impression of the wheel on it (see [See it on my car](#see-it-on-my-car-ai-preview)). The enquiry button opens the enquiry form with the design, finish and sizes filled in; a to-order colour prefills the colour and the lead time. The form logs the enquiry through n8n and then opens WhatsApp (see [Lead delivery](#lead-delivery-n8n)).
 - **Installs (`/installs`).** Customer cars the shop has fitted (BMW M cars and one Audi RS3; no install is linked to a catalogue wheel). Each install opens to three photos: two studio re-shoots made from the customer's own photo, then that photo itself with the number plate pixelated.
 - **Forged SA page (`/forged-sa-wheels`, "Forged SA" in the menu).** The shop's own brand: every FSA set in stock, and a fitment summary. It says only what the owner has confirmed: the FSA designs are Forged SA's own, and they are forged. Every number on it is worked out from the catalogue.
 - **Design names.** Visitors see Sixnine's names for its series: FF-ONE and FF-THREE, not the short codes FF-1 and FF-3 (`designName` in `src/data/catalogue.ts`). The codes stay the key for slugs, models, tests and the structured-data SKU.
 - **Sixnine dealer page (`/sixnine-wheels`, "Sixnine" in the menu).** FORGED as an official Sixnine Wheels dealer: what Sixnine Wheels is (from sixnine-wheels.com, with a source link) and every Sixnine set in stock. Sixnine's range is on the series pages below, reached from the mega menu. A wheel is Sixnine when its design code starts with `FF` (`isSixnineWheel` in `src/data/catalogue.ts`), so a new FF design appears on the page by itself. Every number on it is worked out from the catalogue; the brand text is in `SixnineDealerPage.tsx`. Under the stock it has SIXNINE's two home-page card rows: **New at Sixnine** (what Sixnine has on pre-order, from `sixnineRange.json`: a whole series on pre-order, such as the EVO-TWO, or a single pre-order size named after its car, such as the FF-THREE for the Audi RS5 B10) and **Find your design** (one card per series, linking to its series page). Both use `ShowcaseCard` (`SixnineShowcase.tsx`, data in `src/utils/sixnineShowcase.ts`). The two brand pages share their opening, stock grid, fitment summary and enquiry row (`BrandSections.tsx`, with the fitment facts from `src/utils/brandFitment.ts`), so they stay alike.
 - **Blog (`/blog`).** Nineteen guides in four content pillars (forged wheel basics, BMW M wheel fitment, buying in South Africa, wheel care), at `/blog`, `/blog/:pillar` and `/blog/:pillar/:post`. Every price, size, offset, bolt pattern, lead time and stock count in an article is read from the catalogue, never typed (see [The blog](#the-blog)).
 - **Contact (`/contact`).** WhatsApp, phone, address and areas served; any channel not set in `src/config/site.ts` is hidden.
-- **Privacy notice (`/privacy-policy`).** Describes what the site does today: no accounts, contact by WhatsApp or phone, local storage for an unsent enquiry and the cookie choice, and Google Analytics (loaded through Google Tag Manager), whose two cookies are set only after a visitor accepts the cookie banner. The Google Analytics, cookie and recipient text appears only while `googleTagManagerId` is set in `src/config/site.ts`.
+- **Account (`/account`).** The customer's account, shared with the FORGEDSA configurator: Continue with Google, profile, saved builds, the email choice, and download or delete of their data (see [Customer accounts](#customer-accounts)). Private: noindex, not in the sitemap, linked only from the footer.
+- **Privacy notice (`/privacy-policy`).** Describes what the site does today: the optional account (Google sign-in, shared with the configurator), contact by WhatsApp or phone, local storage for an unsent enquiry, the cookie choice and the sign-in session, and Google Analytics (loaded through Google Tag Manager), whose two cookies are set only after a visitor accepts the cookie banner. The Google Analytics, cookie and recipient text appears only while `googleTagManagerId` is set in `src/config/site.ts`.
 - **Sixnine series pages (`/sixnine-wheels/:series`).** One page per Sixnine series: `ff-one`, `ff-two`, `ff-three`, `evo-one`, `evo-two`, `oem-plus-one`. Each is built like a SIXNINE series landing page:
   - a centred hero with the facts (sizes, diameters, bolt patterns, finishes, sets in stock here);
   - the finishes with Sixnine's names and on-screen swatches;
@@ -73,14 +75,14 @@ Six pages, plus the privacy notice. The shop sells two brands, and the site is o
   - every size Sixnine lists, as cards with offset, load rating, centre bore, concavity and weight, filterable by bolt pattern, each with an "Ask about this size" button;
   - the other series, then an enquiry row.
 
-  The sizes come from `src/data/sixnineRange.json` (see [The Sixnine range data](#the-sixnine-range-data)). Stock and prices come only from the catalogue: FF-1 listings are the FF-ONE, FF-3 the FF-THREE (`sixnineSeriesOfWheel`). Sixnine's renders are not used; a series without a photo of the shop's own shows its name, outlined.
+  The sizes come from `src/data/sixnineRange.json` (see [The Sixnine range data](#the-sixnine-range-data)). Stock and prices come only from the catalogue: FF-1 listings are the FF-ONE, FF-3 the FF-THREE (`sixnineSeriesOfWheel`). The hero, the series cards and the mega menu show Sixnine's own three-quarter render of each series (`public/images/sixnine/renders/`; the owner confirmed on 23 November 2026 that the shop, as an official dealer, may use them). Stock cards and wheel pages keep the shop's own photos.
 - **Navigation.** The header reads Forged SA · Sixnine · Installs · Blog · Contact, with the Enquire button beside it. The brand links open the brand pages, and a wheel page marks its own brand as the current section. Beside "Sixnine" a chevron button opens the mega menu: the dealer page on the left, a tile per series on the right (the shop's photo or the series name, construction and diameters, and "In stock" when the shop has it). It is a disclosure (a link plus a button with `aria-expanded`), not an ARIA menu. It opens on click, or on hover with a mouse, and closes on Escape (focus returns to the button), on a click outside, when focus leaves it, or on a new page. In the phone menu, the same button under "Sixnine" lists the series. From 1024 px the links sit in the header; below that they are behind the menu button (five links and the button do not fit beside the logo at tablet width). On a wheel page, the line under the name names the brand and links to its page, the back link returns to the brand page, and the breadcrumb in the structured data is Home › brand › wheel. The footer links the wheels in stock, both brand pages, installs, the blog, contact and the privacy notice.
 - **Search-ready pages.** Per-route titles, descriptions, canonical URLs, link-preview tags, structured data (each wheel's Product names its brand: Forged SA or Sixnine) and a generated sitemap.
 - **AI-ready.** `/llms.txt` gives AI assistants the stock list, prices and contact details as plain text (see [For AI assistants and coding agents](#for-ai-assistants-and-coding-agents)).
 
 The 3D viewer is a Three.js studio with physically based paint finishes, fixed camera views (face, 3/4, side, back, top), an exploded view and, for staggered sets with two models, a Front / Rear switch. The centre cap shows the FORGED monogram on FSA designs and the SIXNINE badge on FF designs (`capLogoForDesign` in `catalogue.ts`): the viewer finds the cap by looking down the axle, lays the logo on it and, when a model has an open centre bore, fills it with a cap in the wheel's paint first.
 
-Removed in the simplification: the store and its fitment finder, collections and product pages, dealer applications, and client accounts with a garage. Their old addresses redirect (see [Routes](#routes)).
+Removed in the simplification: the store and its fitment finder, collections and product pages, and dealer applications. Their old addresses redirect (see [Routes](#routes)). Client accounts came back on 23 November 2026, rebuilt on the configurator's Supabase accounts (see [Customer accounts](#customer-accounts)).
 
 ### Where to change what
 
@@ -93,7 +95,7 @@ Every change below is a file edit, then a pull request. Merging to `main` publis
 | Add a new listing | `bun run add-wheel` | Same section |
 | Add or replace a 3D model | A `.glb` in `public/models/wheels/` and `MODEL_URL_BY_CODE` (or the listing's `modelUrl`) in `catalogue.ts` | [docs/adding-3d-models.md](docs/adding-3d-models.md) and the `add-wheel-model` skill |
 | Rebuild all 3D models, or check all listings | `npm run build-wheel-models -- --src-dir <folder>`, then `npm run qa-wheels` | [docs/adding-3d-models.md](docs/adding-3d-models.md#doing-all-the-wheels-at-once) |
-| Change how a finish looks in 3D | `src/data/studioFinishes.ts` | Check the wheel page in the viewer. Its swatches are drawn from the same numbers, so they follow |
+| Change how a finish looks in 3D | `src/data/studioFinishes.ts` | Paints are fitted to the real photos (a few designs have their own row in `DESIGN_FINISH_PBR`). After changing one, run `pip install bpy pillow numpy` then `python3 scripts/render-finish-stills.py` to redraw the swatch stills and `finishStills.json`, and check the wheel page in the viewer |
 | Change the to-order lead time | `TO_ORDER_LEAD_TIME` in `catalogue.ts` | Nothing else; pages and `llms.txt` read it |
 | Change the phone, WhatsApp, address or social links | `src/config/site.ts` | Nothing else; empty values are hidden |
 | Switch "See it on my car" on or off | Set `carPreviewUrl` in `src/config/site.ts` (a Worker address to switch on, `''` to switch off). Changing the Worker itself: `worker/car-preview/` | See [See it on my car](#see-it-on-my-car-ai-preview); the privacy notice updates itself |
@@ -166,6 +168,7 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
 | `/sixnine-wheels` | `SixnineDealerPage` | Official Sixnine dealer page: about Sixnine Wheels, every FF set in stock |
 | `/sixnine-wheels/:series` | `SixnineSeriesPage` | One Sixnine series: facts, finishes, sets in stock here (with a "View in 3D" of the stocked design), every size Sixnine lists. An unknown series shows the 404 page |
 | `/contact` | `ContactPage` | WhatsApp, phone, address, areas served |
+| `/account` | `AccountPage` | Customer account shared with the configurator. Lazy route, noindex, not in the sitemap |
 | `/privacy-policy` | `PrivacyPolicyPage` | Privacy notice (POPIA): what is collected, by whom, and how to make a request |
 | `/studio/:slug` | `StudioPreviewPage` | Unlisted, noindex 3D preview (currently `stf399`) |
 | `/admin`, `/admin/*` | `AdminWheelUploader` | Unlisted, passcode-gated, local preview only |
@@ -178,7 +181,8 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
 | `/store`, `/store/*`, `/wheels` | `/#catalogue` |
 | `/official-dealer-sixnine-wheels*` | `/sixnine-wheels` |
 | `/client-fitments`, `/store/client-fitments` | `/installs` |
-| `/account`, `/garage`, `/dealer-application`, `/store/dealer-application` | `/contact` |
+| `/garage` | `/account` |
+| `/dealer-application`, `/store/dealer-application` | `/contact` |
 
 ## Project structure
 
@@ -189,9 +193,9 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
 ├─ render.yaml · vercel.json      Host configuration (Render is in use)
 ├─ vite.config.ts                 Build config: the `@` alias (repository root) and vendor chunks
 ├─ metadata.json · .env.example   Left over from the Google AI Studio starter; the site reads neither
-├─ firebase-applet-config.json    Firebase project config (public web keys)
-├─ firebase-blueprint.json        JSON Schema for the Firestore documents
-├─ firestore.rules                Firestore security rules
+├─ firebase-applet-config.json    Firebase project config (public web keys); superseded, nothing loads it
+├─ firebase-blueprint.json        JSON Schema for the old Firestore documents (superseded)
+├─ firestore.rules                Firestore security rules (superseded)
 ├─ firestore.rules.test.ts        Structural tests for the rules
 ├─ security_spec.md               Rules invariants and adversarial payloads
 ├─ public/
@@ -223,6 +227,7 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
 │  └─ fitment-reshoot/            Pipeline for the install studio re-shoots (jobs.json, Python scripts, README.md)
 ├─ docs/adding-3d-models.md       The owner's steps for adding or replacing a wheel's 3D model, and the limits of AI models
 ├─ docs/installs-pipeline.md      How the Installs gallery is made, with animated diagrams (docs/assets/)
+├─ docs/google-tag-manager/       forged-enquiry-events.json: the GTM import that sends the site's enquiry and car-preview events to GA4
 ├─ docs/blog-seo-plan.md          The blog's keyword map, on-page checklist and how to refine it in Search Console
 ├─ docs/render-blog-rewrites.md   The 24 blog rewrite rules to paste into a Render service whose routes are set by hand
 ├─ worker/car-preview/            Cloudflare Worker behind "See it on my car" (not part of the website build): src/handler.ts, its tests, wrangler.toml, dev-server.mjs, README.md
@@ -235,13 +240,18 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
    ├─ config/site.ts              Business identity and contact channels
    ├─ data/catalogue.ts           Types, the 14 stock listings, in-stock filter, siblings, to-order colours, helpers
    ├─ data/customWheels.json      Photography for stock listings, and listings added by the CLI
-   ├─ data/studioFinishes.ts      Paint settings per finish for the 3D viewer
+   ├─ data/studioFinishes.ts      Paint settings per finish (and per design where needed) for the 3D viewer, fitted to the real photos
+   ├─ data/finishStills.ts/.json  The swatch still of each design in each colour (made by scripts/render-finish-stills.py)
    ├─ data/clientFitments.ts      Customer installs data
    ├─ data/partners.ts            Industry partners shown on the home page
+   ├─ data/googleReviews.ts       Google reviews for the home page, copied word for word (empty until real ones are added)
+   ├─ data/sixnineRange.json      Every size Sixnine lists (see The Sixnine range data)
+   ├─ data/sixnineRange.ts        Sixnine's full range, design by design, for the range section on /sixnine-wheels
    ├─ wheel-viewer/               The 3D wheel viewer, shared with the BMW configurator: stage, paint, swatches, part classification (edited only here; see its README.md)
    ├─ store/                      Zustand store (enquiry form, admin preview) in localStorage
-   ├─ context/FirebaseContext.tsx Firebase provider (kept, not mounted by any page)
-   ├─ lib/firebase.ts             Firebase setup used by that provider
+   ├─ context/AccountContext.tsx  Customer account provider (Supabase Auth, profile, builds); mounted by the account page only
+   ├─ lib/supabase.ts             Supabase client (the configurator's project, PKCE sign-in)
+   ├─ utils/accountService.ts     The account's data calls, written against a client passed in (tested with a stub)
    ├─ utils/router.tsx            pushState router and crawlable <Link>
    ├─ utils/lazyWithRetry.ts      React.lazy with retries, for the 3D viewer's code
    ├─ utils/redirects.ts          Old address to new address
@@ -255,6 +265,15 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
    ├─ utils/brandFitment.ts       A brand page's design list and fitment-at-a-glance facts
    ├─ data/sixnineSeries.ts       The Sixnine series and sizes (from sixnineRange.json), their facts, slugs and finish swatches
    ├─ utils/askAi.ts              The "Ask AI about us" links and their question
+   ├─ utils/listingSpecs.ts       The Sixnine sizes and figures a stocked Sixnine listing matches
+   ├─ utils/sixnineShowcase.ts    Data for the "New at Sixnine" and "Find your design" cards
+   ├─ utils/designCards.ts        The home page's design cards, worked out from the in-stock listings
+   ├─ utils/heroVideo.ts          The hero film's files and posters, named in one place
+   ├─ utils/wheelImageSrcSet.ts · fitmentImageSrcSet.ts   The smaller photo copies each srcset lists
+   ├─ utils/leads.ts              Posts every enquiry to the n8n webhook (see Lead delivery)
+   ├─ utils/googleTagManager.ts   The Google Tag Manager snippet, with the Consent Mode defaults, that the build writes into every page
+   ├─ utils/consent.ts            The cookie choice: read, save, tell GTM, delete the _ga cookies on Decline
+   ├─ utils/analytics.ts          trackEvent (to Umami when set up, and to the GTM data layer) and the Umami tracker
    ├─ utils/carPreview.ts         "See it on my car": is it on, shrink the photo, talk to the Worker
    ├─ utils/wheelBuilder.ts       Builds a stock listing from a short input
    ├─ utils/wheelEnquiry.ts       Reads the spec line and words the WhatsApp enquiry
@@ -262,7 +281,7 @@ Routing is client-side (`src/utils/router.tsx`). Each page in the sitemap also g
       ├─ ui/                      Re-exports of the root components/ui primitives
       ├─ brand/                   Header, footer, home, catalogue (grouped by brand), wheel page, car-preview dialog, installs, the two brand pages and their shared sections, partners strip, Ask AI, contact, privacy
       ├─ admin/                   Admin uploader
-      ├─ shared/                  BrandLogo, enquiry form
+      ├─ shared/                  BrandLogo, enquiry form, cookie banner, floating WhatsApp button, social icons
       └─ visuals/                 WheelStudio (the site's wrapper around `src/wheel-viewer`), WheelStage, its loading skeleton and error boundary
 ```
 
@@ -278,7 +297,7 @@ Since November 2026 the site is built the way the SIXNINE Wheels storefront is (
 - **Selected means lighter, not blue.** The current nav link sits on a lighter pill; the active photo dot is white.
 - **Calm motion.** `.press` shrinks a control to 97 % while pressed, `.press-card` a card to 98.5 %; cards lift their hairline on hover. Both are off under reduced motion.
 - **Product cards** (`ProductCard.tsx`, on the brand pages, the series pages and the blog's in-stock blocks) follow SIXNINE's card: the whole card is one link; the wheel is contained on a soft radial tile with a stock badge; under it a small brand and series label, the finish as the title, the sizes, then the price per set with the finish's swatch.
-- **Showcase cards** (`ShowcaseCard` in `SixnineShowcase.tsx`) follow SIXNINE's large home-page cards: a tall dark tile lit from the top, the wheel at three-quarters in its upper part, a white pill badge, the name large at the bottom left (Satoshi Black) and a round arrow at the bottom right. They show the shop's own angled cut-out where there is one; otherwise the face-on range picture, turned to three-quarters in CSS. Used for the Sixnine series on the dealer page, the series pages ("More Sixnine series") and under the Sixnine group on the home page (a swipe row on phones).
+- **Showcase cards** (`ShowcaseCard` in `SixnineShowcase.tsx`) follow SIXNINE's large home-page cards: a tall dark tile lit from the top, the wheel at three-quarters in its upper part, a white pill badge, the name large at the bottom left (Satoshi Black) and a round arrow at the bottom right. They show Sixnine's three-quarter render of the series; without one, the shop's own angled cut-out, then the face-on range picture turned to three-quarters in CSS. Used for the Sixnine series on the dealer page, the series pages ("More Sixnine series") and under the Sixnine group on the home page (a swipe row on phones).
 - **Sections open with an eyebrow** (`EYEBROW_CLASS`, `src/components/brand/sectionStyles.ts`): one or two uppercase words over the heading.
 
 What stays FORGED's own: the gold logo, Satoshi Black headlines, the palette below, rose for accent text and the focus ring, the brand film, the 3D studio and the photoreal swatches.
@@ -568,6 +587,8 @@ Google Analytics cookies are **off until the visitor taps Accept** in the cookie
 
 ### What is measured
 
+Since the cookie banner, everything in this table is recorded in full only for visitors who tapped **Accept**; the rest send cookieless pings (see [Cookie consent](#cookie-consent-opt-in)).
+
 | Event | When it fires | Comes from | In GA4 today? |
 | --- | --- | --- | --- |
 | `page_view` | A page opens, and each move to another page inside the site | GA4 enhanced measurement | Yes |
@@ -599,7 +620,7 @@ A practical rhythm: look at *Realtime* after any change, and read the weekly num
 ### Setting up and checking
 
 1. **Check it works.** Open the live site and tap **Accept**, then GA4 *Reports → Realtime*: your visit should show within a minute. In the browser's developer tools, the page should load `gtm.js?id=GTM-P554MVX4`, set no `_ga` cookie before Accept and set both after; on the Render address it should load neither.
-2. **Count enquiries as leads.** In GTM: *Variables → New → Data Layer Variable* named `delivered`, and another named `channel`. *Triggers → New → Custom Event*, event name `enquiry_sent`. *Tags → New → Google Analytics: GA4 Event*, measurement ID `G-H2TR6RVSK0`, event name `enquiry_sent`, event parameters `delivered` = `{{delivered}}` and `channel` = `{{channel}}`, fired by that trigger. Preview it on the live site, then *Submit* to publish. In GA4, mark `enquiry_sent` as a key event under *Admin → Data display → Events* once it has arrived (allow a day). Repeat for `enquiry_open` or the car-preview events if they are wanted.
+2. **Count enquiries as leads.** The quick way: in GTM, *Admin → Import container*, choose [docs/google-tag-manager/forged-enquiry-events.json](docs/google-tag-manager/forged-enquiry-events.json), your current workspace, **Merge** and **Rename conflicting tags, triggers, and variables**. It adds three Data Layer Variables (`delivered`, `channel`, `outcome`), a Custom Event trigger and a GA4 Event tag (to `G-H2TR6RVSK0`) for each of `enquiry_open`, `enquiry_sent`, `car_preview_open` and `car_preview_result`, all named `FORGED …`. Preview on the live site, send a test enquiry, then *Submit* to publish. The file was written by hand from published examples of the export format, not exported from GTM; if the import is refused, build the same thing by hand: *Variables → New → Data Layer Variable* named `delivered`, and another named `channel`. *Triggers → New → Custom Event*, event name `enquiry_sent`. *Tags → New → Google Analytics: GA4 Event*, measurement ID `G-H2TR6RVSK0`, event name `enquiry_sent`, event parameters `delivered` = `{{delivered}}` and `channel` = `{{channel}}`, fired by that trigger. Preview it on the live site, then *Submit* to publish. Repeat for `enquiry_open` or the car-preview events if they are wanted. Either way, in GA4 mark `enquiry_sent` as a key event under *Admin → Data display → Events* once it has arrived (allow a day).
 3. **Set data retention to 14 months** (see above).
 
 ### Keeping the privacy notice in step
@@ -636,19 +657,41 @@ The workflow **FORGED · Website Leads** (production URL `https://novahavensai.a
 
 Emails go out through the Gmail credential attached to the workflow. To point a deployment at a different workflow (for example the test URL while developing), set `VITE_LEADS_WEBHOOK_URL`; otherwise `SITE.leadsWebhookUrl` in `src/config/site.ts` is used.
 
-## Firebase
+## Customer accounts
 
-Client accounts and the garage are gone from the site and no page loads Firebase. The Firebase provider (`src/context/FirebaseContext.tsx`), `firestore.rules` and their tests are kept as they were, for a possible later return of accounts. `firestore.rules` denies everything by default and allows owner-only access with a verified email, exact key sets, bounded string sizes, enum allow-lists, server timestamps and immutable identity fields. `security_spec.md` documents the invariants and the adversarial payloads each rule rejects.
+The site and the FORGEDSA configurator ([forged-configurator.vercel.app](https://forged-configurator.vercel.app), repository `FazalRSA/BMW-AND-FORGED-`) share **one account system**: the configurator's Supabase project (`qxlfkfhzpqbxffuqqewg`, "Apex Forged Configurator"). A Google account is one user, one profile and one garage on both sites.
 
-```bash
-firebase deploy --only firestore:rules
-```
+| Piece | Where |
+| --- | --- |
+| Supabase client (public URL and publishable key; `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` override them) | `src/lib/supabase.ts` |
+| Data calls: profile, saved builds, rename, delete, export, account deletion | `src/utils/accountService.ts` |
+| Provider (session, profile, builds, errors) | `src/context/AccountContext.tsx` |
+| The page | `src/components/brand/AccountPage.tsx`, route `/account` |
+| Tables and functions (owned by the configurator repo, `supabase/migrations/`) | `public.profiles`, `public.saved_configurations`, `rename_configuration()`, `export_my_data()`, `delete_my_account()` |
 
-`firebase-applet-config.json` holds the public web configuration for the Firebase project.
+**What a customer can do on `/account`:** continue with Google; edit name, phone, city and brake system; see the builds they saved in the configurator and open (in the configurator), rename or delete them; tick **Email me news and offers** (a separate box, off unless ticked; the service emails about their account and enquiries are not optional while the account exists); download everything stored about them as JSON; delete the account (two steps; it removes the sign-in, profile and saved builds, while enquiries already sent stay with the business as sales records). The website does not create builds: that is the configurator's job.
+
+**Sign-in flow.** PKCE: Google returns the visitor to `/account?code=...`, supabase-js swaps the code for a session, and `AccountContext` removes the code from the address. No token ever sits in the URL or history. `supabase-js` is imported by the account page only (the `vendor-supabase` chunk), so no other page downloads it.
+
+**Honest limit: one sign-in per site.** Browsers keep a session per origin, so a customer signs in once on each site (one click on "Continue with Google"); after that it is the same user, profile and garage on both. True single sign-on would need both sites under one parent domain (for example the configurator on `app.forgedsa.co.za` sharing a cookie with `www.forgedsa.co.za`) and is not built.
+
+**Owner steps** (Supabase dashboard, project *Apex Forged Configurator*):
+
+1. **Authentication → URL Configuration → Redirect URLs:** add `https://www.forgedsa.co.za/**` and `https://forgedsa.co.za/**` (and `http://localhost:3000/**` to try it locally). Without them Google's return is refused.
+2. Google Cloud: nothing new if the Supabase callback `https://qxlfkfhzpqbxffuqqewg.supabase.co/auth/v1/callback` is already an authorised redirect URI of the OAuth client the configurator uses (its set-up is in the configurator's `docs/ACCOUNTS.md`). The Google provider itself must be switched on in Supabase (**Authentication → Providers → Google**), and **Confirm email must stay on**.
+3. The migration that adds `export_my_data()`, `delete_my_account()` and the marketing-consent timestamp (`20261124090000_shared_accounts_and_mailer.sql` in the configurator repo) must be applied before the download and delete buttons work.
+
+**Keeping the privacy notice true.** The notice describes the account, the Supabase and Google recipients, the sign-in entry in local storage and the email choice. If the account page starts collecting anything else, update the notice in the same pull request (and `src/config/site.test.ts` guards the list of features the notice must not describe).
+
+**Real sign-in is not tested by the suite.** Google sign-in cannot run in a test; the unit tests use a stub client, and the page was checked signed out and with a stubbed session at 390 px and 1280 px.
+
+### Firebase (superseded)
+
+The earlier Firebase accounts (Firebase Auth and Firestore, project `gen-lang-client-0484314317`) were never mounted on a page and are superseded by the Supabase accounts above. `src/context/FirebaseContext.tsx`, `src/lib/firebase.ts` and the `firebase` dependency are removed. `firestore.rules`, `firestore.rules.test.ts`, `firebase-blueprint.json`, `security_spec.md` and `firebase-applet-config.json` are kept untouched for now; nothing in the site loads them, and they can be deleted with the Firebase project when the owner decides.
 
 ## Testing
 
-`bun run test` first runs `wheel-viewer:verify` (fails if `src/wheel-viewer/` was edited without a new stamp), then twenty-six test files (262 tests) with `node:test`. The files are listed by name in the `test` script in `package.json`, so a new test file does not run until it is added there.
+`bun run test` first runs `wheel-viewer:verify` (fails if `src/wheel-viewer/` was edited without a new stamp), then twenty-eight test files (282 tests) with `node:test`. The files are listed by name in the `test` script in `package.json`, so a new test file does not run until it is added there.
 
 | Suite | Covers |
 | --- | --- |
@@ -659,6 +702,7 @@ firebase deploy --only firestore:rules
 | `src/utils/listingSpecs.test.ts` | A Sixnine listing's diameters, offsets and bolt pattern match exactly one Sixnine size per diameter, the Technical data table carries Sixnine's figures, a Forged SA listing has none, and an unreadable spec sheet hides the table rather than showing a wrong one |
 | `src/utils/brandFitment.test.ts` | The brand pages' fitment summary: a size, bolt pattern or bore is stated only when every set agrees, and lists read as English |
 | `src/utils/heroVideo.test.ts` | Every hero film file and poster exists, AV1 is offered before H.264, the film stays inside its download budget, it can start before it has fully downloaded, and it plays only for visitors who asked neither for less motion nor to save data |
+| `src/utils/accountService.test.ts` | The customer account's data calls against a stub Supabase client: a profile patch writes only the five editable columns (never the email), limits, builds mapped from their payload, names for ids with a fallback, rename and delete of a build that is not the customer's, the data export and the account deletion |
 | `src/utils/leads.test.ts` | The enquiry's delivery to n8n: the webhook address, the payload, the reference number, a visitor notice when delivery fails, and no send when the hidden honeypot field is filled |
 | `src/utils/designCards.test.ts` | Home page design cards: one per design, badge, price and link from the data, the 3-then-2 row plan, and a cut-out on disk for every photographed listing |
 | `src/utils/wheelImageSrcSet.test.ts` | The `srcset` for each wheel photo (site photos only; nothing for admin uploads or placeholders) and that every smaller copy exists on disk |
@@ -730,7 +774,7 @@ For Firebase Hosting instead:
 { "hosting": { "public": "dist", "rewrites": [{ "source": "**", "destination": "/index.html" }] } }
 ```
 
-Build chunks are split per vendor (`react`, `motion`, `three`, `firebase`, `lucide`) and per route.
+Build chunks are split per vendor (`react`, `motion`, `three`, `supabase`, `lucide`) and per route. `vendor-supabase` is fetched only when `/account` opens.
 
 ## Known limitations and roadmap
 

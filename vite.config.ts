@@ -28,8 +28,9 @@ export default defineConfig(() => {
             if (id.includes('node_modules/three')) {
               return 'vendor-three';
             }
-            if (id.includes('node_modules/firebase') || id.includes('node_modules/@firebase')) {
-              return 'vendor-firebase';
+            // The customer account (supabase-js) is loaded by the /account page only.
+            if (id.includes('node_modules/@supabase')) {
+              return 'vendor-supabase';
             }
           },
         },

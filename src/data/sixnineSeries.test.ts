@@ -60,9 +60,11 @@ test('facts are worked out from the sizes', () => {
   assert.equal(ffOne.dualBoltPattern, false);
   assert.equal(seriesFacts(findSixnineSeries('evo-one')!).dualBoltPattern, true);
   assert.equal(diameterRange(seriesFacts(findSixnineSeries('ff-two')!)), '21″');
-  // A series is called flow forged only when most of its sizes say so.
-  assert.equal(findSixnineSeries('evo-one')!.construction, null);
-  assert.equal(findSixnineSeries('ff-three')!.construction, 'Flow forged');
+  // The owner confirmed every wheel the shop sells is forged: no series or size says flow formed.
+  for (const series of SIXNINE_SERIES) {
+    assert.equal(series.construction, 'Forged', series.code);
+    for (const size of series.sizes) assert.doesNotMatch(size.construction ?? '', /flow/i, series.code);
+  }
 });
 
 test('sizes read the Sixnine way and sort by diameter, width and offset, sets last', () => {

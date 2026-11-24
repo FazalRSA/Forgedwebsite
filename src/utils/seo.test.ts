@@ -62,7 +62,6 @@ const REMOVED_ROUTES = [
   '/official-dealer-sixnine-wheels',
   '/dealer-application',
   '/store/dealer-application',
-  '/account',
   '/garage',
 ];
 
@@ -190,8 +189,19 @@ test('removed routes are no longer pages: they are noindex "not found" and never
   }
 });
 
+test('the account page is a real page that stays out of search results, the sitemap and the page rules', () => {
+  const m = metaForPath('/account');
+  assert.equal(m.noindex, true);
+  assert.equal(m.jsonLd, undefined);
+  assert.ok(!m.title.startsWith('Page not found'), m.title);
+  assert.equal(m.canonicalPath, '/account');
+  assert.ok(!sitemapPaths().includes('/account'));
+  assert.ok(!buildSitemapXml('https://example.test').includes('/account'));
+  assert.ok(!readFileSync(path.join(PUBLIC_DIR, '..', 'render.yaml'), 'utf8').includes('source: /account\n'));
+});
+
 test('private and preview pages are noindex and carry no structured data', () => {
-  for (const p of ['/admin', '/admin/wheels', '/studio/stf399']) {
+  for (const p of ['/admin', '/admin/wheels', '/studio/stf399', '/account']) {
     const m = metaForPath(p);
     assert.equal(m.noindex, true, p);
     assert.equal(m.jsonLd, undefined, p);

@@ -10,7 +10,6 @@
 export const SIXNINE_SOURCES = {
   about: 'https://sixnine-wheels.com/en/pages/about',
   home: 'https://sixnine-wheels.com/en',
-  forgedSeries: 'https://sixnine-wheels.com/en/pages/tuv-forged-series',
   configurator: 'https://sixnine-wheels.com/en/pages/konfigurator',
   legalNotice: 'https://sixnine-wheels.com/en/policies/legal-notice',
 } as const;

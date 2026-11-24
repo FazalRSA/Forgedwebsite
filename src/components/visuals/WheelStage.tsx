@@ -18,6 +18,8 @@ export interface WheelStageProps {
   selectedFinish: WheelFinishId;
   /** Paint choices on offer. Pass only the wheel's own finish: a single entry shows no finish row. */
   availableFinishes: WheelFinishId[];
+  /** The wheel's design code ("FSA003"), for the studio render of each colour on the finish chips. */
+  design?: string;
   onSelectFinish: (finish: WheelFinishId) => void;
   /** The wheel's finish name, e.g. "BlackMatte". */
   finishName?: string;

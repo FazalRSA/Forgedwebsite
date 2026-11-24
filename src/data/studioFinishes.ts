@@ -4,7 +4,8 @@ import type { WheelFinishId } from './catalogue';
  * Physically based paint settings for the 3D wheel studio, one per catalogue finish.
  * The catalogue's WHEEL_FINISHES holds the names and swatch dots; this table holds how
  * each finish is rendered (base colour, metalness, roughness, clear coat, reflection strength).
- * Values were tuned against the SIXNINE reference renders under the studio's lighting.
+ * Values are fitted: each finish was rendered in Cycles under the viewer's studio and the base colour, roughness and coat
+ * adjusted until the render's median colour and light/dark spread matched the real photo of that wheel (scripts/render-finish-stills.py).
  */
 export interface StudioFinishPBR {
   /** Base colour as sRGB hex. */
@@ -17,82 +18,108 @@ export interface StudioFinishPBR {
 }
 
 export const STUDIO_FINISH_PBR: Record<WheelFinishId, StudioFinishPBR> = {
-  // Silver / LiquidMetal: polished, bright metallic silver under a crisp clear coat.
+  // Silver: polished metal, fitted to the FSA004 Silver photo.
   silver: {
-    hex: '#e4e7ec',
+    hex: '#d1d1d1',
     metalness: 1.0,
-    roughness: 0.24,
-    clearcoat: 1.0,
-    clearcoatRoughness: 0.05,
+    roughness: 0.401,
+    clearcoat: 0.204,
+    clearcoatRoughness: 0.06,
     envMapIntensity: 1.2,
   },
-  // BlackMatte / GlossBlack: deep black paint under a full gloss coat. A matte listing name
-  // ("BlackMatte") flattens this in the viewer, so the one row serves both.
+  // BlackMatte / GlossBlack: black paint under a gloss coat (a matte name flattens it in the viewer); fitted to the FSA004 GlossBlack photo.
   'satin-black': {
-    hex: '#0a0a0c',
-    metalness: 0.35,
-    roughness: 0.3,
-    clearcoat: 1.0,
-    clearcoatRoughness: 0.03,
-    envMapIntensity: 1.3,
-  },
-  // Gold / PureBronze: warm metallic.
-  'champagne-bronze': {
-    hex: '#b98a52',
-    metalness: 1.0,
-    roughness: 0.3,
-    clearcoat: 0.3,
-    clearcoatRoughness: 0.06,
-    envMapIntensity: 1.1,
-  },
-  // HyperBlack: dark chrome-like metallic under a full gloss coat.
-  'dark-gunmetal': {
-    hex: '#3d4148',
-    metalness: 1.0,
-    roughness: 0.07,
-    clearcoat: 1.0,
+    hex: '#3b3b3b',
+    metalness: 0.0,
+    roughness: 0.249,
+    clearcoat: 0.906,
     clearcoatRoughness: 0.04,
-    envMapIntensity: 1.35,
-  },
-  // LiquidMetal: mirror-polished, chrome-like silver.
-  'liquid-metal': {
-    hex: '#eef0f3',
-    metalness: 1.0,
-    roughness: 0.11,
-    clearcoat: 1.0,
-    clearcoatRoughness: 0.04,
-    envMapIntensity: 1.35,
-  },
-  // HyperSilver: bright metallic silver under a crisp clear coat (less mirror than LiquidMetal).
-  'hyper-silver': {
-    hex: '#d3d7dc',
-    metalness: 1.0,
-    roughness: 0.27,
-    clearcoat: 1.0,
-    clearcoatRoughness: 0.05,
     envMapIntensity: 1.2,
   },
-  // GlossyBlack: deep black paint under a full gloss coat.
-  'glossy-black': {
-    hex: '#0a0a0c',
-    metalness: 0.35,
-    roughness: 0.3,
-    clearcoat: 1.0,
-    clearcoatRoughness: 0.03,
-    envMapIntensity: 1.3,
-  },
-  // PureBronze: warm metallic bronze.
-  'pure-bronze': {
-    hex: '#b98a52',
+  // Gold: warm metallic, fitted to the FSA003 Gold photo.
+  'champagne-bronze': {
+    hex: '#e8d6b6',
     metalness: 1.0,
-    roughness: 0.3,
-    clearcoat: 0.3,
+    roughness: 0.437,
+    clearcoat: 0.198,
     clearcoatRoughness: 0.06,
-    envMapIntensity: 1.1,
+    envMapIntensity: 1.2,
+  },
+  // HyperBlack: grey metal under a coat, fitted to the FSA003 HyperBlack photo.
+  'dark-gunmetal': {
+    hex: '#a0a0a0',
+    metalness: 1.0,
+    roughness: 0.256,
+    clearcoat: 0.449,
+    clearcoatRoughness: 0.06,
+    envMapIntensity: 1.2,
+  },
+  // LiquidMetal: bright mirror-polished metal, fitted to the FF-3 LiquidMetal photo.
+  'liquid-metal': {
+    hex: '#ababab',
+    metalness: 1.0,
+    roughness: 0.137,
+    clearcoat: 0.521,
+    clearcoatRoughness: 0.04,
+    envMapIntensity: 1.2,
+  },
+  // HyperSilver: bright metallic silver, fitted to the FF-1 Silver photo.
+  'hyper-silver': {
+    hex: '#dcdcdc',
+    metalness: 1.0,
+    roughness: 0.312,
+    clearcoat: 0.452,
+    clearcoatRoughness: 0.06,
+    envMapIntensity: 1.2,
+  },
+  // GlossyBlack: black paint under a gloss coat, fitted to the FF-3 GlossyBlack photo.
+  'glossy-black': {
+    hex: '#202020',
+    metalness: 0.0,
+    roughness: 0.52,
+    clearcoat: 0.815,
+    clearcoatRoughness: 0.04,
+    envMapIntensity: 1.2,
+  },
+  // PureBronze: dark warm metallic, fitted to the FF-3 PureBronze photo.
+  'pure-bronze': {
+    hex: '#7d7067',
+    metalness: 1.0,
+    roughness: 0.128,
+    clearcoat: 0.52,
+    clearcoatRoughness: 0.06,
+    envMapIntensity: 1.2,
   },
 };
 
-/** Settings for a finish id, falling back to silver for an unknown id. */
-export function getStudioFinish(finishId: WheelFinishId | string): StudioFinishPBR {
+/**
+ * A few designs look different enough in their real photos that one paint per finish cannot match both. These rows
+ * replace the finish's paint for that design only, keyed "DESIGN:finish-id".
+ */
+export const DESIGN_FINISH_PBR: Record<string, StudioFinishPBR> = {
+  'FF-1:liquid-metal': {
+    hex: '#b1b1b1',
+    metalness: 1.0,
+    roughness: 0.652,
+    clearcoat: 1.0,
+    clearcoatRoughness: 0.05,
+    envMapIntensity: 1.2,
+  },
+  'FSA002:dark-gunmetal': {
+    hex: '#858585',
+    metalness: 1.0,
+    roughness: 0.273,
+    clearcoat: 0.506,
+    clearcoatRoughness: 0.06,
+    envMapIntensity: 1.2,
+  },
+};
+
+/** Settings for a finish id (and, when given, the design it is on), falling back to silver for an unknown id. */
+export function getStudioFinish(finishId: WheelFinishId | string, design?: string): StudioFinishPBR {
+  if (design) {
+    const own = DESIGN_FINISH_PBR[`${design.trim().toUpperCase()}:${finishId}`];
+    if (own) return own;
+  }
   return STUDIO_FINISH_PBR[finishId as WheelFinishId] ?? STUDIO_FINISH_PBR.silver;
 }

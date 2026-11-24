@@ -19,6 +19,9 @@ import { Link } from '../../utils/router';
  *  - the same design in another colour that is in stock: a swatch that opens that listing;
  *  - the colours of the design that are not in stock: a swatch that shows the colour on the 3D wheel,
  *    always beside the lead-time notice, with an "Ask about" button for the colour on show.
+ *
+ * A swatch is a studio render of the wheel itself in that colour (src/data/finishStills.ts), the same picture
+ * the 3D view's finish chips show; a design without renders gets the paint ball instead.
  */
 
 const SWATCH_SIZE = 36;
@@ -32,6 +35,8 @@ export interface InStockColour {
 }
 
 interface ColourSwatchesProps {
+  /** The wheel's design code ("FSA003"): which renders the swatches show. */
+  design?: string;
   /** The colour in stock on this page. */
   current: { finishId: WheelFinishId; name: string };
   /** Other in-stock colours of the design. */
@@ -54,6 +59,7 @@ const TILE_IDLE = 'border-[#33333E] text-neutral-200 hover:border-[#1D4ED8] hove
 const TILE_ON = 'border-white bg-white/10 text-white font-medium';
 
 export const ColourSwatches: React.FC<ColourSwatchesProps> = ({
+  design,
   current,
   siblings,
   toOrder,
@@ -77,14 +83,14 @@ export const ColourSwatches: React.FC<ColourSwatchesProps> = ({
             onClick={() => onShow(current.finishId)}
             className={`${TILE} ${shown === current.finishId ? TILE_ON : TILE_IDLE}`}
           >
-            <Swatch finishId={current.finishId} name={current.name} />
+            <Swatch finishId={current.finishId} name={current.name} design={design} />
             {current.name}
           </button>
         </li>
         {siblings.map((s) => (
           <li key={s.slug}>
             <Link to={`/wheels/${s.slug}`} className={`${TILE} ${TILE_IDLE}`}>
-              <Swatch finishId={s.finishId} name={s.name} />
+              <Swatch finishId={s.finishId} name={s.name} design={design} />
               {s.name}
             </Link>
           </li>
@@ -110,7 +116,7 @@ export const ColourSwatches: React.FC<ColourSwatchesProps> = ({
                     onClick={() => (has3D ? onShow(finish.id) : onAskAbout(finish))}
                     className={`${TILE} border-dashed ${on ? TILE_ON : TILE_IDLE}`}
                   >
-                    <Swatch finishId={finish.id} />
+                    <Swatch finishId={finish.id} design={design} />
                     {finish.name}
                   </button>
                 </li>
@@ -137,15 +143,17 @@ export const ColourSwatches: React.FC<ColourSwatchesProps> = ({
 };
 
 /**
- * The photoreal ball for a catalogue colour. `name` is the listing's own finish name ("BlackMatte"),
- * which decides matte or gloss; without it the palette's name is used.
+ * The swatch for a catalogue colour: the studio render of the wheel `design` in that colour, or the photoreal
+ * paint ball when there is none. `name` is the listing's own finish name ("BlackMatte"), which decides matte
+ * or gloss; without it the palette's name is used.
  */
-export const CatalogueSwatch: React.FC<{ finishId: WheelFinishId; name?: string; size?: number }> = ({
+export const CatalogueSwatch: React.FC<{ finishId: WheelFinishId; name?: string; size?: number; design?: string }> = ({
   finishId,
   name,
   size = SWATCH_SIZE,
+  design,
 }) => {
-  const finish = toStudioFinish(finishId, name ?? WHEEL_FINISHES[finishId]?.name);
+  const finish = toStudioFinish(finishId, name ?? WHEEL_FINISHES[finishId]?.name, design);
   if (!finish) return null;
   return <FinishSwatch finish={finish} size={size} />;
 };
