@@ -21,7 +21,7 @@ and the traps in this environment.
 | Date | Decision |
 | --- | --- |
 | Nov 17 | FSA002 is the **forked**-spoke wheel. The gold 15-spoke wheel listed as FSA002 is really **FSA003**; `/wheels/fsa002-gold` redirects to `/wheels/fsa003-gold`. |
-| Nov 17 | FF-1 "Silver" is Sixnine's **Hyper Silver**; FF-1 "black" is **Glossy Black**. |
+| Nov 17 | FF-1 "Silver" is Sixnine's **HyperSilver**; FF-1 "black" is **GlossyBlack** (finish names are one word since PR 88, as Sixnine writes them). |
 | Nov 18 | Centre caps: FORGED logo on FSA wheels, SIXNINE logo on FF wheels (done in the viewer, see below). |
 | Nov 20 | Site follows SIXNINE's build ideology but keeps FORGED's palette and type (AGENTS.md → SIXNINE style skills). |
 | Nov 23 | Hero: no stock sentence under the H1. The H1 was shortened to "Forged, not cast."; the owner later chose "Forged Custom Wheels. Turning dreams into reality." (current text in `HeroSection.tsx`). |
@@ -95,7 +95,7 @@ The remaining faint bumps come from the AI source. The real fix is the maker's C
    the owner must run `node scripts/wheel-viewer-sync.mjs pull` there.
 2. **Better 3D sources**: Sixnine's CAD/3D files for FF-ONE and FF-THREE; FORGED's CAD for FSA002 to FSA004.
    Then `npm run build-wheel-models` with plain settings.
-3. **Photos** of FSA003 Silver and FSA004 Hyper Black to replace the 3D-render placeholders
+3. **Photos** of FSA003 Silver and FSA004 HyperBlack to replace the 3D-render placeholders
    (`customWheels.json` entries labelled "3D preview", files in `public/images/wheels/<slug>/`).
 4. **3D for Sixnine designs not in stock** (FF-TWO, EVO-ONE, EVO-TWO, OEM+ONE): none. AGENTS.md forbids AI models of
    wheels the shop does not sell; ask the owner before adding any.
