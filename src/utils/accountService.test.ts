@@ -133,10 +133,10 @@ test('catalogue names turn ids into words, and a failed lookup falls back to the
     cars: [{ id: 'm3', name: 'BMW M3' }],
     paints: [{ id: 'p1', name: 'Brooklyn Grey' }],
     wheels: [{ id: 'w1', name: 'FSA003' }],
-    wheel_finishes: [{ id: 'f1', name: 'Hyper Black' }],
+    wheel_finishes: [{ id: 'f1', name: 'HyperBlack' }],
   };
   const names = await loadCatalogueNames(client({ from: (t: string) => query({ data: tables[t] }) }), builds);
-  assert.equal(describeBuild(builds[0], names), 'BMW M3 · Brooklyn Grey · FSA003 · 19" · Hyper Black');
+  assert.equal(describeBuild(builds[0], names), 'BMW M3 · Brooklyn Grey · FSA003 · 19" · HyperBlack');
 
   const broken = await loadCatalogueNames(client({ from: () => { throw new Error('offline'); } }), builds);
   assert.equal(describeBuild(builds[0], broken), 'm3 · p1 · w1 · 19" · f1');

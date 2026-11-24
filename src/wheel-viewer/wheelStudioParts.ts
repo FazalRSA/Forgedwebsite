@@ -59,12 +59,14 @@ export function cameraDistanceScale(aspect: number, visibleHeightFraction = 1): 
 }
 
 /**
- * Whether a finish name describes a matte or satin paint ("Black Matte", "Satin Bronze").
+ * Whether a finish name describes a matte or satin paint ("BlackMatte", "Black Matte", "SatinBronze").
  * The studio paints each catalogue finish with one gloss setting; a matte name flattens it so a
- * matte wheel is not shown with a gloss clear coat.
+ * matte wheel is not shown with a gloss clear coat. One-word names are split at their capitals
+ * first, so "BlackMatte" reads as matte the same as "Black Matte".
  */
 export function isMatteFinishName(finishName?: string | null): boolean {
-  return /\b(matte|matt|satin|flat)\b/i.test(finishName ?? '');
+  const words = (finishName ?? '').replace(/([a-z])([A-Z])/g, '$1 $2');
+  return /\b(matte|matt|satin|flat)\b/i.test(words);
 }
 
 /** True when the visitor has asked their device to reduce motion. False outside a browser. */

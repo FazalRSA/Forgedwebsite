@@ -45,56 +45,56 @@ export interface WheelFinishOption {
 export const WHEEL_FINISHES: Record<WheelFinishId, WheelFinishOption> = {
   'silver': {
     id: 'silver',
-    name: 'Silver / Liquid Metal',
+    name: 'Silver / LiquidMetal',
     swatchHex: '#CFCFCD',
     secondaryHex: '#8E959E',
     rimAccentHex: '#F3F5F7',
   },
   'satin-black': {
     id: 'satin-black',
-    name: 'Black Matte / Gloss Black',
+    name: 'BlackMatte / GlossBlack',
     swatchHex: '#2B2B2A',
     secondaryHex: '#0D0E10',
     rimAccentHex: '#484B52',
   },
   'champagne-bronze': {
     id: 'champagne-bronze',
-    name: 'Gold / Pure Bronze',
+    name: 'Gold / PureBronze',
     swatchHex: '#B19F7D',
     secondaryHex: '#6E552B',
     rimAccentHex: '#E5C888',
   },
   'dark-gunmetal': {
     id: 'dark-gunmetal',
-    name: 'Hyper Black',
+    name: 'HyperBlack',
     swatchHex: '#5B5B59',
     secondaryHex: '#26292E',
     rimAccentHex: '#7A8088',
   },
   'liquid-metal': {
     id: 'liquid-metal',
-    name: 'Liquid Metal',
+    name: 'LiquidMetal',
     swatchHex: '#B4B4B2',
     secondaryHex: '#9AA1AB',
     rimAccentHex: '#FFFFFF',
   },
   'hyper-silver': {
     id: 'hyper-silver',
-    name: 'Hyper Silver',
+    name: 'HyperSilver',
     swatchHex: '#C6C6C4',
     secondaryHex: '#8E959E',
     rimAccentHex: '#F3F5F7',
   },
   'glossy-black': {
     id: 'glossy-black',
-    name: 'Glossy Black',
+    name: 'GlossyBlack',
     swatchHex: '#262624',
     secondaryHex: '#0D0E10',
     rimAccentHex: '#484B52',
   },
   'pure-bronze': {
     id: 'pure-bronze',
-    name: 'Pure Bronze',
+    name: 'PureBronze',
     swatchHex: '#7A5B49',
     secondaryHex: '#6E552B',
     rimAccentHex: '#D9AE76',
@@ -108,11 +108,11 @@ export const GENERIC_PALETTE: WheelFinishId[] = ['silver', 'satin-black', 'champ
  * The finishes Sixnine Wheels publishes for each design, by their own names. Researched on
  * 2026-11-18 from sixnine-wheels.com (model pages, homepage alt text and image names) and the
  * reseller listing at rims4italy.com; the two agree. Sixnine's pages carry no hex values.
- *  - FF-3 (FF-THREE): Liquid Metal, Glossy Black, Hyper Silver, Pure Bronze.
- *  - FF-1 (FF-ONE): Hyper Silver, Liquid Metal and Glossy Black. Sixnine's pages say "Black" for the
- *    FF-ONE; the owner confirmed on 2026-11-18 that it is Glossy Black, and that the stocked FF-1
- *    "Silver" is Hyper Silver.
- * Sixnine does not list Hyper Black, so it is never offered on an FF design.
+ *  - FF-3 (FF-THREE): LiquidMetal, GlossyBlack, HyperSilver, PureBronze.
+ *  - FF-1 (FF-ONE): HyperSilver, LiquidMetal and GlossyBlack. Sixnine's pages say "Black" for the
+ *    FF-ONE; the owner confirmed on 2026-11-18 that it is GlossyBlack, and that the stocked FF-1
+ *    "Silver" is HyperSilver.
+ * Sixnine does not list HyperBlack, so it is never offered on an FF design.
  */
 export const SIXNINE_DESIGN_FINISHES: Record<string, WheelFinishId[]> = {
   'FF-1': ['hyper-silver', 'liquid-metal', 'glossy-black'],
@@ -299,7 +299,7 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     slug: 'fsa001-black-matte',
     modelCode: 'FSA001',
     sizesAvailable: '19 inch / 20 inch',
-    finishName: 'Black Matte',
+    finishName: 'BlackMatte',
     otherFinishes: '2 piece wheel',
     compatibleCars: 'M3 Sedan (G80)',
     priceZAR: 90000,
@@ -318,7 +318,7 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     slug: 'fsa002-hyper-black',
     modelCode: 'FSA002',
     sizesAvailable: '20 inch / 21 inch',
-    finishName: 'Hyper Black',
+    finishName: 'HyperBlack',
     compatibleCars: 'M3 Competition Sedan (G80)',
     priceZAR: 75000,
     stockStatus: 'In Stock',
@@ -334,7 +334,7 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     slug: 'fsa002-polished-face',
     modelCode: 'FSA002',
     sizesAvailable: '20 inch / 21 inch',
-    finishName: 'Polished Face',
+    finishName: 'PolishedFace',
     compatibleCars: 'M3 Competition Sedan (G80)',
     priceZAR: 85000,
     stockStatus: 'In Stock',
@@ -382,7 +382,7 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     slug: 'fsa003-hyper-black',
     modelCode: 'FSA003',
     sizesAvailable: '20 inch / 21 inch',
-    finishName: 'Hyper Black',
+    finishName: 'HyperBlack',
     compatibleCars: 'M3 Sedan (G80)',
     priceZAR: 75000,
     stockStatus: 'In Stock',
@@ -414,7 +414,7 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     slug: 'fsa004-hyper-black',
     modelCode: 'FSA004',
     sizesAvailable: '20 inch / 21 inch',
-    finishName: 'Hyper Black',
+    finishName: 'HyperBlack',
     compatibleCars: 'M3 Sedan (G80)',
     priceZAR: 70000,
     stockStatus: 'In Stock',
@@ -430,7 +430,7 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     slug: 'fsa004-gloss-black',
     modelCode: 'FSA004',
     sizesAvailable: '20 inch / 21 inch',
-    finishName: 'Gloss Black',
+    finishName: 'GlossBlack',
     compatibleCars: 'M3 Sedan (G80)',
     priceZAR: 70000,
     stockStatus: 'In Stock',
@@ -446,7 +446,7 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     slug: 'ff-1-silver',
     modelCode: 'FF-1',
     sizesAvailable: '20 inch / 21 inch',
-    finishName: 'Silver',
+    finishName: 'HyperSilver',
     compatibleCars: 'M3 Sedan (G80)',
     priceZAR: 80000,
     stockStatus: 'In Stock',
@@ -462,7 +462,7 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     slug: 'ff-3-pure-bronze',
     modelCode: 'FF-3',
     sizesAvailable: '20 inch / 21 inch',
-    finishName: 'Pure Bronze',
+    finishName: 'PureBronze',
     compatibleCars: 'M3 Competition Sedan (G80)',
     priceZAR: 80000,
     stockStatus: 'In Stock',
@@ -478,7 +478,7 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     slug: 'ff-3-glossy-black',
     modelCode: 'FF-3',
     sizesAvailable: '20 inch / 21 inch',
-    finishName: 'Glossy Black',
+    finishName: 'GlossyBlack',
     compatibleCars: 'M3 Competition Sedan (G80)',
     priceZAR: 80000,
     stockStatus: 'In Stock',
@@ -494,7 +494,7 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     slug: 'ff-3-liquid-metal',
     modelCode: 'FF-3',
     sizesAvailable: '20 inch / 21 inch',
-    finishName: 'Liquid Metal',
+    finishName: 'LiquidMetal',
     compatibleCars: 'M3 Competition Sedan (G80)',
     priceZAR: 95000,
     stockStatus: 'In Stock',
@@ -510,7 +510,7 @@ const INVENTORY_SEEDS: RawInventorySeed[] = [
     slug: 'ff-1-liquid-metal',
     modelCode: 'FF-1',
     sizesAvailable: '20 inch / 21 inch',
-    finishName: 'Liquid Metal',
+    finishName: 'LiquidMetal',
     compatibleCars: 'M3 Competition Sedan (G80)',
     priceZAR: 95000,
     stockStatus: 'In Stock',

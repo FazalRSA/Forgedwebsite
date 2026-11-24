@@ -146,7 +146,9 @@ def paint_numbers(paint, name):
     import re
     matte = paint.get('matte')
     if matte is None:
-        matte = bool(re.search(r'\b(matte|matt|satin|flat)\b', name or '', re.I))
+        # Split one-word names at their capitals first ("BlackMatte" -> "Black Matte"), as the viewer does.
+        words = re.sub(r'([a-z])([A-Z])', r'\1 \2', name or '')
+        matte = bool(re.search(r'\b(matte|matt|satin|flat)\b', words, re.I))
     metal = min(paint['metalness'], 0.2) if matte else paint['metalness']
     rough = max(paint['roughness'], 0.6) if matte else paint['roughness']
     coat = min(paint['clearcoat'], 0.05) if matte else paint['clearcoat']

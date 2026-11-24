@@ -185,7 +185,7 @@ export async function loadCatalogueNames(client: SupabaseClient, builds: Build[]
   return names;
 }
 
-/** "BMW M3 · Brooklyn Grey · FSA003 · 19" · Hyper Black", the ids standing in for any name that could not be found. */
+/** "BMW M3 · Brooklyn Grey · FSA003 · 19" · HyperBlack", the ids standing in for any name that could not be found. */
 export function describeBuild(build: Build, names: CatalogueNames): string {
   return [
     names.cars[build.carId] ?? build.carId,
