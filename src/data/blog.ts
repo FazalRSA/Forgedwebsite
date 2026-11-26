@@ -164,7 +164,7 @@ export interface CatalogueFacts {
   /** Listings in stock (each is one design in one finish). */
   listingCount: number;
   setCount: number;
-  /** "R 70,000 to R 95,000", or '' when nothing is in stock. */
+  /** "R 70,000 to R 110,000", or '' when nothing is in stock. */
   priceRange: string;
   minPrice: string;
   maxPrice: string;
