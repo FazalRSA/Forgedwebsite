@@ -23,10 +23,10 @@ import { createWheelEntry } from '../utils/wheelBuilder';
 /** The 14 stock-sheet rows: design, finish name, sets in stock, price in Rand per set of four. */
 const STOCK_SHEET: Array<[string, string, number, number]> = [
   ['FF-1', 'HyperSilver', 1, 80000],
-  ['FF-1', 'LiquidMetal', 2, 95000],
+  ['FF-1', 'LiquidMetal', 2, 110000],
   ['FF-3', 'PureBronze', 1, 80000],
   ['FF-3', 'GlossyBlack', 1, 80000],
-  ['FF-3', 'LiquidMetal', 2, 95000],
+  ['FF-3', 'LiquidMetal', 2, 110000],
   ['FSA001', 'BlackMatte', 1, 90000],
   ['FSA002', 'HyperBlack', 1, 75000],
   ['FSA002', 'PolishedFace', 1, 85000],
